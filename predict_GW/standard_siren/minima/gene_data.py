@@ -27,13 +27,13 @@ def gene_data(vol,error_l,H0=70., om=0.3, reverse=False):
         output:
             z, dl, dl_noised, errorbar
     """
-    p=pz(0.3,70)
+    p=pz(om,H0)
     N=len(p[:,0])
     R=np.zeros([N+1,3])
     R[:,0]=np.append(0,p[:,0])
     R[:,1]=np.append(0,p[:,1])
     R[0,2]=0
-    for i in range (1,N):
+    for i in range(0,N):
 	R[i+1,2]=R[i,2]+R[i,1]*(R[i+1,0]-R[i,0])
     R[:,1]=R[:,1]/R[N,2]
     R[:,2]=R[:,2]/R[N,2]
@@ -48,10 +48,10 @@ def gene_data(vol,error_l,H0=70., om=0.3, reverse=False):
         idx = np.sum(k>R[:,2]) - 1
         zs[i] = R[idx, 0] #np.random.uniform(R[idx, 0],R[idx+1, 0])
     vec_EE=np.vectorize(EE)
-    H=H0             #km/s/Mpc
-    om=om
+#    H=H0             #km/s/Mpc
+#    om=om
     c=299790.        #speed of light [km/s]
-    dl=(1+zs)*c*vec_EE(zs,om)/H            # unit in Mpc 
+    dl=(1+zs)*c*vec_EE(zs,om)/H0            # unit in Mpc 
     DL=np.zeros([len(zs),5])
     if reverse==False:
         DL[:,0]=zs            #zs
