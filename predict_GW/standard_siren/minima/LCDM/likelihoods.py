@@ -33,7 +33,7 @@ def twod_like(theta, y, err):    #set zs to be 2D to get 2D sub_int, from (len(d
     rzs=vec_r(zs,om)
     model = (1+zs)*c*rzs/h0             #133 numbers of the models
     ps=pz(om,h0,scenario=2)             # !!!!! this is important
-    likh = np.exp(-0.5*(pow((y[:,None]-model),2)/pow(err[:,None],2)))*ps[:,1]
+    likh = np.exp(-0.5*(pow((y[:,None]-model),2)/pow(err[:,None],2)))**(4.) * ps[:,1]
     return likh
 
 def lnlike(theta, y, err):

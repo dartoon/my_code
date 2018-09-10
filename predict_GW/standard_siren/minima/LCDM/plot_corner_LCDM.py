@@ -13,7 +13,7 @@ import matplotlib.pyplot as plt
 #f0=open('minima_LDCM_sc3_{0}'.format(level))
 
 #prior = input('Which sernaio?')
-f0 = open ('minima_LDCM_dz_020')#.format(prior))
+f0 = open ('temp_boost4.txt')#.format(prior))
 data=np.loadtxt(f0)
 orl=len(data)
 data=data[data[:,0]>0]

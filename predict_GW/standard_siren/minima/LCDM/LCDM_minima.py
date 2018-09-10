@@ -21,7 +21,7 @@ from likelihoods import lnprob
 # =============================================================================
 ############to generate the likehood with zs############
 error_l=input("which error level?:\n")
-writefile=open('test_{0}'.format(error_l),'w')
+writefile=open('test_{0}_boost_16'.format(error_l),'w')
 writefile.write("# Omage H0"+"\n")
 import scipy.optimize as op
 nll = lambda *args: -lnprob(*args)
@@ -32,7 +32,7 @@ for loop in range(points):
     ticks1=time.time()
     dl = gene_data(10000,error_l)
     z=dl[:,0]
-    y=dl[:,2]            
+    y=dl[:,2]  
     err=dl[:,3] 
     result = op.minimize(nll, (0.30, 70), method='SLSQP', bounds=bnds,args=(y, err))
     ticks2=time.time()

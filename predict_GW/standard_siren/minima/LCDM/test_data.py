@@ -19,8 +19,8 @@ from gene_data import gene_data
 # Test differnet cosmology
 # =============================================================================
 plt.figure(figsize=(13,11))
-dl = gene_data(10000,20, H0=70., om=0.3)
-dl_wr =  gene_data(10000,20, H0=57., om=0.7)
+dl = gene_data(10000,3, H0=70., om=0.3)
+dl_wr =  gene_data(10000,3, H0=57., om=0.7)
 ##dl_wwr =  gene_data(10000, 20, H0=65., om=0.54)
 plt.errorbar(x=dl[:,0],y=dl[:,2], yerr=dl[:,3],fmt='b.',zorder=-1)
 #plt.errorbar(dl_wr[:,0], dl_wr[:,2], yerr=dl_wr[:,3],fmt='y.')
@@ -73,18 +73,18 @@ plt.show()
 
 # =============================================================================
 # Calculate lnprob
-# =========================================================================z====
+# =============================================================================
 from likelihoods import lnlike,lnlike_inpz, lnlike_with_z,chisq_with_z
 like_r= lnlike((0.3,70),dl[:,2], dl[:,3])
 like_w= lnlike((0.7,57),dl[:,2], dl[:,3])
 print like_r, like_w, like_r-like_w
 
-like_r= lnlike_inpz((0.3,70),dl[:,2], dl[:,3],dl[:,0])
-like_w= lnlike_inpz((0.7,57),dl[:,2], dl[:,3],dl[:,0])
-print like_r, like_w, like_r-like_w
+#like_r= lnlike_inpz((0.3,70),dl[:,2], dl[:,3],dl[:,0])
+#like_w= lnlike_inpz((0.7,57),dl[:,2], dl[:,3],dl[:,0])
+#print like_r, like_w, like_r-like_w
 
-like_r= lnlike_with_z((0.3,70),dl[:,2], dl[:,3],dl[:,0])
-like_w= lnlike_with_z((0.7,57),dl[:,2], dl[:,3],dl[:,0])
+like_r= lnlike_with_z((0.3,70),dl[:,2], dl[:,3]*6,dl[:,0])
+like_w= lnlike_with_z((0.7,57),dl[:,2], dl[:,3]*6,dl[:,0])
 print like_r, like_w, like_r-like_w
 
 
