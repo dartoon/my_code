@@ -93,16 +93,23 @@ def pz(om,h0,scenario=2):
    #plt.plot(newps[:,0],newps[:,1])
    #plt.show()
    N=len(newps[:,0])
-   R=np.zeros([N+1,3])
-   R[:,0]=np.append(0,newps[:,0])
-   R[:,1]=np.append(0,newps[:,1])
+#   R=np.zeros([N+1,3])
+#   R[:,0]=np.append(0,newps[:,0])
+#   R[:,1]=np.append(0,newps[:,1])
+#   R[0,2]=0
+   R = np.zeros([N,3])
+   R[:,0]=newps[:,0]
+   R[:,1]=newps[:,1]
    R[0,2]=0
-   for i in range(1,N):
+   for i in range(N-1):
 	   R[i+1,2]=R[i,2]+R[i,1]*(R[i+1,0]-R[i,0])
    #print R
-   R[:,1]=R[:,1]/R[N,2]
-   newps[:,1]=newps[:,1]/R[N,2]   #normaized the possibility density
-   R[:,2]=R[:,2]/R[N,2]
-   return newps
-# print pz(0.3,70)
+   R[:,1]=R[:,1]/R[-1,2]
+   R[:,2]=R[:,2]/R[-1,2]
+#   print "R[-1,2]", R[-1,2]
+#   plt.plot(R[:,0], R[:,2])
+#   plt.show()
+   return R
+#print plt.plot(pz(0.3,70)[:,0], pz(0.3,70)[:,1])
+#plt.show
 

@@ -16,7 +16,7 @@ from gene_data import gene_data
 import matplotlib as matt
 import matplotlib.lines as mlines
 from matplotlib import colors
-mat.rcParams['font.family'] = 'STIXGeneral'
+matt.rcParams['font.family'] = 'STIXGeneral'
 
 # =============================================================================
 # Test differnet cosmology

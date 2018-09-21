@@ -14,9 +14,7 @@ from pz import pz
 from gene_data import gene_data
 ##########to generate the lnPossible funtction, one need the Ka_square; P(zl|zs); P(zs).
 #########to get the P(zs):#################
-om=0.3
-h0=70.
-ps=pz(om,h0)
+ps=pz(0.3,70.)
 zs=ps[:,0]
 ddz=zs[1:]-zs[:-1] #get the difference between each redshift grid
 
@@ -28,20 +26,25 @@ def r(z,om):
     return integrate.quad(Ez, 0, z, args=(om))[0]    #use the cos distance r
 vec_r=np.vectorize(r)
 
-def twod_like(theta, y, err):    #set zs to be 2D to get 2D sub_int, from (len(data)) to (len(data),133)
+#def twod_like(theta, y, err):    #set zs to be 2D to get 2D sub_int, from (len(data)) to (len(data),133)
+#    om, h0 =theta
+#    rzs=vec_r(zs,om)
+#    model = (1+zs)*c*rzs/h0             #133 numbers of the models
+#    ps=pz(om,h0,scenario=2)             # !!!!! this is important
+#    likh = np.exp(-0.5*(pow((y[:,None]-model[:-1]),2)/pow(err[:,None],2))) * (ps[1:,2]-ps[:-1,2])
+##    print "twod_like R[-2,2]", ps[-2,2]
+##    plt.plot(ps[:,0], ps[:,2])
+##    plt.show()
+#    return likh
+
+def lnlike(theta, y, err):
     om, h0 =theta
     rzs=vec_r(zs,om)
     model = (1+zs)*c*rzs/h0             #133 numbers of the models
     ps=pz(om,h0,scenario=2)             # !!!!! this is important
-    likh = np.exp(-0.5*(pow((y[:,None]-model),2)/pow(err[:,None],2)))**(4.) * ps[:,1]
-    return likh
-
-def lnlike(theta, y, err):
-    om, h0 =theta
-#    likh=(twod_like(theta, y, err)[:,1:]+twod_like(theta, y, err)[:,:-1])/2.*ddz.T     #the sub of the intergral
-    likh=twod_like(theta, y, err)[:,:-1] *ddz.T     #the sub of the intergral
+    twod_likh = np.exp(-1./2.*(((y[:,None]-model[:-1])**2.)/(err[:,None]**2.)))
+    likh = twod_likh * (ps[1:,2]-ps[:-1,2])
     int_likh=np.sum(likh,axis=1)
-#    print int_likh.shape    # Should equals to the total number of events.
     return np.sum(np.log(int_likh))
 ######################MCMC#########################
 def lnprior(theta):

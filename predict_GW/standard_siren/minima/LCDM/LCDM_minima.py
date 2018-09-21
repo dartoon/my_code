@@ -21,7 +21,7 @@ from likelihoods import lnprob
 # =============================================================================
 ############to generate the likehood with zs############
 error_l=input("which error level?:\n")
-writefile=open('test_{0}_boost_16'.format(error_l),'w')
+writefile=open('LCDM_{0}'.format(error_l),'w')
 writefile.write("# Omage H0"+"\n")
 import scipy.optimize as op
 nll = lambda *args: -lnprob(*args)
@@ -34,10 +34,13 @@ for loop in range(points):
     z=dl[:,0]
     y=dl[:,2]  
     err=dl[:,3] 
-    result = op.minimize(nll, (0.30, 70), method='SLSQP', bounds=bnds,args=(y, err))
+    result = op.minimize(nll, (0.3, 70), method='SLSQP', bounds=bnds,args=(y, err))
     ticks2=time.time()
     print "the precentage:", float(loop)/points*100, "%;", "time remain:", round((ticks2-ticks1)*(points-loop)/60,2), "mins;", "para:", result["x"], "\n\r",
     writefile.write(repr(result["x"][0]) + " " + repr(result["x"][1])+ "\n")
+#    like_r= lnprob((0.3,70),y, err)
+#    like_w= lnprob((result["x"][0],result["x"][1]),y, err)
+#    print like_r, like_w, like_r-like_w
 writefile.close()
 
 #################perfrom MCMC##################
