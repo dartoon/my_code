@@ -26,25 +26,19 @@ def r(z,om):
     return integrate.quad(Ez, 0, z, args=(om))[0]    #use the cos distance r
 vec_r=np.vectorize(r)
 
-#def twod_like(theta, y, err):    #set zs to be 2D to get 2D sub_int, from (len(data)) to (len(data),133)
-#    om, h0 =theta
-#    rzs=vec_r(zs,om)
-#    model = (1+zs)*c*rzs/h0             #133 numbers of the models
-#    ps=pz(om,h0,scenario=2)             # !!!!! this is important
-#    likh = np.exp(-0.5*(pow((y[:,None]-model[:-1]),2)/pow(err[:,None],2))) * (ps[1:,2]-ps[:-1,2])
-##    print "twod_like R[-2,2]", ps[-2,2]
-##    plt.plot(ps[:,0], ps[:,2])
-##    plt.show()
-#    return likh
-
-def lnlike(theta, y, err):
+def lnlike(theta, y, errs_l, errs_h):
     om, h0 =theta
     rzs=vec_r(zs,om)
     model = (1+zs)*c*rzs/h0             #133 numbers of the models
     ps=pz(om,h0,scenario=2)             # !!!!! this is important
-    twod_likh = np.exp(-1./2.*(((y[:,None]-model[:-1])**2.)/(err[:,None]**2.)))
-    likh = twod_likh * (ps[1:,2]-ps[:-1,2])
-    int_likh=np.sum(likh,axis=1)
+    for i in range(20):
+        err = errs_l + (errs_h - errs_l)*i/19.
+        twod_likh = np.exp(-1./2.*(((y[:,None]-model[:-1])**2.)/(err[:,None]**2.)))
+        likh = twod_likh * (ps[1:,2]-ps[:-1,2])
+        if i == 0:
+            int_likh=np.sum(likh,axis=1)
+        else:
+            int_likh += int_likh
     return np.sum(np.log(int_likh))
 ######################MCMC#########################
 def lnprior(theta):
@@ -53,42 +47,42 @@ def lnprior(theta):
         return 0.0
     return -np.inf
 
-def lnprob(theta, y, err):
+def lnprob(theta, y, errs_l, errs_h):
     lp = lnprior(theta)
     if not np.isfinite(lp):
         return -np.inf
-    return lp + lnlike(theta, y, err)
+    return lp + lnlike(theta, y, errs_l, errs_h)
 
-######lnlike with Pz as data_like#####
-def twod_like_inpz(theta, y, err, z_data):    #set zs to be 2D to get 2D sub_int, from (len(data)) to (len(data),133)
-    om, h0 =theta
-    rzs=vec_r(zs,om)
-    model = (1+zs)*c*rzs/h0             #133 numbers of the models
-    ps = np.zeros_like(zs)
-    for i in range(len(zs)):
-        ps[i] = np.sum(z_data == zs[i])/float(len(z_data))
-    likh = np.exp(-0.5*(pow((y[:,None]-model),2)/pow(err[:,None],2)))*ps
-    return likh
-
-def lnlike_inpz(theta, y, err, z_data):
-    om, h0 =theta
-#    likh=(twod_like(theta, y, err)[:,1:]+twod_like(theta, y, err)[:,:-1])/2.*ddz.T     #the sub of the intergral
-    likh=twod_like_inpz(theta, y, err, z_data)[:,:-1] *ddz.T     #the sub of the intergral
-    int_likh=np.sum(likh,axis=1)
-#    print int_likh.shape    # Should equals to the total number of events.
-    return np.sum(np.log(int_likh))
-    
-#######lnlike with z know:####
-def lnlike_with_z(theta, y, err, z):
-    om, h0 =theta
-    rzs=vec_r(z,om)
-    model = (1+z)*c*rzs/h0
-    likh = np.exp(-0.5*(pow((y-model),2)/pow(err,2)))
-    return np.sum(np.log(likh))
-
-def chisq_with_z(theta, y, err, z):
-    om, h0 =theta
-    rzs=vec_r(z,om)
-    model = (1+z)*c*rzs/h0
-    chisq = pow((y-model),2)/pow(err,2)
-    return np.sum(chisq)
+#######lnlike with Pz as data_like#####
+#def twod_like_inpz(theta, y, err, z_data):    #set zs to be 2D to get 2D sub_int, from (len(data)) to (len(data),133)
+#    om, h0 =theta
+#    rzs=vec_r(zs,om)
+#    model = (1+zs)*c*rzs/h0             #133 numbers of the models
+#    ps = np.zeros_like(zs)
+#    for i in range(len(zs)):
+#        ps[i] = np.sum(z_data == zs[i])/float(len(z_data))
+#    likh = np.exp(-0.5*(pow((y[:,None]-model),2)/pow(err[:,None],2)))*ps
+#    return likh
+#
+#def lnlike_inpz(theta, y, err, z_data):
+#    om, h0 =theta
+##    likh=(twod_like(theta, y, err)[:,1:]+twod_like(theta, y, err)[:,:-1])/2.*ddz.T     #the sub of the intergral
+#    likh=twod_like_inpz(theta, y, err, z_data)[:,:-1] *ddz.T     #the sub of the intergral
+#    int_likh=np.sum(likh,axis=1)
+##    print int_likh.shape    # Should equals to the total number of events.
+#    return np.sum(np.log(int_likh))
+#    
+########lnlike with z know:####
+#def lnlike_with_z(theta, y, err, z):
+#    om, h0 =theta
+#    rzs=vec_r(z,om)
+#    model = (1+z)*c*rzs/h0
+#    likh = np.exp(-0.5*(pow((y-model),2)/pow(err,2)))
+#    return np.sum(np.log(likh))
+#
+#def chisq_with_z(theta, y, err, z):
+#    om, h0 =theta
+#    rzs=vec_r(z,om)
+#    model = (1+z)*c*rzs/h0
+#    chisq = pow((y-model),2)/pow(err,2)
+#    return np.sum(chisq)

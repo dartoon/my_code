@@ -20,8 +20,9 @@ from likelihoods import lnprob
 # ###############minmize lnprob#######################
 # =============================================================================
 ############to generate the likehood with zs############
-error_l=input("which error level?:\n")
-writefile=open('LCDM_{0}'.format(error_l),'w')
+#error_ls=input("which error level?:\n")
+error_ls = (5,10)
+writefile=open('LCDM_{0}-{1}'.format(error_ls[0],error_ls[1]),'w')
 writefile.write("# Omage H0"+"\n")
 import scipy.optimize as op
 nll = lambda *args: -lnprob(*args)
@@ -30,11 +31,11 @@ import time
 points=input("how many minima points?:\n")  #default as 10,000
 for loop in range(points):
     ticks1=time.time()
-    dl = gene_data(10000,error_l)
+    dl = gene_data(10000,error_ls = error_ls)
     z=dl[:,0]
-    y=dl[:,2]  
-    err=dl[:,3] 
-    result = op.minimize(nll, (0.3, 70), method='SLSQP', bounds=bnds,args=(y, err))
+    y=dl[:,2]
+    errs= (dl[:,1] *error_ls[0]/100. , dl[:,1]*error_ls[1]/100.)
+    result = op.minimize(nll, (0.3, 70), method='SLSQP', bounds=bnds,args=(y, errs[0], errs[1]))
     ticks2=time.time()
     print "the precentage:", float(loop)/points*100, "%;", "time remain:", round((ticks2-ticks1)*(points-loop)/60,2), "mins;", "para:", result["x"], "\n\r",
     writefile.write(repr(result["x"][0]) + " " + repr(result["x"][1])+ "\n")

@@ -18,7 +18,7 @@ def EZ(z,om):
 def EE(z,om):
       return quad(EZ, 0, z , args=(om))[0]
 
-def gene_data(vol,error_l,H0=70., om=0.3, reverse=False):
+def gene_data(vol,error_ls=(5,10),H0=70., om=0.3, reverse=False):
     """
     A function to generate data understand LCDM model with Om=0.3, H0=70:
         input:
@@ -29,6 +29,7 @@ def gene_data(vol,error_l,H0=70., om=0.3, reverse=False):
     """
     R=pz(om,H0)
     zs=np.zeros(vol)
+    error_l = np.random.uniform(error_ls[0],error_ls[1],vol)
     for i in range(vol):
         idx = int(np.sum(np.random.random()>R[:,2]))-1
         zs[i] = R[idx, 0] #np.random.uniform(R[idx, 0],R[idx+1, 0])
