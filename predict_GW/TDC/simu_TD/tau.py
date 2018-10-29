@@ -4,11 +4,11 @@ from scipy.special import gamma
 import matplotlib.pyplot as plt
 def tau(zs):       
       c=299790.      #speed of light [km/s]
-      H=70
+      H=70.
       om=0.3
       dH=c/H
       H0=H*1000./(3.0856e22)
-      phi0=8.0e3-3*(H/100)**3
+      phi0=8.0e-3*(H/100)**3
       sig0=161
       alpha=2.32
       bet=2.67
