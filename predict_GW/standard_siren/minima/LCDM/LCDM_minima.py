@@ -21,9 +21,18 @@ from likelihoods import lnprob
 # =============================================================================
 ############to generate the likehood with zs############
 #error_ls=input("which error level?:\n")
-error_ls = (5,30)
-writefile=open('LCDM_{0}-{1}'.format(error_ls[0],error_ls[1]),'w')
-writefile.write("# Omage H0"+"\n")
+error_ls = (5,6)
+
+import glob
+filename = 'LCDM_{0}-{1}'.format(error_ls[0],error_ls[1])
+if_file = glob.glob(filename) 
+if if_file == []:
+    writefile =  open(filename,'w') 
+    writefile.write("# Omage H0"+"\n")
+elif if_file is not []:
+    writefile = open(filename,"r+")
+    writefile.read()
+
 import scipy.optimize as op
 nll = lambda *args: -lnprob(*args)
 bnds = ((0, None), (0, None))
@@ -37,6 +46,7 @@ for loop in range(points):
     errs= (dl[:,1] *error_ls[0]/100. , dl[:,1]*error_ls[1]/100.)
     result = op.minimize(nll, (0.3, 70), method='SLSQP', bounds=bnds,args=(y, errs[0], errs[1]))
     ticks2=time.time()
+    print "To write to the", filename
     print "the precentage:", float(loop)/points*100, "%;", "time remain:", round((ticks2-ticks1)*(points-loop)/60,2), "mins;", "para:", result["x"], "\n\r",
     writefile.write(repr(result["x"][0]) + " " + repr(result["x"][1])+ "\n")
 #    like_r= lnprob((0.3,70),y, err)

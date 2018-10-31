@@ -27,9 +27,10 @@ samples = data
 #                    title_fmt='.2f')
 
 fig = corner.corner(samples, labels=["$\Omega_{m}$", "$H_0$"],
-                    quantiles=[0.16, 0.5, 0.84],show_titles=True,
+                    quantiles=[0.16, 0.84],show_titles=True,
                     title_kwargs={"fontsize": 12},truths=[0.3,70],
-                    plot_datapoints=True,smooth=1.0,smooth1d=1.0,levels=1.0 - np.exp(-0.5 * np.arange(1, 2.1, 1) ** 2),
+                    plot_datapoints=True,smooth=1.0,smooth1d=1.0,
+                    levels=1.0 - np.exp(-0.5 * np.arange(1, 2.1, 1) ** 2),
                     title_fmt='.2f', range=[(0.15,0.50),(55,90)] )
 #fig.savefig("lcdm_{0}.pdf".format(name))
 #####
