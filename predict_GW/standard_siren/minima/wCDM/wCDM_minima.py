@@ -32,28 +32,24 @@ def r(z,om,w):
  #   return 3.33
 vec_r=np.vectorize(r)
 
-def twod_like(theta, y, err):    #set zs to be 2D to get 2D sub_int, from (len(data)) to (len(data),133)
+ddz=ps[:,0][1:]-ps[:,0][:-1] #get the difference between each redshift grid
+
+def lnlike(theta, y, errs_l, errs_h):
     om, w, h0 =theta
     rzs=vec_r(zs,om,w)
     model = (1+zs)*c*rzs/h0             #133 numbers of the models
-    #print np.shape(y),np.shape(model)
-    ps=pz(om,w,h0)
-    likh = np.exp(-0.5*(pow((y[:,None]-model),2)/pow(err[:,None],2)))*ps[:,1]
-    #print likh[1,:]
-    return likh
-#print np.shape(twod_like(theta=[0.3,70], y=data[:,2], err=data[:,3]))
-
-ddz=ps[:,0][1:]-ps[:,0][:-1] #get the difference between each redshift grid
-
-
-def lnlike(theta, y, err):
-    om, w, h0 =theta
     #print theta
-    likh=twod_like(theta, y, err)[:,:-1]*ddz.T     #the sub of the intergral
-    int_likh=np.sum(likh[:,:],axis=1)
+    ps=pz(om,w,h0)
+    for i in range(20):
+        err = errs_l + (errs_h - errs_l)*i/19.
+        twod_like = np.exp(-0.5*(pow((y[:,None]-model),2)/pow(err[:,None],2)))*ps[:,1]
+        likh=twod_like[:,:-1]*ddz.T     #the sub of the intergral
+        if i ==0:
+            int_likh=np.sum(likh[:,:],axis=1)
+        else:
+            int_likh += int_likh
     #print np.shape(int_likh)
     return np.sum(np.log(int_likh))
-#print lnlike(theta=[0.3,70], zl=data[:,1], y=data[:,3], err=data[:,4])
 
 ######################MCMC#########################
 def lnprior(theta):
@@ -62,17 +58,18 @@ def lnprior(theta):
         return 0.0
     return -np.inf
 
-def lnprob(theta, y, yerr):
+def lnprob(theta, y, errs_l, errs_h):
     lp = lnprior(theta)
     if not np.isfinite(lp):
         return -np.inf
-    return lp + lnlike(theta, y, err)
+    return lp + lnlike(theta, y, errs_l, errs_h)
 # =============================================================================
 # ###############minmize lnprob#######################
 # =============================================================================
 ############to generate the likehood with zs############
-error_l=input("which error level?:\n")
-writefile=open('minima_wDCM_{0}'.format(error_l),'w')
+#error_l=input("which error level?:\n")
+error_ls = (5,10)
+writefile=open('wDCM_{0}-{1}'.format(error_ls[0],error_ls[1]),'w')
 writefile.write("# Omage w H0"+"\n")
 import scipy.optimize as op
 nll = lambda *args: -lnprob(*args)
@@ -81,15 +78,12 @@ import time
 points=input("how many minima points?:\n")
 for loop in range(points):
     ticks1=time.time()
-    dl = gene_data(10000,error_l)
+    dl = gene_data(10000, error_ls = error_ls)
     z=dl[:,0]
     y=dl[:,2]            
-    err=dl[:,3]
-    result = op.minimize(nll, (0.30, -1, 70), method='SLSQP', bounds=bnds,args=(y, err))
+    errs= (dl[:,1]*error_ls[0]/100. , dl[:,1]*error_ls[1]/100.)
+    result = op.minimize(nll, (0.30, -1, 70), method='SLSQP', bounds=bnds, args=(y, errs[0], errs[1]))
     ticks2=time.time()
     print "the precentage:", round(float(loop)/points*100,2), "%;", "time remain:", round((ticks2-ticks1)*(points-loop)/60,2), "mins;", "para:", result["x"], "\n\r",
     writefile.write(repr(result["x"][0]) + " " + repr(result["x"][1])+ " " + repr(result["x"][2]) + "\n")
 writefile.close()
-
-
-
