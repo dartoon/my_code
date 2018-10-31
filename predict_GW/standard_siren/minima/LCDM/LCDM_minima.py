@@ -21,7 +21,7 @@ from likelihoods import lnprob
 # =============================================================================
 ############to generate the likehood with zs############
 #error_ls=input("which error level?:\n")
-error_ls = (5,10)
+error_ls = (5,30)
 writefile=open('LCDM_{0}-{1}'.format(error_ls[0],error_ls[1]),'w')
 writefile.write("# Omage H0"+"\n")
 import scipy.optimize as op
