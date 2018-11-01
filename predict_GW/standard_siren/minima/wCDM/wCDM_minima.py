@@ -85,7 +85,7 @@ import scipy.optimize as op
 nll = lambda *args: -lnprob(*args)
 bnds = ((0, None),(None, 0), (0, None))
 import time
-points=input("how many minima points?:\n")
+points=5000 #input("how many minima points?:\n")
 for loop in range(points):
     ticks1=time.time()
     dl = gene_data(10000, error_ls = error_ls)
@@ -94,6 +94,8 @@ for loop in range(points):
     errs= (dl[:,1]*error_prior[0]/100. , dl[:,1]*error_prior[1]/100.)
     result = op.minimize(nll, (0.30, -1, 70), method='SLSQP', bounds=bnds, args=(y, errs[0], errs[1]))
     ticks2=time.time()
+    if loop/10 > (loop-1)/10 :
+        print "To write to the", filename
     print "the precentage:", round(float(loop)/points*100,2), "%;", "time remain:", round((ticks2-ticks1)*(points-loop)/60,2), "mins;", "para:", result["x"], "\n\r",
     writefile.write(repr(result["x"][0]) + " " + repr(result["x"][1])+ " " + repr(result["x"][2]) + "\n")
 writefile.close()
