@@ -68,9 +68,19 @@ def lnprob(theta, y, errs_l, errs_h):
 # =============================================================================
 ############to generate the likehood with zs############
 #error_l=input("which error level?:\n")
-error_ls = (5,10)
-writefile=open('wDCM_{0}-{1}'.format(error_ls[0],error_ls[1]),'w')
-writefile.write("# Omage w H0"+"\n")
+error_ls = 5
+error_prior = (5,20)
+
+import glob
+filename = 'wCDM_{0}_{1}-{2}'.format(error_ls,error_prior[0],error_prior[1])
+if_file = glob.glob(filename) 
+if if_file == []:
+    writefile =  open(filename,'w') 
+    writefile.write("# Omage w H0"+"\n")
+elif if_file is not []:
+    writefile = open(filename,"r+")
+    writefile.read()
+
 import scipy.optimize as op
 nll = lambda *args: -lnprob(*args)
 bnds = ((0, None),(None, 0), (0, None))
@@ -81,7 +91,7 @@ for loop in range(points):
     dl = gene_data(10000, error_ls = error_ls)
     z=dl[:,0]
     y=dl[:,2]            
-    errs= (dl[:,1]*error_ls[0]/100. , dl[:,1]*error_ls[1]/100.)
+    errs= (dl[:,1]*error_prior[0]/100. , dl[:,1]*error_prior[1]/100.)
     result = op.minimize(nll, (0.30, -1, 70), method='SLSQP', bounds=bnds, args=(y, errs[0], errs[1]))
     ticks2=time.time()
     print "the precentage:", round(float(loop)/points*100,2), "%;", "time remain:", round((ticks2-ticks1)*(points-loop)/60,2), "mins;", "para:", result["x"], "\n\r",

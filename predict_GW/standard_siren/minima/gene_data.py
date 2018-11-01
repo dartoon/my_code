@@ -29,7 +29,10 @@ def gene_data(vol,error_ls=(5,10),H0=70., om=0.3, reverse=False):
     """
     R=pz(om,H0)
     zs=np.zeros(vol)
-    error_l = np.random.uniform(error_ls[0],error_ls[1],vol)
+    if isinstance(error_ls,float) or isinstance(error_ls,int):
+        error_l = error_ls
+    elif isinstance(error_ls,tuple):
+        error_l = np.random.uniform(error_ls[0],error_ls[1],vol)
     for i in range(vol):
         idx = int(np.sum(np.random.random()>R[:,2]))-1
         zs[i] = R[idx, 0] #np.random.uniform(R[idx, 0],R[idx+1, 0])
