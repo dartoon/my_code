@@ -14,9 +14,16 @@ import matplotlib.pyplot as plt
 
 #prior = input('Which sernaio?')
 name = 'LCDM_20_5-20'
-f0 = open (name)#.format(prior))
-data=np.loadtxt(f0)
-orl=len(data)
+f = open(name,"r")
+with f as g:
+    lines = g.readlines()
+
+data = []
+for i in range(1,len(lines)-1):
+    line = lines[i].split(' ')
+    data.append([float(line[0]),float(line[1])])
+
+data = np.asarray(data)
 #data=data[data[:,0]>0]
 #data=data[data[:,0]<0.5499]
 samples = data

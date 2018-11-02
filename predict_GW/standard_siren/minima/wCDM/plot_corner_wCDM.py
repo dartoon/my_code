@@ -10,10 +10,21 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 #level=input("which level?: 5? 10? 15? 20?:\n")
-f0=open('wCDM_20_5-20')
-data=np.loadtxt(f0)
-data=data[data[:,0]>0]
-orl=len(data)
+
+name = 'minima_wDCM_10'
+f = open(name,"r")
+with f as g:
+    lines = g.readlines()
+
+
+data = []
+for i in range(1,len(lines)-1):
+    if 'nan' not in lines[i]:
+        line = lines[i].split(' ')
+        data.append([float(line[0]),float(line[1]),float(line[2])])
+data = np.asarray(data)
+#data=data[data[:,0]>0]
+#orl=len(data)
 #data=data[data[:,1]>-1.98]
 #data=data[data[:,2]<94]
 #data=data[data[:,0]<0.54]
