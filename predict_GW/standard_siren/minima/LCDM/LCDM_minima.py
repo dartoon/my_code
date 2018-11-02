@@ -21,7 +21,7 @@ from likelihoods import lnprob
 # =============================================================================
 ############to generate the likehood with zs############
 #error_ls=input("which error level?:\n")
-error_ls = 5
+error_ls = 20
 error_prior = (5,20)
 
 import glob
