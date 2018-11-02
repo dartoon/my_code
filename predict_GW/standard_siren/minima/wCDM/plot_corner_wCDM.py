@@ -9,8 +9,8 @@ import corner
 import numpy as np
 import matplotlib.pyplot as plt
 
-level=input("which level?: 5? 10? 15? 20?:\n")
-f0=open('minima_wDCM_{0}_1st'.format(level))
+#level=input("which level?: 5? 10? 15? 20?:\n")
+f0=open('wCDM_20_5-20')
 data=np.loadtxt(f0)
 data=data[data[:,0]>0]
 orl=len(data)
