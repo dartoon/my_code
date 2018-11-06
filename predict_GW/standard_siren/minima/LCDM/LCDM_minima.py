@@ -21,7 +21,7 @@ from likelihoods import lnprob
 # =============================================================================
 ############to generate the likehood with zs############
 #error_ls=input("which error level?:\n")
-error_ls = 20
+error_ls = (5,15)
 error_prior = (5,20)
 
 import glob
@@ -38,7 +38,7 @@ import scipy.optimize as op
 nll = lambda *args: -lnprob(*args)
 bnds = ((0, None), (0, None))
 import time
-points=input("how many minima points?:\n")  #default as 10,000
+points=5000 #input("how many minima points?:\n")  #default as 10,000
 for loop in range(points):
     ticks1=time.time()
     dl = gene_data(10000,error_ls = error_ls)

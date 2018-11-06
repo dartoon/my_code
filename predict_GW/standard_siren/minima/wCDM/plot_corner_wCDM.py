@@ -25,9 +25,10 @@ for i in range(1,len(lines)-1):
 data = np.asarray(data)
 #data=data[data[:,0]>0]
 #orl=len(data)
-#data=data[data[:,1]>-1.98]
-#data=data[data[:,2]<94]
-#data=data[data[:,0]<0.54]
+data=data[data[:,1]>-1.98]
+data=data[data[:,1]<-0.55]
+data=data[data[:,2]<94]
+data=data[data[:,0]<0.54]
 samples = data
 fig = corner.corner(samples, labels=["$\Omega_{m}$","$w$", "$H_0$"],
                     quantiles=[0.16, 0.5, 0.84], title_kwargs={"fontsize": 12},truths=[0.3,-1,70],
