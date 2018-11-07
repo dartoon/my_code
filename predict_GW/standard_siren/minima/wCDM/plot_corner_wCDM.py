@@ -31,9 +31,11 @@ data=data[data[:,2]<94]
 data=data[data[:,0]<0.54]
 samples = data
 fig = corner.corner(samples, labels=["$\Omega_{m}$","$w$", "$H_0$"],
-                    quantiles=[0.16, 0.5, 0.84], title_kwargs={"fontsize": 12},truths=[0.3,-1,70],
-                    plot_datapoints=False,smooth=1.0,smooth1d=1.0,plot_density=True, levels=(0.6826, 0.9544),
-                    title_fmt='.3f',show_titles=False )
+                    quantiles=[0.16, 0.84],show_titles=True,
+                    title_kwargs={"fontsize": 12},truths=[0.3,-1,70],
+                    plot_datapoints=True,smooth=1.0,smooth1d=1.0,
+                    levels=1.0 - np.exp(-0.5 * np.arange(1, 2.1, 1) ** 2),
+                    title_fmt='.2f', range=[(0.15,0.40),(-1.9,-0.5),(60,90)] )
 #fig.savefig("wcdm_%s.pdf"%(level))
 #####
 plt.show()   

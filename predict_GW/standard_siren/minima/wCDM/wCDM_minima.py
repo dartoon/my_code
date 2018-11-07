@@ -68,7 +68,7 @@ def lnprob(theta, y, errs_l, errs_h):
 # =============================================================================
 ############to generate the likehood with zs############
 #error_l=input("which error level?:\n")
-error_ls = (5,20)
+error_ls = (5,15)
 error_prior = (5,20)
 
 import glob
@@ -85,7 +85,7 @@ import scipy.optimize as op
 nll = lambda *args: -lnprob(*args)
 bnds = ((0, None),(None, 0), (0, None))
 import time
-points=5000 #input("how many minima points?:\n")
+points=3000 #input("how many minima points?:\n")
 for loop in range(points):
     ticks1=time.time()
     dl = gene_data(10000, error_ls = error_ls)
