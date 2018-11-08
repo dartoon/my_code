@@ -11,7 +11,7 @@ import matplotlib.pyplot as plt
 
 #level=input("which level?: 5? 10? 15? 20?:\n")
 
-name = 'minima_wDCM_10'
+name = 'wCDM_(5, 20)_5-20'
 f = open(name,"r")
 with f as g:
     lines = g.readlines()
