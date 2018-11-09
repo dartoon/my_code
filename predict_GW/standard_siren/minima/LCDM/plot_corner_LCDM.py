@@ -38,8 +38,8 @@ fig = corner.corner(samples, labels=["$\Omega_{m}$", "$H_0$"],
                     title_kwargs={"fontsize": 12},truths=[0.3,70],
                     plot_datapoints=True,smooth=1.0,smooth1d=1.0,
                     levels=1.0 - np.exp(-0.5 * np.arange(1, 2.1, 1) ** 2),
-                    title_fmt='.2f', range=[(0.15,0.40),(60,90)] )
-#fig.savefig("lcdm_{0}.pdf".format(name))
-#####
+                    title_fmt='.2f', range=[(0.15,0.45),(60,90)] )
+fig.savefig("lcdm_{0}.pdf".format(name[9:12]))
+####
 plt.show()   
 
