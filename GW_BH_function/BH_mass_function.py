@@ -42,7 +42,7 @@ class BH_mass_function:
             1. A function of normalized distritbuion of m between mbh_min and mbh_max
             2. The intergral function of 1
         '''
-        N = (self.mbh_max)**(-self.a+1)/(1-self.a) - (self.mbh_min)**(-self.a+1)/(1-self.a)
+        N = (self.mbh_max)**(-self.a+1)/(1-self.a) - (self.mbh_min)**(-self.a+1)/(1-self.a)             # The intergral function of m**a
         return m**(-self.a)/N, ((m)**(-self.a+1)/(1-self.a) - (self.mbh_min)**(-self.a+1)/(1-self.a))/N
     
     
@@ -88,7 +88,8 @@ class BH_mass_function:
         m_tot = m1 + m2
         m1, m2 = self.gen_m1m2()
         m_chirp = (m1*m2)**(3/5.)/m_tot**(1/5.)
-        return m_chirp
+        masses = np.asarray([m_chirp, m1, m2])
+        return masses
         
 #vol = 2000   
 #BHBH = BH_mass_function(vol = vol)
@@ -213,7 +214,7 @@ class gene_BHBH:
         year_rate = np.sum(dis_dotN* (z[1:]-z[:-1]))
         return dis_dotN, year_rate, Ctheta2
     
-    def mc_year_rate(self, seed_vol= 20000, itera = 40):
+    def mc_year_rate(self, seed_vol= 10000, itera = 40):
         '''
         Use MCMC to calculate the rate, with steps equals to seed_vol.
             1. the BH mass are randomly given with BH_mass_function.
@@ -230,13 +231,11 @@ class gene_BHBH:
         bhmass_class = BH_mass_function(vol = seed_vol)
 #        thetas = theta_class.gene_theta_func()
 #        mass_Chirp = 6.7 
-        thetas = theta_class.gene_theta()
-        mass_Chirp = bhmass_class.chirp_mass()
         #==============================================================================
         #    Randomly generate a list of redshift
         #==============================================================================  
         dotN = 4 * np.pi * dH**3. * (n0/(1+z)) * Dist**2* Ez(z,om)
-        p_dotN = dotN[:-1] * (z[1:]-z[:-1])
+        p_dotN = dotN[1:] * (z[1:]-z[:-1])
         norm_n = p_dotN.sum()
         dotN /= norm_n              # The total BHBH events, in order to normalize the total BHBH numbers
         R = np.zeros([len(z),3])
@@ -246,12 +245,14 @@ class gene_BHBH:
         for i in range(len(z)-1):
             R[i+1,2]=R[i,2]+R[i,1]*(R[i+1,0]-R[i,0])          
         over_rate = np.zeros(itera)
-        zs_detected = np.array([])
+        zs_detected, rhos_detected = np.array([]), np.array([])
         for j in range(itera):
+            thetas = theta_class.gene_theta()
+            mass_Chirp = bhmass_class.chirp_mass()
             zs = np.zeros(seed_vol)
             dist_zs = np.zeros(seed_vol)
             for i in range(seed_vol):
-                idx = int(np.sum(np.random.random()>R[:,2]))-1    # minus one so that the idx can start from zero. (i.e. [:-1])
+                idx = int(np.sum(np.random.random()>R[:,2]))    # minus one so that the idx can start from zero. (i.e. [:-1])
                 zs[i] = R[idx, 0] #np.random.uniform(R[idx, 0],R[idx+1, 0])
                 dist_zs[i] = Dist[zs[i]==z]
             #==============================================================================
@@ -259,10 +260,17 @@ class gene_BHBH:
             #   Rho = 8 Theta * r0/(dl) * (M_chirp_redshifted/1.2) **(5/6)
             #==============================================================================
             dlzs = (1+zs)*dH*dist_zs
-            rhos = 8.*thetas * r0/dlzs * ((1+zs)*mass_Chirp/1.2)**(5/6.)
+            rhos = 8.*thetas * r0/dlzs * ((1+zs)*mass_Chirp[0]/1.2)**(5/6.)
             n_over_8 = np.sum([rhos>rho0])
             over_rate[j] = n_over_8/float(seed_vol)
             zs_detected = np.concatenate((zs_detected,zs[rhos>rho0]))
+            if j == 0:
+                masses = mass_Chirp.T[rhos>rho0]
+            elif j >0:
+                masses = np.concatenate((masses, mass_Chirp.T[rhos>rho0]))
+            rhos_detected = np.concatenate((rhos_detected,rhos[rhos>rho0]))
+            if j/5 > (j-1)/5 :
+                print "Total itera:", itera, "; Finish itera:", j
         av_over_rate = np.average(over_rate)
         event_rate = av_over_rate*norm_n
         '''
@@ -281,11 +289,10 @@ class gene_BHBH:
         n_detected = (p_dotN* over_rate).sum()
         return n_detected, over_rate, rhos
         '''
-        return event_rate, zs_detected
-    
+        return event_rate, zs_detected, masses, rhos_detected
 test = gene_BHBH()
 dis_dotN, year_rate, Ctheta2 = test.num_year_rate()
-event_rate, zs_detected = test.mc_year_rate()
+event_rate, zs_detected, masses, rhos_detected = test.mc_year_rate()
 print year_rate
 print event_rate
 
