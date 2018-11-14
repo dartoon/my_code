@@ -88,7 +88,7 @@ error_ls = (5,15)
 error_prior = (5,20)
 ################perfrom MCMC##################
 import emcee
-value = 20000
+value = 50000
 dl = gene_data(value,error_ls = error_ls)
 z=dl[:,0]
 y=dl[:,2]           #set to the 1 truth, 2 biased
@@ -103,9 +103,9 @@ print "para:", result["x"], "\n\r",  # test the natural value of the minimazatio
 
 import time
 ticks1=time.time()
-nwalkers = 60
+nwalkers = 50
 ndim = 3  # number of 
-Nburn = 500
+Nburn = 300
 mcmc_count = 1
 sampler = emcee.EnsembleSampler(nwalkers, ndim, lnprob, args=(y, errs[0], errs[1]))  ###the input args() should change
 pos = [result["x"] + 1e-4*np.random.randn(ndim) for i in range(nwalkers)]

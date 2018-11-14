@@ -81,7 +81,7 @@ error_ls = (5,15)
 error_prior = (5,20)
 ################perfrom MCMC##################
 import emcee
-value = 20000
+value = 50000
 dl = gene_data(value,error_ls = error_ls)
 z=dl[:,0]
 y=dl[:,2]           #set to the 1 truth, 2 biased
