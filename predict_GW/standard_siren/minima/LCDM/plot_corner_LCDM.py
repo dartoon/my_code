@@ -13,6 +13,7 @@ import matplotlib.pyplot as plt
 #f0=open('minima_LDCM_sc3_{0}'.format(level))
 
 #prior = input('Which sernaio?')
+'''
 name = 'LCDM_(5, 20)_5-20'
 f = open(name,"r")
 with f as g:
@@ -39,7 +40,26 @@ fig = corner.corner(samples, labels=["$\Omega_{m}$", "$H_0$"],
                     plot_datapoints=True,smooth=1.0,smooth1d=1.0,
                     levels=1.0 - np.exp(-0.5 * np.arange(1, 2.1, 1) ** 2),
                     title_fmt='.2f', range=[(0.15,0.45),(60,90)] )
-fig.savefig("lcdm_{0}.pdf".format(name[9:12]))
+fig.savefig("lcdm_{0}.pdf".format(name[9:11]))
 ####
 plt.show()   
+'''
 
+################load the data##############
+value = 2
+import pickle
+ndim =2
+samplerchain=pickle.load(open("mcmc_lcdm_%s"%(value),'rb'))
+burn=samplerchain[:,:,:].T
+plt.plot(burn[0,20:,:], '-', color='k', alpha=0.3)  #show the chain after 50 steps 
+samples = samplerchain[:, 40:, :].reshape((-1, ndim))
+import corner
+fig = corner.corner(samples, labels=["$\Omega_{m}$", "$H_0$"],
+                    quantiles=[0.16, 0.84],show_titles=True,
+                    title_kwargs={"fontsize": 12},truths=[0.3,70],
+                    plot_datapoints=True,smooth=1.0,smooth1d=1.0,
+                    levels=1.0 - np.exp(-0.5 * np.arange(1, 2.1, 1) ** 2),
+                    title_fmt='.2f', range=[(0.15,0.45),(60,90)] )
+#fig.savefig("triangle.png")
+#####
+plt.show()   

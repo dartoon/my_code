@@ -27,8 +27,8 @@ data = np.asarray(data)
 #orl=len(data)
 data=data[data[:,1]>-1.98]
 data=data[data[:,1]<-0.55]
-data=data[data[:,2]<94]
-data=data[data[:,0]<0.54]
+#data=data[data[:,2]<88]
+data=data[data[:,0]>0.20]
 samples = data
 fig = corner.corner(samples, labels=["$\Omega_{m}$","$w$", "$H_0$"],
                     quantiles=[0.16, 0.84],show_titles=True,
@@ -36,7 +36,26 @@ fig = corner.corner(samples, labels=["$\Omega_{m}$","$w$", "$H_0$"],
                     plot_datapoints=True,smooth=1.0,smooth1d=1.0,
                     levels=1.0 - np.exp(-0.5 * np.arange(1, 2.1, 1) ** 2),
                     title_fmt='.2f', range=[(0.15,0.40),(-1.9,-0.5),(60,90)] )
-#fig.savefig("wcdm_%s.pdf"%(level))
+fig.savefig("wcdm_{0}.pdf".format(name[9:11]))
 #####
 plt.show()   
+'''
 
+################load the data##############
+value = 2
+import pickle
+ndim =3
+samplerchain=pickle.load(open("mcmc_wcdm_%s"%(value),'rb'))
+burn=samplerchain[:,:,:].T
+plt.plot(burn[0,20:,:], '-', color='k', alpha=0.3)  #show the chain after 50 steps 
+samples = samplerchain[:, 40:, :].reshape((-1, ndim))
+fig = corner.corner(samples, labels=["$\Omega_{m}$","$w$", "$H_0$"],
+                    quantiles=[0.16, 0.84],show_titles=True,
+                    title_kwargs={"fontsize": 12},truths=[0.3,-1,70],
+                    plot_datapoints=True,smooth=1.0,smooth1d=1.0,
+                    levels=1.0 - np.exp(-0.5 * np.arange(1, 2.1, 1) ** 2),
+                    title_fmt='.2f', range=[(0.15,0.40),(-1.9,-0.5),(60,90)] )
+#fig.savefig("triangle.png")
+#####
+plt.show()   
+'''
