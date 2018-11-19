@@ -15,7 +15,7 @@ rcParams["font.size"] = 16
 #f0=open('minima_LDCM_sc3_{0}'.format(level))
 
 #prior = input('Which sernaio?')
-
+'''
 name = 'LCDM_(5, 20)_5-20'
 f = open(name,"r")
 with f as g:
@@ -48,7 +48,7 @@ plt.show()
 '''
 
 ################load the data##############
-value = 2
+value = 10
 import pickle
 ndim =2
 samplerchain=pickle.load(open("mcmc_lcdm_%s"%(value),'rb'))
@@ -64,4 +64,9 @@ fig = corner.corner(samples, labels=["$\Omega_{m}$", "$H_0$"],
                     title_fmt='.2f', range=[(0.15,0.45),(60,90)] )
 #fig.savefig("triangle.png")
 #####
-plt.show()   '''
+plt.show()
+h0_l = np.percentile(samples, 16,axis=0)[1]
+h0_h = np.percentile(samples, 84,axis=0)[1]
+h0_m = np.percentile(samples, 50,axis=0)[1]
+level = (h0_h - h0_l)/h0_m/2
+print "H0 level:", level*100

@@ -16,7 +16,7 @@ rcParams["font.size"] = 16
 #rcParams["text.latex.preamble"] = r"\usepackage{cmbright}"
 
 #level=input("which level?: 5? 10? 15? 20?:\n")
-
+'''
 name = 'wCDM_(5, 15)_5-20'
 f = open(name,"r")
 with f as g:
@@ -49,7 +49,7 @@ plt.show()
 '''
 
 ################load the data##############
-value = 2
+value = 5
 import pickle
 ndim =3
 samplerchain=pickle.load(open("mcmc_wcdm_%s"%(value),'rb'))
@@ -65,4 +65,10 @@ fig = corner.corner(samples, labels=["$\Omega_{m}$","$w$", "$H_0$"],
 #fig.savefig("triangle.png")
 #####
 plt.show()   
-'''
+
+
+h0_l = np.percentile(samples, 16,axis=0)[2]
+h0_h = np.percentile(samples, 84,axis=0)[2]
+h0_m = np.percentile(samples, 50,axis=0)[2]
+level = (h0_h - h0_l)/h0_m/2
+print "H0 level:", level*100
