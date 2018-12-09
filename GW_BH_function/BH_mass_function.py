@@ -22,6 +22,7 @@ class BH_mass_function:
         a: The power law slope alpha 
         mbh_max: The blash of blash
         mbh_min: usually define as 5 Solar mass
+        vol: The number of simulated data
     '''
     def __init__(self, a=2.35, mbh_max=80., mbh_min=5., vol=1):
         self.a = a
@@ -86,7 +87,6 @@ class BH_mass_function:
     def chirp_mass(self):
         m1, m2 = self.gen_m1m2()
         m_tot = m1 + m2
-        m1, m2 = self.gen_m1m2()
         m_chirp = (m1*m2)**(3/5.)/m_tot**(1/5.)
         masses = np.asarray([m_chirp, m1, m2])
         return masses
@@ -175,6 +175,20 @@ def Ez(z,om):
 def r(z,om):
     return integrate.quad(Ez, 0, z, args=(om))[0]
 vec_r=np.vectorize(r)
+def dl(z,om=0.3,h0=70):
+    """
+    Calculate the luminosity distance.
+    """
+    c=299790.
+    dl_distance = (1+z) * c/h0 * vec_r(z,om=om)
+    return dl_distance
+#print dl(np.array([1,2]))
+
+def solve_z(lum_dis, om=0.3, h0=70):
+    func = lambda z : (lum_dis-dl(z,om=om, h0=h0))
+    zs = fsolve(func,2)
+    return zs[0]
+#print solve_z(15500)
 
 class gene_BHBH:
     def __init__(self, h0=70):
@@ -189,18 +203,19 @@ class gene_BHBH:
         bhbh = np.loadtxt(f)
         self.bhbh=bhbh[bhbh[:,0].argsort()]
         self.z = self.bhbh[:,0]
+        
         om = 0.3
         scenario = 2        # 2 is standard low
         n0 = self.bhbh[:,scenario]*10**(-9) 
         
-    def num_year_rate(self):
+    def num_year_rate(self, ave_chirp_mass = 6.7):
         '''
         Numerically calcualte the rate as show in Arxiv: 1409.8360
         '''
         dH=c/self.h0
         z = self.z
         Dist = vec_r(z,om)
-        Mchirp = 6.7
+        Mchirp = ave_chirp_mass
         N=len(z)
         x=(rho0/8.)*(1+z)**(1/6.)*dH*(Dist/r0)*(1.2/Mchirp)**(5/6.)
         Ctheta2 = np.zeros(N)
@@ -214,7 +229,7 @@ class gene_BHBH:
         year_rate = np.sum(dis_dotN* (z[1:]-z[:-1]))
         return dis_dotN, year_rate, Ctheta2
     
-    def mc_year_rate(self, seed_vol= 10000, itera = 40):
+    def mc_year_rate(self, seed_vol= 10000, itera = 40, a=2.35, mbh_max=80., mbh_min=5.):
         '''
         Use MCMC to calculate the rate, with steps equals to seed_vol.
             1. the BH mass are randomly given with BH_mass_function.
@@ -228,7 +243,7 @@ class gene_BHBH:
         #    Randomly assign the values for Chirpmass and Thetas     
         #==============================================================================
         theta_class = Theta(vol = seed_vol)
-        bhmass_class = BH_mass_function(vol = seed_vol)
+        bhmass_class = BH_mass_function(vol = seed_vol, a=a, mbh_max=mbh_max, mbh_min=mbh_min)
 #        thetas = theta_class.gene_theta_func()
 #        mass_Chirp = 6.7 
         #==============================================================================
@@ -269,7 +284,7 @@ class gene_BHBH:
             elif j >0:
                 masses = np.concatenate((masses, mass_Chirp.T[rhos>rho0]))
             rhos_detected = np.concatenate((rhos_detected,rhos[rhos>rho0]))
-            if j/5 > (j-1)/5 :
+            if j/5 > (j-1)/5:
                 print "Total itera:", itera, "; Finish itera:", j
         av_over_rate = np.average(over_rate)
         event_rate = av_over_rate*norm_n
@@ -290,11 +305,12 @@ class gene_BHBH:
         return n_detected, over_rate, rhos
         '''
         return event_rate, zs_detected, masses, rhos_detected
-test = gene_BHBH()
-dis_dotN, year_rate, Ctheta2 = test.num_year_rate()
-event_rate, zs_detected, masses, rhos_detected = test.mc_year_rate()
-print year_rate
-print event_rate
+
+#test = gene_BHBH()
+##dis_dotN, year_rate, Ctheta2 = test.num_year_rate()
+#event_rate, zs_detected, masses, rhos_detected = test.mc_year_rate()
+##print year_rate
+#print event_rate
 
 #plt.plot(test.z, test.year_rate()[2])
 #plt.show()

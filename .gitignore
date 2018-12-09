@@ -42,7 +42,6 @@ Thumbs.db
 
 ################
 # The folders #
-Cycle25data/*
-analysis_Astrodrz/*/astrodrz/*
-analysis_Astrodrz/*/noise_map/*
+fit_result*/
 *~
+*.fits
