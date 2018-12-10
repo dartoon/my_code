@@ -251,7 +251,7 @@ for QSO_i in range(1,59):  # run the rest sample
         
         ascii.write("{0} {1} {2} {3} {4} ".format(str(file_name_seq[k])+'-'+band_seq[k]+'-'+qso_ID, frm_c_RA_DEC_list[k][0][0][0], frm_c_RA_DEC_list[k][1][0][0], zp_list[k],0.168))
         ascii.write("{0}% {1} {2} {3} {4} ".format(result['host_flux_ratio_percent'], result['center_x'], result['center_y'],result['host_amp'],result['host_mag']))
-        ascii.write("{0} {1} {2} {3} {4} {5}".format(result['R_sersic'],result['n_sersic'],result['q'],result['Kron_radius'], result['Kron_flux'], result['Kron_mag']))
+        ascii.write("{0} {1} {2} {3} {4} {5} ".format(result['R_sersic'],result['n_sersic'],result['q'],result['Kron_radius'], result['Kron_flux'], result['Kron_mag']))
         qso_mag = -2.5*np.log10(result['QSO_amp']) + zp_list[k]
         if fixcenter == False:
             c_miss =np.sqrt((result['center_x']-result['qso_x'])**2+(result['center_y']-result['qso_y'])**2)
@@ -271,12 +271,12 @@ for QSO_i in range(1,59):  # run the rest sample
         tag_c = 'fit_result/fit_image_{0}-{1}'.format(file_name_seq[0],file_name_seq[4])
         file_name = file_name_seq[0]
         host_g_i = data_host_list[0] -data_host_list[2]
-        pyfits.PrimaryHDU(host_g_i,header=file_header).writeto(tag_c+'host_g-i.fits',overwrite=True)
+        pyfits.PrimaryHDU(host_g_i,header=file_header).writeto(tag_c+'_host_g-i.fits',overwrite=True)
         host_r_z = data_host_list[1] -data_host_list[3]
-        pyfits.PrimaryHDU(host_r_z,header=file_header).writeto(tag_c+'host_r-z.fits',overwrite=True)
+        pyfits.PrimaryHDU(host_r_z,header=file_header).writeto(tag_c+'_host_r-z.fits',overwrite=True)
         host_i_y = data_host_list[2] -data_host_list[4]
-        pyfits.PrimaryHDU(host_i_y,header=file_header).writeto(tag_c+'host_i-y.fits',overwrite=True)
+        pyfits.PrimaryHDU(host_i_y,header=file_header).writeto(tag_c+'_host_i-y.fits',overwrite=True)
 ascii.close()
     
-#import os
-#os.system('say "your program has finished"')
+import os
+os.system('say "your program has finished"')
