@@ -193,38 +193,38 @@ def solve_z(lum_dis, om=0.3, h0=70):
 class gene_BHBH:
     def __init__(self, h0=70):
         self.h0 = h0
-        global n0, om, rho0, r0, c
-        c=299790. # speed of light [km/s]
-        rho0 = 8.
-        r0 = 1527.;	# in [Mpc] value for ET - polynomial Noise curve
-#        r0 = 1591.;	# ET-D sensitivity
-#        r0 = 1918.;    # ET - xylophone
+#        global n0, om, rho0, r0, c
+        self.c=299790. # speed of light [km/s]
+        self.rho0 = 8.
+        self.r0 = 1527.;	# in [Mpc] value for ET - polynomial Noise curve
+#        self.r0 = 1591.;	# ET-D sensitivity
+#       self. r0 = 1918.;    # ET - xylophone
         f=open('../data/BHBHrates.dat')
         bhbh = np.loadtxt(f)
         self.bhbh=bhbh[bhbh[:,0].argsort()]
         self.z = self.bhbh[:,0]
         
-        om = 0.3
+        self.om = 0.3
         scenario = 2        # 2 is standard low
-        n0 = self.bhbh[:,scenario]*10**(-9) 
+        self.n0 = self.bhbh[:,scenario]*10**(-9) 
         
     def num_year_rate(self, ave_chirp_mass = 6.7):
         '''
         Numerically calcualte the rate as show in Arxiv: 1409.8360
         '''
-        dH=c/self.h0
+        dH=self.c/self.h0
         z = self.z
-        Dist = vec_r(z,om)
+        Dist = vec_r(z,self.om)
         Mchirp = ave_chirp_mass
         N=len(z)
-        x=(rho0/8.)*(1+z)**(1/6.)*dH*(Dist/r0)*(1.2/Mchirp)**(5/6.)
+        x=(self.rho0/8.)*(1+z)**(1/6.)*dH*(Dist/self.r0)*(1.2/Mchirp)**(5/6.)
         Ctheta2 = np.zeros(N)
         for i in range (0,N):
             if x[i]>=0 and x[i]<=4:
                 Ctheta2[i]=(1+x[i])*(4-x[i])**4/256.
             else:
                 Ctheta2[i]=0
-        dotN = 4 * np.pi * dH**3. * (n0/(1+z)) * Dist**2*Ez(z,om)
+        dotN = 4 * np.pi * dH**3. * (self.n0/(1+z)) * Dist**2*Ez(z,self.om)
         dis_dotN = dotN[:-1]*Ctheta2[:-1]
         year_rate = np.sum(dis_dotN* (z[1:]-z[:-1]))
         return dis_dotN, year_rate, Ctheta2
@@ -236,8 +236,8 @@ class gene_BHBH:
             2. the Theta are randomly given using the Theta_class
         '''
         z = self.z
-        dH=c/self.h0
-        Dist = vec_r(z,om)
+        dH=self.c/self.h0
+        Dist = vec_r(z,self.om)
         seed_vol = seed_vol
         #==============================================================================
         #    Randomly assign the values for Chirpmass and Thetas     
@@ -249,7 +249,7 @@ class gene_BHBH:
         #==============================================================================
         #    Randomly generate a list of redshift
         #==============================================================================  
-        dotN = 4 * np.pi * dH**3. * (n0/(1+z)) * Dist**2* Ez(z,om)
+        dotN = 4 * np.pi * dH**3. * (self.n0/(1+z)) * Dist**2* Ez(z,self.om)
         p_dotN = dotN[1:] * (z[1:]-z[:-1])
         norm_n = p_dotN.sum()
         dotN /= norm_n              # The total BHBH events, in order to normalize the total BHBH numbers
@@ -275,15 +275,15 @@ class gene_BHBH:
             #   Rho = 8 Theta * r0/(dl) * (M_chirp_redshifted/1.2) **(5/6)
             #==============================================================================
             dlzs = (1+zs)*dH*dist_zs
-            rhos = 8.*thetas * r0/dlzs * ((1+zs)*mass_Chirp[0]/1.2)**(5/6.)
-            n_over_8 = np.sum([rhos>rho0])
+            rhos = 8.*thetas * self.r0/dlzs * ((1+zs)*mass_Chirp[0]/1.2)**(5/6.)
+            n_over_8 = np.sum([rhos>self.rho0])
             over_rate[j] = n_over_8/float(seed_vol)
-            zs_detected = np.concatenate((zs_detected,zs[rhos>rho0]))
+            zs_detected = np.concatenate((zs_detected,zs[rhos>self.rho0]))
             if j == 0:
-                masses = mass_Chirp.T[rhos>rho0]
+                masses = mass_Chirp.T[rhos>self.rho0]
             elif j >0:
-                masses = np.concatenate((masses, mass_Chirp.T[rhos>rho0]))
-            rhos_detected = np.concatenate((rhos_detected,rhos[rhos>rho0]))
+                masses = np.concatenate((masses, mass_Chirp.T[rhos>self.rho0]))
+            rhos_detected = np.concatenate((rhos_detected,rhos[rhos>self.rho0]))
             if j/5 > (j-1)/5:
                 print "Total itera:", itera, "; Finish itera:", j
         av_over_rate = np.average(over_rate)
@@ -298,8 +298,8 @@ class gene_BHBH:
             mass_Chirp = 6.7
             dist_zs = Dist[i]
             dlzs = (1+z[i])*dH*dist_zs
-            rhos = 8.*thetas * r0/dlzs * ((1+z[i])*mass_Chirp/1.2)**(5/6.)
-            n_over_8 = np.sum(rhos>rho0)
+            rhos = 8.*thetas * self.r0/dlzs * ((1+z[i])*mass_Chirp/1.2)**(5/6.)
+            n_over_8 = np.sum(rhos>self.rho0)
             over_rate[i] = float(n_over_8)/float(vol)
         n_detected = (p_dotN* over_rate).sum()
         return n_detected, over_rate, rhos
@@ -308,15 +308,28 @@ class gene_BHBH:
 
 #test = gene_BHBH()
 ##dis_dotN, year_rate, Ctheta2 = test.num_year_rate()
-#event_rate, zs_detected, masses, rhos_detected = test.mc_year_rate()
-##print year_rate
+##event_rate, zs_detected, masses, rhos_detected = test.mc_year_rate(a=1.5, mbh_max=45.)
+#event_rate, zs_detected, masses, rhos_detected = test.mc_year_rate(a=2.35, mbh_max=80.)
 #print event_rate
-
-#plt.plot(test.z, test.year_rate()[2])
+#
+#plt.hist(zs_detected)
 #plt.show()
 #plt.plot(test.z[1:], test.num_year_rate()[0])
 #plt.show()
-
+#
+##plot the m1 intrinsic mass curve
+#m = np.linspace(5,80,1000)
+#a=2.35
+#mbh_max=80.
+#mbh_min=5.
+#Norm = (mbh_max)**(-a+1)/(1-a) - (mbh_min)**(-a+1)/(1-a)
+#dn_dm = m **(-a) / Norm
+#print len(masses), dn_dm.sum() * (80-5)/1001.
+#plt.hist(masses[:,1],bins=30, normed =1)
+#plt.plot(m,dn_dm, 'r')
+##plt.xlim(3,30)
+##plt.yscale('log', nonposy='clip')
+#plt.show()
 
 #    '''
 #    The Class to calculate the BHBH events yearly detection rate and randomly obtain the data format
