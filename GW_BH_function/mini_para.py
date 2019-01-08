@@ -74,26 +74,33 @@ m1_obs, m1_nlevel, dl_obs,dl_sig, chirp_m_obs, chirp_m_sig = m1_obs[bool_pos], m
 
 def lnprob(para, sam_m1_obs, sam_dm1_obs, sam_dl, sam_dl_sig, sam_mass_Chirp, sam_mass_Chirp_sig):
 #    a=2.35, mbh_max=80., mbh_min=5.
+    ######################MCMC#########################
     a, mbh_max, mbh_min = para
-    vec_posterior = np.vectorize(posterior)
-    post = vec_posterior(sam_m1_obs, sam_dm1_obs, sam_dl, sam_dl_sig, sam_mass_Chirp, sam_mass_Chirp_sig, a=a, mbh_max=mbh_max, mbh_min=mbh_min)
-    return np.sum(np.log(post))
+    if 1.1 < a < 3 and 79 < mbh_max < 81 and 4.5 < mbh_min < 5.5:
+        vec_posterior = np.vectorize(posterior)
+        post = vec_posterior(sam_m1_obs, sam_dm1_obs, sam_dl, sam_dl_sig, sam_mass_Chirp, sam_mass_Chirp_sig, a=a, mbh_max=mbh_max, mbh_min=mbh_min)
+        return -np.sum(np.log(post))
+    else:
+        return np.inf
 
-nll = lambda *args: -lnprob(*args)
+nll = lambda *args: lnprob(*args)
 bnds = ((1.2, 3), (79.9, 80.1),(4.9, 5.1))
 
+from scipy.optimize import fmin
+para = (2.35, 80, 5)
+
 shuffe_list = range(len(m1_obs))
-vol = 1000
+vol = 50
 t1 = time.time()
 for loop in range(1):
     random.shuffle(shuffe_list)
     sam_m1_obs, sam_dm1_obs, sam_dl, sam_dl_sig, sam_mass_Chirp, sam_mass_Chirp_sig =\
 m1_obs[shuffe_list][:vol], m1_nlevel[shuffe_list][:vol], dl_obs[shuffe_list][:vol],dl_sig[shuffe_list][:vol], chirp_m_obs[shuffe_list][:vol], chirp_m_sig[shuffe_list][:vol]
-    print 'lnprob', lnprob((1.15, 80., 5.), sam_m1_obs, sam_dm1_obs, sam_dl, sam_dl_sig, sam_mass_Chirp, sam_mass_Chirp_sig)
-    print 'lnprob', lnprob((2.15, 80., 5.), sam_m1_obs, sam_dm1_obs, sam_dl, sam_dl_sig, sam_mass_Chirp, sam_mass_Chirp_sig)
-    print 'lnprob', lnprob((2.35, 80., 5.), sam_m1_obs, sam_dm1_obs, sam_dl, sam_dl_sig, sam_mass_Chirp, sam_mass_Chirp_sig)
+#    print 'lnprob', lnprob((2.25, 80., 5.), sam_m1_obs, sam_dm1_obs, sam_dl, sam_dl_sig, sam_mass_Chirp, sam_mass_Chirp_sig)
+#    print 'lnprob', lnprob((2.35, 80., 5.), sam_m1_obs, sam_dm1_obs, sam_dl, sam_dl_sig, sam_mass_Chirp, sam_mass_Chirp_sig)
 #    print 'lnprob', lnprob((2.45, 80., 5.), sam_m1_obs, sam_dm1_obs, sam_dl, sam_dl_sig, sam_mass_Chirp, sam_mass_Chirp_sig)
-#    result = op.minimize(nll, (2.35, 80., 5.), method='SLSQP', bounds=bnds,args=(sam_m1_obs, sam_dm1_obs, sam_dl, sam_dl_sig, sam_mass_Chirp, sam_mass_Chirp_sig))
-#    print result["x"]
+    result = op.minimize(nll, para, method='SLSQP', bounds=bnds,args=(sam_m1_obs, sam_dm1_obs, sam_dl, sam_dl_sig, sam_mass_Chirp, sam_mass_Chirp_sig))
+    print result["x"]
+#    mini=fmin(lnprob,para,maxiter=10000, args=(sam_m1_obs, sam_dm1_obs, sam_dl, sam_dl_sig, sam_mass_Chirp, sam_mass_Chirp_sig))
 t2 = time.time()
 print t2-t1, 's'
