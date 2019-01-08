@@ -86,11 +86,15 @@ class BH_mass_function:
     
     def chirp_mass(self):
         m1, m2 = self.gen_m1m2()
-        m_tot = m1 + m2
-        m_chirp = (m1*m2)**(3/5.)/m_tot**(1/5.)
+        m_chirp = cal_chirpmass(m1, m2)
         masses = np.asarray([m_chirp, m1, m2])
         return masses
-        
+
+def cal_chirpmass(m1,m2):
+    m_tot = m1 + m2
+    return (m1*m2)**(3/5.)/m_tot**(1/5.)
+    
+
 #vol = 2000   
 #BHBH = BH_mass_function(vol = vol)
 #m = np.linspace(5,80,10000)
