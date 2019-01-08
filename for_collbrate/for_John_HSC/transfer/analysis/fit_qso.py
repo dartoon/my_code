@@ -85,9 +85,9 @@ def fit_qso(QSO_im, psf_ave, psf_std=None, source_params=None,ps_param=None, bac
         fixed_ps = [{}]
         kwargs_ps = [{'ra_image': [center_x], 'dec_image': [center_y], 'point_amp': [point_amp]}]
         kwargs_ps_init = kwargs_ps
-        kwargs_ps_sigma = [{'ra_image': [0.01], 'dec_image': [0.01]}]
-        kwargs_lower_ps = [{'ra_image': [-10], 'dec_image': [-10]}]
-        kwargs_upper_ps = [{'ra_image': [10], 'dec_image': [10]}]
+        kwargs_ps_sigma = [{'ra_image': [0.05], 'dec_image': [0.05]}]
+        kwargs_lower_ps = [{'ra_image': [-0.6], 'dec_image': [-0.6]}]
+        kwargs_upper_ps = [{'ra_image': [0.6], 'dec_image': [0.6]}]
         ps_param = [kwargs_ps_init, kwargs_ps_sigma, fixed_ps, kwargs_lower_ps, kwargs_upper_ps]
     else:
         ps_param = ps_param
@@ -112,7 +112,7 @@ def fit_qso(QSO_im, psf_ave, psf_std=None, source_params=None,ps_param=None, bac
     light_model_list = ['SERSIC_ELLIPSE'] * len(source_params[0])
     lightModel = LightModel(light_model_list=light_model_list)
     from lenstronomy.PointSource.point_source import PointSource
-    point_source_list = ['UNLENSED']
+    point_source_list = ['UNLENSED'] * len(ps_param[0])
     pointSource = PointSource(point_source_type_list=point_source_list)
     
     from lenstronomy.ImSim.image_model import ImageModel
@@ -125,7 +125,7 @@ def fit_qso(QSO_im, psf_ave, psf_std=None, source_params=None,ps_param=None, bac
     # numerical options and fitting sequences
     
     if fixcenter == False:
-        kwargs_constraints = {'num_point_source_list': [1]
+        kwargs_constraints = {'num_point_source_list': [1] * len(ps_param[0])
                               }
     elif fixcenter == True:
         kwargs_constraints = {'joint_source_with_point_source': [[0, 0]],
