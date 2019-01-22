@@ -1,0 +1,95 @@
+#!/usr/bin/env python2
+# -*- coding: utf-8 -*-
+"""
+Created on Mon Nov 26 21:57:36 2018
+
+@author: Dartoon
+
+Test if whether the likelihood would recover the para
+if all the m1 are measureable.
+With error bar
+"""
+import numpy as np
+import matplotlib.pyplot as plt
+import glob
+from BH_mass_function import BH_mass_function
+from cal_likelihood import likelihood_lognorm as likelihood_i
+likelihood = np.vectorize(likelihood_i)
+from scipy.optimize import fmin
+import time
+t1 = time.time()
+a, mbh_max, mbh_min = 2.35, 80., 5.
+vol = 1000
+BHBH_mass = BH_mass_function(a = a, mbh_max=mbh_max, mbh_min=mbh_min, vol= vol)
+m_noise_level = 0.2     #The actually sigma_star is np.exp(0.2)
+
+use_method=raw_input('Consider random.lognormal generate value is med or exp?:\n')
+
+if use_method == 'med':
+    filename = 'test1_0_med_un{0}.txt'.format(int(m_noise_level*100))
+elif use_method == 'exp':
+    filename = 'test1_1_trans_exp_un{0}.txt'.format(int(m_noise_level*100))
+
+def point_Chisq(para, m1_obs,m1_sig):
+    a,mbh_max, mbh_min  = para
+    if 1.1 < a < 3 and 50 < mbh_max < 100 and 2 < mbh_min < 8:
+        poss_m1_i = likelihood(m1_obs,m1_sig, a=a, mbh_max=mbh_max, mbh_min=mbh_min, use_method=use_method)
+        chisq = -np.sum(np.log(poss_m1_i))
+#        print a, mbh_max, mbh_min, chisq
+        return chisq
+    else:
+        return np.inf
+#print point_Chisq([2.35,80, 5.], m1_obs, m1_sig_ratio)
+        
+para_ini = [2.35,80, 5.]
+best_p = []
+if_file = glob.glob(filename)
+if if_file == []:
+    para_result =  open(filename,'w') 
+else:
+    para_result =  open(filename,'r+') 
+rounds = 500
+for loop in range(rounds):
+    m1 = BHBH_mass.gen_dm()   #The expected position
+    if use_method == 'med':
+        m1_mu = np.log(m1)   # 0_med np.log(mu_star) = mu 
+    elif use_method == 'exp':
+        m1_mu = np.log(m1) - m_noise_level**2/2.   # 1_trans_exp np.log(mu) = np.log(exp-sig**2/2)
+    m1_sigstar= np.exp(m_noise_level)  #Not useful in the generate generation, but useful in understand the upper lower level.
+    m1_obs = np.random.lognormal(m1_mu, m_noise_level, size=m1.shape)  #Generating for the mu as med, 
+    m1_sig_fake = m1 * m_noise_level     #The fake "sigma"
+    print m1_obs.min(), m1_obs.max()
+#    #a test if m1_samp_grid bug exists
+#    test = likelihood(m1_obs,m1_sig_fake, a=a, mbh_max=mbh_max, mbh_min=mbh_min, use_method=use_method)
+#    print np.where(test == 0)
+    mini=fmin(point_Chisq,para_ini,maxiter=1000, args=(m1_obs, m1_sig_fake))
+    if loop > 0:
+        para_result = open(filename,'r+')
+        para_result.read()
+    para_result.write(repr(mini)+"\n")
+    para_result.close()
+    best_p.append(mini)
+    t2 = time.time()
+    time_sp = t2-t1
+    time_ave = (t2-t1)/(loop+1)
+    time_total = time_ave * rounds
+    t_left = time_total - time_sp
+    print mini
+    print "loop:", loop, use_method, "m_noise_level", m_noise_level
+    print "Finish percent:",round(time_sp/time_total*100,2),"%" ,"total time needed :", round(time_total/60,2), "mins", "time_left", round(t_left/60,2), 'mins'
+
+#import corner
+#with open('test1_mini_lognorm_2.txt') as f:
+#        content = f.readlines()
+#lines = [x.strip() for x in content] 
+#numbers = np.asarray([np.float_(lines[i].split(' ')) for i in range(len(lines))])
+#samples = numbers
+#fig = corner.corner(samples, labels=["$alpha$","$Mbh_{max}$", "$Mbh_{min}$"],
+#                    quantiles=[0.16, 0.84],show_titles=True,
+#                    title_kwargs={"fontsize": 12},truths=[2.35,80,5],
+##                    plot_datapoints=True,smooth=1.0,smooth1d=1.0,
+#                    levels=1.0 - np.exp(-0.5 * np.arange(1, 2.1, 1) ** 2),
+#                    title_fmt='.2f')
+#fig.savefig("test1_lognorm_likeli.pdf")
+######
+#plt.show()  

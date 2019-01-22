@@ -12,7 +12,7 @@ import astropy.io.fits as pyfits
 import matplotlib.pyplot as plt
 from BH_mass_function import Theta, solve_z
 
-def mass_fun_i(m1, a=2.35, mbh_max=80., mbh_min=5.):
+def mass_fun_i(m1, a, mbh_max, mbh_min):
     if m1>=mbh_min and m1<=mbh_max:
         N = (mbh_max)**(-a+1)/(1-a) - (mbh_min)**(-a+1)/(1-a)             # The intergral function of m**a for normalize the power law function
         return m1**(-a)/N
@@ -24,19 +24,62 @@ def poss_gaussian(m1, mu, sigma):
     poss =  1/(sigma * np.sqrt(2 * np.pi)) * np.exp(-(m1 - mu)**2/(2*sigma**2))
     return poss
 
+def poss_ln_gaussian(m1, mu, sigma):
+    poss =  1/(m1 * sigma * np.sqrt(2 * np.pi)) * np.exp(-(np.log(m1) - mu)**2/(2*sigma**2))
+    return poss
+
 def likelihood(m1_obs, dm1_obs, a=2.35, mbh_max=80., mbh_min=5., bins = None):
 #    m1_samp_grid = np.logspace(np.log(mbh_min-0.1),np.log(mbh_max+1),800)
     if bins==None:
         if abs(m1_obs-mbh_min)>5:
             bins = 51
         else:
-            max_bins = 5001
+            max_bins = 161
             min_bins = 51
             gap = 5   # from 5-5 to 10-5
             bins = int(max_bins-(m1_obs-mbh_min)*(max_bins-min_bins)/gap)     #Set the max bins as 1001
-    m1_samp_grid = np.linspace(m1_obs-5*dm1_obs,m1_obs+5*dm1_obs,bins)
-    likeli = (poss_gaussian(m1_samp_grid, m1_obs, dm1_obs) * poss_mass_fun(m1_samp_grid, a=a, mbh_max=mbh_max, mbh_min=mbh_min))[1:] * (m1_samp_grid[1:]-m1_samp_grid[:-1])
+        m1_samp_grid = np.linspace(m1_obs-5*dm1_obs,m1_obs+5*dm1_obs,bins)   #!!! This is wrong!!!
+        m1_samp_grid = m1_samp_grid[m1_samp_grid>0]
+        if (m1_obs-5*dm1_obs)<mbh_min<(m1_obs+5*dm1_obs): 
+            m1_samp_grid = np.append(m1_samp_grid,mbh_min)
+            m1_samp_grid = m1_samp_grid[m1_samp_grid.argsort()]
+        if (m1_obs-5*dm1_obs)<mbh_max<(m1_obs+5*dm1_obs):
+            m1_samp_grid = np.append(m1_samp_grid,mbh_max)
+            m1_samp_grid = m1_samp_grid[m1_samp_grid.argsort()]
+                
+    likeli = (poss_gaussian(m1_samp_grid, mu=m1_obs, sigma=dm1_obs) * poss_mass_fun(m1_samp_grid, a=a, mbh_max=mbh_max, mbh_min=mbh_min))[1:] * (m1_samp_grid[1:]-m1_samp_grid[:-1])
     return likeli.sum()
+
+def likelihood_lognorm(m1_obs, dm1_obs, a=2.35, mbh_max=80., mbh_min=5., use_method='med'):
+    '''
+    The likelihood for log-norm
+    '''
+    if abs(m1_obs-mbh_min)>5:
+        bins = 51
+    else:
+        max_bins = 101
+        min_bins = 51
+        gap = 5   # from 5-5 to 10-5
+        bins = int(max_bins-(m1_obs-mbh_min)*(max_bins-min_bins)/gap)     #Set the max bins as 1001
+    sigma = dm1_obs/m1_obs  # Recover the noise level
+    m1_samp_grid = np.linspace(m1_obs/np.exp(sigma)**5,m1_obs*np.exp(sigma)**5,bins)
+    if (m1_obs/np.exp(sigma)**5)<mbh_min<(m1_obs*np.exp(sigma)**5):
+        m1_samp_grid = np.linspace(m1_obs/np.exp(sigma)**5,m1_obs*np.exp(sigma)**5,bins)
+        m1_samp_grid = np.append(mbh_min,m1_samp_grid)
+        m1_samp_grid = m1_samp_grid[m1_samp_grid.argsort()]
+    if (m1_obs/np.exp(sigma)**5)<mbh_max<(m1_obs*np.exp(sigma)**5):
+        m1_samp_grid = np.linspace(m1_obs/np.exp(sigma)**5,m1_obs*np.exp(sigma)**5,bins)
+        m1_samp_grid = np.append(m1_samp_grid,mbh_max)
+        m1_samp_grid = m1_samp_grid[m1_samp_grid.argsort()]
+    if use_method == 'med':
+        mu = np.log(m1_obs)             #0_med, i.e. directly use the med as generated
+    elif use_method == 'exp':
+        mu = np.log(m1_obs) - sigma**2/2.        #1_trans_exp np.log(mu) = np.log(exp-sig**2/2)
+#    print m1_samp_grid
+#    print mu, sigma,m1_samp_grid, poss_ln_gaussian(m1_samp_grid, mu=mu, sigma=sigma), poss_mass_fun(m1_samp_grid, a=a, mbh_max=mbh_max, mbh_min=mbh_min)
+    likeli = (poss_ln_gaussian(m1_samp_grid, mu=mu, sigma=sigma) * poss_mass_fun(m1_samp_grid, a=a, mbh_max=mbh_max, mbh_min=mbh_min))[1:] * (m1_samp_grid[1:]-m1_samp_grid[:-1])
+    return likeli.sum()
+
 
 def random_Theta(seed_vol=100000):
     '''
@@ -157,7 +200,7 @@ def fac_s_eff_un(dl, dl_sig,mass_Chirp, mass_Chirp_sig,thetas=None,r0 = 1527):
     marginalize_aix1 = np.sum( (marginalize_aix0 * poss_gaussian(chirpm_grid,mass_Chirp,mass_Chirp_sig))[1:] * (chirpm_grid[1:]- chirpm_grid[:-1]))
     return marginalize_aix1
 
-thetas = random_Theta()
+#thetas = random_Theta()
 def posterior(m1_obs, dm1_obs, dl, dl_sig,mass_Chirp, mass_Chirp_sig, a=2.35, mbh_max=80., mbh_min=5., r0 = 1527):
     '''
     Purpose:
@@ -198,10 +241,26 @@ def posterior(m1_obs, dm1_obs, dl, dl_sig,mass_Chirp, mass_Chirp_sig, a=2.35, mb
 #plt.show()
 #print 'if == 1:', np.sum(num[1:] * (m[1:]-m[:-1]))
 
+## Test if poss_ln_gaussian is well normizled:
+#mu, sigma= 5., 1.
+#sigma_star = np.exp(sigma/mu)
+#m = np.linspace(mu-5*sigma,mu+5*sigma,41)
+#num = poss_ln_gaussian(m, mu=np.log(mu), sigma=sigma/mu)
+#plt.plot(m, num)
+#plt.show()
+#print mu/sigma_star,mu ,mu*sigma_star
+#print 'if == 1:', np.sum(num[1:] * (m[1:]-m[:-1]))
+
 ##Test if likelihood is well defined and the difference by changing the bins.
 #m, dm=5, 1
 #print mass_fun_i(m), likelihood(m,dm)
 #print (likelihood(m,dm)-likelihood(m,dm, bins=100002))/likelihood(m,dm, bins=100002) * 100, '%'
+##print (likelihood(6,1, bins=400).sum()-likelihood(6,1).sum())/likelihood(6,1).sum()
+
+##Test if likelihood is well defined and the difference by changing the bins.
+##print mass_fun_i(79,a = 2.35, mbh_max=80, mbh_min=5),
+#print likelihood_lognorm(2.50183031, 0.50036606,a = 2.35, mbh_max=80, mbh_min=5)
+##print (likelihood(m,dm)-likelihood(m,dm, bins=100002))/likelihood(m,dm, bins=100002) * 100, '%'
 ##print (likelihood(6,1, bins=400).sum()-likelihood(6,1).sum())/likelihood(6,1).sum()
 
 ##Test the func: fac_s_eff_s
