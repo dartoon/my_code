@@ -50,7 +50,7 @@ def likelihood(m1_obs, dm1_obs, a=2.35, mbh_max=80., mbh_min=5., bins = None):
     likeli = (poss_gaussian(m1_samp_grid, mu=m1_obs, sigma=dm1_obs) * poss_mass_fun(m1_samp_grid, a=a, mbh_max=mbh_max, mbh_min=mbh_min))[1:] * (m1_samp_grid[1:]-m1_samp_grid[:-1])
     return likeli.sum()
 
-def likelihood_lognorm(m1_obs, dm1_obs, a=2.35, mbh_max=80., mbh_min=5., use_method='med'):
+def likelihood_lognorm(m1_obs, dm1_obs, a=2.35, mbh_max=80., mbh_min=5., use_method='exp'):
     '''
     The likelihood for log-norm
     '''
@@ -77,7 +77,8 @@ def likelihood_lognorm(m1_obs, dm1_obs, a=2.35, mbh_max=80., mbh_min=5., use_met
         mu = np.log(m1_obs) - sigma**2/2.        #1_trans_exp np.log(mu) = np.log(exp-sig**2/2)
 #    print m1_samp_grid
 #    print mu, sigma,m1_samp_grid, poss_ln_gaussian(m1_samp_grid, mu=mu, sigma=sigma), poss_mass_fun(m1_samp_grid, a=a, mbh_max=mbh_max, mbh_min=mbh_min)
-    likeli = (poss_ln_gaussian(m1_samp_grid, mu=mu, sigma=sigma) * poss_mass_fun(m1_samp_grid, a=a, mbh_max=mbh_max, mbh_min=mbh_min))[1:] * (m1_samp_grid[1:]-m1_samp_grid[:-1])
+    joint = poss_ln_gaussian(m1_samp_grid, mu=mu, sigma=sigma) * poss_mass_fun(m1_samp_grid, a=a, mbh_max=mbh_max, mbh_min=mbh_min)
+    likeli = (joint[1:]+joint[:-1])/2 * (m1_samp_grid[1:]-m1_samp_grid[:-1])
     return likeli.sum()
 
 

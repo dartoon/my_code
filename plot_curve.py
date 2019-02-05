@@ -64,7 +64,6 @@ sig_star = np.exp(sigma)
 
 plt.plot(mu_star*sig_star + y_l*0,y_l, 'g--')
 plt.plot(mu_star/sig_star + y_l*0,y_l, 'g--')
-plt.plot(expected_m1 + y_l*0,y_l, 'b')
 plt.plot(expected_m1 + y_l*0,y_l, 'b')     #Blue, the expected mean.
 plt.plot(mu_star + y_l*0,y_l, 'g')         #Green, the np.exp(mu) is the MEDIAN point.
 plt.plot(mode_m1 + y_l*0,y_l, 'r')       #Red, the mode
