@@ -12,7 +12,7 @@ import astropy.io.fits as pyfits
 import matplotlib.pyplot as plt
 
 import corner
-filename = 'test2_0_med(ave0-1)_un20.txt'
+filename = 'test1_conv_lognorm_20.txt'
 print filename
 with open(filename) as f:
         content = f.readlines()

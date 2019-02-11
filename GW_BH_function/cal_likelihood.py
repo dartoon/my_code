@@ -11,6 +11,8 @@ import numpy as np
 import astropy.io.fits as pyfits
 import matplotlib.pyplot as plt
 from BH_mass_function import Theta, solve_z
+from scipy.integrate import quad
+from scipy import interpolate
 
 def mass_fun_i(m1, a, mbh_max, mbh_min):
     if m1>=mbh_min and m1<=mbh_max:
@@ -28,58 +30,75 @@ def poss_ln_gaussian(m1, mu, sigma):
     poss =  1/(m1 * sigma * np.sqrt(2 * np.pi)) * np.exp(-(np.log(m1) - mu)**2/(2*sigma**2))
     return poss
 
-def likelihood(m1_obs, dm1_obs, a=2.35, mbh_max=80., mbh_min=5., bins = None):
-#    m1_samp_grid = np.logspace(np.log(mbh_min-0.1),np.log(mbh_max+1),800)
-    if bins==None:
-        if abs(m1_obs-mbh_min)>5:
-            bins = 51
-        else:
-            max_bins = 161
-            min_bins = 51
-            gap = 5   # from 5-5 to 10-5
-            bins = int(max_bins-(m1_obs-mbh_min)*(max_bins-min_bins)/gap)     #Set the max bins as 1001
-        m1_samp_grid = np.linspace(m1_obs-5*dm1_obs,m1_obs+5*dm1_obs,bins)   #!!! This is wrong!!!
-        m1_samp_grid = m1_samp_grid[m1_samp_grid>0]
-        if (m1_obs-5*dm1_obs)<mbh_min<(m1_obs+5*dm1_obs): 
-            m1_samp_grid = np.append(m1_samp_grid,mbh_min)
-            m1_samp_grid = m1_samp_grid[m1_samp_grid.argsort()]
-        if (m1_obs-5*dm1_obs)<mbh_max<(m1_obs+5*dm1_obs):
-            m1_samp_grid = np.append(m1_samp_grid,mbh_max)
-            m1_samp_grid = m1_samp_grid[m1_samp_grid.argsort()]
-                
-    likeli = (poss_gaussian(m1_samp_grid, mu=m1_obs, sigma=dm1_obs) * poss_mass_fun(m1_samp_grid, a=a, mbh_max=mbh_max, mbh_min=mbh_min))[1:] * (m1_samp_grid[1:]-m1_samp_grid[:-1])
-    return likeli.sum()
+def joint_twofun(tau, t, a=2.35, mbh_max=80, mbh_min=5, sigma =0.2):
+    return mass_fun_i(tau, a=a, mbh_max=mbh_max, mbh_min=mbh_min) * poss_ln_gaussian(t, mu=np.log(tau), sigma = sigma)
+def cov_twofun(t, a=2.35, mbh_max=80, mbh_min=5, sigma =0.2):
+    inter = quad(joint_twofun, 0, 200, args=(t, a, mbh_max, mbh_min,sigma))[0]
+    return inter
+cov_twofun=np.vectorize(cov_twofun)   
 
-def likelihood_lognorm(m1_obs, dm1_obs, a=2.35, mbh_max=80., mbh_min=5., use_method='exp'):
+#def likelihood(m1_obs, dm1_obs, a=2.35, mbh_max=80., mbh_min=5., bins = None):
+##    m1_samp_grid = np.logspace(np.log(mbh_min-0.1),np.log(mbh_max+1),800)
+#    if bins==None:
+#        if abs(m1_obs-mbh_min)>5:
+#            bins = 51
+#        else:
+#            max_bins = 161
+#            min_bins = 51
+#            gap = 5   # from 5-5 to 10-5
+#            bins = int(max_bins-(m1_obs-mbh_min)*(max_bins-min_bins)/gap)     #Set the max bins as 1001
+#        m1_samp_grid = np.linspace(m1_obs-5*dm1_obs,m1_obs+5*dm1_obs,bins)   #!!! This is wrong!!!
+#        m1_samp_grid = m1_samp_grid[m1_samp_grid>0]
+#        if (m1_obs-5*dm1_obs)<mbh_min<(m1_obs+5*dm1_obs): 
+#            m1_samp_grid = np.append(m1_samp_grid,mbh_min)
+#            m1_samp_grid = m1_samp_grid[m1_samp_grid.argsort()]
+#        if (m1_obs-5*dm1_obs)<mbh_max<(m1_obs+5*dm1_obs):
+#            m1_samp_grid = np.append(m1_samp_grid,mbh_max)
+#            m1_samp_grid = m1_samp_grid[m1_samp_grid.argsort()]
+#    likeli = (poss_gaussian(m1_samp_grid, mu=m1_obs, sigma=dm1_obs) * poss_mass_fun(m1_samp_grid, a=a, mbh_max=mbh_max, mbh_min=mbh_min))[1:] * (m1_samp_grid[1:]-m1_samp_grid[:-1])
+#    return likeli.sum()
+
+def likelihood_lognorm(m1_obs, dm1_obs, a=2.35, mbh_max=80., mbh_min=5., use_method='med', f = None):
     '''
     The likelihood for log-norm
+    The way to summarize the likelihood should be re-write.
     '''
-    if abs(m1_obs-mbh_min)>5:
-        bins = 51
-    else:
-        max_bins = 101
-        min_bins = 51
-        gap = 5   # from 5-5 to 10-5
-        bins = int(max_bins-(m1_obs-mbh_min)*(max_bins-min_bins)/gap)     #Set the max bins as 1001
-    sigma = dm1_obs/m1_obs  # Recover the noise level
-    m1_samp_grid = np.linspace(m1_obs/np.exp(sigma)**5,m1_obs*np.exp(sigma)**5,bins)
-    if (m1_obs/np.exp(sigma)**5)<mbh_min<(m1_obs*np.exp(sigma)**5):
-        m1_samp_grid = np.linspace(m1_obs/np.exp(sigma)**5,m1_obs*np.exp(sigma)**5,bins)
-        m1_samp_grid = np.append(mbh_min,m1_samp_grid)
-        m1_samp_grid = m1_samp_grid[m1_samp_grid.argsort()]
-    if (m1_obs/np.exp(sigma)**5)<mbh_max<(m1_obs*np.exp(sigma)**5):
-        m1_samp_grid = np.linspace(m1_obs/np.exp(sigma)**5,m1_obs*np.exp(sigma)**5,bins)
-        m1_samp_grid = np.append(m1_samp_grid,mbh_max)
-        m1_samp_grid = m1_samp_grid[m1_samp_grid.argsort()]
-    if use_method == 'med':
-        mu = np.log(m1_obs)             #0_med, i.e. directly use the med as generated
-    elif use_method == 'exp':
-        mu = np.log(m1_obs) - sigma**2/2.        #1_trans_exp np.log(mu) = np.log(exp-sig**2/2)
-#    print m1_samp_grid
-#    print mu, sigma,m1_samp_grid, poss_ln_gaussian(m1_samp_grid, mu=mu, sigma=sigma), poss_mass_fun(m1_samp_grid, a=a, mbh_max=mbh_max, mbh_min=mbh_min)
-    joint = poss_ln_gaussian(m1_samp_grid, mu=mu, sigma=sigma) * poss_mass_fun(m1_samp_grid, a=a, mbh_max=mbh_max, mbh_min=mbh_min)
+#    if abs(m1_obs-mbh_min)>5:
+#        bins = 51
+#    else:
+#        max_bins = 51
+#        min_bins = 51
+#        gap = 5   # from 5-5 to 10-5
+#        bins = int(max_bins-(m1_obs-mbh_min)*(max_bins-min_bins)/gap)     #Set the max bins as 1001
+#    bins = 41
+#    sigma = dm1_obs/m1_obs  # Recover the noise level
+#    m1_samp_grid = np.linspace(m1_obs/np.exp(sigma)**5,m1_obs*np.exp(sigma)**5,bins)
+#    if use_method == 'med':
+#        mu = np.log(m1_obs)             #0_med, i.e. directly use the med as generated
+#    elif use_method == 'exp':
+#        mu = np.log(m1_obs) - sigma**2/2.        #1_trans_exp np.log(mu) = np.log(exp-sig**2/2)
+#    if (m1_obs/np.exp(sigma)**5)<mbh_min<(m1_obs*np.exp(sigma)**5):
+#        m1_samp_grid = np.linspace(m1_obs/np.exp(sigma)**5,m1_obs*np.exp(sigma)**5,bins)
+#        m1_samp_grid = np.append(mbh_min,m1_samp_grid)
+#        m1_samp_grid = m1_samp_grid[m1_samp_grid.argsort()]
+#    if (m1_obs/np.exp(sigma)**5)<mbh_max<(m1_obs*np.exp(sigma)**5):
+#        m1_samp_grid = np.linspace(m1_obs/np.exp(sigma)**5,m1_obs*np.exp(sigma)**5,bins)
+#        m1_samp_grid = np.append(m1_samp_grid,mbh_max)
+#        m1_samp_grid = m1_samp_grid[m1_samp_grid.argsort()]
+#    print m1_samp_grid.min(), m1_samp_grid.max()
+#    if f == None:
+#        x = np.logspace(np.log10(2/1.1), np.log10(400*1.1),300)
+#        y = cov_twofun(x, a=a, mbh_max=mbh_max, mbh_min=mbh_min,sigma=sigma)
+#        f = interpolate.interp1d(x, y)  # Use interpolate to make cal faster
+    joint = poss_ln_gaussian(m1_samp_grid, mu=mu, sigma=sigma) * f(m1_samp_grid)
     likeli = (joint[1:]+joint[:-1])/2 * (m1_samp_grid[1:]-m1_samp_grid[:-1])
     return likeli.sum()
+#Test if likelihood is well defined and the difference by changing the bins.
+#print mass_fun_i(79,a = 2.35, mbh_max=80, mbh_min=5),
+#print likelihood_lognorm( 5.09 , 5*0.2 ,a = 2.35, mbh_max=80, mbh_min=5)
+#print (likelihood(m,dm)-likelihood(m,dm, bins=100002))/likelihood(m,dm, bins=100002) * 100, '%'
+#print (likelihood(6,1, bins=400).sum()-likelihood(6,1).sum())/likelihood(6,1).sum()
+
 
 
 def random_Theta(seed_vol=100000):
