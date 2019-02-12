@@ -10,7 +10,8 @@ Calculate the likelihood for by given the m1
 import numpy as np
 import astropy.io.fits as pyfits
 import matplotlib.pyplot as plt
-from BH_mass_function import Theta, solve_z
+from BH_mass_function import Theta, solve_z, random_z, cal_chirpmass
+from BH_mass_function import dl as cal_dl
 from scipy.integrate import quad
 from scipy import interpolate
 
@@ -37,6 +38,8 @@ def cov_twofun(t, a=2.35, mbh_max=80, mbh_min=5, sigma =0.2):
     return inter
 cov_twofun=np.vectorize(cov_twofun)   
 
+"""
+However, it turns out the likelihood is not "necessary":
 #def likelihood(m1_obs, dm1_obs, a=2.35, mbh_max=80., mbh_min=5., bins = None):
 ##    m1_samp_grid = np.logspace(np.log(mbh_min-0.1),np.log(mbh_max+1),800)
 #    if bins==None:
@@ -57,59 +60,52 @@ cov_twofun=np.vectorize(cov_twofun)
 #            m1_samp_grid = m1_samp_grid[m1_samp_grid.argsort()]
 #    likeli = (poss_gaussian(m1_samp_grid, mu=m1_obs, sigma=dm1_obs) * poss_mass_fun(m1_samp_grid, a=a, mbh_max=mbh_max, mbh_min=mbh_min))[1:] * (m1_samp_grid[1:]-m1_samp_grid[:-1])
 #    return likeli.sum()
-
-def likelihood_lognorm(m1_obs, dm1_obs, a=2.35, mbh_max=80., mbh_min=5., use_method='med', f = None):
-    '''
-    The likelihood for log-norm
-    The way to summarize the likelihood should be re-write.
-    '''
-#    if abs(m1_obs-mbh_min)>5:
-#        bins = 51
-#    else:
-#        max_bins = 51
-#        min_bins = 51
-#        gap = 5   # from 5-5 to 10-5
-#        bins = int(max_bins-(m1_obs-mbh_min)*(max_bins-min_bins)/gap)     #Set the max bins as 1001
-#    bins = 41
-#    sigma = dm1_obs/m1_obs  # Recover the noise level
-#    m1_samp_grid = np.linspace(m1_obs/np.exp(sigma)**5,m1_obs*np.exp(sigma)**5,bins)
-#    if use_method == 'med':
-#        mu = np.log(m1_obs)             #0_med, i.e. directly use the med as generated
-#    elif use_method == 'exp':
-#        mu = np.log(m1_obs) - sigma**2/2.        #1_trans_exp np.log(mu) = np.log(exp-sig**2/2)
-#    if (m1_obs/np.exp(sigma)**5)<mbh_min<(m1_obs*np.exp(sigma)**5):
-#        m1_samp_grid = np.linspace(m1_obs/np.exp(sigma)**5,m1_obs*np.exp(sigma)**5,bins)
-#        m1_samp_grid = np.append(mbh_min,m1_samp_grid)
-#        m1_samp_grid = m1_samp_grid[m1_samp_grid.argsort()]
-#    if (m1_obs/np.exp(sigma)**5)<mbh_max<(m1_obs*np.exp(sigma)**5):
-#        m1_samp_grid = np.linspace(m1_obs/np.exp(sigma)**5,m1_obs*np.exp(sigma)**5,bins)
-#        m1_samp_grid = np.append(m1_samp_grid,mbh_max)
-#        m1_samp_grid = m1_samp_grid[m1_samp_grid.argsort()]
-#    print m1_samp_grid.min(), m1_samp_grid.max()
-#    if f == None:
-#        x = np.logspace(np.log10(2/1.1), np.log10(400*1.1),300)
-#        y = cov_twofun(x, a=a, mbh_max=mbh_max, mbh_min=mbh_min,sigma=sigma)
-#        f = interpolate.interp1d(x, y)  # Use interpolate to make cal faster
-    joint = poss_ln_gaussian(m1_samp_grid, mu=mu, sigma=sigma) * f(m1_samp_grid)
-    likeli = (joint[1:]+joint[:-1])/2 * (m1_samp_grid[1:]-m1_samp_grid[:-1])
-    return likeli.sum()
-#Test if likelihood is well defined and the difference by changing the bins.
-#print mass_fun_i(79,a = 2.35, mbh_max=80, mbh_min=5),
-#print likelihood_lognorm( 5.09 , 5*0.2 ,a = 2.35, mbh_max=80, mbh_min=5)
-#print (likelihood(m,dm)-likelihood(m,dm, bins=100002))/likelihood(m,dm, bins=100002) * 100, '%'
-#print (likelihood(6,1, bins=400).sum()-likelihood(6,1).sum())/likelihood(6,1).sum()
-
-
+#def likelihood_lognorm(m1_obs, dm1_obs, a=2.35, mbh_max=80., mbh_min=5., use_method='med', f = None):
+#    '''
+#    The likelihood for log-norm
+#    The way to summarize the likelihood should be re-write.
+#    '''
+##    if abs(m1_obs-mbh_min)>5:
+##        bins = 51
+##    else:
+##        max_bins = 51
+##        min_bins = 51
+##        gap = 5   # from 5-5 to 10-5
+##        bins = int(max_bins-(m1_obs-mbh_min)*(max_bins-min_bins)/gap)     #Set the max bins as 1001
+##    bins = 41
+##    sigma = dm1_obs/m1_obs  # Recover the noise level
+##    m1_samp_grid = np.linspace(m1_obs/np.exp(sigma)**5,m1_obs*np.exp(sigma)**5,bins)
+##    if use_method == 'med':
+##        mu = np.log(m1_obs)             #0_med, i.e. directly use the med as generated
+##    elif use_method == 'exp':
+##        mu = np.log(m1_obs) - sigma**2/2.        #1_trans_exp np.log(mu) = np.log(exp-sig**2/2)
+##    if (m1_obs/np.exp(sigma)**5)<mbh_min<(m1_obs*np.exp(sigma)**5):
+##        m1_samp_grid = np.linspace(m1_obs/np.exp(sigma)**5,m1_obs*np.exp(sigma)**5,bins)
+##        m1_samp_grid = np.append(mbh_min,m1_samp_grid)
+##        m1_samp_grid = m1_samp_grid[m1_samp_grid.argsort()]
+##    if (m1_obs/np.exp(sigma)**5)<mbh_max<(m1_obs*np.exp(sigma)**5):
+##        m1_samp_grid = np.linspace(m1_obs/np.exp(sigma)**5,m1_obs*np.exp(sigma)**5,bins)
+##        m1_samp_grid = np.append(m1_samp_grid,mbh_max)
+##        m1_samp_grid = m1_samp_grid[m1_samp_grid.argsort()]
+##    print m1_samp_grid.min(), m1_samp_grid.max()
+##    if f == None:
+##        x = np.logspace(np.log10(2/1.1), np.log10(400*1.1),300)
+##        y = cov_twofun(x, a=a, mbh_max=mbh_max, mbh_min=mbh_min,sigma=sigma)
+##        f = interpolate.interp1d(x, y)  # Use interpolate to make cal faster
+#    joint = poss_ln_gaussian(m1_samp_grid, mu=mu, sigma=sigma) * f(m1_samp_grid)
+#    likeli = (joint[1:]+joint[:-1])/2 * (m1_samp_grid[1:]-m1_samp_grid[:-1])
+#    return likeli.sum()
+##Test if likelihood is well defined and the difference by changing the bins.
+##print mass_fun_i(79,a = 2.35, mbh_max=80, mbh_min=5),
+##print likelihood_lognorm( 5.09 , 5*0.2 ,a = 2.35, mbh_max=80, mbh_min=5)
+##print (likelihood(m,dm)-likelihood(m,dm, bins=100002))/likelihood(m,dm, bins=100002) * 100, '%'
+##print (likelihood(6,1, bins=400).sum()-likelihood(6,1).sum())/likelihood(6,1).sum()
+"""
 
 def random_Theta(seed_vol=100000):
     '''
     Purpose:
     Use MC to realize the selection effect given the: Chripmass, dl
-    Parameter
-    --------
-        a: The blash of blash
-        b: The blash of blash
-        c: The blash of blash
     Return
     --------
         A sth sth
@@ -119,7 +115,32 @@ def random_Theta(seed_vol=100000):
     print "This means the random_Theta calculation is on, which shouldn't appear more than once"
     return thetas
 
-def fac_s_eff_s(dl,mass_Chirp,thetas=None,r0 = 1527):
+def m1_fac_select_effect(m1, mbh_min=5, thetas=None, itera=5000, r0 = 1527.):
+    '''
+    Purpose:
+    Use MC to evaluate the possibility of detecting m1
+    Return
+    --------
+        The possibility of detecting m1
+    '''    
+    if thetas is None:
+        thetas = random_Theta()
+    m2 = np.random.uniform(mbh_min, m1, size = itera)
+    mass_Chirp = cal_chirpmass(m1,m2)
+    zs = random_z(itera=itera)
+    dl = cal_dl(zs)
+    over_rho0 = []
+    for i in range(itera):
+        rhos = 8.*thetas * r0/dl[i] * ((1+zs[i])*mass_Chirp[i]/1.2)**(5/6.)
+        over_rho0.append(np.sum([rhos>8])/float(len(rhos)))
+    over_rho0 = np.asarray(over_rho0)
+    return over_rho0
+thetas = random_Theta()
+over_rho0 = m1_fac_select_effect(m1=6, thetas=thetas)
+print 'm1_fac_select_effect', np.average(over_rho0)
+
+
+def fac_s_eff_s(dl,mass_Chirp,thetas=None,r0 = 1527.):
     '''
     Purpose:
     Use the MC result of Theta's to evalute the selection effect factor given the specific value
@@ -143,55 +164,45 @@ def fac_s_eff_s(dl,mass_Chirp,thetas=None,r0 = 1527):
     rhos = 8.*thetas * r0/dl * ((1+zs)*mass_Chirp/1.2)**(5/6.)
     ratio = len(rhos[rhos>8])/float(len(rhos))
     return ratio
+##Test the func: fac_s_eff_s
+#thetas = random_Theta()
+#print 'the possibility of detecting:', fac_s_eff_s(dl=5000, mass_Chirp=7, thetas=thetas)
 
-def count_poss(need_bin, a):
+def fac_s_eff_v(dl,mass_Chirp,thetas=None,r0 = 1527.):
     '''
-    Purpose
-    Calculate the 'possibility' in b which exceed need_bin
-    '''
-    return 1-a[:need_bin].sum()/a.sum()
+    Purpose:
+        Same as fac_s_eff_s but vectorize
+    '''    
+    if thetas is None:
+        thetas = random_Theta()
+    vec_solve_z = np.vectorize(solve_z)
+    zs = vec_solve_z(dl)
+    need_theta = 8./(8. * r0/dl * ((1+zs)*mass_Chirp/1.2)**(5/6.))
+#    print need_theta
+    ratios = np.sum(need_theta<thetas[:,None],axis=0)/float(len(thetas))
+    return ratios
+#thetas = random_Theta()
+#print 'the possibility of detecting:', fac_s_eff_v(dl = np.linspace(5000,8000,3), mass_Chirp = np.linspace(7,8,3), thetas=thetas)
 
-def twod_fac_s_eff_s(v_dl,v_mass_Chirp,thetas=None,r0 = 1527):
+
+def twod_fac_s_eff_s(dl,mass_Chirp,thetas=None,r0 = 1527.):
     '''
     same as fac_s_eff_s but in 2-dimensional. dl as first D and mass as second D.
     '''
     if thetas is None:
         thetas = random_Theta()
     vec_solve_z = np.vectorize(solve_z)
-    v_zs = vec_solve_z(v_dl)
-    need_theta = 8./(8. * r0/v_dl[:,None] * ((1+v_zs[:,None])*v_mass_Chirp/1.2)**(5/6.))
-#    hist_a,hist_b,_ = plt.hist(thetas, bins=201)
-#    plt.close()
-#    need_bins = np.sum((need_theta>hist_b[:,None,None]),axis=0)
-#    v_ratio = np.zeros((11,10))
-#    for i in range(len(v_ratio)):
-#        for j in range(len(v_ratio.T)):
-#            v_ratio[i][j] = count_poss(need_bins[i][j], hist_a)
-##            print i, j, count_poss(need_bins[i][j], hist_a)
+    v_zs = vec_solve_z(dl)
+    need_theta = 8./(8. * r0/dl[:,None] * ((1+v_zs[:,None])*mass_Chirp/1.2)**(5/6.))
     v_ratio = np.sum(need_theta<thetas[:,None,None],axis=0)/float(len(thetas))
     return v_ratio
-#Test twod_fac_s_eff_s
-#thetas = random_Theta()
-#v_ratio = twod_fac_s_eff_s(v_dl = np.linspace(7000,8000,11), v_mass_Chirp = np.linspace(7,8,10), thetas=thetas)
-#print v_ratio
-
-#def twod_fac_s_eff_s(v_dl,v_mass_Chirp,thetas=None,r0 = 1527):
-#    '''
-#    same as fac_s_eff_s but in 2-dimensional. dl as first D and mass as second D.
-#    '''
-#    if thetas is None:
-#        thetas = random_Theta()
-#    vec_solve_z = np.vectorize(solve_z)
-#    v_zs = vec_solve_z(v_dl)
-#    v_rhos = 8.*thetas * r0/v_dl[:,None,None] * ((1+v_zs[:,None,None])*v_mass_Chirp[:,None]/1.2)**(5/6.)  # This is supposed in 3D...
-#    v_ratio = np.sum(v_rhos>8,axis=2)/float(len(thetas))
-#    return v_ratio
 ##Test twod_fac_s_eff_s
 #thetas = random_Theta()
-#v_ratio = twod_fac_s_eff_s(v_dl = np.linspace(7000,8000,11), v_mass_Chirp = np.linspace(7,8,10), thetas=thetas)
-#print v_ratio
+#v_ratio = twod_fac_s_eff_s(dl = np.linspace(7000,8000,11), mass_Chirp = np.linspace(7,8,10), thetas=thetas)
+#print v_ratio.shape
 
-def fac_s_eff_un(dl, dl_sig,mass_Chirp, mass_Chirp_sig,thetas=None,r0 = 1527):
+
+def fac_s_eff_un(dl, dl_sig, mass_Chirp, mass_Chirp_sig,thetas=None,r0 = 1527):
     '''
     Purpose:
     Similar to fac_s_eff_s, but the data are provided with uncertainty. The possiblity
@@ -215,30 +226,14 @@ def fac_s_eff_un(dl, dl_sig,mass_Chirp, mass_Chirp_sig,thetas=None,r0 = 1527):
         dl_low = 1
     dl_grid = np.linspace(dl_low,dl+3*dl_sig,num=11)
     chirpm_grid = np.linspace(mass_Chirp-5*mass_Chirp_sig,mass_Chirp+5*mass_Chirp_sig,num=10)
-    twod_fac = twod_fac_s_eff_s(v_dl=dl_grid,v_mass_Chirp=chirpm_grid,thetas=thetas,r0 = r0)
+    twod_fac = twod_fac_s_eff_s(dl=dl_grid,mass_Chirp=chirpm_grid,thetas=thetas,r0 = r0)
     marginalize_aix0 = np.sum( (twod_fac * poss_gaussian(dl_grid,dl,dl_sig)[:,None])[1:] *(dl_grid[1:]-dl_grid[:-1]), axis=0)
     marginalize_aix1 = np.sum( (marginalize_aix0 * poss_gaussian(chirpm_grid,mass_Chirp,mass_Chirp_sig))[1:] * (chirpm_grid[1:]- chirpm_grid[:-1]))
     return marginalize_aix1
-
+##Test func fac_s_eff_un
 #thetas = random_Theta()
-def posterior(m1_obs, dm1_obs, dl, dl_sig,mass_Chirp, mass_Chirp_sig, a=2.35, mbh_max=80., mbh_min=5., r0 = 1527):
-    '''
-    Purpose:
-    Calculate the posterior given the data include the m1, dl, chirpmass and their uncertainties.
-
-    Parameter
-    --------
-    m1_obs, dm1_obs: m1 and m1's uncertainty
-
-    Return
-    --------
-        The possibility
-    '''
-    prior = fac_s_eff_un(dl=dl, dl_sig=dl_sig,mass_Chirp=mass_Chirp, mass_Chirp_sig=mass_Chirp_sig,thetas=thetas,r0 = r0)
-    likeli = likelihood(m1_obs, dm1_obs, a=a, mbh_max=mbh_max, mbh_min=mbh_min)
-    poster = prior * likeli
-    return poster
-
+#fac_s_eff_un = fac_s_eff_un(7000, 1000,9, 1,thetas=thetas)
+#print fac_s_eff_s(7000,9,thetas=thetas), fac_s_eff_un
 
 #==============================================================================
 #For the test: 

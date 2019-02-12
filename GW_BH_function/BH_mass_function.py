@@ -194,8 +194,38 @@ def solve_z(lum_dis, om=0.3, h0=70):
     return zs[0]
 #print solve_z(15500)
 
+def random_z(itera = 1, fname='../data/BHBHrates.dat'):
+    h0=70.
+    om = 0.3
+    c=299790.
+    dH=c/h0
+    f=open(fname)
+    bhbh = np.loadtxt(f)
+    bhbh=bhbh[bhbh[:,0].argsort()]
+    z = bhbh[:,0]
+    scenario = 2        # 2 is standard low
+    n0 = bhbh[:,scenario]*10**(-9) 
+    Dist = vec_r(z,om)
+    dotN = 4 * np.pi * dH**3. * (n0/(1+z)) * Dist**2* Ez(z,om)
+    p_dotN = dotN[1:] * (z[1:]-z[:-1])
+    norm_n = p_dotN.sum()
+    dotN /= norm_n              # The total BHBH events, in order to normalize the total BHBH numbers
+    R = np.zeros([len(z),3])
+    R[:,0]=z
+    R[:,1]=dotN     # The possibility density of pointing to one GW event.
+    R[0,2]=0
+    for i in range(len(z)-1):
+        R[i+1,2]=R[i,2]+R[i,1]*(R[i+1,0]-R[i,0])
+    R[:,1]=R[:,1]/R[-1,2]
+    R[:,2]=R[:,2]/R[-1,2]
+    zs = np.zeros(itera)
+    for i in range(itera):
+        idx = int(np.sum(np.random.random()>R[:,2]))    # minus one so that the idx can start from zero. (i.e. [:-1])
+        zs[i] = R[idx, 0] #np.random.uniform(R[idx, 0],R[idx+1, 0])
+    return zs
+
 class gene_BHBH:
-    def __init__(self, h0=70):
+    def __init__(self, h0=70.):
         self.h0 = h0
 #        global n0, om, rho0, r0, c
         self.c=299790. # speed of light [km/s]
@@ -207,11 +237,9 @@ class gene_BHBH:
         bhbh = np.loadtxt(f)
         self.bhbh=bhbh[bhbh[:,0].argsort()]
         self.z = self.bhbh[:,0]
-        
         self.om = 0.3
         scenario = 2        # 2 is standard low
         self.n0 = self.bhbh[:,scenario]*10**(-9) 
-        
     def num_year_rate(self, ave_chirp_mass = 6.7):
         '''
         Numerically calcualte the rate as show in Arxiv: 1409.8360
@@ -232,12 +260,11 @@ class gene_BHBH:
         dis_dotN = dotN[:-1]*Ctheta2[:-1]
         year_rate = np.sum(dis_dotN* (z[1:]-z[:-1]))
         return dis_dotN, year_rate, Ctheta2
-    
     def mc_year_rate(self, seed_vol= 10000, itera = 40, a=2.35, mbh_max=80., mbh_min=5.):
         '''
         Use MCMC to calculate the rate, with steps equals to seed_vol.
             1. the BH mass are randomly given with BH_mass_function.
-            2. the Theta are randomly given using the Theta_class
+            2. the Theta are randovec_rmly given using the Theta_class
         '''
         z = self.z
         dH=self.c/self.h0
@@ -262,7 +289,9 @@ class gene_BHBH:
         R[:,1]=dotN     # The possibility density of pointing to one GW event.
         R[0,2]=0
         for i in range(len(z)-1):
-            R[i+1,2]=R[i,2]+R[i,1]*(R[i+1,0]-R[i,0])          
+            R[i+1,2]=R[i,2]+R[i,1]*(R[i+1,0]-R[i,0])    
+        R[:,1]=R[:,1]/R[-1,2]
+        R[:,2]=R[:,2]/R[-1,2]
         over_rate = np.zeros(itera)
         zs_detected, rhos_detected = np.array([]), np.array([])
         for j in range(itera):
@@ -313,7 +342,7 @@ class gene_BHBH:
 #test = gene_BHBH()
 ##dis_dotN, year_rate, Ctheta2 = test.num_year_rate()
 ##event_rate, zs_detected, masses, rhos_detected = test.mc_year_rate(a=1.5, mbh_max=45.)
-#event_rate, zs_detected, masses, rhos_detected = test.mc_year_rate(a=2.35, mbh_max=80.)
+#event_rate, zs_detected, masses, rhos_detected = test.mc_year_rate(seed_vol= 1000, itera = 4,a=2.35, mbh_max=80.)
 #print event_rate
 #
 #plt.hist(zs_detected)

@@ -13,8 +13,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 import glob
 from BH_mass_function import BH_mass_function
-#from cal_likelihood import likelihood_lognorm as likelihood_i
-likelihood = np.vectorize(likelihood_i)
 from scipy.optimize import fmin
 import time
 t1 = time.time()
@@ -30,7 +28,7 @@ if use_method == 'med':
 #elif use_method == 'exp':
 #    filename = 'test2_1_trans_exp_obsun{0}.txt'.format(int(m_noise_level*100))
 
-def point_Chisq(para, m1_obs,m1_sig):
+def point_Chisq(para, m1_obs,m_noise_level):
     a,mbh_max,mbh_min  = para
     if 1.1 < a < 3 and 50 < mbh_max < 100 and 2 < mbh_min < 8:
         x = np.logspace(np.log10(m1_obs.min()/1.1), np.log10(m1_obs.max()*1.1),300)
@@ -78,7 +76,7 @@ for loop in range(rounds):
     m1_obs = np.random.lognormal(m1_mu, m_noise_level, size=m1.shape)  #Generating for the mu as med, 
     m1_sig_fake = m1_obs * m_noise_level      #The fake "sigma", (m1_obs * m_noise_level) and (m1 * m_noise_level)
     print "m1_obs.min(), m1_obs.max():",m1_obs.min(), m1_obs.max()
-    mini=fmin(point_Chisq,para_ini,maxiter=1000, args=(m1_obs, m1_sig_fake))
+    mini=fmin(point_Chisq,para_ini,maxiter=1000, args=(m1_obs, m_noise_level))
     if loop > 0:
         para_result = open(filename,'r+')
         para_result.read()
