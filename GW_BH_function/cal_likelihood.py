@@ -14,6 +14,7 @@ from BH_mass_function import Theta, solve_z, random_z, cal_chirpmass
 from BH_mass_function import dl as cal_dl
 from scipy.integrate import quad
 from scipy import interpolate
+import pickle
 
 def mass_fun_i(m1, a, mbh_max, mbh_min):
     if m1>=mbh_min and m1<=mbh_max:
@@ -30,14 +31,6 @@ def poss_gaussian(m1, mu, sigma):
 def poss_ln_gaussian(m1, mu, sigma):
     poss =  1/(m1 * sigma * np.sqrt(2 * np.pi)) * np.exp(-(np.log(m1) - mu)**2/(2*sigma**2))
     return poss
-
-def joint_twofun(tau, t, a=2.35, mbh_max=80, mbh_min=5, sigma =0.2):
-    return mass_fun_i(tau, a=a, mbh_max=mbh_max, mbh_min=mbh_min) * poss_ln_gaussian(t, mu=np.log(tau), sigma = sigma)
-def cov_twofun(t, a=2.35, mbh_max=80, mbh_min=5, sigma =0.2):
-    inter = quad(joint_twofun, 0, 200, args=(t, a, mbh_max, mbh_min,sigma))[0]
-    return inter
-cov_twofun=np.vectorize(cov_twofun)   
-
 """
 However, it turns out the likelihood is not "necessary":
 #def likelihood(m1_obs, dm1_obs, a=2.35, mbh_max=80., mbh_min=5., bins = None):
@@ -135,9 +128,61 @@ def m1_fac_select_effect(m1, mbh_min=5, thetas=None, itera=5000, r0 = 1527.):
         over_rho0.append(np.sum([rhos>8])/float(len(rhos)))
     over_rho0 = np.asarray(over_rho0)
     return over_rho0
-thetas = random_Theta()
-over_rho0 = m1_fac_select_effect(m1=6, thetas=thetas)
-print 'm1_fac_select_effect', np.average(over_rho0)
+#thetas = random_Theta()
+#over_rho0 = m1_fac_select_effect(m1=6, thetas=thetas)
+#print 'm1_fac_select_effect', np.average(over_rho0)
+def m1_array_select_effect(mbh_min=5., thetas=None, itera=10000, r0 = 1527., bins=250):
+    '''
+    Purpose:
+    based on def m1_fac_select_effect to derive a m1_array prior
+    '''    
+    m1s = np.logspace(np.log10(mbh_min+0.01), np.log10(200), bins)
+    priors = np.zeros(bins)
+    for i in range(bins):
+        m1 = m1s[i]
+        priors[i] = np.average(m1_fac_select_effect(m1=m1,mbh_min=mbh_min, thetas=thetas, itera=itera, r0 = r0))
+        if i/20 > (i-1)/20:
+            print "Total bins:", bins, "; Finish i:", i
+    return m1s, priors
+#thetas = random_Theta()
+#import time
+#t1= time.time()
+#m1s, priors = m1_array_select_effect(mbh_min=5, thetas=thetas)
+#plt.plot(m1s,priors)
+#plt.xlim(0,150)
+#plt.show()
+#t2 = time.time()
+#print (t2-t1)/60. , "mins"    
+#pickle.dump([m1s, priors], open('select_effect_MBHmin5', 'wb'))
+def select_effect(m1, fname='select_effect_MBHmin5'):
+    x, y = pickle.load(open(fname,'rb'))
+    f = interpolate.interp1d(x, y)
+    if x[0]<m1<x[-1]:
+        return f(m1)
+    elif m1:
+        return 0
+def joint_prior_lognorm(tau, t, sigma =0.2):
+    return select_effect(tau) * poss_ln_gaussian(t, mu=np.log(tau), sigma = sigma)
+def cov_prior_lognorm(t, sigma =0.2):
+    inter = quad(joint_prior_lognorm, 0, 200, args=(t,sigma))[0]
+    return inter
+#cov_prior_lognorm=np.vectorize(cov_prior_lognorm)   
+#m1_obs = np.logspace(np.log10(0.01), np.log10(150), 200)
+#cov_priors = cov_prior_lognorm(m1_obs)
+#plt.plot(m1_obs,cov_priors)
+#plt.xlim(0,150)
+#pickle.dump([m1_obs, cov_priors], open('select_effect_MBHmin5_cov_lognorm0.2', 'wb'))
+#plt.show()
+
+
+def joint_twofun(tau, t, a=2.35, mbh_max=80, mbh_min=5, sigma =0.2):
+    return mass_fun_i(tau, a=a, mbh_max=mbh_max, mbh_min=mbh_min) * poss_ln_gaussian(t, mu=np.log(tau), sigma = sigma)
+def cov_twofun(t, a=2.35, mbh_max=80, mbh_min=5, sigma =0.2):
+    inter = quad(joint_twofun, 0, 200, args=(t, a, mbh_max, mbh_min,sigma))[0]
+    return inter
+cov_twofun=np.vectorize(cov_twofun)   
+
+
 
 
 def fac_s_eff_s(dl,mass_Chirp,thetas=None,r0 = 1527.):

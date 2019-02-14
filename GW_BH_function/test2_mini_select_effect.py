@@ -24,6 +24,7 @@ import numpy as np
 import astropy.io.fits as pyfits
 import matplotlib.pyplot as plt
 from BH_mass_function import gene_BHBH, dl, solve_z
+from cal_likelihood import fac_s_eff_v
 import pickle
 import glob
 import random
@@ -66,8 +67,13 @@ zs_all, chirp_mass_all, m1_all, m2_all, lumi_dis_all = zs_detected, masses[:,0],
 from scipy import interpolate
 from cal_likelihood import cov_twofun
 from scipy.optimize import fmin
-from cal_likelihood import random_Theta, fac_s_eff_v  #The prior given dl and chirpmass, no errorbar
-
+from cal_likelihood import random_Theta  #The prior given dl and chirpmass, no errorbar
+def select_effect(m1_obs, fname = 'select_effect_MBHmin5_cov_lognorm0.2'):
+    x, y  = pickle.load(open(fname,'rb'))
+    f = interpolate.interp1d(x, y)
+    prior = f(m1_obs)
+    return prior
+    
 def posterior(para, m1_obs,m_noise_level,prior):
     a,mbh_max,mbh_min  = para
     if 1.1 < a < 3 and 50 < mbh_max < 100 and 2 < mbh_min < 8:
@@ -75,14 +81,14 @@ def posterior(para, m1_obs,m_noise_level,prior):
         y = cov_twofun(x, a=a, mbh_max=mbh_max, mbh_min=mbh_min,sigma=m_noise_level)
         f = interpolate.interp1d(x, y)
         poss_m1_i = f(m1_obs)
-        post = poss_m1_i / prior
-        chisq = -0.5*np.sum(np.log(post))
+        post = poss_m1_i #/ prior
+        chisq = -0.5*np.sum(np.log(post) / prior)
         return chisq
     else:
         return np.inf       
 #    even
 
-def each_likeli(para, m1_obs,m1_sig):
+def each_likeli(para, m1_obs,m1_sig,prior):
     a,mbh_max,mbh_min  = para
     if 1.1 < a < 3 and 50 < mbh_max < 100 and 2 < mbh_min < 8:
         x = np.logspace(np.log10(m1_obs.min()/np.exp(m_noise_level)**5/1.1), np.log10(m1_obs.max()*np.exp(m_noise_level)**5*1.1),300)
@@ -90,7 +96,7 @@ def each_likeli(para, m1_obs,m1_sig):
         f = interpolate.interp1d(x, y)
 #        poss_m1_i = likelihood(m1_obs,m1_sig, a=a, mbh_max=mbh_max, mbh_min=mbh_min, use_method='med', f=f)
         poss_m1_i = f(m1_obs)
-        post = poss_m1_i / prior
+        post = poss_m1_i #(1/ prior)
 #        print a, mbh_max, mbh_min, chisq
         return post
     else:
@@ -101,14 +107,14 @@ m_noise_level = 0.20
 thetas = random_Theta()
 
 para_ini = [a, mbh_max, mbh_min]
-filename = 'test2_select_eff_{0}.txt'.format(int(m_noise_level*100)) 
+filename = 'test2_select_eff_dl-chirpmass-taken_{0}.txt'.format(int(m_noise_level*100)) 
 if_file = glob.glob(filename)
 if if_file == []:
     para_result =  open(filename,'w') 
 else:
     para_result =  open(filename,'r+') 
 t1 = time.time()
-rounds = 1
+rounds = 500
 index = np.arange(len(m1_all))
 for loop in range(rounds):
     idx = random.sample(index, 1000)
@@ -119,11 +125,12 @@ for loop in range(rounds):
     m1_sigstar= np.exp(m_noise_level)  #Not useful in the generate generation, but useful in understand the upper lower level.
     m1_obs = np.random.lognormal(m1_mu, m_noise_level, size=m1.shape)  #Generating for the mu as med, 
     m1_sig_fake = m1_obs * m_noise_level      #The fake "sigma", (m1_obs * m_noise_level) and (m1 * m_noise_level)
+#    prior = select_effect(m1_obs)
     prior = fac_s_eff_v(dl=dl, mass_Chirp=mass_Chirp, thetas=thetas)
     print "m1_obs.min(), m1_obs.max():",m1_obs.min(), m1_obs.max()
     mini=fmin(posterior,para_ini,maxiter=1000, args=(m1_obs, m_noise_level, prior))
-    print "ini Chisq:", posterior(para_ini, m1_obs,m_noise_level,prior)
-    print "Minimazied Chisq:", posterior(mini, m1_obs,m_noise_level,prior)
+#    print "ini Chisq:", posterior(para_ini, m1_obs,m_noise_level,prior)
+#    print "Minimazied Chisq:", posterior(mini, m1_obs,m_noise_level,prior)
     if loop > 0:
         para_result = open(filename,'r+')
         para_result.read()
@@ -138,15 +145,20 @@ for loop in range(rounds):
     print "loop:", loop, "m_noise_level", m_noise_level
     print "Finish percent:",round(time_sp/time_total*100,2),"%" ,"total time needed :", round(time_total/60,2), "mins", "time_left", round(t_left/60,2), 'mins'
 
-m1_put = m1_obs
-dis_likeli_true = each_likeli(para_ini, m1_put, m1_put * m_noise_level)
-dis_likeli_mini = each_likeli(mini, m1_put, m1_put * m_noise_level)
-
-plt.figure(figsize=(10, 8))
-plt.plot(m1_put, dis_likeli_true, 'r.')
-plt.plot(m1_put, dis_likeli_mini, '.')
-#plt.xlim([20,40])
-#plt.ylim([0,0.05])
-plt.show()
-print dis_likeli_true.sum()
-print dis_likeli_mini.sum()
+#m1_put = m1_obs
+#dis_likeli_true = each_likeli(para_ini, m1_put, m1_put * m_noise_level,prior)
+#dis_likeli_mini = each_likeli(mini, m1_put, m1_put * m_noise_level,prior)
+#
+#plt.figure(figsize=(10, 8))
+#plt.plot(m1_put, np.log(dis_likeli_true)/prior, 'r.')
+#plt.plot(m1_put, np.log(dis_likeli_mini)/prior, '.')
+##plt.xlim([20,40])
+##plt.ylim([0,0.05])
+#plt.show()
+##print dis_likeli_true
+##print dis_likeli_mini
+#Chisq_true =-0.5*np.sum(np.log(dis_likeli_true)) 
+#Chisq_mini =-0.5*np.sum(np.log(dis_likeli_mini))
+#print Chisq_true
+#print Chisq_mini
+#print Chisq_true- Chisq_mini
