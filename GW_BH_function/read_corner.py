@@ -12,7 +12,7 @@ import astropy.io.fits as pyfits
 import matplotlib.pyplot as plt
 
 import corner
-filename = 'test2_select_eff_dl-chirpmass-taken_20.txt'
+filename = 'test2_select-eff_noise-dl-chirpmass-taken_20.txt'
 print filename
 with open(filename) as f:
         content = f.readlines()

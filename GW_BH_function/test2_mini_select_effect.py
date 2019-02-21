@@ -74,7 +74,7 @@ def select_effect(m1_obs, fname = 'select_effect_MBHmin5_cov_lognorm0.2'):
     prior = f(m1_obs)
     return prior
     
-def posterior(para, m1_obs,m_noise_level,prior):
+def posterior(para, m1_obs,m_noise_level,prior,prior_true=None):
     a,mbh_max,mbh_min  = para
     if 1.1 < a < 3 and 50 < mbh_max < 100 and 2 < mbh_min < 8:
         x = np.logspace(np.log10(m1_obs.min()/1.1), np.log10(m1_obs.max()*1.1),300)
@@ -82,7 +82,9 @@ def posterior(para, m1_obs,m_noise_level,prior):
         f = interpolate.interp1d(x, y)
         poss_m1_i = f(m1_obs)
         post = poss_m1_i #/ prior
-        chisq = -0.5*np.sum(np.log(post) / prior)
+        if prior_true is not None:
+            prior[np.where(prior<prior_true.min())]  = prior_true.min()
+        chisq = -0.5*np.sum(np.log(post)/prior)
         return chisq
     else:
         return np.inf       
@@ -107,7 +109,7 @@ m_noise_level = 0.20
 thetas = random_Theta()
 
 para_ini = [a, mbh_max, mbh_min]
-filename = 'test2_select_eff_dl-chirpmass-taken_{0}.txt'.format(int(m_noise_level*100)) 
+filename = 'test2_select-eff_based_m1_{0}.txt'.format(int(m_noise_level*100)) 
 if_file = glob.glob(filename)
 if if_file == []:
     para_result =  open(filename,'w') 
@@ -120,15 +122,19 @@ for loop in range(rounds):
     idx = random.sample(index, 1000)
     m1 = m1_all[idx]
     dl = lumi_dis_all[idx]
+    dl_noised =  np.random.lognormal(np.log(dl), 0.35, size=dl.shape)
     mass_Chirp = chirp_mass_all[idx]
+    mass_Chirp_noised = np.random.lognormal(np.log(mass_Chirp), 0.17, size=mass_Chirp.shape)
     m1_mu = np.log(m1)   # 0_med np.log(mu_star) = mu 
     m1_sigstar= np.exp(m_noise_level)  #Not useful in the generate generation, but useful in understand the upper lower level.
     m1_obs = np.random.lognormal(m1_mu, m_noise_level, size=m1.shape)  #Generating for the mu as med, 
     m1_sig_fake = m1_obs * m_noise_level      #The fake "sigma", (m1_obs * m_noise_level) and (m1 * m_noise_level)
-#    prior = select_effect(m1_obs)
-    prior = fac_s_eff_v(dl=dl, mass_Chirp=mass_Chirp, thetas=thetas)
+    prior = select_effect(m1_obs)
+#    prior_true = fac_s_eff_v(dl=dl, mass_Chirp=mass_Chirp, thetas=thetas)
+#    prior = fac_s_eff_v(dl=dl_noised, mass_Chirp=mass_Chirp_noised, thetas=thetas)
     print "m1_obs.min(), m1_obs.max():",m1_obs.min(), m1_obs.max()
     mini=fmin(posterior,para_ini,maxiter=1000, args=(m1_obs, m_noise_level, prior))
+#    mini_true = fmin(posterior,para_ini,maxiter=1000, args=(m1_obs, m_noise_level, prior))
 #    print "ini Chisq:", posterior(para_ini, m1_obs,m_noise_level,prior)
 #    print "Minimazied Chisq:", posterior(mini, m1_obs,m_noise_level,prior)
     if loop > 0:
