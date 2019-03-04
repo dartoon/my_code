@@ -74,17 +74,18 @@ def select_effect(m1_obs, fname = 'select_effect_MBHmin5_cov_lognorm0.2'):
     prior = f(m1_obs)
     return prior
     
-def posterior(para, m1_obs,m_noise_level,prior,prior_true=None):
+def posterior(para, m1_obs,m_noise_level,sf_factor):
     a,mbh_max,mbh_min  = para
     if 1.1 < a < 3 and 50 < mbh_max < 100 and 2 < mbh_min < 8:
         x = np.logspace(np.log10(m1_obs.min()/1.1), np.log10(m1_obs.max()*1.1),300)
         y = cov_twofun(x, a=a, mbh_max=mbh_max, mbh_min=mbh_min,sigma=m_noise_level)
         f = interpolate.interp1d(x, y)
         poss_m1_i = f(m1_obs)
-        post = poss_m1_i #/ prior
-        if prior_true is not None:
-            prior[np.where(prior<prior_true.min())]  = prior_true.min()
-        chisq = -0.5*np.sum(np.log(post)/prior)
+        post = poss_m1_i
+#        if prior_true is not None:
+#            prior[np.where(prior<prior_true.min())]  = prior_true.min()
+#        sf_factor[np.where(sf_factor>75)]  = 75  # Do it in other place
+        chisq = -0.5*np.sum(np.log(post)*sf_factor)
         return chisq
     else:
         return np.inf       
@@ -109,15 +110,31 @@ m_noise_level = 0.20
 thetas = random_Theta()
 
 para_ini = [a, mbh_max, mbh_min]
-filename = 'test2_select-eff_based_m1_{0}.txt'.format(int(m_noise_level*100)) 
+filename = 'test2_select-eff_correct_sigmalogdiv3_{0}.txt'.format(int(m_noise_level*100)) 
 if_file = glob.glob(filename)
 if if_file == []:
     para_result =  open(filename,'w') 
 else:
     para_result =  open(filename,'r+') 
 t1 = time.time()
-rounds = 500
+rounds = 200
 index = np.arange(len(m1_all))
+
+# =============================================================================
+# Infer the information of the sigma.
+# =============================================================================
+#lines = np.loadtxt('inveres_prior_scatter.txt')
+#invprior_true, invprior_mean, invprior_median, m1_list, m1_obs_list, dl_list, massChirp_list = [lines[:,i] for i in range(len(lines.T))]
+#solve_z = np.vectorize(solve_z)
+#z = solve_z(np.array(dl_list))
+#x = np.log(np.array(dl_list)*(1/np.array(massChirp_list)**(5/6.))/(1+z)**(5/6.) )
+#sigma = np.sqrt(2*np.log(np.array(invprior_mean)/np.array(invprior_median)))
+#y = sigma
+#y = y[x!=x.min()] #Delete the mini point
+#x = x[x!=x.min()]
+#v_min, v_max = x.min(), x.max()
+#fit1d = np.poly1d(np.polyfit(x, y, 30))
+
 for loop in range(rounds):
     idx = random.sample(index, 1000)
     m1 = m1_all[idx]
@@ -129,11 +146,22 @@ for loop in range(rounds):
     m1_sigstar= np.exp(m_noise_level)  #Not useful in the generate generation, but useful in understand the upper lower level.
     m1_obs = np.random.lognormal(m1_mu, m_noise_level, size=m1.shape)  #Generating for the mu as med, 
     m1_sig_fake = m1_obs * m_noise_level      #The fake "sigma", (m1_obs * m_noise_level) and (m1 * m_noise_level)
-    prior = select_effect(m1_obs)
-#    prior_true = fac_s_eff_v(dl=dl, mass_Chirp=mass_Chirp, thetas=thetas)
-#    prior = fac_s_eff_v(dl=dl_noised, mass_Chirp=mass_Chirp_noised, thetas=thetas)
+#    prior = select_effect(m1_obs)
+    prior_true = fac_s_eff_v(dl=dl, mass_Chirp=mass_Chirp, thetas=thetas)
+    prior = fac_s_eff_v(dl=dl_noised, mass_Chirp=mass_Chirp_noised, thetas=thetas)
+    prior[prior==0] = 0.001
+    sf_factor = 1/prior
+#    sf_factor[np.where(sf_factor>300)]  = 300
+#    z_inf = solve_z(np.array(dl_noised))
+#    x_value = np.log(np.array(dl_noised)*(1/np.array(mass_Chirp_noised)**(5/6.))/(1+z_inf)**(5/6.))
+#    sf_sigma = fit1d(x_value)
+#    sf_sigma[x_value<v_min] = fit1d(v_min)
+#    sf_sigma[x_value>v_max] = fit1d(v_max)
+#    sf_sigma = 0.434302399  # The mean value of the sigma
+    sf_sigma = np.log(sf_factor)/3
+    sf_factor = sf_factor/np.exp(sf_sigma**2/2)
     print "m1_obs.min(), m1_obs.max():",m1_obs.min(), m1_obs.max()
-    mini=fmin(posterior,para_ini,maxiter=1000, args=(m1_obs, m_noise_level, prior))
+    mini=fmin(posterior,para_ini,maxiter=1000, args=(m1_obs, m_noise_level, sf_factor))
 #    mini_true = fmin(posterior,para_ini,maxiter=1000, args=(m1_obs, m_noise_level, prior))
 #    print "ini Chisq:", posterior(para_ini, m1_obs,m_noise_level,prior)
 #    print "Minimazied Chisq:", posterior(mini, m1_obs,m_noise_level,prior)

@@ -44,7 +44,7 @@ def select_effect(m1_obs, fname = 'select_effect_MBHmin5_cov_lognorm0.2'):
     prior = f(m1_obs)
     return prior
 
-#thetas = random_Theta()
+thetas = random_Theta()
 
 #filename = 'inveres_prior_scatter.txt'
 #if_file = glob.glob(filename)
@@ -53,7 +53,8 @@ def select_effect(m1_obs, fname = 'select_effect_MBHmin5_cov_lognorm0.2'):
 #else:
 #    scatter_result =  open(filename,'r+') 
 #invprior_true, invprior_mean, invprior_median, m1_list, m1_obs_list, dl_list, massChirp_list = [], [], [], [], [], [], []
-#index = np.arange(len(m1_all))
+index = np.arange(len(m1_all))
+
 #for i in range(1):
 #    idx = random.sample(index, 1)
 #    m1 = m1_all[idx]
@@ -103,12 +104,11 @@ def select_effect(m1_obs, fname = 'select_effect_MBHmin5_cov_lognorm0.2'):
 ##                         repr(dl_list[i]) +' ' + repr(massChirp_list[i]) +"\n")
 ##    scatter_result.close()
 #    if i/5 > (i-1)/5: 
-#        print "invprior_True, invprior_mean, invprior_median, m1_obs"
+#        print "invprior_True, invprior_median,invprior_mean, m1_obs"
 #        print i,':', invprior_true[i], invprior_median[i], invprior_mean[i], m1_obs_list[i]
 #        print "sigma", np.sqrt(2*np.log(np.array(invprior_mean[i])/np.array(invprior_median[i])))
-#    
 # =============================================================================
-# ### Sigma of the Lognorm  
+# ### Test Sigma of the Lognorm related to which?
 # =============================================================================
 lines = np.loadtxt('inveres_prior_scatter.txt')
 invprior_true, invprior_mean, invprior_median, m1_list, m1_obs_list, dl_list, massChirp_list = [lines[:,i] for i in range(len(lines.T))]
@@ -118,14 +118,43 @@ invprior_true, invprior_mean, invprior_median, m1_list, m1_obs_list, dl_list, ma
 #plt.show()
 #plt.plot(np.log(np.array(massChirp_list)**(5/6.)), np.sqrt(2*np.log(np.array(invprior_mean)/np.array(invprior))),'.')
 #plt.show()
-
 sigma = np.sqrt(2*np.log(np.array(invprior_mean)/np.array(invprior_median)))
 
-#plt.scatter(np.array(massChirp_list), sigma,c=np.array(dl_list))
+#plt.plot(np.log10(invprior_true), sigma,'.')
 #plt.show()
 solve_z = np.vectorize(solve_z)
 z = solve_z(np.array(dl_list))
-plt.plot((np.array(dl_list)*(1/np.array(massChirp_list)**(5/6.))/(1+z)**(5/6.) ), sigma,'.')
+plt.scatter(np.log(np.array(dl_list)*(1/np.array(massChirp_list)**(5/6.))/(1+z)**(5/6.) ), sigma,c= m1_obs_list)
+plt.colorbar()
 plt.show()
-#plt.plot(np.array(dl_list)*(1/np.array(massChirp_list)**(5/6.)), sigma,'.')
-#plt.show()
+
+
+for loop in range(1):
+    idx = random.sample(index, 1000)
+    m1 = m1_all[idx]
+    dl = lumi_dis_all[idx]
+    dl_noised =  np.random.lognormal(np.log(dl), 0.35, size=dl.shape)
+    mass_Chirp = chirp_mass_all[idx]
+    mass_Chirp_noised = np.random.lognormal(np.log(mass_Chirp), 0.17, size=mass_Chirp.shape)
+    m1_mu = np.log(m1)   # 0_med np.log(mu_star) = mu 
+    m1_sigstar= np.exp(m_noise_level)  #Not useful in the generate generation, but useful in understand the upper lower level.
+    m1_obs = np.random.lognormal(m1_mu, m_noise_level, size=m1.shape)  #Generating for the mu as med, 
+    m1_sig_fake = m1_obs * m_noise_level      #The fake "sigma", (m1_obs * m_noise_level) and (m1 * m_noise_level)
+#    prior = select_effect(m1_obs)
+    prior_true = fac_s_eff_v(dl=dl, mass_Chirp=mass_Chirp, thetas=thetas)
+    sf_factor_true = 1/prior_true
+    prior = fac_s_eff_v(dl=dl_noised, mass_Chirp=mass_Chirp_noised, thetas=thetas)
+    prior[prior==0] = 0.001
+    sf_factor = 1/prior
+#    sf_factor[np.where(sf_factor>300)]  = 300
+#    z_inf = solve_z(np.array(dl_noised))
+#    x_value = np.log(np.array(dl_noised)*(1/np.array(mass_Chirp_noised)**(5/6.))/(1+z_inf)**(5/6.))
+#    sf_sigma = fit1d(x_value)
+#    sf_sigma[x_value<v_min] = fit1d(v_min)
+#    sf_sigma[x_value>v_max] = fit1d(v_max)
+#    sf_sigma = 0.434302399  # The mean value of the sigma
+    sf_sigma = np.log(sf_factor)/3
+    sf_factor_cor = sf_factor/np.exp(sf_sigma**2/2)
+    plt.hist(sf_factor_cor - sf_factor_true)
+    plt.show()
+    print np.mean(sf_factor_cor - sf_factor_true) #!!!This is important

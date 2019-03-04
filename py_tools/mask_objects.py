@@ -66,17 +66,22 @@ def detect_obj(img, snr=2.8, exp_sz= 1.2, pltshow=1):
     return objs, c_index
     
 
-def mask_obj(img, snr=3.0, exp_sz= 1.2, pltshow = 1):
+def mask_obj(img, snr=3.0, exp_sz= 1.2, pltshow = 0, npixels=20, return_deblend = False):
     threshold = detect_threshold(img, snr=snr)
-    center_img = len(img)/2
     sigma = 3.0 * gaussian_fwhm_to_sigma# FWHM = 3.
-    kernel = Gaussian2DKernel(sigma, x_size=5, y_size=5)
+    kernel = Gaussian2DKernel(sigma, x_size=npixels/4, y_size=npixels/4)
     kernel.normalize()
-    segm = detect_sources(img, threshold, npixels=10, filter_kernel=kernel)
-    npixels = 20
+    segm = detect_sources(img, threshold, npixels=npixels, filter_kernel=kernel)
+    npixels = npixels
     segm_deblend = deblend_sources(img, segm, npixels=npixels,
                                     filter_kernel=kernel, nlevels=15,
                                     contrast=0.001)
+    columns = ['id', 'xcentroid', 'ycentroid', 'source_sum', 'area']
+    cat = source_properties(img, segm_deblend)
+    tbl = cat.to_table(columns=columns)
+    tbl['xcentroid'].info.format = '.2f'  # optional format
+    tbl['ycentroid'].info.format = '.2f'
+    print(tbl)
     #Number of objects segm_deblend.data.max()
     fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12.5, 10))
     import copy, matplotlib
@@ -87,17 +92,13 @@ def mask_obj(img, snr=3.0, exp_sz= 1.2, pltshow = 1):
     ax1.imshow(img, origin='lower', cmap=my_cmap, norm=LogNorm(), vmin=vmin, vmax=vmax)
     ax1.set_title('Data')
     ax2.imshow(segm_deblend, origin='lower', cmap=segm_deblend.cmap(random_state=12345))
+    for obj in cat:
+        ax2.text(obj.xcentroid.value, obj.ycentroid.value,'ID{0}'.format(obj.id-1),fontsize=20, color='white')
     ax2.set_title('Segmentation Image')
-    plt.close()
-    columns = ['id', 'xcentroid', 'ycentroid', 'source_sum', 'area']
-    cat = source_properties(img, segm_deblend)
-    tbl = cat.to_table(columns=columns)
-    tbl['xcentroid'].info.format = '.2f'  # optional format
-    tbl['ycentroid'].info.format = '.2f'
-    print(tbl)
+    if return_deblend == True:
+        plt.show()
     
     from photutils import EllipticalAperture
-    cat = source_properties(img, segm_deblend)
     segm_deblend_size = segm_deblend.areas
     apertures = []
     for obj in cat:
@@ -110,7 +111,7 @@ def mask_obj(img, snr=3.0, exp_sz= 1.2, pltshow = 1):
         a, b = a_o*r, b_o*r
         theta = obj.orientation.value
         apertures.append(EllipticalAperture(position, a, b, theta=theta))
-    
+    center_img = len(img)/2
     dis_sq = [np.sqrt((apertures[i].positions[0][0]-center_img)**2+(apertures[i].positions[0][1]-center_img)**2) for i in range(len(apertures))]
     dis_sq = np.asarray(dis_sq)
     c_index= np.where(dis_sq == dis_sq.min())[0][0]
@@ -126,14 +127,12 @@ def mask_obj(img, snr=3.0, exp_sz= 1.2, pltshow = 1):
         aperture = apertures[i]
         aperture.plot(color='white', lw=1.5, ax=ax1)
         aperture.plot(color='white', lw=1.5, ax=ax2)
-    if pltshow == 0:
+    if pltshow == 0 or return_deblend == True:
         plt.close()
     else:
         plt.show()
-    
     from regions import PixCoord, EllipsePixelRegion
     from astropy.coordinates import Angle
-    
     obj_masks = []  # In the script, the objects are 1, emptys are 0.
     for i in range(len(apertures)):
         aperture = apertures[i]
@@ -154,7 +153,10 @@ def mask_obj(img, snr=3.0, exp_sz= 1.2, pltshow = 1):
             target_mask = mask
     if obj_masks == []:
         obj_masks.append(np.zeros_like(img))
-    return target_mask, obj_masks
+    if return_deblend == False :
+        return target_mask, obj_masks
+    else:
+        return target_mask, obj_masks, segm_deblend
 
 def find_loc_max(data, neighborhood_size = 4, threshold = 5):
     neighborhood_size = neighborhood_size

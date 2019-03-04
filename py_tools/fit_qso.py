@@ -13,7 +13,7 @@ import corner
 
 def fit_qso(QSO_im, psf_ave, psf_std=None, source_params=None,ps_param=None, background_rms=0.04, pix_sz = 0.168,
             exp_time = 300., fix_n=None, image_plot = True, corner_plot=True,
-            flux_ratio_plot=True, deep_seed = False, fixcenter = False, QSO_msk=None, QSO_std=None,
+            flux_ratio_plot=False, deep_seed = False, fixcenter = False, QSO_msk=None, QSO_std=None,
             tag = None, no_MCMC= False, pltshow = 1, return_Chisq = False):
     '''
     A quick fit for the QSO image with (so far) single sersice + one PSF. The input psf noise is optional.
@@ -235,30 +235,48 @@ def fit_qso(QSO_im, psf_ave, psf_std=None, source_params=None,ps_param=None, bac
                plt.close()
            else:
                plt.show()
-           
         
     if flux_ratio_plot==True and no_MCMC==False:
-        from lenstronomy.Workflow.parameters import Param
-        param = Param(kwargs_model, kwargs_constraints, kwargs_fixed_source=source_params[2], kwargs_fixed_ps=fixed_ps)
+        from lenstronomy.Sampling.parameters import Param
+        param = Param(kwargs_model, kwargs_constraints, kwargs_fixed_source=source_params[2], kwargs_fixed_ps=ps_param[2])
         mcmc_new_list = []
-        labels_new = [r"Quasar flux", r"host_flux", r"source_x", r"source_y"]
-        
-        # transform the parameter position of the MCMC chain in a lenstronomy convention with keyword arguments #
-        for i in range(len(samples_mcmc)/10):
-            kwargs_lens_out, kwargs_light_source_out, kwargs_light_lens_out, kwargs_ps_out, kwargs_cosmo = param.getParams(samples_mcmc[i+ len(samples_mcmc)/10*9])
-            image_reconstructed, _, _, _ = imageModel.image_linear_solve(kwargs_source=kwargs_light_source_out, kwargs_ps=kwargs_ps_out)
-            
-            image_ps = imageModel.point_source(kwargs_ps_out)
-            flux_quasar = np.sum(image_ps)
-            image_disk = imageModel.source_surface_brightness(kwargs_light_source_out, k=0)
-            flux_disk = np.sum(image_disk)
-            source_x = kwargs_ps_out[0]['ra_image']
-            source_y = kwargs_ps_out[0]['dec_image']
-            #    image_buldge = imageModel.source_surface_brightness(kwargs_light_source_out, k=1)
-            #    flux_buldge = np.sum(image_buldge)
-#            kwargs_ps_out
-            if flux_disk>0:
-                mcmc_new_list.append([flux_quasar, flux_disk, source_x, source_y])
+        if len(source_params) >=2: 
+            if source_params[2][1] == {'n_sersic': 1.0} or source_params[2][1] == {'n_sersic': 4.0}:
+                if source_params[2][1] == {'n_sersic': 1.0}:
+                    buldge_i, disk_i = 0, 1
+                elif source_params[2][1] == {'n_sersic': 4.0}:
+                    buldge_i, disk_i = 1, 0
+                labels_new = [r"Quasar flux", r"buldge flux", r"disk flux", r"buldge Reff", r"disk Reff"]
+                for i in range(len(samples_mcmc)/10):
+                    kwargs_lens_out, kwargs_light_source_out, kwargs_light_lens_out, kwargs_ps_out, kwargs_cosmo = param.args2kwargs(samples_mcmc[i+ len(samples_mcmc)/10*9])
+                    image_reconstructed, _, _, _ = imageModel.image_linear_solve(kwargs_source=kwargs_light_source_out, kwargs_ps=kwargs_ps_out)
+                    image_ps = imageModel.point_source(kwargs_ps_out)
+                    flux_quasar = np.sum(image_ps)
+                    image_buldge = imageModel.source_surface_brightness(kwargs_light_source_out,unconvolved= False, k=buldge_i)
+                    flux_buldge = np.sum(image_buldge)                    
+                    image_disk = imageModel.source_surface_brightness(kwargs_light_source_out,unconvolved= False, k=disk_i)
+                    flux_disk = np.sum(image_disk)
+                    buldge_R = kwargs_light_source_out[0]['R_sersic']
+                    disk_R = kwargs_light_source_out[1]['R_sersic']
+                    if i/1000 > (i-1)/1000 :
+                        print "finished translate:", i                    
+                    mcmc_new_list.append([flux_quasar, flux_buldge, flux_disk, buldge_R, disk_R])
+        else:
+            labels_new = [r"quasar flux", r"host_flux", r"host Sersic", r"host Reff"]
+            # transform the parameter position of the MCMC chain in a lenstronomy convention with keyword arguments #
+            for i in range(len(samples_mcmc)/10):
+                kwargs_lens_out, kwargs_light_source_out, kwargs_light_lens_out, kwargs_ps_out, kwargs_cosmo = param.args2kwargs(samples_mcmc[i+ len(samples_mcmc)/10*9])
+                image_reconstructed, _, _, _ = imageModel.image_linear_solve(kwargs_source=kwargs_light_source_out, kwargs_ps=kwargs_ps_out)
+                image_ps = imageModel.point_source(kwargs_ps_out)
+                flux_quasar = np.sum(image_ps)
+                image_host = imageModel.source_surface_brightness(kwargs_light_source_out, k=0)
+                image_host = np.sum(image_host)
+                n_sersic = kwargs_light_source_out[0]['n_sersic']
+                R_sersic = kwargs_light_source_out[0]['R_sersic']
+                if i/1000 > (i-1)/1000 :
+                    print "finished translate:", i
+                if image_host>0:
+                    mcmc_new_list.append([flux_quasar, image_host, n_sersic, R_sersic])
         plot = corner.corner(mcmc_new_list, labels=labels_new, show_titles=True)
         if tag is not None:
             plot.savefig('{0}_HOSTvsQSO_corner.pdf'.format(tag))
@@ -267,28 +285,13 @@ def fit_qso(QSO_im, psf_ave, psf_std=None, source_params=None,ps_param=None, bac
         else:
             plt.show()
     if QSO_std is None:
-        if return_Chisq == False:
-            return source_result, ps_result, image_ps, image_host, np.sqrt(data_class.C_D+np.abs(error_map))
-        elif return_Chisq == True:
-            return source_result, ps_result, image_ps, image_host, np.sqrt(data_class.C_D+np.abs(error_map)), reduced_Chisq
+        noise_map = np.sqrt(data_class.C_D+np.abs(error_map))
     else:
-        if return_Chisq == False:
-            return source_result, ps_result, image_ps, image_host, np.sqrt(QSO_std**2+np.abs(error_map))
-        elif return_Chisq == True:
-            return source_result, ps_result, image_ps, image_host, np.sqrt(QSO_std**2+np.abs(error_map)), reduced_Chisq #error_map=0
-    
-    if QSO_std is None:
-        if return_Chisq == False:
-            return source_result, image_host, np.sqrt(data_class.C_D+np.abs(error_map))
-        elif return_Chisq == True:
-            return source_result, image_host, np.sqrt(data_class.C_D+np.abs(error_map)), reduced_Chisq
-    else:
-        if return_Chisq == False:
-            return source_result, image_host, np.sqrt(galaxy_std**2+np.abs(error_map)) #error_map=0
-        elif return_Chisq == True:
-            return source_result, image_host, np.sqrt(galaxy_std**2+np.abs(error_map)), reduced_Chisq #error_map=0
-    
-
+        noise_map = np.sqrt(QSO_std**2+np.abs(error_map))
+    if return_Chisq == False:
+        return source_result, ps_result, image_ps, image_host, noise_map
+    elif return_Chisq == True:
+        return source_result, ps_result, image_ps, image_host, noise_map, reduced_Chisq
 
 
 def fit_qso_multiband(QSO_im_list, psf_ave_list, psf_std_list=None, source_params=None,ps_param=None,
@@ -739,7 +742,6 @@ def fit_galaxy(galaxy_im, psf_ave, psf_std=None, source_params=None, background_
     print('============ CONGRATULATION, YOUR JOB WAS SUCCESSFUL ================ ')
     # this is the linear inversion. The kwargs will be updated afterwards
     image_reconstructed, error_map, _, _ = imageModel.image_linear_solve(kwargs_source=source_result, kwargs_ps=ps_result)
-    image_ps = imageModel.point_source(ps_result)
     image_host = []
     for i in range(len(source_result)):
         image_host.append(imageModel.source_surface_brightness(source_result, k=i))
