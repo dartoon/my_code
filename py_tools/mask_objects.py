@@ -95,7 +95,9 @@ def mask_obj(img, snr=3.0, exp_sz= 1.2, pltshow = 0, npixels=20, return_deblend 
     for obj in cat:
         ax2.text(obj.xcentroid.value, obj.ycentroid.value,'ID{0}'.format(obj.id-1),fontsize=20, color='white')
     ax2.set_title('Segmentation Image')
-    if return_deblend == True:
+    if pltshow == 0 or return_deblend == True:
+        plt.close()
+    else:
         plt.show()
     
     from photutils import EllipticalAperture

@@ -156,6 +156,7 @@ def save_loc_png(img, center_QSO, c_psf_list=None,extra_psfs=None,ID=None, label
         ax.text(len(img)*0.05, len(img)*0.8, ID,color='white', fontsize=30)
     if ifsave == True:
         fig.savefig('QSO_{0}_loc.pdf'.format(name))
+    plt.show()
 
 def shift_label_index(s):
     if s==1:
