@@ -260,7 +260,7 @@ class gene_BHBH:
         dis_dotN = dotN[:-1]*Ctheta2[:-1]
         year_rate = np.sum(dis_dotN* (z[1:]-z[:-1]))
         return dis_dotN, year_rate, Ctheta2
-    def mc_year_rate(self, seed_vol= 10000, itera = 40, a=2.35, mbh_max=80., mbh_min=5.):
+    def mc_year_rate(self, seed_vol=10000, itera=40, a=2.35, mbh_max=80., mbh_min=5., etype = 'const'):
         '''
         Use MCMC to calculate the rate, with steps equals to seed_vol.
             1. the BH mass are randomly given with BH_mass_function.
@@ -274,7 +274,8 @@ class gene_BHBH:
         #    Randomly assign the values for Chirpmass and Thetas     
         #==============================================================================
         theta_class = Theta(vol = seed_vol)
-        bhmass_class = BH_mass_function(vol = seed_vol, a=a, mbh_max=mbh_max, mbh_min=mbh_min)
+        if etype == 'const':
+            bhmass_class = BH_mass_function(vol = seed_vol, a=a, mbh_max=mbh_max, mbh_min=mbh_min)
 #        thetas = theta_class.gene_theta_func()
 #        mass_Chirp = 6.7 
         #==============================================================================
@@ -296,13 +297,18 @@ class gene_BHBH:
         zs_detected, rhos_detected = np.array([]), np.array([])
         for j in range(itera):
             thetas = theta_class.gene_theta()
-            mass_Chirp = bhmass_class.chirp_mass()
             zs = np.zeros(seed_vol)
             dist_zs = np.zeros(seed_vol)
             for i in range(seed_vol):
                 idx = int(np.sum(np.random.random()>R[:,2]))    # minus one so that the idx can start from zero. (i.e. [:-1])
                 zs[i] = R[idx, 0] #np.random.uniform(R[idx, 0],R[idx+1, 0])
                 dist_zs[i] = Dist[zs[i]==z]
+            if etype != 'const':
+                a = a[0] + a[1] * zs
+            elif etype != 'const':
+                a = a[0] + a[1] * zs/(1+zs)
+            bhmass_class = BH_mass_function(vol = seed_vol, a=a, mbh_max=mbh_max, mbh_min=mbh_min)
+            mass_Chirp = bhmass_class.chirp_mass()
             #==============================================================================
             #   Calculate the observed events based on this vol of events 
             #   Rho = 8 Theta * r0/(dl) * (M_chirp_redshifted/1.2) **(5/6)
@@ -338,6 +344,13 @@ class gene_BHBH:
         return n_detected, over_rate, rhos
         '''
         return event_rate, zs_detected, masses, rhos_detected
+#    def sim_BHBH(self, seed_vol= 200000, a0=2.35, a1=2.3, mbh_max=80., mbh_min=5., etype='linear'):
+#        if etype='linear'
+#        
+#        self.a = a0 + a1 * z
+        
+        
+        
 
 #test = gene_BHBH()
 ##dis_dotN, year_rate, Ctheta2 = test.num_year_rate()
@@ -367,4 +380,3 @@ class gene_BHBH:
 #    '''
 #    The Class to calculate the BHBH events yearly detection rate and randomly obtain the data format
 #    ''' 
-    
