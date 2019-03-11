@@ -20,7 +20,7 @@ from flux_profile import profiles_compare, flux_profile
 from matplotlib.colors import LogNorm
 import copy
 
-deep_seed = True  #Set as True to put more seed and steps to fit,
+deep_seed = False  #Set as True to put more seed and steps to fit,
 import time
 t1 = time.time()
 fix_on_I_band = input("Do you want, based on I band's inference, fix the other band's Reff and n???\n input 1 means yes, input others means no. \n")
@@ -41,7 +41,7 @@ elif if_file is not []:
 
 #ID, RA, DEC, zp, pixel_scale, host_flux_ratio(%),host_x, host_y, host_flux, host_mag, Kron_radius(arcsec), host_Kron_flux, host_Kron_mag, Reff(arcsec), n_sersic, host_q,qso_x, qso_y, qso_flux, qso_mag, host_qso_center_mismatch(arcsec)                               
 
-for QSO_i in range(1,59):  # run the rest sample
+for QSO_i in range(1,2):  # run the rest sample
     ID_seq = QSO_i
     file_name_seq = [ i + (ID_seq-1)*5 + 2 for i in range(5)]  #The 'NO.' in the filename.
     band_seq = ['G', 'R', 'I', 'Z', 'Y']
