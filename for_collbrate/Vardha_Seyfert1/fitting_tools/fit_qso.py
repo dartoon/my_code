@@ -95,12 +95,11 @@ def fit_qso(QSO_im, psf_ave, psf_std=None, source_params=None,ps_param=None, bac
     #==============================================================================
     #Doing the QSO fitting 
     #==============================================================================
-    from lenstronomy.SimulationAPI.simulations import Simulation
+    import lenstronomy.Util.simulation_util as sim_util
     from lenstronomy.Data.imaging_data import Data
-    SimAPI = Simulation()
-    kwargs_data = SimAPI.data_configure(numPix, deltaPix, exp_time, background_rms)
+    kwargs_data = sim_util.data_configure_simple(numPix, deltaPix, exp_time, background_rms, inverse=True)
     data_class = Data(kwargs_data)
-    kwargs_psf =  SimAPI.psf_configure(psf_type=psf_type, fwhm=fwhm, kernelsize=kernel_size, deltaPix=deltaPix, kernel=kernel)
+    kwargs_psf =  sim_util.psf_configure_simple(psf_type=psf_type, fwhm=fwhm, kernelsize=kernel_size, deltaPix=deltaPix, kernel=kernel)
     from lenstronomy.Data.psf import PSF
     psf_class = PSF(kwargs_psf)
     data_class.update_data(QSO_im)
@@ -235,21 +234,27 @@ def fit_qso(QSO_im, psf_ave, psf_std=None, source_params=None,ps_param=None, bac
         from lenstronomy.Sampling.parameters import Param
         param = Param(kwargs_model, kwargs_fixed_source=source_params[2], kwargs_fixed_ps=ps_param[2], **kwargs_constraints)
         mcmc_new_list = []
-        if len(source_params[0]) >=2: 
-            labels_new = ["Quasar flux"] +  ["host{0} flux".format(i) for i in range(len(source_params[0]))] + ["host{0} Reff".format(i) for i in range(len(source_params[0]))]
-            for i in range(len(samples_mcmc)/10):
-                kwargs_lens_out, kwargs_light_source_out, kwargs_light_lens_out, kwargs_ps_out, kwargs_cosmo = param.args2kwargs(samples_mcmc[i+ len(samples_mcmc)/10*9])
-                image_reconstructed, _, _, _ = imageModel.image_linear_solve(kwargs_source=kwargs_light_source_out, kwargs_ps=kwargs_ps_out)
-                image_ps = imageModel.point_source(kwargs_ps_out)
-                flux_quasar = np.sum(image_ps)
-                fluxs, reffs = [],[]
-                for j in range(len(source_params[0])):
-                    image_j = imageModel.source_surface_brightness(kwargs_light_source_out,unconvolved= False, k=j)
-                    fluxs.append(np.sum(image_j))
-                    reffs.append(kwargs_light_source_out[j]['R_sersic'])
-                mcmc_new_list.append([flux_quasar] + fluxs + reffs)
-                if i/1000 > (i-1)/1000 :
-                    print "finished translate:", i                    
+        if len(source_params) >=2: 
+            if source_params[2][1] == {'n_sersic': 1.0} or source_params[2][1] == {'n_sersic': 4.0}:
+                if source_params[2][1] == {'n_sersic': 1.0}:
+                    buldge_i, disk_i = 0, 1
+                elif source_params[2][1] == {'n_sersic': 4.0}:
+                    buldge_i, disk_i = 1, 0
+                labels_new = [r"Quasar flux", r"buldge flux", r"disk flux", r"buldge Reff", r"disk Reff"]
+                for i in range(len(samples_mcmc)/10):
+                    kwargs_lens_out, kwargs_light_source_out, kwargs_light_lens_out, kwargs_ps_out, kwargs_cosmo = param.args2kwargs(samples_mcmc[i+ len(samples_mcmc)/10*9])
+                    image_reconstructed, _, _, _ = imageModel.image_linear_solve(kwargs_source=kwargs_light_source_out, kwargs_ps=kwargs_ps_out)
+                    image_ps = imageModel.point_source(kwargs_ps_out)
+                    flux_quasar = np.sum(image_ps)
+                    image_buldge = imageModel.source_surface_brightness(kwargs_light_source_out,unconvolved= False, k=buldge_i)
+                    flux_buldge = np.sum(image_buldge)                    
+                    image_disk = imageModel.source_surface_brightness(kwargs_light_source_out,unconvolved= False, k=disk_i)
+                    flux_disk = np.sum(image_disk)
+                    buldge_R = kwargs_light_source_out[0]['R_sersic']
+                    disk_R = kwargs_light_source_out[1]['R_sersic']
+                    if i/1000 > (i-1)/1000 :
+                        print "finished translate:", i                    
+                    mcmc_new_list.append([flux_quasar, flux_buldge, flux_disk, buldge_R, disk_R])
         else:
             labels_new = [r"quasar flux", r"host_flux", r"host Sersic", r"host Reff"]
             # transform the parameter position of the MCMC chain in a lenstronomy convention with keyword arguments #
@@ -373,20 +378,21 @@ def fit_qso_multiband(QSO_im_list, psf_ave_list, psf_std_list=None, source_param
     #==============================================================================
     #Doing the QSO fitting 
     #==============================================================================
-    from lenstronomy.SimulationAPI.simulations import Simulation
+#    from lenstronomy.SimulationAPI.simulations import Simulation
     from lenstronomy.Data.imaging_data import Data
     from lenstronomy.Data.psf import PSF
-    SimAPI = Simulation()
+#    SimAPI = Simulation()
+    
+    import lenstronomy.Util.simulation_util as sim_util
     kwargs_data_list, data_class_list = [], []
     for i in range(len(QSO_im_list)):
-        kwargs_data_i = SimAPI.data_configure(numPix, deltaPix, exp_time, background_rms_list[i])
+        kwargs_data_i = sim_util.data_configure_simple(numPix, deltaPix, exp_time, background_rms_list[i], inverse=True)
         kwargs_data_list.append(kwargs_data_i)
         data_class_list.append(Data(kwargs_data_i))
     kwargs_psf_list = []
     psf_class_list = []
     for i in range(len(QSO_im_list)):
-        kwargs_psf_i =  SimAPI.psf_configure(psf_type=psf_type, fwhm=fwhm, kernelsize=kernel_size_list[i],
-                                           deltaPix=deltaPix, kernel=kernel_list[i])
+        kwargs_psf_i = sim_util.psf_configure_simple(psf_type=psf_type, fwhm=fwhm, kernelsize=kernel_size_list[i], deltaPix=deltaPix, kernel=kernel_list[i])
         kwargs_psf_list.append(kwargs_psf_i)
         psf_class_list.append(PSF(kwargs_psf_i))
         data_class_list[i].update_data(QSO_im_list[i])
@@ -657,16 +663,15 @@ def fit_galaxy(galaxy_im, psf_ave, psf_std=None, source_params=None, background_
     #==============================================================================
     #Doing the QSO fitting 
     #==============================================================================
-    from lenstronomy.SimulationAPI.simulations import Simulation
+    import lenstronomy.Util.simulation_util as sim_util
     from lenstronomy.Data.imaging_data import Data
-    SimAPI = Simulation()
-    kwargs_data = SimAPI.data_configure(numPix, deltaPix, exp_time, background_rms)
+    kwargs_data = sim_util.data_configure_simple(numPix, deltaPix, exp_time, background_rms, inverse=True)
     data_class = Data(kwargs_data)
     if psf_ave is not None:
-        kwargs_psf =  SimAPI.psf_configure(psf_type=psf_type, fwhm=fwhm, kernelsize=kernel_size, deltaPix=deltaPix, kernel=kernel)
+        kwargs_psf =  sim_util.psf_configure_simple(psf_type=psf_type, fwhm=fwhm, kernelsize=kernel_size, deltaPix=deltaPix, kernel=kernel)
     else:
-        kwargs_psf =  SimAPI.psf_configure(psf_type='NONE')
-        
+        kwargs_psf =  sim_util.psf_configure_simple(psf_type='NONE')
+    
     from lenstronomy.Data.psf import PSF
     psf_class = PSF(kwargs_psf)
     data_class.update_data(galaxy_im)
