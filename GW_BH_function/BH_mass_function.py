@@ -260,7 +260,7 @@ class gene_BHBH:
         dis_dotN = dotN[:-1]*Ctheta2[:-1]
         year_rate = np.sum(dis_dotN* (z[1:]-z[:-1]))
         return dis_dotN, year_rate, Ctheta2
-    def mc_year_rate(self, seed_vol=10000, itera=40, a=2.35, mbh_max=80., mbh_min=5., etype = 'const'):
+    def mc_year_rate(self, seed_vol=10000, itera=40, a=2.35, mbh_max=80., mbh_min=5., ev_type = 'const'):
         '''
         Use MCMC to calculate the rate, with steps equals to seed_vol.
             1. the BH mass are randomly given with BH_mass_function.
@@ -274,8 +274,6 @@ class gene_BHBH:
         #    Randomly assign the values for Chirpmass and Thetas     
         #==============================================================================
         theta_class = Theta(vol = seed_vol)
-        if etype == 'const':
-            bhmass_class = BH_mass_function(vol = seed_vol, a=a, mbh_max=mbh_max, mbh_min=mbh_min)
 #        thetas = theta_class.gene_theta_func()
 #        mass_Chirp = 6.7 
         #==============================================================================
@@ -303,12 +301,20 @@ class gene_BHBH:
                 idx = int(np.sum(np.random.random()>R[:,2]))    # minus one so that the idx can start from zero. (i.e. [:-1])
                 zs[i] = R[idx, 0] #np.random.uniform(R[idx, 0],R[idx+1, 0])
                 dist_zs[i] = Dist[zs[i]==z]
-            if etype != 'const':
-                a = a[0] + a[1] * zs
-            elif etype != 'const':
-                a = a[0] + a[1] * zs/(1+zs)
-            bhmass_class = BH_mass_function(vol = seed_vol, a=a, mbh_max=mbh_max, mbh_min=mbh_min)
-            mass_Chirp = bhmass_class.chirp_mass()
+                
+            if ev_type == 'const':
+                bhmass_class = BH_mass_function(vol = seed_vol, a=a, mbh_max=mbh_max, mbh_min=mbh_min)
+                mass_Chirp = bhmass_class.chirp_mass()                
+            elif ev_type != 'const':
+                mass_Chirp = []
+                if ev_type != 'mode0':
+                    a_z = a[0] + a[1] * zs
+                elif ev_type != 'mode1':
+                    a_z = a[0] + a[1] * zs/(1+zs)
+                for i in range(len(a_z)):
+                    bhmass_class = BH_mass_function(vol = 1, a=a_z[i], mbh_max=mbh_max, mbh_min=mbh_min)
+                    mass_Chirp.append(bhmass_class.chirp_mass())
+                mass_Chirp = np.asarray(mass_Chirp).reshape(3,len(a_z))
             #==============================================================================
             #   Calculate the observed events based on this vol of events 
             #   Rho = 8 Theta * r0/(dl) * (M_chirp_redshifted/1.2) **(5/6)
