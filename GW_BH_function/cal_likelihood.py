@@ -178,11 +178,14 @@ def cov_prior_lognorm(t, sigma =0.2):
 def joint_twofun(tau, t, a=2.35, mbh_max=80, mbh_min=5, sigma =0.2):
     return mass_fun_i(tau, a=a, mbh_max=mbh_max, mbh_min=mbh_min) * poss_ln_gaussian(t, mu=np.log(tau), sigma = sigma)
 def cov_twofun(t, a=2.35, mbh_max=80, mbh_min=5, sigma =0.2):
-    inter = quad(joint_twofun, 0, 200, args=(t, a, mbh_max, mbh_min,sigma))[0]
+    inter = quad(joint_twofun, 0, 120, args=(t, a, mbh_max, mbh_min,sigma))[0]
     return inter
 cov_twofun=np.vectorize(cov_twofun)   
 
-
+#x = np.logspace(np.log10(3/1.1), np.log10(80*1.1),50)  #50 could be smaller?
+#y = cov_twofun(x, a=2.35, mbh_max=80,mbh_min=5,sigma=0.2) #
+#plt.plot(x,y)
+#plt.show()
 
 
 def fac_s_eff_s(dl,mass_Chirp,thetas=None,r0 = 1527.):

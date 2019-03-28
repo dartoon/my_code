@@ -68,11 +68,11 @@ from scipy import interpolate
 from cal_likelihood import cov_twofun
 from scipy.optimize import fmin
 from cal_likelihood import random_Theta  #The prior given dl and chirpmass, no errorbar
-def select_effect(m1_obs, fname = 'select_effect_MBHmin5_cov_lognorm0.2'):
-    x, y  = pickle.load(open(fname,'rb'))
-    f = interpolate.interp1d(x, y)
-    prior = f(m1_obs)
-    return prior
+#def select_effect(m1_obs, fname = 'select_effect_MBHmin5_cov_lognorm0.2'):
+#    x, y  = pickle.load(open(fname,'rb'))
+#    f = interpolate.interp1d(x, y)
+#    prior = f(m1_obs)
+#    return prior
     
 def posterior(para, m1_obs,m_noise_level,sf_factor):
     a,mbh_max,mbh_min  = para

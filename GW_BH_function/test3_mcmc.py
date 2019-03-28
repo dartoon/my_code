@@ -21,7 +21,7 @@ a0, a1, mbh_max, mbh_min = 2.35, 0.7, 80., 5.   #mode1
 #filename = 'test3_sim_a_{0}_max_{1}_min_{2}'.format(round(a,2), round(mbh_max,1), round(mbh_min,1))
 #if_file = glob.glob(filename)  
 
-seed = 1
+seed = 2
 np.random.seed(seed)
 test = gene_BHBH(h0=70)
 #event_rate0, zs_detected0, masses0, rhos_detected0 = test.mc_year_rate(a=a, mbh_max=mbh_max, mbh_min=mbh_min, ev_type = 'const')
@@ -41,8 +41,7 @@ from cal_likelihood import cov_twofun
 from scipy.optimize import fmin
 from cal_likelihood import random_Theta  #The prior given dl and chirpmass, no errorbar
    
-step = 0
- 
+step,step_last = 0,0
 def posterior(para, m1_obs,m_noise_level,sf_factor,z):
     a0, a1, mbh_max,mbh_min  = para
 #    a_z = a0 + a1 * z
@@ -63,17 +62,20 @@ def posterior(para, m1_obs,m_noise_level,sf_factor,z):
             f = interpolate.interp1d(x, y)
             poss_m1_i = f(m1_obs[i])
             post.append(poss_m1_i)
-            if i/300 > (i-1)/300:
-                print i
+#            if i!=0 and i/300 > (i-1)/300:
+#                print i
         post = np.array(post)
         chisq = -0.5*np.sum(np.log(post)*sf_factor)
+        step=np.sum(sampler.flatchain!=0)/(ndim*nwalkers)
+#        if step ==0:
         t2 = time.time()
         t_cost = (t2-t1)
-        t_per_cost = t_cost/step
+        if step == 0:
+            t_per_cost = t_cost
+        elif step != 0:
+            t_per_cost = t_cost/step
         t_remain = t_per_cost * (step_total-step)
-        step=np.sum(sampler.flatchain!=0)/(ndim*nwalkers)
-        if step != 0:
-            print "step:",step,"percent",round(step/(step_total/100),2),"%","\r","para:",para, "time remain:", round(t_remain/60), 'mins'
+        print "step:", step, ", t_cost", round(t_cost/60), "mins, t_remain", round(t_remain/60), "mins"
         return chisq
     else:
         return np.inf       
@@ -106,25 +108,45 @@ m1_sig_fake = m1_obs * m_noise_level      #The fake "sigma", (m1_obs * m_noise_l
 #    prior = select_effect(m1_obs)
 #    prior_true = fac_s_eff_v(dl=dl, mass_Chirp=mass_Chirp, thetas=thetas)
 #    prior = prior_true
+
+#%%
 prior = fac_s_eff_v(dl=dl_noised, mass_Chirp=mass_Chirp_noised, thetas=thetas)
 prior[prior==0] = 0.001
 sf_factor = 1/prior
-z_inf = solve_z(np.array(dl_noised))
+z_inf = solve_z(np.array(dl))
 sf_sigma = np.log(sf_factor)/3
 sf_factor = sf_factor/np.exp(sf_sigma**2/2)
 print "m1_obs.min(), m1_obs.max():",m1_obs.min(), m1_obs.max()
 #mini=fmin(posterior,para_ini,maxiter=1000, args=(m1_obs, m_noise_level, sf_factor,z_inf))
-
-ndim, nwalkers = 4, 70
+count = 0
+ndim, nwalkers = 4, 50
+#pos = [[2.09369352,  0.81751357, 79.85400038,  4.79346203] + 1e-4*np.random.randn(ndim) for i in range(nwalkers)]
 pos = [[a0, a1, mbh_max, mbh_min] + 1e-4*np.random.randn(ndim) for i in range(nwalkers)]
 
-step_total = 500.
+step_total = 200.
 import emcee
-sampler = emcee.EnsembleSampler(nwalkers, ndim, posterior, args=(m1_obs, m_noise_level, sf_factor,z_inf))  ###the input args() should change
+sampler = emcee.EnsembleSampler(nwalkers, ndim, posterior, args=(m1_obs, m_noise_level, sf_factor,z_inf),threads=10)  ###the input args() should change
 sampler.run_mcmc(pos, step_total)
 
 ###############save the data###############
 samples = sampler.chain.reshape((-1, ndim))   #sampler.chain[:, 50:, :] to cut the data
 burn=sampler.chain[:,:,:].T
 import pickle
-pickle.dump([sampler.chain,burn], open('test3_mode1_seed1.txt','wb'))
+pickle.dump([sampler.chain,burn], open('test3_mode1_seed2_zcor_mcmc.txt','wb'))
+
+#samples = sampler.chain[:, 50:, :].reshape((-1, ndim))
+#import corner
+#fig = corner.corner(samples, labels=["$om$", "$w$", "$h0$"],
+#                      truths=[0.3, -1, 70])
+#plt.show()
+
+
+###Load sample
+#ndim, nwalkers =3, 50
+#sampler,burn=pickle.load(open('eas_500_wCDM.txt','rb'))
+#plt.plot(burn[0,50:,:], '-', color='k', alpha=0.3)  
+#samples=sampler[:, 50:, :].reshape((-1, ndim))
+#print samples.shape
+#fig = corner.corner(samples, labels=["$\Omega_{m0}$", "$w$", "$H_0$"], truths=[0.3, -1, 70],
+#                    quantiles=[0.16, 0.5, 0.84],  #quantiles shows 1D possiblity region
+#                    show_titles=True, title_kwargs={"fontsize": 12}) 

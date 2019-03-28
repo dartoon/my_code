@@ -307,14 +307,17 @@ class gene_BHBH:
                 mass_Chirp = bhmass_class.chirp_mass()                
             elif ev_type != 'const':
                 mass_Chirp = []
-                if ev_type != 'mode0':
+                if ev_type == 'mode0':
                     a_z = a[0] + a[1] * zs
-                elif ev_type != 'mode1':
+                elif ev_type == 'mode1':
                     a_z = a[0] + a[1] * zs/(1+zs)
+#                    print a_z[0]
                 for i in range(len(a_z)):
+#                    print a_z[i], zs[i], a[0] + a[1] * zs[i]/(1+zs[i])
                     bhmass_class = BH_mass_function(vol = 1, a=a_z[i], mbh_max=mbh_max, mbh_min=mbh_min)
                     mass_Chirp.append(bhmass_class.chirp_mass())
-                mass_Chirp = np.asarray(mass_Chirp).reshape(3,len(a_z))
+                mass_Chirp = np.asarray(mass_Chirp).T[0] #.reshape(3,len(a_z))
+#                print mass_Chirp.shape
             #==============================================================================
             #   Calculate the observed events based on this vol of events 
             #   Rho = 8 Theta * r0/(dl) * (M_chirp_redshifted/1.2) **(5/6)
