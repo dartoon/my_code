@@ -14,22 +14,30 @@ import glob
 from BH_mass_function import gene_BHBH, dl, solve_z
 import random
 import time
+import pickle
+
 solve_z = np.vectorize(solve_z)
 #a0, a1, mbh_max, mbh_min = 2.35, 0.1, 80., 5.
 a0, a1, mbh_max, mbh_min = 2.35, 0.7, 80., 5.   #mode1
 
-#filename = 'test3_sim_a_{0}_max_{1}_min_{2}'.format(round(a,2), round(mbh_max,1), round(mbh_min,1))
-#if_file = glob.glob(filename)  
-
 seed = 2
-np.random.seed(seed)
-test = gene_BHBH(h0=70)
+filename = 'test3_seed{0}_data'.format(seed)
+if_file = glob.glob(filename)  
+if if_file==[]:
+    np.random.seed(seed)
+    test = gene_BHBH(h0=70)
+    event_rate, zs_detected, masses, rhos_detected = test.mc_year_rate(a=[a0, a1], mbh_max=mbh_max, mbh_min=mbh_min, ev_type = 'mode1')
+    dl_zs = dl(zs_detected)
+    sim_data = [event_rate, zs_detected, masses, rhos_detected, dl_zs]
+    pickle.dump(sim_data, open(filename, 'wb'))
+else:
+    event_rate, zs_detected, masses, rhos_detected, dl_zs=pickle.load(open(filename,'rb'))
+
 #event_rate0, zs_detected0, masses0, rhos_detected0 = test.mc_year_rate(a=a, mbh_max=mbh_max, mbh_min=mbh_min, ev_type = 'const')
 #event_rate1, zs_detected1, masses1, rhos_detected1 = test.mc_year_rate(a=[2.35,0.1], mbh_max=mbh_max, mbh_min=mbh_min, ev_type = 'mode0')
-event_rate2, zs_detected2, masses2, rhos_detected2 = test.mc_year_rate(a=[a0, a1], mbh_max=mbh_max, mbh_min=mbh_min, ev_type = 'mode1')
+#event_rate2, zs_detected2, masses2, rhos_detected2 = test.mc_year_rate(a=[a0, a1], mbh_max=mbh_max, mbh_min=mbh_min, ev_type = 'mode1')
 
-dl_zs = dl(zs_detected2)
-zs_all, chirp_mass_all, m1_all, m2_all, lumi_dis_all = zs_detected2, masses2[:,0], masses2[:,1], masses2[:,2], dl_zs                                                      
+zs_all, chirp_mass_all, m1_all, m2_all, lumi_dis_all = zs_detected, masses[:,0], masses[:,1], masses[:,2], dl_zs                                                      
 #
 ##%% Test if the data slope follows the redshift trend.
 #plt.hist(m1_all[zs_all==2.141], m1_all[zs_all==5.531],normed=True, log=True)
@@ -41,7 +49,6 @@ from cal_likelihood import cov_twofun
 from scipy.optimize import fmin
 from cal_likelihood import random_Theta  #The prior given dl and chirpmass, no errorbar
    
-step,step_last = 0,0
 def posterior(para, m1_obs,m_noise_level,sf_factor,z):
     a0, a1, mbh_max,mbh_min  = para
 #    a_z = a0 + a1 * z
@@ -66,8 +73,14 @@ def posterior(para, m1_obs,m_noise_level,sf_factor,z):
 #                print i
         post = np.array(post)
         chisq = -0.5*np.sum(np.log(post)*sf_factor)
-        step=np.sum(sampler.flatchain!=0)/(ndim*nwalkers)
-#        if step ==0:
+	global count
+	try:	
+	    step=count/10
+            count = count+1
+#	    print count
+	except NameError:
+	    print "None sampler value"
+	    step=0
         t2 = time.time()
         t_cost = (t2-t1)
         if step == 0:
@@ -122,10 +135,10 @@ count = 0
 ndim, nwalkers = 4, 50
 #pos = [[2.09369352,  0.81751357, 79.85400038,  4.79346203] + 1e-4*np.random.randn(ndim) for i in range(nwalkers)]
 pos = [[a0, a1, mbh_max, mbh_min] + 1e-4*np.random.randn(ndim) for i in range(nwalkers)]
-
 step_total = 200.
 import emcee
 sampler = emcee.EnsembleSampler(nwalkers, ndim, posterior, args=(m1_obs, m_noise_level, sf_factor,z_inf),threads=10)  ###the input args() should change
+print "ready to run MCMC"
 sampler.run_mcmc(pos, step_total)
 
 ###############save the data###############
@@ -134,11 +147,11 @@ burn=sampler.chain[:,:,:].T
 import pickle
 pickle.dump([sampler.chain,burn], open('test3_mode1_seed2_zcor_mcmc.txt','wb'))
 
-#samples = sampler.chain[:, 50:, :].reshape((-1, ndim))
-#import corner
-#fig = corner.corner(samples, labels=["$om$", "$w$", "$h0$"],
-#                      truths=[0.3, -1, 70])
-#plt.show()
+samples = sampler.chain[:, 50:, :].reshape((-1, ndim))
+import corner
+fig = corner.corner(samples, labels=["a0", "a1", "mbh_max", "mbh_min"],
+                      truths=[2.35, 0.7, 80., 5.])
+plt.show()
 
 
 ###Load sample
