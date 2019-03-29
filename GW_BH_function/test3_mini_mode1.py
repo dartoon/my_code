@@ -48,7 +48,6 @@ from scipy import interpolate
 from cal_likelihood import cov_twofun
 from scipy.optimize import fmin
 from cal_likelihood import random_Theta  #The prior given dl and chirpmass, no errorbar
-mini_count = 0 
 def posterior(para, m1_obs,m_noise_level,sf_factor,z):
     a0, a1, mbh_max,mbh_min  = para
 #    a_z = a0 + a1 * z
@@ -82,6 +81,7 @@ count = 0
 
 part = 3
 for loop in range(part*rounds,(part+1)*rounds):
+    mini_count = 0 
     print "Calculating loop:", loop
     seed_i = loop
     np.random.seed(seed_i)
@@ -120,7 +120,7 @@ for loop in range(part*rounds,(part+1)*rounds):
     para_result.close()    
     t2 = time.time()
     time_sp = t2-t1
-    time_ave = (t2-t1)/(loop+1)
+    time_ave = (t2-t1)/(count+1)
     time_total = time_ave * rounds
     t_left = time_total - time_sp
     print "Finish percent:",round(time_sp/time_total*100,2),"%" ,"total time needed :", round(time_total/60,2), "mins", "time_left", round(t_left/60,2), 'mins'
