@@ -55,40 +55,41 @@ def posterior(para, m1_obs,m_noise_level,sf_factor,z):
 #    if 1.1 < a0 < 3 and -0.5 < a1 < 0.5  and 50 < mbh_max < 100 and 2 < mbh_min < 8:
     a_z = a0 + a1 * z/(1+z)
     if 1.1 < a0 < 3 and -0.5 < a1 < 1.5 and 50 < mbh_max < 100 and 2 < mbh_min < 8:
-        x = np.logspace(np.log10(m1_obs.min()/1.1), np.log10(m1_obs.max()*1.1),50)  #!!! 50 could be big enough?
         post, az_lib, y_lib = [], [], []
         for i in range(len(z)): 
-            if a_z[i] not in az_lib:
-                y = cov_twofun(x, a=a_z[i], mbh_max=mbh_max,
-                               mbh_min=mbh_min,sigma=m_noise_level) #!!!
-            else:
-                j = np.where(np.asarray(az_lib) == a_z[i])[0][0]
-                y = y_lib[j]
-            az_lib.append(a_z[i])
-            y_lib.append(y)
-            f = interpolate.interp1d(x, y)
-            poss_m1_i = f(m1_obs[i])
+#            x = np.logspace(np.log10(m1_obs.min()/1.1), np.log10(m1_obs.max()*1.1),50)  #!!! 50 could be big enough?
+#            if a_z[i] not in az_lib:
+#                y = cov_twofun(x, a=a_z[i], mbh_max=mbh_max,
+#                               mbh_min=mbh_min,sigma=m_noise_level) #!!!
+#            else:
+#                j = np.where(np.asarray(az_lib) == a_z[i])[0][0]
+#                y = y_lib[j]
+#            az_lib.append(a_z[i])
+#            y_lib.append(y)
+#            f = interpolate.interp1d(x, y)
+            poss_m1_i = cov_twofun(m1_obs[i], a=a_z[i], mbh_max=mbh_max, mbh_min=mbh_min,sigma=m_noise_level)
             post.append(poss_m1_i)
-#            if i!=0 and i/300 > (i-1)/300:
+#            if i!=0 and i/500 > (i-1)/500:
 #                print i
         post = np.array(post)
         chisq = -0.5*np.sum(np.log(post)*sf_factor)
-	global count
-	try:	
-	    step=count/10
-            count = count+1
+        print para, chisq
+#	global count
+#	try:	
+#	    step=count/10
+#            count = count+1
 #	    print count
-	except NameError:
-	    print "None sampler value"
-	    step=0
-        t2 = time.time()
-        t_cost = (t2-t1)
-        if step == 0:
-            t_per_cost = t_cost
-        elif step != 0:
-            t_per_cost = t_cost/step
-        t_remain = t_per_cost * (step_total-step)
-        print "step:", step, ", t_cost", round(t_cost/60), "mins, t_remain", round(t_remain/60), "mins"
+#	except NameError:
+#	    print "None sampler value"
+#	    step=0
+#        t2 = time.time()
+#        t_cost = (t2-t1)
+#        if step == 0:
+#            t_per_cost = t_cost
+#        elif step != 0:
+#            t_per_cost = t_cost/step
+#        t_remain = t_per_cost * (step_total-step)
+#        print "step:", step, ", t_cost", round(t_cost/60), "mins, t_remain", round(t_remain/60), "mins"
         return chisq
     else:
         return np.inf       
@@ -126,11 +127,15 @@ m1_sig_fake = m1_obs * m_noise_level      #The fake "sigma", (m1_obs * m_noise_l
 prior = fac_s_eff_v(dl=dl_noised, mass_Chirp=mass_Chirp_noised, thetas=thetas)
 prior[prior==0] = 0.001
 sf_factor = 1/prior
-z_inf = solve_z(np.array(dl))
+z_inf = solve_z(np.array(dl_noised))
 sf_sigma = np.log(sf_factor)/3
 sf_factor = sf_factor/np.exp(sf_sigma**2/2)
 print "m1_obs.min(), m1_obs.max():",m1_obs.min(), m1_obs.max()
-#mini=fmin(posterior,para_ini,maxiter=1000, args=(m1_obs, m_noise_level, sf_factor,z_inf))
+mini=fmin(posterior,para_ini,maxiter=1000, args=(m1_obs, m_noise_level, sf_factor,z_inf))
+print mini
+
+print "if [2.09369352,  0.81751357, 79.85400038,  4.79346203]"
+"""
 count = 0
 ndim, nwalkers = 4, 50
 #pos = [[2.09369352,  0.81751357, 79.85400038,  4.79346203] + 1e-4*np.random.randn(ndim) for i in range(nwalkers)]
@@ -152,7 +157,7 @@ import corner
 fig = corner.corner(samples, labels=["a0", "a1", "mbh_max", "mbh_min"],
                       truths=[2.35, 0.7, 80., 5.])
 plt.show()
-
+"""
 
 ###Load sample
 #ndim, nwalkers =3, 50
