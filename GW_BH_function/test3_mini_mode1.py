@@ -48,7 +48,7 @@ from scipy import interpolate
 from cal_likelihood import cov_twofun
 from scipy.optimize import fmin
 from cal_likelihood import random_Theta  #The prior given dl and chirpmass, no errorbar
-count = 0 
+mini_count = 0 
 def posterior(para, m1_obs,m_noise_level,sf_factor,z):
     a0, a1, mbh_max,mbh_min  = para
 #    a_z = a0 + a1 * z
@@ -62,10 +62,10 @@ def posterior(para, m1_obs,m_noise_level,sf_factor,z):
         post = np.array(post)
         chisq = -0.5*np.sum(np.log(post)*sf_factor)
 #        print para, chisq
-    	global count
-        if count/20 > (count-1)/20:
-            print "State of count in this loop {0}:".format(count), para, chisq
-        count = count+1
+    	global mini_count
+        if mini_count/20 > (mini_count-1)/20:
+            print "State of count {0}".format(mini_count), para, chisq
+        mini_count = mini_count+1
         return chisq
     else:
         return np.inf       
@@ -78,6 +78,8 @@ t1 = time.time()
 index = np.arange(len(m1_all))
 from cal_likelihood import fac_s_eff_v
 rounds = 50
+count = 0
+
 part = 3
 for loop in range(part*rounds,(part+1)*rounds):
     print "Calculating loop:", loop
@@ -102,15 +104,15 @@ for loop in range(part*rounds,(part+1)*rounds):
     print "m1_obs.min(), m1_obs.max():",m1_obs.min(), m1_obs.max()
     mini=fmin(posterior,para_ini,maxiter=1000, args=(m1_obs, m_noise_level, sf_factor,z_inf))
     datafile = 'test3_mode1_level{0}_p{1}.txt'.format(int(m_noise_level*100),part) 
-    if loop ==0:
+    if count ==0:
         if_file = glob.glob(datafile)
         if if_file == []:
             para_result =  open(datafile,'w') 
         else:
-            print "HAHAHA"
+#            print "HAHAHA"
             para_result =  open(datafile,'r+')
             para_result.read()
-    if loop > 0:
+    if count > 0:
         para_result = open(datafile,'r+')
         para_result.read()
     para_result.write("seed = {0}, ".format(seed_i))    
@@ -122,4 +124,4 @@ for loop in range(part*rounds,(part+1)*rounds):
     time_total = time_ave * rounds
     t_left = time_total - time_sp
     print "Finish percent:",round(time_sp/time_total*100,2),"%" ,"total time needed :", round(time_total/60,2), "mins", "time_left", round(t_left/60,2), 'mins'
-    
+    count = count+1
