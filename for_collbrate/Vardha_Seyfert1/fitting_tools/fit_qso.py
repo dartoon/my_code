@@ -213,6 +213,7 @@ def fit_qso(QSO_im, psf_ave, psf_std=None, source_params=None,ps_param=None, bac
         #f.subplots_adjust(left=None, bottom=None, right=None, top=None, wspace=0., hspace=0.05)
         if tag is not None:
             f.savefig('{0}_fitted_image.pdf'.format(tag))
+            print "Print to claim the PDF file1 to be saved."
         if pltshow == 0:
             plt.close()
         else:
@@ -225,6 +226,7 @@ def fit_qso(QSO_im, psf_ave, psf_std=None, source_params=None,ps_param=None, bac
            plot = corner.corner(samples_mcmc, labels=param_mcmc, show_titles=True)
            if tag is not None:
                plot.savefig('{0}_para_corner.pdf'.format(tag))
+               print "Print to claim the PDF file2 to be saved."               
            if pltshow == 0:
                plt.close()
            else:
@@ -274,6 +276,7 @@ def fit_qso(QSO_im, psf_ave, psf_std=None, source_params=None,ps_param=None, bac
         plot = corner.corner(mcmc_new_list, labels=labels_new, show_titles=True)
         if tag is not None:
             plot.savefig('{0}_HOSTvsQSO_corner.pdf'.format(tag))
+            print "Print to claim the PDF file3 to be saved."
         if pltshow == 0:
             plt.close()
         else:
