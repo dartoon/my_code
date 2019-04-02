@@ -24,7 +24,7 @@ filename = 'test3_result/test3_mode1_level20.txt'
 #lines = [lines[i] for i in range(len(lines)) if len(lines[i]) ==4]
 #numbers = np.asarray(lines).astype(float)
 numbers = np.loadtxt(filename)
-samples = numbers[numbers[:,1]<3]
+samples = numbers#[numbers[:,1]<3]
 fig = corner.corner(samples, labels=["a0", "a1", "mbh_max", "mbh_min"],
                     truths=[2.35, 0.7, 80., 5.],
                     quantiles=[0.16, 0.84],show_titles=True,
