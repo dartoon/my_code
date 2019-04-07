@@ -46,3 +46,5 @@ fit_result*/
 *~
 *.fits
 *.pdf
+*.pkl
+*.png

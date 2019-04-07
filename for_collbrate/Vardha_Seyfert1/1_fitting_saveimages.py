@@ -22,10 +22,10 @@ agn_image = pyfits.getdata('{0}_cutout.fits'.format(ID))
 agn_stdd = pyfits.getdata('{0}_stdd.fits'.format(ID))
 
 ##Activate this part if one need to cut to a smaller size such as 81:
-fit_frame_size = 81
-ct = (len(agn_image)-fit_frame_size)/2     # If want to cut to 81, agn_image[ct:-ct,ct:-ct]
-agn_image = agn_image[ct:-ct,ct:-ct]
-agn_stdd = agn_stdd[ct:-ct,ct:-ct]
+#fit_frame_size = 81
+#ct = (len(agn_image)-fit_frame_size)/2     # If want to cut to 81, agn_image[ct:-ct,ct:-ct]
+#agn_image = agn_image[ct:-ct,ct:-ct]
+#agn_stdd = agn_stdd[ct:-ct,ct:-ct]
 print "The fitting image:"
 plt.imshow(agn_image, norm = LogNorm(), origin='lower')
 plt.savefig('agn.png')
@@ -113,14 +113,14 @@ ps_param = [kwargs_ps_init, kwargs_ps_sigma, fixed_ps, kwargs_lower_ps, kwargs_u
 name_save = 'fitting'
 deep_seed = True
 pix_sz = 0.04  # The pixel scale of the image.
-
-source_result, ps_result, image_ps, image_host, error_map=fit_qso(agn_image, psf_ave=psf, ps_param = ps_param, 
-                                                                  pix_sz = pix_sz, QSO_std = agn_stdd,  QSO_msk = QSO_msk,
-                                                                  source_params=source_params, fixcenter=False, no_MCMC =False,
-                                                                  tag=name_save, deep_seed= deep_seed, pltshow = 0, flux_ratio_plot=True)   
-zp = 25.0985
-print "Total Magnitude Result:"
-print "AGN magnitude:", -2.5*np.log(image_ps.sum()) + zp
-print "Buldge magnitude:", -2.5*np.log(image_host[0].sum()) + zp
-print "Disk magnitude:", -2.5*np.log(image_host[1].sum()) + zp
+#
+#source_result, ps_result, image_ps, image_host, error_map=fit_qso(agn_image, psf_ave=psf, ps_param = ps_param, 
+#                                                                  pix_sz = pix_sz, QSO_std = agn_stdd,  QSO_msk = QSO_msk,
+#                                                                  source_params=source_params, fixcenter=False, no_MCMC =False,
+#                                                                  tag=name_save, deep_seed= deep_seed, pltshow = 0, flux_ratio_plot=True)   
+#zp = 25.0985
+#print "Total Magnitude Result:"
+#print "AGN magnitude:", -2.5*np.log(image_ps.sum()) + zp
+#print "Buldge magnitude:", -2.5*np.log(image_host[0].sum()) + zp
+#print "Disk magnitude:", -2.5*np.log(image_host[1].sum()) + zp
 #print "Bar magnitude:", -2.5*np.log(image_host[2].sum()) + zp

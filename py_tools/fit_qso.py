@@ -14,7 +14,7 @@ import corner
 def fit_qso(QSO_im, psf_ave, psf_std=None, source_params=None,ps_param=None, background_rms=0.04, pix_sz = 0.168,
             exp_time = 300., fix_n=None, image_plot = True, corner_plot=True,
             flux_ratio_plot=False, deep_seed = False, fixcenter = False, QSO_msk=None, QSO_std=None,
-            tag = None, no_MCMC= False, pltshow = 1, return_Chisq = False):
+            tag = None, no_MCMC= False, pltshow = 1, return_Chisq = False, dump_result = False):
     '''
     A quick fit for the QSO image with (so far) single sersice + one PSF. The input psf noise is optional.
     
@@ -43,7 +43,6 @@ def fit_qso(QSO_im, psf_ave, psf_std=None, source_params=None,ps_param=None, bac
     exp_time = exp_time  #  exposure time (arbitrary units, flux per pixel is in units #photons/exp_time unit)
     numPix = len(QSO_im)  #  cutout pixel size
     deltaPix = pix_sz
-    fwhm = 0.1  # full width half max of PSF (only valid when psf_type='gaussian')
     psf_type = 'PIXEL'  # 'gaussian', 'pixel', 'NONE'
     kernel_size = len(psf_ave)
     kernel = psf_ave
@@ -99,7 +98,7 @@ def fit_qso(QSO_im, psf_ave, psf_std=None, source_params=None,ps_param=None, bac
     from lenstronomy.Data.imaging_data import Data
     kwargs_data = sim_util.data_configure_simple(numPix, deltaPix, exp_time, background_rms, inverse=True)
     data_class = Data(kwargs_data)
-    kwargs_psf =  sim_util.psf_configure_simple(psf_type=psf_type, fwhm=fwhm, kernelsize=kernel_size, deltaPix=deltaPix, kernel=kernel)
+    kwargs_psf =  sim_util.psf_configure_simple(psf_type=psf_type, kernelsize=kernel_size, deltaPix=deltaPix, kernel=kernel)
     from lenstronomy.Data.psf import PSF
     psf_class = PSF(kwargs_psf)
     data_class.update_data(QSO_im)
@@ -171,7 +170,7 @@ def fit_qso(QSO_im, psf_ave, psf_std=None, source_params=None,ps_param=None, bac
     elif deep_seed == True:
          fitting_kwargs_list = [
              ['PSO', {'sigma_scale': 0.8, 'n_particles': 150, 'n_iterations': 150}],
-             ['MCMC', {'n_burn': 50, 'n_run': 100, 'walkerRatio': 50, 'sigma_scale': .1}]
+             ['MCMC', {'n_burn': 20, 'n_run': 40, 'walkerRatio': 50, 'sigma_scale': .1}]
             ]
     if no_MCMC == True:
         fitting_kwargs_list = [fitting_kwargs_list[0],
@@ -234,27 +233,21 @@ def fit_qso(QSO_im, psf_ave, psf_std=None, source_params=None,ps_param=None, bac
         from lenstronomy.Sampling.parameters import Param
         param = Param(kwargs_model, kwargs_fixed_source=source_params[2], kwargs_fixed_ps=ps_param[2], **kwargs_constraints)
         mcmc_new_list = []
-        if len(source_params) >=2: 
-            if source_params[2][1] == {'n_sersic': 1.0} or source_params[2][1] == {'n_sersic': 4.0}:
-                if source_params[2][1] == {'n_sersic': 1.0}:
-                    buldge_i, disk_i = 0, 1
-                elif source_params[2][1] == {'n_sersic': 4.0}:
-                    buldge_i, disk_i = 1, 0
-                labels_new = [r"Quasar flux", r"buldge flux", r"disk flux", r"buldge Reff", r"disk Reff"]
-                for i in range(len(samples_mcmc)/10):
-                    kwargs_lens_out, kwargs_light_source_out, kwargs_light_lens_out, kwargs_ps_out, kwargs_cosmo = param.args2kwargs(samples_mcmc[i+ len(samples_mcmc)/10*9])
-                    image_reconstructed, _, _, _ = imageModel.image_linear_solve(kwargs_source=kwargs_light_source_out, kwargs_ps=kwargs_ps_out)
-                    image_ps = imageModel.point_source(kwargs_ps_out)
-                    flux_quasar = np.sum(image_ps)
-                    image_buldge = imageModel.source_surface_brightness(kwargs_light_source_out,unconvolved= False, k=buldge_i)
-                    flux_buldge = np.sum(image_buldge)                    
-                    image_disk = imageModel.source_surface_brightness(kwargs_light_source_out,unconvolved= False, k=disk_i)
-                    flux_disk = np.sum(image_disk)
-                    buldge_R = kwargs_light_source_out[0]['R_sersic']
-                    disk_R = kwargs_light_source_out[1]['R_sersic']
-                    if i/1000 > (i-1)/1000 :
-                        print "finished translate:", i                    
-                    mcmc_new_list.append([flux_quasar, flux_buldge, flux_disk, buldge_R, disk_R])
+        if len(source_params[0]) >=2: 
+            labels_new = ["Quasar flux"] +  ["host{0} flux".format(i) for i in range(len(source_params[0]))] + ["host{0} Reff".format(i) for i in range(len(source_params[0]))]
+            for i in range(len(samples_mcmc)/10):
+                kwargs_lens_out, kwargs_light_source_out, kwargs_light_lens_out, kwargs_ps_out, kwargs_cosmo = param.args2kwargs(samples_mcmc[i+ len(samples_mcmc)/10*9])
+                image_reconstructed, _, _, _ = imageModel.image_linear_solve(kwargs_source=kwargs_light_source_out, kwargs_ps=kwargs_ps_out)
+                image_ps = imageModel.point_source(kwargs_ps_out)
+                flux_quasar = np.sum(image_ps)
+                fluxs, reffs = [],[]
+                for j in range(len(source_params[0])):
+                    image_j = imageModel.source_surface_brightness(kwargs_light_source_out,unconvolved= False, k=j)
+                    fluxs.append(np.sum(image_j))
+                    reffs.append(kwargs_light_source_out[j]['R_sersic'])
+                mcmc_new_list.append([flux_quasar] + fluxs + reffs)
+                if i/1000 > (i-1)/1000 :
+                    print "finished translate:", i                    
         else:
             labels_new = [r"quasar flux", r"host_flux", r"host Sersic", r"host Reff"]
             # transform the parameter position of the MCMC chain in a lenstronomy convention with keyword arguments #
@@ -282,11 +275,15 @@ def fit_qso(QSO_im, psf_ave, psf_std=None, source_params=None,ps_param=None, bac
         noise_map = np.sqrt(data_class.C_D+np.abs(error_map))
     else:
         noise_map = np.sqrt(QSO_std**2+np.abs(error_map))
+    if dump_result == True:
+        import pickle
+        paras = [source_params[2], ps_param[2], mcmc_new_list, labels_new]
+        picklename='dump_' + tag + '.pkl'
+        pickle.dump([source_result, image_host, ps_result, image_ps, samples_mcmc, param_mcmc, paras], open(picklename, 'wb'))
     if return_Chisq == False:
         return source_result, ps_result, image_ps, image_host, noise_map
     elif return_Chisq == True:
         return source_result, ps_result, image_ps, image_host, noise_map, reduced_Chisq
-
 
 def fit_qso_multiband(QSO_im_list, psf_ave_list, psf_std_list=None, source_params=None,ps_param=None,
                       background_rms_list=[0.04]*5, pix_sz = 0.168,
@@ -452,15 +449,6 @@ def fit_qso_multiband(QSO_im_list, psf_ave_list, psf_std_list=None, source_param
     
     if deep_seed == False:
         fitting_kwargs_list = [
-#            {'fitting_routine': 'PSO', 'mpi': False, 'sigma_scale': 0.8, 'n_particles': 80,
-#            'n_iterations': 60, 'compute_bands': [True]+[False]*(len(QSO_im_list)-1)},
-#            {'fitting_routine': 'align_images', 'n_particles': 10, 'n_iterations': 10,
-#            'compute_bands': [False]+[True]*(len(QSO_im_list)-1)},
-#            {'fitting_routine': 'PSO', 'mpi': False, 'sigma_scale': 0.8, 'n_particles': 100,
-#            'n_iterations': 200, 'compute_bands': [True]*len(QSO_im_list)},
-#            {'fitting_routine': 'MCMC', 'n_burn': 10, 'n_run': 20, 'walkerRatio': 50, 'mpi': False,   ##Inputs  to CosmoHammer:
-#               #n_particles - particleCount; n_burn - burninIterations; n_run: sampleIterations (n_burn and n_run usually the same.); walkerRatio: walkersRatio.
-#            'sigma_scale': .1}  
             ['PSO', {'sigma_scale': 0.8, 'n_particles': 80, 'n_iterations': 60, 'compute_bands': [True]+[False]*(len(QSO_im_list)-1)}],
             ['align_images', {'n_particles': 10, 'n_iterations': 10, 'compute_bands': [False]+[True]*(len(QSO_im_list)-1)}],
             ['PSO', {'sigma_scale': 0.8, 'n_particles': 100, 'n_iterations': 200, 'compute_bands': [True]*len(QSO_im_list)}],
@@ -468,19 +456,10 @@ def fit_qso_multiband(QSO_im_list, psf_ave_list, psf_std_list=None, source_param
             ]
     elif deep_seed == True:
          fitting_kwargs_list = [
-#            {'fitting_routine': 'PSO', 'mpi': False, 'sigma_scale': 0.8, 'n_particles': 150,
-#            'n_iterations': 60, 'compute_bands': [True]+[False]*(len(QSO_im_list)-1)},
-#            {'fitting_routine': 'align_images', 'n_particles': 20, 'n_iterations': 20,
-#            'compute_bands': [False]+[True]*(len(QSO_im_list)-1)},
-#            {'fitting_routine': 'PSO', 'mpi': False, 'sigma_scale': 0.8, 'n_particles': 150,
-#            'n_iterations': 200, 'compute_bands': [True]*len(QSO_im_list)},
-#            {'fitting_routine': 'MCMC', 'n_burn': 50, 'n_run': 100, 'walkerRatio': 50, 'mpi': False,   ##Inputs  to CosmoHammer:
-#               #n_particles - particleCount; n_burn - burninIterations; n_run: sampleIterations (n_burn and n_run usually the same.); walkerRatio: walkersRatio.
-#            'sigma_scale': .1}     
             ['PSO', {'sigma_scale': 0.8, 'n_particles': 150, 'n_iterations': 60, 'compute_bands': [True]+[False]*(len(QSO_im_list)-1)}],
             ['align_images', {'n_particles': 20, 'n_iterations': 20, 'compute_bands': [False]+[True]*(len(QSO_im_list)-1)}],
             ['PSO', {'sigma_scale': 0.8, 'n_particles': 150, 'n_iterations': 200, 'compute_bands': [True]*len(QSO_im_list)}],
-            ['MCMC', {'n_burn': 50, 'n_run': 100, 'walkerRatio': 50, 'sigma_scale': 0.8}]                 
+            ['MCMC', {'n_burn': 20, 'n_run': 40, 'walkerRatio': 50, 'sigma_scale': .1}]                 
             ]
     if no_MCMC == True:
         del fitting_kwargs_list[-1]
@@ -715,12 +694,12 @@ def fit_galaxy(galaxy_im, psf_ave, psf_std=None, source_params=None, background_
     elif deep_seed == True:
          fitting_kwargs_list = [
             ['PSO', {'sigma_scale': 0.8, 'n_particles': 100, 'n_iterations': 80}],
-            ['MCMC', {'n_burn': 20, 'n_run': 20, 'walkerRatio': 100, 'sigma_scale': .1}]
+            ['MCMC', {'n_burn': 20, 'n_run': 40, 'walkerRatio': 100, 'sigma_scale': .1}]
             ]
     elif deep_seed == 'very_deep':
          fitting_kwargs_list = [
             ['PSO', {'sigma_scale': 0.8, 'n_particles': 150, 'n_iterations': 150}],
-            ['MCMC', {'n_burn': 20, 'n_run': 20, 'walkerRatio': 100, 'sigma_scale': .1}]
+            ['MCMC', {'n_burn': 20, 'n_run': 40, 'walkerRatio': 100, 'sigma_scale': .1}]
             ]
     if no_MCMC == True:
         fitting_kwargs_list = [fitting_kwargs_list[0],
