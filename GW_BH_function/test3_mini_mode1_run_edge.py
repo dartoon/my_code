@@ -77,14 +77,20 @@ t1 = time.time()
 
 index = np.arange(len(m1_all))
 from cal_likelihood import fac_s_eff_v
-rounds = 50
+#rounds = 50
 count = 0
 
-part = 3
+pre_result = np.loadtxt('test3_result/test3_mode1_level20_npy.txt')
+bool_1 = (pre_result[:,1]>2.7)
+bool_2 = (pre_result[:,3]>95)
+seed_list = pre_result[:,0][bool_1 + bool_2]
+
+part = 1
+rounds = len(seed_list)/4
 for loop in range(part*rounds,(part+1)*rounds):
     mini_count = 0 
-    print "Calculating loop:", loop
-    seed_i = loop
+    seed_i = int(seed_list[loop])
+    print "Calculating seed_i:", seed_i, 'loop', loop
     np.random.seed(seed_i)
     idx = np.random.choice(index, 1000)
     m1 = m1_all[idx]
@@ -104,7 +110,7 @@ for loop in range(part*rounds,(part+1)*rounds):
     sf_factor = sf_factor/np.exp(sf_sigma**2/2)
     print "m1_obs.min(), m1_obs.max():",m1_obs.min(), m1_obs.max()
     mini=fmin(posterior,para_ini,maxiter=1000, args=(m1_obs, m_noise_level, sf_factor,z_inf))
-    datafile = 'test3_mode1_level{0}_p{1}.txt'.format(int(m_noise_level*100),part) 
+    datafile = 'test3_mode1_level{0}_run_edge.txt'.format(int(m_noise_level*100)) 
     if count ==0:
         if_file = glob.glob(datafile)
         if if_file == []:

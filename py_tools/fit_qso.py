@@ -566,7 +566,6 @@ def fit_qso_multiband(QSO_im_list, psf_ave_list, psf_std_list=None, source_param
             errp_list.append(np.sqrt(data_class_list[k].C_D+np.abs(error_map_list[k])))
         else:
             errp_list.append(np.sqrt(QSO_std_list[k]**2+np.abs(error_map_list[k])))
-            
     return source_result_list, ps_result_list, image_ps_list, image_host_list, errp_list, shift_RADEC_list, fitting_seq     #fitting_seq.multi_band_list
 
 def fit_galaxy(galaxy_im, psf_ave, psf_std=None, source_params=None, background_rms=0.04, pix_sz = 0.08,
