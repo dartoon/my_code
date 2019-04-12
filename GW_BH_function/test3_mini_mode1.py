@@ -12,7 +12,6 @@ import astropy.io.fits as pyfits
 import matplotlib.pyplot as plt
 import glob
 from BH_mass_function import gene_BHBH, dl, solve_z
-import random
 import time
 import pickle
 
@@ -77,10 +76,10 @@ t1 = time.time()
 
 index = np.arange(len(m1_all))
 from cal_likelihood import fac_s_eff_v
-rounds = 50
+rounds = 250
 count = 0
 
-part = 3
+part = 0
 for loop in range(part*rounds,(part+1)*rounds):
     mini_count = 0 
     print "Calculating loop:", loop
@@ -104,7 +103,7 @@ for loop in range(part*rounds,(part+1)*rounds):
     sf_factor = sf_factor/np.exp(sf_sigma**2/2)
     print "m1_obs.min(), m1_obs.max():",m1_obs.min(), m1_obs.max()
     mini=fmin(posterior,para_ini,maxiter=1000, args=(m1_obs, m_noise_level, sf_factor,z_inf))
-    datafile = 'test3_mode1_level{0}_p{1}.txt'.format(int(m_noise_level*100),part) 
+    datafile = 'test3_mode1_take2_level{0}_p{1}.txt'.format(int(m_noise_level*100),part) 
     if count ==0:
         if_file = glob.glob(datafile)
         if if_file == []:
