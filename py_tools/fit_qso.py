@@ -186,13 +186,13 @@ def fit_qso(QSO_im, psf_ave, psf_std=None, source_params=None,ps_param=None, bac
     # this is the linear inversion. The kwargs will be updated afterwards
     image_reconstructed, error_map, _, _ = imageModel.image_linear_solve(kwargs_source=source_result, kwargs_ps=ps_result)
     image_ps = imageModel.point_source(ps_result)
-    image_host = []
-    for i in range(len(source_result)):
-        image_host.append(imageModel.source_surface_brightness(source_result, de_lensed=True,unconvolved=False,k=i))
-    # let's plot the output of the PSO minimizer
     from lenstronomy.Plots.output_plots import LensModelPlot
     lensPlot = LensModelPlot(kwargs_data, kwargs_psf, kwargs_numerics, kwargs_model, lens_result, source_result,
                              lens_light_result, ps_result, arrow_size=0.02, cmap_string="gist_heat")
+    image_host = []  #!!! The linear_solver before and after LensModelPlot could have different result for very faint sources.
+    for i in range(len(source_result)):
+        image_host.append(imageModel.source_surface_brightness(source_result, de_lensed=True,unconvolved=False,k=i))
+    # let's plot the output of the PSO minimizer
     reduced_Chisq =  lensPlot._reduced_x2
     if image_plot:
         f, axes = plt.subplots(3, 3, figsize=(16, 16), sharex=False, sharey=False)
@@ -477,7 +477,6 @@ def fit_qso_multiband(QSO_im_list, psf_ave_list, psf_std_list=None, source_param
     for k in range(len(QSO_im_list)):
     # this is the linear inversion. The kwargs will be updated afterwards
         image_reconstructed_k, error_map_k, _, _ = imageModel_list[k].image_linear_solve(kwargs_source=source_result, kwargs_ps=ps_result)
-        print "source_result", 'for', "k", source_result
         [kwargs_data_k, kwargs_psf_k, kwargs_numerics_k] = fitting_seq.multi_band_list[k]
         data_class_k = Data(kwargs_data_k)
         psf_class_k = PSF(kwargs_psf_k)
@@ -485,13 +484,14 @@ def fit_qso_multiband(QSO_im_list, psf_ave_list, psf_std_list=None, source_param
                                 point_source_class=pointSource, kwargs_numerics=kwargs_numerics_list[k])
         
         image_ps_k = imageModel_k.point_source(ps_result)
+        from lenstronomy.Plots.output_plots import LensModelPlot
+        lensPlot = LensModelPlot(kwargs_data_list[k], kwargs_psf_list[k], kwargs_numerics_list[k], kwargs_model, lens_result, source_result,
+                                 lens_light_result, ps_result, arrow_size=0.02, cmap_string="gist_heat")
+        print "source_result", 'for', "k", source_result
         image_host_k = []
         for i in range(len(source_result)):
             image_host_k.append(imageModel_list[k].source_surface_brightness(source_result,de_lensed=True,unconvolved=False, k=i))
         # let's plot the output of the PSO minimizer
-        from lenstronomy.Plots.output_plots import LensModelPlot
-        lensPlot = LensModelPlot(kwargs_data_list[k], kwargs_psf_list[k], kwargs_numerics_list[k], kwargs_model, lens_result, source_result,
-                                 lens_light_result, ps_result, arrow_size=0.02, cmap_string="gist_heat")
         
         image_reconstructed_list.append(image_reconstructed_k)
         source_result_list.append(source_result)
@@ -677,7 +677,7 @@ def fit_galaxy(galaxy_im, psf_ave, psf_std=None, source_params=None, background_
     if psf_std is not None:
         kwargs_psf['psf_error_map'] = psf_std
     
-    imageModel = ImageModel(data_class, psf_class, source_model_class=lightModel,kwargs_numerics=kwargs_numerics)
+    
                   
     image_band = [kwargs_data, kwargs_psf, kwargs_numerics]
     multi_band_list = [image_band]
@@ -712,10 +712,15 @@ def fit_galaxy(galaxy_im, psf_ave, psf_std=None, source_params=None, background_
     print(end_time - start_time, 'total time needed for computation')
     print('============ CONGRATULATION, YOUR JOB WAS SUCCESSFUL ================ ')
     # this is the linear inversion. The kwargs will be updated afterwards
+    imageModel = ImageModel(data_class, psf_class, source_model_class=lightModel,kwargs_numerics=kwargs_numerics)
     image_reconstructed, error_map, _, _ = imageModel.image_linear_solve(kwargs_source=source_result, kwargs_ps=ps_result)
-    image_host = []
-    for i in range(len(source_result)):
-        image_host.append(imageModel.source_surface_brightness(source_result,de_lensed=True,unconvolved=False, k=i))  
+#    image_host = []   #!!! The linear_solver before and after could have different result for very faint sources.
+#    for i in range(len(source_result)):
+#        image_host_i = imageModel.source_surface_brightness(source_result,de_lensed=True,unconvolved=False, k=i)
+#        print "image_host_i", source_result[i]
+#        print "total flux", image_host_i.sum()
+#        image_host.append(image_host_i)  
+        
     # let's plot the output of the PSO minimizer
     from lenstronomy.Plots.output_plots import LensModelPlot
     lensPlot = LensModelPlot(kwargs_data, kwargs_psf, kwargs_numerics, kwargs_model, lens_result, source_result,
@@ -734,6 +739,12 @@ def fit_galaxy(galaxy_im, psf_ave, psf_std=None, source_params=None, background_
             plt.close()
         else:
             plt.show()
+    image_host = []    
+    for i in range(len(source_result)):
+        image_host_i = imageModel.source_surface_brightness(source_result,de_lensed=True,unconvolved=False, k=i)
+#        print "image_host_i", source_result[i]
+#        print "total flux", image_host_i.sum()
+        image_host.append(image_host_i)  
         
     if corner_plot==True and no_MCMC==False:
         # here the (non-converged) MCMC chain of the non-linear parameters

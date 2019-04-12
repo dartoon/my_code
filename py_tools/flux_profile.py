@@ -211,6 +211,87 @@ def SB_profile(image, center, radius=35, start_p=1.5, grids=20, gridspace = None
         plt.show()
     return r_SB, r_grids
 
+def concentration_profile(image, center, total_flux=None, radius=35,start_p=1.5,
+                          grids=100, gridspace=None, ifplot=False,
+                          fits_plot=False):
+    '''
+    Derive the flux profile of one image start at the center.
+    
+    Parameters
+    --------
+        image: A 2-D array image;
+        center: The center point of the profile;
+        radius: The radius of the profile favourable with default equals to 35;
+        grids: The number of points to sample the flux with default equals to 20;
+        ifplot: if plot the profile
+        fits_plot: if plot the fits file with the regions.
+    Returns
+    --------
+        1. A 1-D array of the tot_flux value of each 'grids' in the profile sampled radius. 
+        2. The grids of each pixel radius.
+        3. The region file for each radius.
+    '''
+    if total_flux==None:
+        total_flux = image.sum()
+    if gridspace == None:
+        r_grids=(np.linspace(0,1,grids+1)*radius)[1:]
+        diff = start_p - r_grids[0]
+        r_grids += diff             #starts from pixel 0.5
+    elif gridspace == 'log':
+        r_grids=(np.logspace(-2,0,grids+1)*radius)[1:]
+        diff =  start_p - r_grids[0]
+        r_grids += diff             #starts from pixel 0.5
+    r80_flux = 0.8* total_flux
+    r20_flux = 0.2* total_flux
+    r100_flux = total_flux
+    
+    r_flux = np.empty(grids)
+    regions = []
+    for i in range(len(r_grids)):
+        region = pix_region(center, r_grids[i])
+        r_flux[i] =flux_in_region(image, region)
+        regions.append(region)
+    index = []
+    index.append(np.where(abs(r20_flux - r_flux) == abs(r20_flux - r_flux).min())[0][0])
+    index.append(np.where(abs(r80_flux - r_flux) == abs(r80_flux - r_flux).min())[0][0])
+    index.append(np.where(abs(r100_flux - r_flux) == abs(r100_flux - r_flux).min())[0][0])
+    print index
+    if fits_plot == True:
+        ax=plt.subplot(1,1,1)
+        cax=ax.imshow((image),norm=LogNorm(),origin='lower')#,cmap='gist_heat')
+        #ax.add_patch(mask.bbox.as_artist(facecolor='none', edgecolor='white'))
+        for i in range(grids):
+            if i in index:
+                ax.add_patch(regions[i].as_artist(facecolor='none', edgecolor='red'))
+            else:
+                ax.add_patch(regions[i].as_artist(facecolor='none', edgecolor='orange'))
+        plt.colorbar(cax)
+        plt.show()
+    if ifplot == True:
+        minorLocator = AutoMinorLocator()
+        fig, ax = plt.subplots()
+        plt.plot(r_grids, r_flux, 'x-')
+        plt.plot(r_grids[index[0]], r_flux[index[0]], 'ro')
+        plt.text(r_grids[index[0]]+2, r_flux[index[0]], 'r_20',fontsize=14)
+        plt.plot(r_grids[index[1]], r_flux[index[1]], 'ro')
+        plt.text(r_grids[index[1]]+2, r_flux[index[1]], 'r_80',fontsize=14)        
+        plt.plot(r_grids[index[2]], r_flux[index[2]], 'ro')
+        plt.text(r_grids[index[2]], r_flux[index[2]]*15/16, 'r model total',fontsize=14)        
+        ax.xaxis.set_minor_locator(minorLocator)
+        plt.tick_params(which='both', width=2)
+        plt.tick_params(which='major', length=7)
+        plt.tick_params(which='minor', length=4, color='r')
+        plt.grid()
+        ax.set_ylabel("Total Flux")
+        ax.set_xlabel("Pixels")
+        if gridspace == 'log':
+            ax.set_xscale('log')
+            plt.xlim(start_p*0.7, ) 
+        plt.grid(which="minor")
+        plt.show()
+    return r_grids[index[0]], r_grids[index[1]]
+
+
 def text_in_string_list(text, string_list):
     '''
     Parameter
@@ -746,8 +827,8 @@ def galaxy_total_compare(label_list, flux_list, zp=27.0, delatPixel=1,
             model_flux += flux_list[2]
     model_flux = flux_list[1] + flux_list[2]
 
-    label_SB_list = [label_list[0], label_list[-2], label_list[1], label_list[2]] 
-    flux_SB_list = [flux_list[0], model_flux, flux_list[1], flux_list[2]]
+    label_SB_list = [label_list[0],label_list[1]] 
+    flux_SB_list = [flux_list[0], model_flux]
     radi = len(flux_list[0])/2
     if if_annuli == False:
         for i in range(len(label_SB_list)):
