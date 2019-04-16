@@ -185,13 +185,13 @@ def fit_qso(QSO_im, psf_ave, psf_std=None, source_params=None,ps_param=None, bac
     print('============ CONGRATULATION, YOUR JOB WAS SUCCESSFUL ================ ')
     # this is the linear inversion. The kwargs will be updated afterwards
     image_reconstructed, error_map, _, _ = imageModel.image_linear_solve(kwargs_source=source_result, kwargs_ps=ps_result)
-    image_ps = imageModel.point_source(ps_result)
     from lenstronomy.Plots.output_plots import LensModelPlot
     lensPlot = LensModelPlot(kwargs_data, kwargs_psf, kwargs_numerics, kwargs_model, lens_result, source_result,
                              lens_light_result, ps_result, arrow_size=0.02, cmap_string="gist_heat")
     image_host = []  #!!! The linear_solver before and after LensModelPlot could have different result for very faint sources.
     for i in range(len(source_result)):
         image_host.append(imageModel.source_surface_brightness(source_result, de_lensed=True,unconvolved=False,k=i))
+    image_ps = imageModel.point_source(ps_result)
     # let's plot the output of the PSO minimizer
     reduced_Chisq =  lensPlot._reduced_x2
     if image_plot:
@@ -483,7 +483,6 @@ def fit_qso_multiband(QSO_im_list, psf_ave_list, psf_std_list=None, source_param
         imageModel_k = ImageModel(data_class_k, psf_class_k, source_model_class=lightModel,
                                 point_source_class=pointSource, kwargs_numerics=kwargs_numerics_list[k])
         
-        image_ps_k = imageModel_k.point_source(ps_result)
         from lenstronomy.Plots.output_plots import LensModelPlot
         lensPlot = LensModelPlot(kwargs_data_list[k], kwargs_psf_list[k], kwargs_numerics_list[k], kwargs_model, lens_result, source_result,
                                  lens_light_result, ps_result, arrow_size=0.02, cmap_string="gist_heat")
@@ -491,6 +490,7 @@ def fit_qso_multiband(QSO_im_list, psf_ave_list, psf_std_list=None, source_param
         image_host_k = []
         for i in range(len(source_result)):
             image_host_k.append(imageModel_list[k].source_surface_brightness(source_result,de_lensed=True,unconvolved=False, k=i))
+        image_ps_k = imageModel_k.point_source(ps_result)
         # let's plot the output of the PSO minimizer
         
         image_reconstructed_list.append(image_reconstructed_k)
