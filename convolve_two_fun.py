@@ -12,6 +12,11 @@ import astropy.io.fits as pyfits
 import matplotlib.pyplot as plt
 from scipy.integrate import quad
 
+import matplotlib as matt
+import matplotlib.lines as mlines
+from matplotlib import colors
+matt.rcParams['font.family'] = 'STIXGeneral'
+
 def poss_ln_gaussian(m1, mu, sigma):
     if m1 >= 0:
         poss =  1/(m1 * sigma * np.sqrt(2 * np.pi)) * np.exp(-(np.log(m1) - mu)**2/(2*sigma**2))
@@ -20,7 +25,7 @@ def poss_ln_gaussian(m1, mu, sigma):
     return poss
 
 
-def mass_fun_i(m1, a=2.35, mbh_max=80, mbh_min=5):
+def mass_fun_i(m1, a=3.35, mbh_max=80, mbh_min=5):
     if m1>=mbh_min and m1<=mbh_max:
         N = (mbh_max)**(-a+1)/(1-a) - (mbh_min)**(-a+1)/(1-a)             # The intergral function of m**a for normalize the power law function
         return m1**(-a)/N
@@ -35,12 +40,14 @@ def cov_twofun(t, a=2.35, mbh_max=80, mbh_min=5, sigma =0.2):
     return inter
 cov_twofun=np.vectorize(cov_twofun)   
 
+
+plt.subplots(figsize=(8, 6))
 #print cov_twofun(5.5)
 #Before conv:
 x = np.logspace(np.log10(0.2), np.log10(85),300)
 y = poss_mass_fun(x)
 #y = poss_ln_gaussian(x,mu=np.log(5.5),sigma=0.2)
-plt.plot(x, y)
+plt.plot(x, y ,'--', label = 'A power-law distritbuion')
 #plt.xlim(3,20)
 #plt.show()
 
@@ -49,6 +56,11 @@ x = np.logspace(np.log10(0.2), np.log10(85),300)
 #y = poss_mass_fun(x)
 #y = poss_ln_gaussian(x,mu=np.log(5.5),sigma=0.2)
 y = cov_twofun(x, sigma=0.04)
-plt.plot(x, y)
+plt.plot(x, y, label = 'After convolving as Log-Normal')
+plt.xlabel("$m_1 (M_{\odot})$",fontsize=25)
+plt.ylabel("P($m$)",fontsize=25)
 plt.xlim(3,20)
+plt.tick_params(labelsize=15)
+plt.legend(prop={'size': 20},loc=1)
+#plt.savefig("convolving.pdf")
 plt.show()
