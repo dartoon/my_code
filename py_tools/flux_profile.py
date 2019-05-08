@@ -20,6 +20,9 @@ from astropy.visualization.mpl_normalize import ImageNormalize
 import matplotlib
 import matplotlib as matt
 matt.rcParams['font.family'] = 'STIXGeneral'
+import copy
+my_cmap = copy.copy(matplotlib.cm.get_cmap('gist_heat')) # copy the default cmap
+my_cmap.set_bad('black')
 
 def pix_region(center=([49,49]), radius=5):
     '''
@@ -570,7 +573,7 @@ def total_compare(label_list, flux_list, zp=27.0, delatPixel=1,
     ax4 = plt.subplot2grid((6,5), (0,4), rowspan=5)
     ax5 = plt.subplot2grid((6,5), (5,4), rowspan=1)
 
-    im1 = ax1.imshow(flux_list[0] + add_background,origin='lower',cmap="gist_heat", norm=norm, vmax = flux_list[0].max())
+    im1 = ax1.imshow(flux_list[0] + add_background,origin='lower',cmap= my_cmap, norm=norm, vmax = flux_list[0].max())
     clim=im1.properties()['clim']
     frame_size = len(flux_list[0])
     ax1.set_ylabel(target_ID, fontsize=15, weight='bold')
@@ -584,7 +587,7 @@ def total_compare(label_list, flux_list, zp=27.0, delatPixel=1,
     cb1.set_ticks([1.e-5, 1.e-4, 1.e-3, 1.e-2,1.e-1,0,1])   
 #    cb1.ax.()
     
-    im2 = ax2.imshow(flux_list[1] + flux_list[2] + add_background,origin='lower',cmap="gist_heat", norm=norm, clim=clim)
+    im2 = ax2.imshow(flux_list[1] + flux_list[2] + add_background,origin='lower',cmap= my_cmap, norm=norm, clim=clim)
 #    pos2_o = ax2.get_position() # get the original position
 #    pos2 = [pos2_o.x0 -0.03, pos2_o.y0, pos2_o.width, pos2_o.height]
 #    ax2.set_position(pos2) # set a new position
@@ -749,6 +752,8 @@ def total_compare(label_list, flux_list, zp=27.0, delatPixel=1,
     ax5.set_position(pos5) # set a new position
     if plot_compare == True:
         plt.show()
+    else:
+        plt.close()
     return f
 
 def galaxy_total_compare(label_list, flux_list, zp=27.0, delatPixel=1,
@@ -778,7 +783,7 @@ def galaxy_total_compare(label_list, flux_list, zp=27.0, delatPixel=1,
     ax4 = plt.subplot2grid((6,4), (0,3), rowspan=5)
     ax5 = plt.subplot2grid((6,4), (5,3), rowspan=1)
 
-    im1 = ax1.imshow(flux_list[0] + add_background,origin='lower',cmap="gist_heat", norm=norm, vmax = flux_list[0].max())
+    im1 = ax1.imshow(flux_list[0] + add_background,origin='lower',cmap= my_cmap, norm=norm, vmax = flux_list[0].max())
     clim=im1.properties()['clim']
     frame_size = len(flux_list[0])
     ax1.set_ylabel(target_ID, fontsize=15, weight='bold')
@@ -792,7 +797,7 @@ def galaxy_total_compare(label_list, flux_list, zp=27.0, delatPixel=1,
     cb1.set_ticks([1.e-5, 1.e-4, 1.e-3, 1.e-2,1.e-1,0,1])   
 #    cb1.ax.()
     
-    im2 = ax2.imshow(flux_list[1] + flux_list[2] + add_background,origin='lower',cmap="gist_heat", norm=norm, clim=clim)
+    im2 = ax2.imshow(flux_list[1] + flux_list[2] + add_background,origin='lower',cmap= my_cmap, norm=norm, clim=clim)
     ax2.text(frame_size*0.05, frame_size*0.9, label_list[-2],weight='bold',
          fontsize=20, color='white')
     scale_bar(ax2, frame_size, dist=1/delatPixel, text='1"', color = 'white')
