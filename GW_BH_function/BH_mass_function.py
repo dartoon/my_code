@@ -181,7 +181,7 @@ def r(z,om):
 vec_r=np.vectorize(r)
 def dl(z,om=0.3,h0=70):
     """
-    Calculate the luminosity distance.
+    Calculate the luminosity distance. In Mpc.
     """
     c=299790.
     dl_distance = (1+z) * c/h0 * vec_r(z,om=om)

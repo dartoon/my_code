@@ -48,3 +48,10 @@ fit_result*/
 *.pdf
 *.pkl
 *.png
+*.bbl
+*.tmp
+*.top
+*.tui
+*.dvi
+*.blg
+*.aux

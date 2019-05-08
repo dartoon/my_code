@@ -11,17 +11,18 @@ import numpy as np
 import astropy.io.fits as pyfits
 import matplotlib.pyplot as plt
 
+import matplotlib
+import matplotlib as matt
+matt.rcParams['font.family'] = 'STIXGeneral'
+cmap = matplotlib.cm.get_cmap('viridis')
+
 import corner
 #filename = 'test2_select-eff_correct_sigmalogdiv3_20.txt'
 #filename = 'few_tests/right_answer_test1_conv_lognorm_20.txt'
-pre_result = np.loadtxt('test3_result/test3_mode1_level20_npy.txt')
-bool_1 = (pre_result[:,1]>2.7)
-bool_2 = (pre_result[:,3]>95)
-bools = np.invert(bool_1+bool_2)
-result_rm_edge = pre_result[bools]
-result_new_edge = np.loadtxt('test3_result/test3_edge.txt')
+result = np.loadtxt('test3_result_secondrun/test3_mode1_take2_level20.txt')
+numbers = result
 
-numbers = np.concatenate((result_rm_edge,result_new_edge))
+
 #%%
 #print filename
 #with open(filename) as f:
@@ -32,13 +33,15 @@ numbers = np.concatenate((result_rm_edge,result_new_edge))
 #lines = [lines[i] for i in range(len(lines)) if len(lines[i]) ==4]
 #numbers = np.asarray(lines).astype(float)
 samples = numbers#[numbers[:,1]<3]
-fig = corner.corner(numbers[:,1:], labels=["a0", "a1", "mbh_max", "mbh_min"],
+fig = corner.corner(numbers, labels=[r"$\alpha_0$", r"$\alpha_1$", "M$_{max}$", "M$_{min}$"],
                     truths=[2.35, 0.7, 80., 5.],
-                    quantiles=[0.16, 0.84],show_titles=True,
-                    title_kwargs={"fontsize": 12},#truths=[2.35,80,5],
+                    quantiles=[0.16, 0.5, 0.84],show_titles=True, smooth = 0.7,
+                    title_kwargs={"fontsize": 15}, label_kwargs = {"fontsize": 25},
 #                    plot_datapoints=True,smooth=1.0,smooth1d=1.0,
-                    levels=1.0 - np.exp(-0.5 * np.arange(1, 2.1, 1) ** 2),
+#                    levels=1.0 - np.exp(-0.5 * np.array([1.,2.]) ** 2),
                     title_fmt='.2f')
-#fig.savefig("test1_lognorm_likeli.pdf")
+for ax in fig.get_axes():
+      ax.tick_params(axis='both', labelsize=20)
+#fig.savefig("fig_results_4para.pdf")
 #####
 plt.show()  
