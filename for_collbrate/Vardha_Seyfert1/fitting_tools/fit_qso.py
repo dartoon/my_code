@@ -276,11 +276,16 @@ def fit_qso(QSO_im, psf_ave, psf_std=None, source_params=None,ps_param=None, bac
         noise_map = np.sqrt(data_class.C_D+np.abs(error_map))
     else:
         noise_map = np.sqrt(QSO_std**2+np.abs(error_map))
-    if dump_result == True:
+    if dump_result == True  and no_MCMC == False:
         import pickle
         paras = [source_params[2], ps_param[2], mcmc_new_list, labels_new]
         picklename='dump_' + tag + '.pkl'
         pickle.dump([source_result, image_host, ps_result, image_ps, samples_mcmc, param_mcmc, paras], open(picklename, 'wb'))
+    if dump_result == True  and no_MCMC == True:
+        import pickle
+        paras = [source_params[2], ps_param[2]]
+        picklename='dump_' + tag + '.pkl'
+        pickle.dump([source_result, image_host, ps_result, image_ps, param_mcmc, paras], open(picklename, 'wb'))
     if return_Chisq == False:
         return source_result, ps_result, image_ps, image_host, noise_map
     elif return_Chisq == True:

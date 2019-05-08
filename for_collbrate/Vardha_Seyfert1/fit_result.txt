@@ -28,3 +28,9 @@ obj 1 result:
 obj 2 result:
     {'n_sersic': 0.5, 'host_mag': 20.568, 'R_sersic': 4.593, 'q': 0.649, 'center_x': 0.141, 'center_y': -0.13, 'host_amp': 64.886, 'phi_G': 1.429, 'amp': 15.036}
 ======================
+Result for target l106:
+point source result:
+    [{'point_amp': array([879.04470343]), 'ra_image': array([-0.02449764]), 'dec_image': array([0.00341959])}]
+obj 0 result:
+    {'n_sersic': 5.504, 'host_mag': 15.465, 'R_sersic': 9.552, 'q': 0.604, 'center_x': -0.067, 'center_y': 0.054, 'host_amp': 7136.713, 'phi_G': -0.049, 'amp': 6.879}
+======================
