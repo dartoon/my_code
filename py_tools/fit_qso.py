@@ -6,6 +6,9 @@ Created on Wed Mar 28 20:23:36 2018
 @author: Dartoon
 
 A func for fitting the QSO with a input PSF. The PSF std is optional.
+
+Update for Lenstronomy version 0.7.0
+Imporve the way for to pickle.dump
 """
 from matplotlib.pylab import plt
 import numpy as np
@@ -15,7 +18,7 @@ import pickle
 def fit_qso(QSO_im, psf_ave, psf_std=None, source_params=None,ps_param=None, background_rms=0.04, pix_sz = 0.168,
             exp_time = 300., fix_n=None, image_plot = True, corner_plot=True,
             flux_ratio_plot=False, deep_seed = False, fixcenter = False, QSO_msk=None, QSO_std=None,
-            tag = None, no_MCMC= False, pltshow = 1, return_Chisq = False, dump_result = False):
+            tag = None, no_MCMC= False, pltshow = 1, return_Chisq = False, dump_result = False, pso_diag=False):
     '''
     A quick fit for the QSO image with (so far) single sersice + one PSF. The input psf noise is optional.
     
@@ -194,6 +197,17 @@ def fit_qso(QSO_im, psf_ave, psf_std=None, source_params=None,ps_param=None, bac
     for i in range(len(source_result)):
         image_host.append(imageModel.source_surface_brightness(source_result, de_lensed=True,unconvolved=False,k=i))
     image_ps = imageModel.point_source(ps_result)
+    
+    if pso_diag == True:
+        import lenstronomy.Plots.output_plots as out_plot
+        for i in range(len(chain_list)):
+            if len(param_list[i]) > 0:
+                f, axes = out_plot.plot_chain(chain_list[i], param_list[i])
+            if pltshow == 0:
+                plt.close()
+            else:
+                plt.show()
+
     # let's plot the output of the PSO minimizer
     reduced_Chisq =  lensPlot._reduced_x2
     if image_plot:
@@ -261,11 +275,14 @@ def fit_qso(QSO_im, psf_ave, psf_std=None, source_params=None,ps_param=None, bac
         noise_map = np.sqrt(QSO_std**2+np.abs(error_map))
     if dump_result == True:
         if flux_ratio_plot==True and no_MCMC==False:
-            trans_paras = [source_params[2], ps_param[2], mcmc_new_list, labels_new]
+            trans_paras = [source_params[2], ps_param[2], mcmc_new_list, labels_new, 'source_params[2], ps_param[2], mcmc_new_list, labels_new']
         else:
             trans_paras = []
         picklename= tag + '.pkl'
-        pickle.dump([source_result, image_host, ps_result, image_ps, samples_mcmc, param_mcmc, trans_paras], open(picklename, 'wb'))
+        best_fit = [source_result, image_host, ps_result, image_ps,'source_result, image_host, ps_result, image_ps']
+        pso_fit = [chain_list, param_list, 'chain_list, param_list']
+        mcmc_fit = [samples_mcmc, param_mcmc, dist_mcmc, 'samples_mcmc, param_mcmc, dist_mcmc']
+        pickle.dump([best_fit,pso_fit,mcmc_fit, trans_paras], open(picklename, 'wb'))
     if return_Chisq == False:
         return source_result, ps_result, image_ps, image_host, noise_map
     elif return_Chisq == True:
@@ -556,8 +573,8 @@ def fit_qso_multiband(QSO_im_list, psf_ave_list, psf_std_list=None, source_param
 
 def fit_galaxy(galaxy_im, psf_ave, psf_std=None, source_params=None, background_rms=0.04, pix_sz = 0.08,
             exp_time = 300., fix_n=None, image_plot = True, corner_plot=True,
-            deep_seed = False, galaxy_msk=None, galaxy_std=None,
-            tag = None, no_MCMC= False, pltshow = 1, return_Chisq = False):
+            deep_seed = False, galaxy_msk=None, galaxy_std=None, flux_corner_plot = False,
+            tag = None, no_MCMC= False, pltshow = 1, return_Chisq = False, dump_result = False, pso_diag=False):
     '''
     A quick fit for the QSO image with (so far) single sersice + one PSF. The input psf noise is optional.
     
@@ -674,18 +691,18 @@ def fit_galaxy(galaxy_im, psf_ave, psf_std=None, source_params=None, background_
     
     if deep_seed == False:
         fitting_kwargs_list = [
-             ['PSO', {'sigma_scale': 0.8, 'n_particles': 50, 'n_iterations': 50}],
-             ['MCMC', {'n_burn': 10, 'n_run': 20, 'walkerRatio': 50, 'sigma_scale': .1}]
+            ['PSO', {'sigma_scale': 0.8, 'n_particles': 50, 'n_iterations': 50}],
+            ['MCMC', {'n_burn': 10, 'n_run': 10, 'walkerRatio': 50, 'sigma_scale': .1}]
             ]            
     elif deep_seed == True:
          fitting_kwargs_list = [
             ['PSO', {'sigma_scale': 0.8, 'n_particles': 100, 'n_iterations': 80}],
-            ['MCMC', {'n_burn': 20, 'n_run': 40, 'walkerRatio': 100, 'sigma_scale': .1}]
+            ['MCMC', {'n_burn': 10, 'n_run': 15, 'walkerRatio': 50, 'sigma_scale': .1}]
             ]
     elif deep_seed == 'very_deep':
          fitting_kwargs_list = [
             ['PSO', {'sigma_scale': 0.8, 'n_particles': 150, 'n_iterations': 150}],
-            ['MCMC', {'n_burn': 20, 'n_run': 40, 'walkerRatio': 100, 'sigma_scale': .1}]
+            ['MCMC', {'n_burn': 10, 'n_run': 20, 'walkerRatio': 50, 'sigma_scale': .1}]
             ]
     if no_MCMC == True:
         fitting_kwargs_list = [fitting_kwargs_list[0],
@@ -712,6 +729,16 @@ def fit_galaxy(galaxy_im, psf_ave, psf_std=None, source_params=None, background_
     from lenstronomy.Plots.output_plots import LensModelPlot
     lensPlot = LensModelPlot(kwargs_data, kwargs_psf, kwargs_numerics, kwargs_model, lens_result, source_result,
                              lens_light_result, ps_result, arrow_size=0.02, cmap_string="gist_heat")
+    if pso_diag == True:
+        import lenstronomy.Plots.output_plots as out_plot
+        for i in range(len(chain_list)):
+            if len(param_list[i]) > 0:
+                f, axes = out_plot.plot_chain(chain_list[i], param_list[i])    
+            if pltshow == 0:
+                plt.close()
+            else:
+                plt.show()  
+                
     reduced_Chisq =  lensPlot._reduced_x2
     if image_plot:
         f, axes = plt.subplots(1, 3, figsize=(16, 16), sharex=False, sharey=False)
@@ -744,14 +771,47 @@ def fit_galaxy(galaxy_im, psf_ave, psf_std=None, source_params=None, background_
                plt.close()
            else:
                plt.show()
+    if flux_corner_plot ==True and no_MCMC==False:
+        from lenstronomy.Sampling.parameters import Param
+        param = Param(kwargs_model, kwargs_fixed_source=source_params[2], **kwargs_constraints)
+        mcmc_new_list = []
+        labels_new = ["host{0} flux".format(i) for i in range(len(source_params[0]))]
+        for i in range(len(samples_mcmc)):
+            kwargs_lens_out, kwargs_light_source_out, kwargs_light_lens_out, kwargs_ps_out, kwargs_cosmo = param.args2kwargs(samples_mcmc[i])
+            image_reconstructed, _, _, _ = imageModel.image_linear_solve(kwargs_source=kwargs_light_source_out, kwargs_ps=kwargs_ps_out)
+            fluxs = []
+            for j in range(len(source_params[0])):
+                image_j = imageModel.source_surface_brightness(kwargs_light_source_out,unconvolved= False, k=j)
+                fluxs.append(np.sum(image_j))
+            mcmc_new_list.append( fluxs )
+            if i/1000 > (i-1)/1000 :
+                print len(samples_mcmc), "MCMC samplers in total, finished translate:", i    
+        plot = corner.corner(mcmc_new_list, labels=labels_new, show_titles=True)
+        if tag is not None:
+            plot.savefig('{0}_HOSTvsQSO_corner.pdf'.format(tag))
+        if pltshow == 0:
+            plt.close()
+        else:
+            plt.show() 
+
     if galaxy_std is None:
-        if return_Chisq == False:
-            return source_result, image_host, np.sqrt(data_class.C_D+np.abs(error_map))
-        elif return_Chisq == True:
-            return source_result, image_host, np.sqrt(data_class.C_D+np.abs(error_map)), reduced_Chisq
+        noise_map = np.sqrt(data_class.C_D+np.abs(error_map))
     else:
-        if return_Chisq == False:
-            return source_result, image_host, np.sqrt(galaxy_std**2+np.abs(error_map)) #error_map=0
-        elif return_Chisq == True:
-            return source_result, image_host, np.sqrt(galaxy_std**2+np.abs(error_map)), reduced_Chisq #error_map=0
-    
+        noise_map = np.sqrt(galaxy_std**2+np.abs(error_map))   
+        
+    if dump_result == True:
+        if flux_corner_plot==True and no_MCMC==False:
+            trans_paras = [source_params[2], mcmc_new_list, labels_new, 'source_params[2], mcmc_new_list, labels_new']
+        else:
+            trans_paras = []
+        picklename= tag + '.pkl'
+        best_fit = [source_result, image_host, 'source_result, image_host']
+        pso_fit = [chain_list, param_list, 'chain_list, param_list']
+        mcmc_fit = [samples_mcmc, param_mcmc, dist_mcmc, 'samples_mcmc, param_mcmc, dist_mcmc']
+        pickle.dump([best_fit, pso_fit, mcmc_fit, trans_paras], open(picklename, 'wb'))
+        
+               
+    if return_Chisq == False:
+        return source_result, image_host, noise_map
+    elif return_Chisq == True:
+        return source_result, image_host, noise_map, reduced_Chisq
