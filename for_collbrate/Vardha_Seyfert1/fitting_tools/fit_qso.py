@@ -6,15 +6,18 @@ Created on Wed Mar 28 20:23:36 2018
 @author: Dartoon
 
 A func for fitting the QSO with a input PSF. The PSF std is optional.
+
+Update for Lenstronomy version 0.7.0
 """
 from matplotlib.pylab import plt
 import numpy as np
 import corner
+import pickle
 
 def fit_qso(QSO_im, psf_ave, psf_std=None, source_params=None,ps_param=None, background_rms=0.04, pix_sz = 0.168,
             exp_time = 300., fix_n=None, image_plot = True, corner_plot=True,
             flux_ratio_plot=False, deep_seed = False, fixcenter = False, QSO_msk=None, QSO_std=None,
-            tag = None, no_MCMC= False, pltshow = 1, return_Chisq = False, dump_result = False):
+            tag = None, no_MCMC= False, pltshow = 1, return_Chisq = False, dump_result = False, pso_diag=False):
     '''
     A quick fit for the QSO image with (so far) single sersice + one PSF. The input psf noise is optional.
     
@@ -43,7 +46,6 @@ def fit_qso(QSO_im, psf_ave, psf_std=None, source_params=None,ps_param=None, bac
     exp_time = exp_time  #  exposure time (arbitrary units, flux per pixel is in units #photons/exp_time unit)
     numPix = len(QSO_im)  #  cutout pixel size
     deltaPix = pix_sz
-    fwhm = 0.1  # full width half max of PSF (only valid when psf_type='gaussian')
     psf_type = 'PIXEL'  # 'gaussian', 'pixel', 'NONE'
     kernel_size = len(psf_ave)
     kernel = psf_ave
@@ -99,7 +101,7 @@ def fit_qso(QSO_im, psf_ave, psf_std=None, source_params=None,ps_param=None, bac
     from lenstronomy.Data.imaging_data import Data
     kwargs_data = sim_util.data_configure_simple(numPix, deltaPix, exp_time, background_rms, inverse=True)
     data_class = Data(kwargs_data)
-    kwargs_psf =  sim_util.psf_configure_simple(psf_type=psf_type, fwhm=fwhm, kernelsize=kernel_size, deltaPix=deltaPix, kernel=kernel)
+    kwargs_psf =  sim_util.psf_configure_simple(psf_type=psf_type, kernelsize=kernel_size, deltaPix=deltaPix, kernel=kernel)
     from lenstronomy.Data.psf import PSF
     psf_class = PSF(kwargs_psf)
     data_class.update_data(QSO_im)
@@ -161,17 +163,18 @@ def fit_qso(QSO_im, psf_ave, psf_std=None, source_params=None,ps_param=None, bac
     # The Params for the fitting. kwargs_init: initial input. kwargs_sigma: The parameter uncertainty. kwargs_fixed: fixed parameters;
     #kwargs_lower,kwargs_upper: Lower and upper limits.
 
-    fitting_seq = FittingSequence(multi_band_list, kwargs_model, kwargs_constraints, kwargs_likelihood, kwargs_params)
+    kwargs_data_joint = {'multi_band_list': multi_band_list, 'image_type': 'multi-band'}
+    fitting_seq = FittingSequence(kwargs_data_joint, kwargs_model, kwargs_constraints, kwargs_likelihood, kwargs_params)
     
     if deep_seed == False:
         fitting_kwargs_list = [
-             ['PSO', {'sigma_scale': 0.8, 'n_particles': 80, 'n_iterations': 60}],
-             ['MCMC', {'n_burn': 10, 'n_run': 20, 'walkerRatio': 50, 'sigma_scale': .1}]
+             ['PSO', {'sigma_scale': 0.8, 'n_particles': 100, 'n_iterations': 60}],
+             ['MCMC', {'n_burn': 10, 'n_run': 10, 'walkerRatio': 50, 'sigma_scale': .1}]
             ]
     elif deep_seed == True:
          fitting_kwargs_list = [
              ['PSO', {'sigma_scale': 0.8, 'n_particles': 150, 'n_iterations': 150}],
-             ['MCMC', {'n_burn': 20, 'n_run': 40, 'walkerRatio': 50, 'sigma_scale': .1}]
+             ['MCMC', {'n_burn': 10, 'n_run': 15, 'walkerRatio': 50, 'sigma_scale': .1}]
             ]
     if no_MCMC == True:
         fitting_kwargs_list = [fitting_kwargs_list[0],
@@ -186,14 +189,25 @@ def fit_qso(QSO_im, psf_ave, psf_std=None, source_params=None,ps_param=None, bac
     print('============ CONGRATULATION, YOUR JOB WAS SUCCESSFUL ================ ')
     # this is the linear inversion. The kwargs will be updated afterwards
     image_reconstructed, error_map, _, _ = imageModel.image_linear_solve(kwargs_source=source_result, kwargs_ps=ps_result)
-    image_ps = imageModel.point_source(ps_result)
-    image_host = []
-    for i in range(len(source_result)):
-        image_host.append(imageModel.source_surface_brightness(source_result, de_lensed=True,unconvolved=False,k=i))
-    # let's plot the output of the PSO minimizer
     from lenstronomy.Plots.output_plots import LensModelPlot
     lensPlot = LensModelPlot(kwargs_data, kwargs_psf, kwargs_numerics, kwargs_model, lens_result, source_result,
                              lens_light_result, ps_result, arrow_size=0.02, cmap_string="gist_heat")
+    image_host = []  #!!! The linear_solver before and after LensModelPlot could have different result for very faint sources.
+    for i in range(len(source_result)):
+        image_host.append(imageModel.source_surface_brightness(source_result, de_lensed=True,unconvolved=False,k=i))
+    image_ps = imageModel.point_source(ps_result)
+    
+    if pso_diag == True:
+        import lenstronomy.Plots.output_plots as out_plot
+        for i in range(len(chain_list)):
+            if len(param_list[i]) > 0:
+                f, axes = out_plot.plot_chain(chain_list[i], param_list[i])
+            if pltshow == 0:
+                plt.close()
+            else:
+                plt.show()
+
+    # let's plot the output of the PSO minimizer
     reduced_Chisq =  lensPlot._reduced_x2
     if image_plot:
         f, axes = plt.subplots(3, 3, figsize=(16, 16), sharex=False, sharey=False)
@@ -234,37 +248,19 @@ def fit_qso(QSO_im, psf_ave, psf_std=None, source_params=None,ps_param=None, bac
         from lenstronomy.Sampling.parameters import Param
         param = Param(kwargs_model, kwargs_fixed_source=source_params[2], kwargs_fixed_ps=ps_param[2], **kwargs_constraints)
         mcmc_new_list = []
-        if len(source_params[0]) >=2: 
-            labels_new = ["Quasar flux"] +  ["host{0} flux".format(i) for i in range(len(source_params[0]))] + ["host{0} Reff".format(i) for i in range(len(source_params[0]))]
-            for i in range(len(samples_mcmc)/10):
-                kwargs_lens_out, kwargs_light_source_out, kwargs_light_lens_out, kwargs_ps_out, kwargs_cosmo = param.args2kwargs(samples_mcmc[i+ len(samples_mcmc)/10*9])
-                image_reconstructed, _, _, _ = imageModel.image_linear_solve(kwargs_source=kwargs_light_source_out, kwargs_ps=kwargs_ps_out)
-                image_ps = imageModel.point_source(kwargs_ps_out)
-                flux_quasar = np.sum(image_ps)
-                fluxs, reffs = [],[]
-                for j in range(len(source_params[0])):
-                    image_j = imageModel.source_surface_brightness(kwargs_light_source_out,unconvolved= False, k=j)
-                    fluxs.append(np.sum(image_j))
-                    reffs.append(kwargs_light_source_out[j]['R_sersic'])
-                mcmc_new_list.append([flux_quasar] + fluxs + reffs)
-                if i/1000 > (i-1)/1000 :
-                    print "finished translate:", i                    
-        else:
-            labels_new = [r"quasar flux", r"host_flux", r"host Sersic", r"host Reff"]
-            # transform the parameter position of the MCMC chain in a lenstronomy convention with keyword arguments #
-            for i in range(len(samples_mcmc)/10):
-                kwargs_lens_out, kwargs_light_source_out, kwargs_light_lens_out, kwargs_ps_out, kwargs_cosmo = param.args2kwargs(samples_mcmc[i+ len(samples_mcmc)/10*9])
-                image_reconstructed, _, _, _ = imageModel.image_linear_solve(kwargs_source=kwargs_light_source_out, kwargs_ps=kwargs_ps_out)
-                image_ps = imageModel.point_source(kwargs_ps_out)
-                flux_quasar = np.sum(image_ps)
-                image_host = imageModel.source_surface_brightness(kwargs_light_source_out,de_lensed=True,unconvolved=False, k=0)
-                image_host = np.sum(image_host)
-                n_sersic = kwargs_light_source_out[0]['n_sersic']
-                R_sersic = kwargs_light_source_out[0]['R_sersic']
-                if i/1000 > (i-1)/1000 :
-                    print "finished translate:", i
-                if image_host>0:
-                    mcmc_new_list.append([flux_quasar, image_host, n_sersic, R_sersic])
+        labels_new = ["Quasar flux"] +  ["host{0} flux".format(i) for i in range(len(source_params[0]))]
+        for i in range(len(samples_mcmc)):
+            kwargs_lens_out, kwargs_light_source_out, kwargs_light_lens_out, kwargs_ps_out, kwargs_cosmo = param.args2kwargs(samples_mcmc[i])
+            image_reconstructed, _, _, _ = imageModel.image_linear_solve(kwargs_source=kwargs_light_source_out, kwargs_ps=kwargs_ps_out)
+            image_ps = imageModel.point_source(kwargs_ps_out)
+            flux_quasar = np.sum(image_ps)
+            fluxs = []
+            for j in range(len(source_params[0])):
+                image_j = imageModel.source_surface_brightness(kwargs_light_source_out,unconvolved= False, k=j)
+                fluxs.append(np.sum(image_j))
+            mcmc_new_list.append([flux_quasar] + fluxs )
+            if i/1000 > (i-1)/1000 :
+                print len(samples_mcmc), "MCMC samplers in total, finished translate:", i    
         plot = corner.corner(mcmc_new_list, labels=labels_new, show_titles=True)
         if tag is not None:
             plot.savefig('{0}_HOSTvsQSO_corner.pdf'.format(tag))
@@ -276,16 +272,16 @@ def fit_qso(QSO_im, psf_ave, psf_std=None, source_params=None,ps_param=None, bac
         noise_map = np.sqrt(data_class.C_D+np.abs(error_map))
     else:
         noise_map = np.sqrt(QSO_std**2+np.abs(error_map))
-    if dump_result == True  and no_MCMC == False:
-        import pickle
-        paras = [source_params[2], ps_param[2], mcmc_new_list, labels_new]
-        picklename='dump_' + tag + '.pkl'
-        pickle.dump([source_result, image_host, ps_result, image_ps, samples_mcmc, param_mcmc, paras], open(picklename, 'wb'))
-    if dump_result == True  and no_MCMC == True:
-        import pickle
-        paras = [source_params[2], ps_param[2]]
-        picklename='dump_' + tag + '.pkl'
-        pickle.dump([source_result, image_host, ps_result, image_ps, param_mcmc, paras], open(picklename, 'wb'))
+    if dump_result == True:
+        if flux_ratio_plot==True and no_MCMC==False:
+            trans_paras = [source_params[2], ps_param[2], mcmc_new_list, labels_new, 'source_params[2], ps_param[2], mcmc_new_list, labels_new']
+        else:
+            trans_paras = []
+        picklename= tag + '.pkl'
+        best_fit = [source_result, image_host, ps_result, image_ps,'source_result, image_host, ps_result, image_ps']
+        pso_fit = [chain_list, param_list, 'chain_list, param_list']
+        mcmc_fit = [samples_mcmc, param_mcmc, dist_mcmc, 'samples_mcmc, param_mcmc, dist_mcmc']
+        pickle.dump([best_fit,pso_fit,mcmc_fit, trans_paras], open(picklename, 'wb'))
     if return_Chisq == False:
         return source_result, ps_result, image_ps, image_host, noise_map
     elif return_Chisq == True:
@@ -450,8 +446,8 @@ def fit_qso_multiband(QSO_im_list, psf_ave_list, psf_std_list=None, source_param
 #    mpi = False  # MPI possible, but not supported through that notebook.
     # The Params for the fitting. kwargs_init: initial input. kwargs_sigma: The parameter uncertainty. kwargs_fixed: fixed parameters;
     #kwargs_lower,kwargs_upper: Lower and upper limits.
-
-    fitting_seq = FittingSequence(multi_band_list, kwargs_model, kwargs_constraints, kwargs_likelihood, kwargs_params)
+    kwargs_data_joint = {'multi_band_list': multi_band_list, 'image_type': 'multi-band'}
+    fitting_seq = FittingSequence(kwargs_data_joint, kwargs_model, kwargs_constraints, kwargs_likelihood, kwargs_params)
     
     if deep_seed == False:
         fitting_kwargs_list = [
@@ -483,21 +479,21 @@ def fit_qso_multiband(QSO_im_list, psf_ave_list, psf_std_list=None, source_param
     for k in range(len(QSO_im_list)):
     # this is the linear inversion. The kwargs will be updated afterwards
         image_reconstructed_k, error_map_k, _, _ = imageModel_list[k].image_linear_solve(kwargs_source=source_result, kwargs_ps=ps_result)
-        print "source_result", 'for', "k", source_result
         [kwargs_data_k, kwargs_psf_k, kwargs_numerics_k] = fitting_seq.multi_band_list[k]
         data_class_k = Data(kwargs_data_k)
         psf_class_k = PSF(kwargs_psf_k)
         imageModel_k = ImageModel(data_class_k, psf_class_k, source_model_class=lightModel,
                                 point_source_class=pointSource, kwargs_numerics=kwargs_numerics_list[k])
         
-        image_ps_k = imageModel_k.point_source(ps_result)
-        image_host_k = []
-        for i in range(len(source_result)):
-            image_host_k.append(imageModel_list[k].source_surface_brightness(source_result,de_lensed=True,unconvolved=False, k=i))
-        # let's plot the output of the PSO minimizer
         from lenstronomy.Plots.output_plots import LensModelPlot
         lensPlot = LensModelPlot(kwargs_data_list[k], kwargs_psf_list[k], kwargs_numerics_list[k], kwargs_model, lens_result, source_result,
                                  lens_light_result, ps_result, arrow_size=0.02, cmap_string="gist_heat")
+        print "source_result", 'for', "k", source_result
+        image_host_k = []
+        for i in range(len(source_result)):
+            image_host_k.append(imageModel_list[k].source_surface_brightness(source_result,de_lensed=True,unconvolved=False, k=i))
+        image_ps_k = imageModel_k.point_source(ps_result)
+        # let's plot the output of the PSO minimizer
         
         image_reconstructed_list.append(image_reconstructed_k)
         source_result_list.append(source_result)
@@ -572,13 +568,12 @@ def fit_qso_multiband(QSO_im_list, psf_ave_list, psf_std_list=None, source_param
             errp_list.append(np.sqrt(data_class_list[k].C_D+np.abs(error_map_list[k])))
         else:
             errp_list.append(np.sqrt(QSO_std_list[k]**2+np.abs(error_map_list[k])))
-            
     return source_result_list, ps_result_list, image_ps_list, image_host_list, errp_list, shift_RADEC_list, fitting_seq     #fitting_seq.multi_band_list
 
 def fit_galaxy(galaxy_im, psf_ave, psf_std=None, source_params=None, background_rms=0.04, pix_sz = 0.08,
             exp_time = 300., fix_n=None, image_plot = True, corner_plot=True,
-            deep_seed = False, galaxy_msk=None, galaxy_std=None,
-            tag = None, no_MCMC= False, pltshow = 1, return_Chisq = False):
+            deep_seed = False, galaxy_msk=None, galaxy_std=None, flux_corner_plot = False,
+            tag = None, no_MCMC= False, pltshow = 1, return_Chisq = False, dump_result = False, pso_diag=False):
     '''
     A quick fit for the QSO image with (so far) single sersice + one PSF. The input psf noise is optional.
     
@@ -684,28 +679,29 @@ def fit_galaxy(galaxy_im, psf_ave, psf_std=None, source_params=None, background_
     if psf_std is not None:
         kwargs_psf['psf_error_map'] = psf_std
     
-    imageModel = ImageModel(data_class, psf_class, source_model_class=lightModel,kwargs_numerics=kwargs_numerics)
+    
                   
     image_band = [kwargs_data, kwargs_psf, kwargs_numerics]
     multi_band_list = [image_band]
     
     from lenstronomy.Workflow.fitting_sequence import FittingSequence
-    fitting_seq = FittingSequence(multi_band_list, kwargs_model, kwargs_constraints, kwargs_likelihood, kwargs_params)
+    kwargs_data_joint = {'multi_band_list': multi_band_list, 'image_type': 'multi-band'}
+    fitting_seq = FittingSequence(kwargs_data_joint, kwargs_model, kwargs_constraints, kwargs_likelihood, kwargs_params)
     
     if deep_seed == False:
         fitting_kwargs_list = [
-             ['PSO', {'sigma_scale': 0.8, 'n_particles': 50, 'n_iterations': 50}],
-             ['MCMC', {'n_burn': 10, 'n_run': 20, 'walkerRatio': 50, 'sigma_scale': .1}]
+            ['PSO', {'sigma_scale': 0.8, 'n_particles': 50, 'n_iterations': 50}],
+            ['MCMC', {'n_burn': 10, 'n_run': 10, 'walkerRatio': 50, 'sigma_scale': .1}]
             ]            
     elif deep_seed == True:
          fitting_kwargs_list = [
             ['PSO', {'sigma_scale': 0.8, 'n_particles': 100, 'n_iterations': 80}],
-            ['MCMC', {'n_burn': 20, 'n_run': 40, 'walkerRatio': 100, 'sigma_scale': .1}]
+            ['MCMC', {'n_burn': 10, 'n_run': 15, 'walkerRatio': 50, 'sigma_scale': .1}]
             ]
     elif deep_seed == 'very_deep':
          fitting_kwargs_list = [
             ['PSO', {'sigma_scale': 0.8, 'n_particles': 150, 'n_iterations': 150}],
-            ['MCMC', {'n_burn': 20, 'n_run': 40, 'walkerRatio': 100, 'sigma_scale': .1}]
+            ['MCMC', {'n_burn': 10, 'n_run': 20, 'walkerRatio': 50, 'sigma_scale': .1}]
             ]
     if no_MCMC == True:
         fitting_kwargs_list = [fitting_kwargs_list[0],
@@ -719,14 +715,29 @@ def fit_galaxy(galaxy_im, psf_ave, psf_std=None, source_params=None, background_
     print(end_time - start_time, 'total time needed for computation')
     print('============ CONGRATULATION, YOUR JOB WAS SUCCESSFUL ================ ')
     # this is the linear inversion. The kwargs will be updated afterwards
+    imageModel = ImageModel(data_class, psf_class, source_model_class=lightModel,kwargs_numerics=kwargs_numerics)
     image_reconstructed, error_map, _, _ = imageModel.image_linear_solve(kwargs_source=source_result, kwargs_ps=ps_result)
-    image_host = []
-    for i in range(len(source_result)):
-        image_host.append(imageModel.source_surface_brightness(source_result,de_lensed=True,unconvolved=False, k=i))  
+#    image_host = []   #!!! The linear_solver before and after could have different result for very faint sources.
+#    for i in range(len(source_result)):
+#        image_host_i = imageModel.source_surface_brightness(source_result,de_lensed=True,unconvolved=False, k=i)
+#        print "image_host_i", source_result[i]
+#        print "total flux", image_host_i.sum()
+#        image_host.append(image_host_i)  
+        
     # let's plot the output of the PSO minimizer
     from lenstronomy.Plots.output_plots import LensModelPlot
     lensPlot = LensModelPlot(kwargs_data, kwargs_psf, kwargs_numerics, kwargs_model, lens_result, source_result,
                              lens_light_result, ps_result, arrow_size=0.02, cmap_string="gist_heat")
+    if pso_diag == True:
+        import lenstronomy.Plots.output_plots as out_plot
+        for i in range(len(chain_list)):
+            if len(param_list[i]) > 0:
+                f, axes = out_plot.plot_chain(chain_list[i], param_list[i])    
+            if pltshow == 0:
+                plt.close()
+            else:
+                plt.show()  
+                
     reduced_Chisq =  lensPlot._reduced_x2
     if image_plot:
         f, axes = plt.subplots(1, 3, figsize=(16, 16), sharex=False, sharey=False)
@@ -741,6 +752,12 @@ def fit_galaxy(galaxy_im, psf_ave, psf_std=None, source_params=None, background_
             plt.close()
         else:
             plt.show()
+    image_host = []    
+    for i in range(len(source_result)):
+        image_host_i = imageModel.source_surface_brightness(source_result,de_lensed=True,unconvolved=False, k=i)
+#        print "image_host_i", source_result[i]
+#        print "total flux", image_host_i.sum()
+        image_host.append(image_host_i)  
         
     if corner_plot==True and no_MCMC==False:
         # here the (non-converged) MCMC chain of the non-linear parameters
@@ -753,14 +770,47 @@ def fit_galaxy(galaxy_im, psf_ave, psf_std=None, source_params=None, background_
                plt.close()
            else:
                plt.show()
+    if flux_corner_plot ==True and no_MCMC==False:
+        from lenstronomy.Sampling.parameters import Param
+        param = Param(kwargs_model, kwargs_fixed_source=source_params[2], **kwargs_constraints)
+        mcmc_new_list = []
+        labels_new = ["host{0} flux".format(i) for i in range(len(source_params[0]))]
+        for i in range(len(samples_mcmc)):
+            kwargs_lens_out, kwargs_light_source_out, kwargs_light_lens_out, kwargs_ps_out, kwargs_cosmo = param.args2kwargs(samples_mcmc[i])
+            image_reconstructed, _, _, _ = imageModel.image_linear_solve(kwargs_source=kwargs_light_source_out, kwargs_ps=kwargs_ps_out)
+            fluxs = []
+            for j in range(len(source_params[0])):
+                image_j = imageModel.source_surface_brightness(kwargs_light_source_out,unconvolved= False, k=j)
+                fluxs.append(np.sum(image_j))
+            mcmc_new_list.append( fluxs )
+            if i/1000 > (i-1)/1000 :
+                print len(samples_mcmc), "MCMC samplers in total, finished translate:", i    
+        plot = corner.corner(mcmc_new_list, labels=labels_new, show_titles=True)
+        if tag is not None:
+            plot.savefig('{0}_HOSTvsQSO_corner.pdf'.format(tag))
+        if pltshow == 0:
+            plt.close()
+        else:
+            plt.show() 
+
     if galaxy_std is None:
-        if return_Chisq == False:
-            return source_result, image_host, np.sqrt(data_class.C_D+np.abs(error_map))
-        elif return_Chisq == True:
-            return source_result, image_host, np.sqrt(data_class.C_D+np.abs(error_map)), reduced_Chisq
+        noise_map = np.sqrt(data_class.C_D+np.abs(error_map))
     else:
-        if return_Chisq == False:
-            return source_result, image_host, np.sqrt(galaxy_std**2+np.abs(error_map)) #error_map=0
-        elif return_Chisq == True:
-            return source_result, image_host, np.sqrt(galaxy_std**2+np.abs(error_map)), reduced_Chisq #error_map=0
-    
+        noise_map = np.sqrt(galaxy_std**2+np.abs(error_map))   
+        
+    if dump_result == True:
+        if flux_corner_plot==True and no_MCMC==False:
+            trans_paras = [source_params[2], mcmc_new_list, labels_new, 'source_params[2], mcmc_new_list, labels_new']
+        else:
+            trans_paras = []
+        picklename= tag + '.pkl'
+        best_fit = [source_result, image_host, 'source_result, image_host']
+        pso_fit = [chain_list, param_list, 'chain_list, param_list']
+        mcmc_fit = [samples_mcmc, param_mcmc, dist_mcmc, 'samples_mcmc, param_mcmc, dist_mcmc']
+        pickle.dump([best_fit, pso_fit, mcmc_fit, trans_paras], open(picklename, 'wb'))
+        
+               
+    if return_Chisq == False:
+        return source_result, image_host, noise_map
+    elif return_Chisq == True:
+        return source_result, image_host, noise_map, reduced_Chisq

@@ -1,36 +1,10 @@
 Result for target l106:
 point source result:
-    [{'point_amp': array([876.09185281]), 'ra_image': array([-0.02539754]), 'dec_image': array([0.00519837])}]
+    [{'point_amp': array([821.64227473]), 'ra_image': array([-0.02441067]), 'dec_image': array([0.00282253])}]
 obj 0 result:
-    {'n_sersic': 1.385, 'host_mag': 17.562, 'R_sersic': 0.544, 'q': 0.625, 'center_x': -0.062, 'center_y': 0.041, 'host_amp': 1033.789, 'phi_G': -0.42, 'amp': 431.165}
+    {'n_sersic': 3.641, 'host_mag': 17.064, 'R_sersic': 1.643, 'q': 0.661, 'center_x': -0.063, 'center_y': 0.051, 'host_amp': 1635.427, 'phi_G': -0.079, 'amp': 74.482}
 obj 1 result:
-    {'n_sersic': 1.0, 'host_mag': 17.839, 'R_sersic': 11.555, 'q': 0.455, 'center_x': 0.918, 'center_y': 0.856, 'host_amp': 801.307, 'phi_G': 0.585, 'amp': 21.206}
+    {'n_sersic': 1.0, 'host_mag': 20.603, 'R_sersic': 9.992, 'q': 0.92, 'center_x': 0.089, 'center_y': 0.015, 'host_amp': 62.827, 'phi_G': -1.035, 'amp': 1.469}
 obj 2 result:
-    {'n_sersic': 0.5, 'host_mag': 19.31, 'R_sersic': 2.671, 'q': 0.172, 'center_x': -0.005, 'center_y': 0.016, 'host_amp': 206.644, 'phi_G': 0.393, 'amp': 35.386}
-======================
-Result for target l106:
-point source result:
-    [{'point_amp': array([876.49442494]), 'ra_image': array([-0.02485701]), 'dec_image': array([0.00437387])}]
-obj 0 result:
-    {'n_sersic': 1.698, 'host_mag': 17.352, 'R_sersic': 0.673, 'q': 0.658, 'center_x': -0.055, 'center_y': 0.048, 'host_amp': 1255.207, 'phi_G': -0.126, 'amp': 314.787}
-obj 1 result:
-    {'n_sersic': 1.0, 'host_mag': 19.608, 'R_sersic': 11.342, 'q': 0.336, 'center_x': -0.035, 'center_y': 0.882, 'host_amp': 157.081, 'phi_G': -0.606, 'amp': 4.992}
-obj 2 result:
-    {'n_sersic': 0.5, 'host_mag': 18.107, 'R_sersic': 6.446, 'q': 0.303, 'center_x': 0.224, 'center_y': -0.05, 'host_amp': 625.765, 'phi_G': 0.587, 'amp': 36.815}
-======================
-Result for target l106:
-point source result:
-    [{'point_amp': array([834.00937641]), 'ra_image': array([-0.02397331]), 'dec_image': array([0.00179794])}]
-obj 0 result:
-    {'n_sersic': 4.693, 'host_mag': 16.982, 'R_sersic': 2.899, 'q': 0.671, 'center_x': -0.062, 'center_y': 0.052, 'host_amp': 1763.859, 'phi_G': -0.061, 'amp': 31.4}
-obj 1 result:
-    {'n_sersic': 1.0, 'host_mag': 19.14, 'R_sersic': 10.032, 'q': 0.802, 'center_x': 0.232, 'center_y': 0.129, 'host_amp': 241.775, 'phi_G': -0.844, 'amp': 0.58}
-obj 2 result:
-    {'n_sersic': 0.5, 'host_mag': 20.568, 'R_sersic': 4.593, 'q': 0.649, 'center_x': 0.141, 'center_y': -0.13, 'host_amp': 64.886, 'phi_G': 1.429, 'amp': 15.036}
-======================
-Result for target l106:
-point source result:
-    [{'point_amp': array([879.04470343]), 'ra_image': array([-0.02449764]), 'dec_image': array([0.00341959])}]
-obj 0 result:
-    {'n_sersic': 5.504, 'host_mag': 15.465, 'R_sersic': 9.552, 'q': 0.604, 'center_x': -0.067, 'center_y': 0.054, 'host_amp': 7136.713, 'phi_G': -0.049, 'amp': 6.879}
+    {'n_sersic': 0.5, 'host_mag': 18.742, 'R_sersic': 4.927, 'q': 0.904, 'center_x': 0.049, 'center_y': -0.053, 'host_amp': 348.899, 'phi_G': -0.989, 'amp': 18.929}
 ======================

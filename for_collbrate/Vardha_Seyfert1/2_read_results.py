@@ -10,40 +10,63 @@ import matplotlib.pyplot as plt
 import pickle
 import corner
 import astropy.io.fits as pyfits
+from matplotlib.colors import LogNorm
 
-picklename = 'dump_fitting.pkl'
+
+ID = 'l106'
+picklename = ID+'_fitting.pkl'
 result = pickle.load(open(picklename,'rb'))
-[source_result, image_host, ps_result, image_ps, samples_mcmc, param_mcmc, paras] = result
+[best_fit,pso_fit,mcmc_fit, trans_paras] = result
+
+source_result, image_host, ps_result, image_ps, _ =best_fit
+chain_list, param_list, _ = pso_fit
+samples_mcmc, param_mcmc, dist_mcmc, _ = mcmc_fit
+_, _, mcmc_new_list, labels_new, _ = trans_paras
 
 print "best-fit source_result:", source_result
 print "best-fit ps_result:", ps_result
+pix_sz = 0.04
 
-#%%
+#%%Replot the profiles
 import sys
 sys.path.insert(0,'./fitting_tools/')
 from flux_profile import total_compare
 zp = 25.0985
-if len(image_host) == 1:
-    host = image_host[0]
-    label = ['data', 'QSO', 'host', 'model', 'normalized residual']
-elif len(image_host) >1:
-    host = np.zeros_like(image_host[0])
-    for i in range(len(image_host)):
-        host += image_host[i]
-    label = ['data', 'QSO', 'host as {0} components'.format(i+1), 'model', 'normalized residual']  #Print the numbers of objects
-agn_image = pyfits.getdata('{0}_cutout.fits'.format(ID))    
-flux_list = [agn_image, image_ps, host, error_map]
+
+flux_hdulist = pyfits.open(ID+'_flux_list.fits')  # includes [agn_image,image_ps, extended_source, error_map, QSO_msk]
+flux_list = [flux_hdulist[i].data for i in range(4)]
+QSO_msk = flux_hdulist[4].data
+label = ['data', 'QSO', 'extended sources', 'model', 'normalized residual']
 fig = total_compare(label_list = label, flux_list = flux_list, target_ID = ID, pix_sz=pix_sz, zp = zp,
                     plot_compare = False, msk_image = QSO_msk)
-fig.savefig("{0}_SB_profile.pdf".format(name_save), bbox_inches = 'tight')
+plt.show()
 
-#%%
+print "plot inividual frame:"
+plt.imshow(flux_list[0] - flux_list[1], norm=LogNorm(),origin='low')
+plt.colorbar()
+frame_size = len(flux_list[0])
+plt.text(frame_size*0.05, frame_size*0.9, 'data - Point Source', weight='bold',
+         fontsize=17, color='white')
+plt.show()
 
+#%%diagnose the PSO chain convergency
+import lenstronomy.Plots.output_plots as out_plot
+for i in range(len(chain_list)):
+    if len(param_list[i]) > 0:
+        f, axes = out_plot.plot_chain(chain_list[i], param_list[i])
+
+#%%test the MCMC chain convergency
+#        
+#import lenstronomy.Plots.output_plots as plot_mcmc_behaviour
+fig = plt.figure(figsize=(20, 15))
+ax = fig.add_subplot(111)
+out_plot.plot_mcmc_behaviour(ax, samples_mcmc, param_mcmc, dist_mcmc)       
+
+#%%Plot the transferred corner plots
 # here the (non-converged) MCMC chain of the non-linear parameters
 if not samples_mcmc == []:
 #    plot = corner.corner(samples_mcmc, labels=param_mcmc, show_titles=True)
 #    plt.show()
-    [source_params_2, ps_param_2, mcmc_new_list, labels_new] = paras
     plot = corner.corner(mcmc_new_list, labels=labels_new, show_titles=True)
     plt.show()
 
