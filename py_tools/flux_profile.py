@@ -20,9 +20,6 @@ from astropy.visualization.mpl_normalize import ImageNormalize
 import matplotlib
 import matplotlib as matt
 matt.rcParams['font.family'] = 'STIXGeneral'
-import copy
-my_cmap = copy.copy(matplotlib.cm.get_cmap('gist_heat')) # copy the default cmap
-my_cmap.set_bad('black')
 
 def pix_region(center=([49,49]), radius=5):
     '''
@@ -546,23 +543,20 @@ def cr_mask(image, filename='test_circle.reg', mask_reg_cut = 0.):
     mask_box_part *= box
     return mask
 
-def total_compare(label_list, flux_list, zp=27.0, delatPixel=1,
-                  facility = 'F140w' , plot_type= 4, target_ID = 'target_ID',
+def total_compare(label_list, flux_list, zp=27.0, target_ID = 'target_ID',
                   add_background=0.0, data_mask_list = None, data_cut = 0.,plot_compare=False,
                   pix_sz = 'drz06', msk_image=None, if_annuli=False, arrows=False):
-    if facility == 'F140w':
-        zp = 26.4524
-    elif facility == 'F125w':
-        zp = 26.2303
-    elif facility == 'acs':
-        zp = 25.94333
-    
     if pix_sz == 'swarp':
         delatPixel = 0.127985
     elif pix_sz == 'drz06':
         delatPixel = 0.0642
     elif pix_sz == 'acs':
         delatPixel = 0.03
+    elif isinstance(pix_sz,float):
+        delatPixel = pix_sz
+    else:
+        delatPixel = 1.
+        print "Warning: The pix_sz is inappropriate and thus delatPixel=1.0"  
     
     norm = LogNorm() #ImageNormalize(stretch=SqrtStretch())
     f = plt.figure(0, figsize=(20.1,4))
@@ -573,7 +567,7 @@ def total_compare(label_list, flux_list, zp=27.0, delatPixel=1,
     ax4 = plt.subplot2grid((6,5), (0,4), rowspan=5)
     ax5 = plt.subplot2grid((6,5), (5,4), rowspan=1)
 
-    im1 = ax1.imshow(flux_list[0] + add_background,origin='lower',cmap= my_cmap, norm=norm, vmax = flux_list[0].max())
+    im1 = ax1.imshow(flux_list[0] + add_background,origin='lower',cmap="gist_heat", norm=norm, vmax = flux_list[0].max())
     clim=im1.properties()['clim']
     frame_size = len(flux_list[0])
     ax1.set_ylabel(target_ID, fontsize=15, weight='bold')
@@ -587,7 +581,7 @@ def total_compare(label_list, flux_list, zp=27.0, delatPixel=1,
     cb1.set_ticks([1.e-5, 1.e-4, 1.e-3, 1.e-2,1.e-1,0,1])   
 #    cb1.ax.()
     
-    im2 = ax2.imshow(flux_list[1] + flux_list[2] + add_background,origin='lower',cmap= my_cmap, norm=norm, clim=clim)
+    im2 = ax2.imshow(flux_list[1] + flux_list[2] + add_background,origin='lower',cmap="gist_heat", norm=norm, clim=clim)
 #    pos2_o = ax2.get_position() # get the original position
 #    pos2 = [pos2_o.x0 -0.03, pos2_o.y0, pos2_o.width, pos2_o.height]
 #    ax2.set_position(pos2) # set a new position
@@ -752,27 +746,28 @@ def total_compare(label_list, flux_list, zp=27.0, delatPixel=1,
     ax5.set_position(pos5) # set a new position
     if plot_compare == True:
         plt.show()
-    else:
-        plt.close()
     return f
 
-def galaxy_total_compare(label_list, flux_list, zp=27.0, delatPixel=1,
-                  facility = 'F140w' , plot_type= 4, target_ID = 'target_ID',
+def galaxy_total_compare(label_list, flux_list, zp=27.0, pix_sz=1., target_ID = 'target_ID',
                   add_background=0.0, data_mask_list = None, data_cut = 0.,plot_compare=False,
-                  pix_sz = 'drz06', msk_image=None, if_annuli=False, arrows=False):
-    if facility == 'F140w':
-        zp = 26.4524
-    elif facility == 'F125w':
-        zp = 26.2303
-    elif facility == 'acs':
-        zp = 25.94333
-    
+                  msk_image=None, if_annuli=False, arrows=False):
+#    if facility == 'F140w':
+#        zp = 26.4524
+#    elif facility == 'F125w':
+#        zp = 26.2303
+#    elif facility == 'acs':
+#        zp = 25.94333
     if pix_sz == 'swarp':
         delatPixel = 0.127985
     elif pix_sz == 'drz06':
         delatPixel = 0.0642
     elif pix_sz == 'acs':
         delatPixel = 0.03
+    elif isinstance(pix_sz,float):
+        delatPixel = pix_sz
+    else:
+        delatPixel = 1.
+        print "Warning: The pix_sz is inappropriate and thus delatPixel=1.0"
     
     norm = LogNorm() #ImageNormalize(stretch=SqrtStretch())
     f = plt.figure(0, figsize=(17,4))
@@ -783,7 +778,7 @@ def galaxy_total_compare(label_list, flux_list, zp=27.0, delatPixel=1,
     ax4 = plt.subplot2grid((6,4), (0,3), rowspan=5)
     ax5 = plt.subplot2grid((6,4), (5,3), rowspan=1)
 
-    im1 = ax1.imshow(flux_list[0] + add_background,origin='lower',cmap= my_cmap, norm=norm, vmax = flux_list[0].max())
+    im1 = ax1.imshow(flux_list[0] + add_background,origin='lower',cmap="gist_heat", norm=norm, vmax = flux_list[0].max())
     clim=im1.properties()['clim']
     frame_size = len(flux_list[0])
     ax1.set_ylabel(target_ID, fontsize=15, weight='bold')
@@ -797,7 +792,7 @@ def galaxy_total_compare(label_list, flux_list, zp=27.0, delatPixel=1,
     cb1.set_ticks([1.e-5, 1.e-4, 1.e-3, 1.e-2,1.e-1,0,1])   
 #    cb1.ax.()
     
-    im2 = ax2.imshow(flux_list[1] + flux_list[2] + add_background,origin='lower',cmap= my_cmap, norm=norm, clim=clim)
+    im2 = ax2.imshow(flux_list[1] + flux_list[2] + add_background,origin='lower',cmap="gist_heat", norm=norm, clim=clim)
     ax2.text(frame_size*0.05, frame_size*0.9, label_list[-2],weight='bold',
          fontsize=20, color='white')
     scale_bar(ax2, frame_size, dist=1/delatPixel, text='1"', color = 'white')
