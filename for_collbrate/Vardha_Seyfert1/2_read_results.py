@@ -37,7 +37,7 @@ flux_hdulist = pyfits.open(ID+'_flux_list.fits')  # includes [agn_image,image_ps
 flux_list = [flux_hdulist[i].data for i in range(4)]
 QSO_msk = flux_hdulist[4].data
 label = ['data', 'QSO', 'extended sources', 'model', 'normalized residual']
-fig = total_compare(label_list = label, flux_list = flux_list, target_ID = ID, delatPixel=pix_sz, zp = zp,
+fig = total_compare(label_list = label, flux_list = flux_list, target_ID = ID, pix_sz=pix_sz, zp = zp,
                     plot_compare = False, msk_image = QSO_msk)
 plt.show()
 

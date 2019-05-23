@@ -152,7 +152,7 @@ elif len(image_host) >1:
         host += image_host[i]
     label = ['data', 'QSO', 'host as {0} components'.format(i+1), 'model', 'normalized residual']  #Print the numbers of objects
 flux_list = [agn_image, image_ps, host, error_map]
-fig = total_compare(label_list = label, flux_list = flux_list, target_ID = ID, delatPixel=pix_sz, zp = zp,
+fig = total_compare(label_list = label, flux_list = flux_list, target_ID = ID, pix_sz=pix_sz, zp = zp,
                     plot_compare = False, msk_image = QSO_msk)
 fig.savefig("{0}_SB_profile.pdf".format(name_save), bbox_inches = 'tight')
 if pltshow == 0:
@@ -193,7 +193,7 @@ fit_result.write('======================\n')
 fit_result.close()    
 
 print "Total Magnitude Result:"
-print "AGN magnitude:", -2.5*np.log(image_ps.sum()) + zp
-print "Buldge magnitude:", -2.5*np.log(image_host[0].sum()) + zp
-print "Disk magnitude:", -2.5*np.log(image_host[1].sum()) + zp
-print "Bar magnitude:", -2.5*np.log(image_host[2].sum()) + zp
+print "AGN magnitude:", -2.5*np.log10(image_ps.sum()) + zp
+print "Buldge magnitude:", -2.5*np.log10(image_host[0].sum()) + zp
+print "Disk magnitude:", -2.5*np.log10(image_host[1].sum()) + zp
+print "Bar magnitude:", -2.5*np.log10(image_host[2].sum()) + zp

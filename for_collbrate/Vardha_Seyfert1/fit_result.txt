@@ -28,3 +28,23 @@ obj 1 result:
 obj 2 result:
     {'n_sersic': 0.5, 'host_mag': 18.681, 'R_sersic': 3.958, 'q': 0.336, 'center_x': 0.363, 'center_y': 0.409, 'host_amp': 369.017, 'phi_G': 0.701, 'amp': 26.045}
 ======================
+Result for target l106:
+point source result:
+    {'point_amp': array([788.84186999]), 'ra_image': array([-0.024439]), 'PSF_mag': array([17.85602512]), 'dec_image': array([0.0017084])}
+obj 0 result:
+    {'n_sersic': 5.464, 'host_mag': 17.043, 'R_sersic': 2.981, 'q': 0.668, 'center_x': -0.061, 'center_y': 0.048, 'host_amp': 1667.531, 'phi_G': -0.098, 'amp': 25.683}
+obj 1 result:
+    {'n_sersic': 1.0, 'host_mag': 18.564, 'R_sersic': 11.558, 'q': 0.282, 'center_x': 0.221, 'center_y': -0.107, 'host_amp': 411.137, 'phi_G': 0.551, 'amp': 11.716}
+obj 2 result:
+    {'n_sersic': 0.5, 'host_mag': 23.679, 'R_sersic': 5.594, 'q': 0.753, 'center_x': -0.016, 'center_y': 0.428, 'host_amp': 3.695, 'phi_G': 1.56, 'amp': 0.201}
+======================
+Result for target l106:
+point source result:
+    {'point_amp': array([788.84186999]), 'ra_image': array([-0.024439]), 'PSF_mag': array([17.85602512]), 'dec_image': array([0.0017084])}
+obj 0 result:
+    {'n_sersic': 5.464, 'host_mag': 17.043, 'R_sersic': 2.981, 'q': 0.668, 'center_x': -0.061, 'center_y': 0.048, 'host_amp': 1667.531, 'phi_G': -0.098, 'amp': 25.683}
+obj 1 result:
+    {'n_sersic': 1.0, 'host_mag': 18.564, 'R_sersic': 11.558, 'q': 0.282, 'center_x': 0.221, 'center_y': -0.107, 'host_amp': 411.137, 'phi_G': 0.551, 'amp': 11.716}
+obj 2 result:
+    {'n_sersic': 0.5, 'host_mag': 23.679, 'R_sersic': 5.594, 'q': 0.753, 'center_x': -0.016, 'center_y': 0.428, 'host_amp': 3.695, 'phi_G': 1.56, 'amp': 0.201}
+======================

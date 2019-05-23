@@ -94,7 +94,6 @@ def transfer_obj_to_result(source_result,image_host, zp):
     del result['e1']
     del result['e2']
     result['host_amp'] = image_host.sum()
-    zp = zp
     result['host_mag'] = - 2.5 * np.log10(result['host_amp']) + zp 
     result=roundme(result)
     return result

@@ -462,23 +462,20 @@ def cr_mask(image, filename='test_circle.reg', mask_reg_cut = 0.):
     mask_box_part *= box
     return mask
 
-def total_compare(label_list, flux_list, zp=27.0, delatPixel=1,
-                  facility = 'F140w' , plot_type= 4, target_ID = 'target_ID',
+def total_compare(label_list, flux_list, zp=27.0, target_ID = 'target_ID',
                   add_background=0.0, data_mask_list = None, data_cut = 0.,plot_compare=False,
                   pix_sz = 'drz06', msk_image=None, if_annuli=False, arrows=False):
-    if facility == 'F140w':
-        zp = 26.4524
-    elif facility == 'F125w':
-        zp = 26.2303
-    elif facility == 'acs':
-        zp = 25.94333
-    
     if pix_sz == 'swarp':
         delatPixel = 0.127985
     elif pix_sz == 'drz06':
         delatPixel = 0.0642
     elif pix_sz == 'acs':
         delatPixel = 0.03
+    elif isinstance(pix_sz,float):
+        delatPixel = pix_sz
+    else:
+        delatPixel = 1.
+        print "Warning: The pix_sz is inappropriate and thus delatPixel=1.0"  
     
     norm = LogNorm() #ImageNormalize(stretch=SqrtStretch())
     f = plt.figure(0, figsize=(20.1,4))
@@ -670,23 +667,26 @@ def total_compare(label_list, flux_list, zp=27.0, delatPixel=1,
         plt.show()
     return f
 
-def galaxy_total_compare(label_list, flux_list, zp=27.0, delatPixel=1,
-                  facility = 'F140w' , plot_type= 4, target_ID = 'target_ID',
+def galaxy_total_compare(label_list, flux_list, zp=27.0, pix_sz=1., target_ID = 'target_ID',
                   add_background=0.0, data_mask_list = None, data_cut = 0.,plot_compare=False,
-                  pix_sz = 'drz06', msk_image=None, if_annuli=False, arrows=False):
-    if facility == 'F140w':
-        zp = 26.4524
-    elif facility == 'F125w':
-        zp = 26.2303
-    elif facility == 'acs':
-        zp = 25.94333
-    
+                  msk_image=None, if_annuli=False, arrows=False):
+#    if facility == 'F140w':
+#        zp = 26.4524
+#    elif facility == 'F125w':
+#        zp = 26.2303
+#    elif facility == 'acs':
+#        zp = 25.94333
     if pix_sz == 'swarp':
         delatPixel = 0.127985
     elif pix_sz == 'drz06':
         delatPixel = 0.0642
     elif pix_sz == 'acs':
         delatPixel = 0.03
+    elif isinstance(pix_sz,float):
+        delatPixel = pix_sz
+    else:
+        delatPixel = 1.
+        print "Warning: The pix_sz is inappropriate and thus delatPixel=1.0"
     
     norm = LogNorm() #ImageNormalize(stretch=SqrtStretch())
     f = plt.figure(0, figsize=(17,4))
