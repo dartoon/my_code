@@ -152,7 +152,7 @@ elif len(image_host) >1:
         host += image_host[i]
     label = ['data', 'QSO', 'host as {0} components'.format(i+1), 'model', 'normalized residual']  #Print the numbers of objects
 flux_list = [agn_image, image_ps, host, error_map]
-fig = total_compare(label_list = label, flux_list = flux_list, target_ID = ID, pix_sz=pix_sz, zp = zp,
+fig = total_compare(label_list = label, flux_list = flux_list, target_ID = ID, delatPixel=pix_sz, zp = zp,
                     plot_compare = False, msk_image = QSO_msk)
 fig.savefig("{0}_SB_profile.pdf".format(name_save), bbox_inches = 'tight')
 if pltshow == 0:
@@ -181,8 +181,10 @@ elif if_file is not []:
     fit_result = open(filename,"r+")
     fit_result.read()
 fit_result.write("Result for target " + ID + ":\n")
-fit_result.write("point source result:\n".format(i))
-fit_result.write("    "+ repr(ps_result) + "\n")
+ps_result_0 = ps_result[0]
+ps_result_0['PSF_mag'] = -2.5*np.log10(ps_result_0['point_amp']) + zp
+fit_result.write("point source result:\n")
+fit_result.write("    "+ repr(ps_result_0) + "\n")
 for i in range(len(source_result)):
     fit_result.write("obj {0} result:\n".format(i))
     result = transfer_obj_to_result(source_result =source_result[i] ,image_host=image_host[i], zp=zp)
