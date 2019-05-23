@@ -1,0 +1,28 @@
+#galaxy_img intensity in the band I: 207.56 
+#fit result of the galaxy by in band I: 
+{'n_sersic': 2.622, 'host_mag': 21.248, 'Kron_mag': 21.36, 'R_sersic': 0.886, 'reduced_Chisq': 1.061986856248238, 'q': 0.736, 'center_x': -0.028, 'center_y': -0.091, 'host_amp': 199.982, 'phi_G': -0.578, 'amp': 19.298, 'concentration': 3.363, 'Kron_flux': 180.226, 'Kron_radius': 3.0}
+#obj 1: 
+{'n_sersic': 1.24, 'host_mag': 25.122, 'R_sersic': 0.109, 'q': 0.338, 'center_x': -1.891, 'center_y': 2.612, 'host_amp': 5.637, 'phi_G': -0.012, 'amp': 323.091}
+#obj 2: 
+{'n_sersic': 0.971, 'host_mag': 26.69, 'R_sersic': 0.576, 'q': 0.636, 'center_x': 2.446, 'center_y': -3.714, 'host_amp': 1.33, 'phi_G': 0.082, 'amp': 0.534}
+#galaxy_img intensity in the band I: 207.56 
+#fit result of the galaxy by in band I: 
+{'n_sersic': 2.605, 'host_mag': 21.251, 'Kron_mag': 21.362, 'R_sersic': 0.881, 'reduced_Chisq': 1.0620655901809244, 'q': 0.737, 'center_x': -0.028, 'center_y': -0.091, 'host_amp': 199.429, 'phi_G': -0.582, 'amp': 19.465, 'concentration': 3.363, 'Kron_flux': 180.001, 'Kron_radius': 3.0}
+#obj 1: 
+{'n_sersic': 0.302, 'host_mag': 25.143, 'R_sersic': 0.181, 'q': 0.34, 'center_x': -1.9, 'center_y': 2.63, 'host_amp': 5.531, 'phi_G': 0.425, 'amp': 60.385}
+#obj 2: 
+{'n_sersic': 6.8, 'host_mag': 26.491, 'R_sersic': 2.849, 'q': 0.175, 'center_x': 2.44, 'center_y': -3.178, 'host_amp': 1.599, 'phi_G': -1.175, 'amp': 0.056}
+#galaxy_img intensity in the band I: 195.56 
+#fit result of the galaxy by in band I: 
+{'n_sersic': 2.503, 'host_mag': 21.327, 'Kron_mag': 21.376, 'R_sersic': 0.852, 'reduced_Chisq': 1.106468439597346, 'q': 0.732, 'center_x': -0.028, 'center_y': -0.092, 'host_amp': 185.828, 'phi_G': -0.556, 'amp': 20.812, 'concentration': 3.032, 'Kron_flux': 177.623, 'Kron_radius': 3.0}
+#obj 1: 
+{'n_sersic': 3.169, 'host_mag': 24.619, 'R_sersic': 2.999, 'q': 0.179, 'center_x': -1.848, 'center_y': 2.688, 'host_amp': 8.964, 'phi_G': -0.4, 'amp': 0.322}
+#obj 2: 
+{'n_sersic': 6.736, 'host_mag': 27.186, 'R_sersic': 1.593, 'q': 0.344, 'center_x': 2.441, 'center_y': -2.766, 'host_amp': 0.842, 'phi_G': 0.755, 'amp': 0.067}
+#galaxy_img intensity in the band I: 195.56 
+#fit result of the galaxy by in band I: 
+{'n_sersic': 2.654, 'host_mag': 21.308, 'Kron_mag': 21.36, 'R_sersic': 0.891, 'reduced_Chisq': 1.1085608586604114, 'q': 0.736, 'center_x': -0.028, 'center_y': -0.091, 'host_amp': 189.136, 'phi_G': -0.574, 'amp': 19.033, 'concentration': 3.116, 'Kron_flux': 180.272, 'Kron_radius': 3.0}
+#obj 1: 
+{'n_sersic': 0.554, 'host_mag': 25.191, 'R_sersic': 0.104, 'q': 0.229, 'center_x': -1.917, 'center_y': 2.609, 'host_amp': 5.292, 'phi_G': 0.383, 'amp': 929.003}
+#obj 2: 
+{'n_sersic': 0.453, 'host_mag': 27.837, 'R_sersic': 0.169, 'q': 0.733, 'center_x': 2.412, 'center_y': -3.013, 'host_amp': 0.463, 'phi_G': 1.137, 'amp': 2.835}
