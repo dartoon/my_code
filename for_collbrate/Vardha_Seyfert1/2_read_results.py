@@ -41,7 +41,7 @@ fig = total_compare(label_list = label, flux_list = flux_list, target_ID = ID, p
                     plot_compare = False, msk_image = QSO_msk)
 plt.show()
 
-print "plot inividual frame:"
+print "plot individual frame:"
 plt.imshow(flux_list[0] - flux_list[1], norm=LogNorm(),origin='low')
 plt.colorbar()
 frame_size = len(flux_list[0])

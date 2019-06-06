@@ -348,8 +348,13 @@ for band in band_list:
     else:
         picklename = 'fit_result/'+'fit_image_'+QSO_id+ '_HSC-{0}.pkl'.format(band)
         result = pickle.load(open(picklename,'rb'))
-        [source_result, image_host, ps_result, image_ps, samples_mcmc, param_mcmc, paras, chain_list, param_list] = result
-        [source_params_2, ps_param_2, mcmc_new_list, labels_new] = paras
+#        [source_result, image_host, ps_result, image_ps, samples_mcmc, param_mcmc, paras, chain_list, param_list] = result
+#        [source_params_2, ps_param_2, mcmc_new_list, labels_new] = paras
+        [best_fit,pso_fit,mcmc_fit, trans_paras] = result            
+        source_result, image_host, ps_result, image_ps, _ =best_fit
+        chain_list, param_list, _ = pso_fit
+        samples_mcmc, param_mcmc, dist_mcmc, _ = mcmc_fit
+        _, _, mcmc_new_list, labels_new, _ = trans_paras            
         mcmc_new_list = np.asarray(mcmc_new_list)
         idx = 1     #The translated flux for the host
         v_l=np.percentile(mcmc_new_list[:,idx],16,axis=0)

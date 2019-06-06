@@ -1,0 +1,1 @@
+#ID, RA, DEC, zp, pixel_scale, galaxy_x, galaxy_y, galaxy_flux, galaxy_mag, Reff(arcsec), n_sersic, galaxy_q, Kron_radius(arcsec), galaxy_Kron_flux, galaxy_Kron_mag, concentration, reduced_Chisq , local_bkg_light(pixel/flux)

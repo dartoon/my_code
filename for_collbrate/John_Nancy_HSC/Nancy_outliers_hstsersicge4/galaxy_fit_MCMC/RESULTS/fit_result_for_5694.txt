@@ -1,0 +1,22 @@
+#galaxy_img intensity in the band I: 2997.26 
+#fit result of the galaxy by in band I: 
+{'n_sersic': 0.805, 'host_mag': 20.507, 'Kron_mag': 20.599, 'R_sersic': 1.449, 'reduced_Chisq': 8.393064045269824, 'q': 0.37, 'center_x': 0.152, 'center_y': 0.054, 'host_amp': 395.466, 'phi_G': -1.014, 'amp': 46.5, 'concentration': 2.583, 'Kron_flux': 363.284, 'Kron_radius': 3.0}
+#obj 1: 
+{'n_sersic': 0.302, 'host_mag': 18.605, 'R_sersic': 0.1, 'q': 0.51, 'center_x': 0.55, 'center_y': 2.931, 'host_amp': 2279.303, 'phi_G': 1.163, 'amp': 55667.844}
+#obj 2: 
+{'n_sersic': 3.362, 'host_mag': 22.042, 'R_sersic': 2.862, 'q': 0.803, 'center_x': -3.172, 'center_y': -0.915, 'host_amp': 96.225, 'phi_G': -0.867, 'amp': 0.923}
+#obj 3: 
+{'n_sersic': 1.423, 'host_mag': 24.379, 'R_sersic': 2.546, 'q': 0.642, 'center_x': -2.612, 'center_y': 3.549, 'host_amp': 11.183, 'phi_G': -1.445, 'amp': 0.224}
+#obj 4: 
+{'n_sersic': 2.032, 'host_mag': 21.179, 'R_sersic': 1.891, 'q': 0.223, 'center_x': -1.468, 'center_y': 5.018, 'host_amp': 213.052, 'phi_G': 0.411, 'amp': 18.151}
+#galaxy_img intensity in the band I: 2997.26 
+#fit result of the galaxy by in band I: 
+{'n_sersic': 0.783, 'host_mag': 20.489, 'Kron_mag': 20.572, 'R_sersic': 1.379, 'reduced_Chisq': 9.883335852776355, 'q': 0.418, 'center_x': 0.209, 'center_y': -0.104, 'host_amp': 402.028, 'phi_G': -0.988, 'amp': 46.765, 'concentration': 2.583, 'Kron_flux': 372.394, 'Kron_radius': 3.0}
+#obj 1: 
+{'n_sersic': 0.417, 'host_mag': 18.61, 'R_sersic': 0.103, 'q': 0.291, 'center_x': 0.505, 'center_y': 2.919, 'host_amp': 2269.434, 'phi_G': -1.144, 'amp': 66631.552}
+#obj 2: 
+{'n_sersic': 0.719, 'host_mag': 22.604, 'R_sersic': 0.61, 'q': 0.799, 'center_x': -3.891, 'center_y': -0.191, 'host_amp': 57.353, 'phi_G': 0.877, 'amp': 18.49}
+#obj 3: 
+{'n_sersic': 0.656, 'host_mag': 27.152, 'R_sersic': 1.427, 'q': 0.594, 'center_x': -2.788, 'center_y': 3.322, 'host_amp': 0.87, 'phi_G': 0.382, 'amp': 0.072}
+#obj 4: 
+{'n_sersic': 2.728, 'host_mag': 20.931, 'R_sersic': 2.533, 'q': 0.469, 'center_x': -1.288, 'center_y': 5.105, 'host_amp': 267.692, 'phi_G': 0.646, 'amp': 6.268}

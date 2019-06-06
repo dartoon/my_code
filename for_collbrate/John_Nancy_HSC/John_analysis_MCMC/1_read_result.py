@@ -13,7 +13,10 @@ import glob
 import astropy.io.fits as pyfits
 from gen_fit_id import gen_fit_id
 
-image_folder = '../images_directory/'
+#image_folder = '../images_directory/'
+image_folder = '/Users/Dartoon/Astro/for_collbrate/for_John_ascii_folder/images_directory/'
+
+folder = 'result/'
 
 QSO_id = "000017.88+002612.6"
 QSO_RA, QSO_DEC = 0.07452999800443649, 0.4368380010128021
@@ -25,10 +28,17 @@ if_file = glob.glob("fit_result/*{0}*{1}.pkl".format(QSO_id,band))
 if if_file == []:
     print "MCMC for {0}-{1} not performed!".format(QSO_id,band)
 else:
-    picklename = 'fit_result/'+'fit_image_'+QSO_id+ '_HSC-{0}.pkl'.format(band)
+    picklename = folder +'fit_image_'+QSO_id+ '_HSC-{0}.pkl'.format(band)
     result = pickle.load(open(picklename,'rb'))
-    [source_result, image_host, ps_result, image_ps, samples_mcmc, param_mcmc, paras, chain_list, param_list] = result
-    [source_params_2, ps_param_2, mcmc_new_list, labels_new] = paras
+    
+    [best_fit,pso_fit,mcmc_fit, trans_paras] = result            
+    source_result, image_host, ps_result, image_ps, _ =best_fit
+    chain_list, param_list, _ = pso_fit
+    samples_mcmc, param_mcmc, dist_mcmc, _ = mcmc_fit
+    _, _, mcmc_new_list, labels_new, _ = trans_paras            
+    mcmc_new_list = np.asarray(mcmc_new_list)    
+#    [source_result, image_host, ps_result, image_ps, samples_mcmc, param_mcmc, paras, chain_list, param_list] = result
+#    [source_params_2, ps_param_2, mcmc_new_list, labels_new] = paras
     #print "The fixed parameters in galaxy:", source_params_2
     #%%
 #    print "plot the overall parameter contour:"
@@ -63,12 +73,21 @@ else:
     print "The mid fit:", -2.5 * np.log10(v_m) + zp
     print "upper limit", -2.5 * np.log10(v_l) + zp
 
-##%%
-#print "Check the convergency of the PSO chains:"
-#import lenstronomy.Plots.output_plots as out_plot
-#for i in range(len(chain_list)):
-#    if len(param_list[i]) > 0:
-#        f, axes = out_plot.plot_chain(chain_list[i], param_list[i]) 
+#%%
+print "Check the convergency of the PSO chains:"
+import lenstronomy.Plots.output_plots as out_plot
+for i in range(len(chain_list)):
+    if len(param_list[i]) > 0:
+        f, axes = out_plot.plot_chain(chain_list[i], param_list[i]) 
+plt.show()
+
+#%%test the MCMC chain convergency
+#        
+#import lenstronomy.Plots.output_plots as plot_mcmc_behaviour
+fig = plt.figure(figsize=(20, 15))
+ax = fig.add_subplot(111)
+out_plot.plot_mcmc_behaviour(ax, samples_mcmc, param_mcmc, dist_mcmc)       
+plt.show()
 
 #%% Plot the image again:
 band_seq = ['G', 'R', 'I', 'Z', 'Y']
@@ -89,6 +108,7 @@ elif len(image_host) >1:
 agn_image = QSO_im[ct:-ct,ct:-ct]
 error_map = err_map[ct:-ct,ct:-ct]
 flux_list = [agn_image, image_ps, host, error_map]
+
 total_compare(label_list = label, flux_list = flux_list, target_ID = QSO_id+'-'+band, pix_sz=pix_scale, zp = zp,
                     plot_compare = False, msk_image = np.ones_like(agn_image))
 

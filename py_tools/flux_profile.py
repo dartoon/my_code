@@ -17,9 +17,12 @@ from matplotlib.ticker import AutoMinorLocator
 from matplotlib.colors import LogNorm
 from astropy.visualization import SqrtStretch
 from astropy.visualization.mpl_normalize import ImageNormalize
-import matplotlib
 import matplotlib as matt
 matt.rcParams['font.family'] = 'STIXGeneral'
+
+import copy, matplotlib
+my_cmap = copy.copy(matplotlib.cm.get_cmap('gist_heat')) # copy the default cmap
+my_cmap.set_bad('black')
 
 def pix_region(center=([49,49]), radius=5):
     '''
@@ -104,7 +107,7 @@ def flux_profile(image, center, radius=35,start_p=1.5, grids=20, gridspace=None,
             
     if fits_plot == True:
         ax=plt.subplot(1,1,1)
-        cax=ax.imshow((image*mask),norm=LogNorm(),origin='lower')#,cmap='gist_heat')
+        cax=ax.imshow((image*mask),norm=LogNorm(),origin='lower')#,cmap=my_cmap)
         #ax.add_patch(mask.bbox.as_artist(facecolor='none', edgecolor='white'))
         for i in range(grids):
             ax.add_patch(regions[i].as_artist(facecolor='none', edgecolor='orange'))
@@ -258,7 +261,7 @@ def concentration_profile(image, center, total_flux=None, radius=35,start_p=1.5,
     print index
     if fits_plot == True:
         ax=plt.subplot(1,1,1)
-        cax=ax.imshow((image),norm=LogNorm(),origin='lower')#,cmap='gist_heat')
+        cax=ax.imshow((image),norm=LogNorm(),origin='lower')#,cmap=my_cmap)
         #ax.add_patch(mask.bbox.as_artist(facecolor='none', edgecolor='white'))
         for i in range(grids):
             if i in index:
@@ -567,7 +570,7 @@ def total_compare(label_list, flux_list, zp=27.0, target_ID = 'target_ID',
     ax4 = plt.subplot2grid((6,5), (0,4), rowspan=5)
     ax5 = plt.subplot2grid((6,5), (5,4), rowspan=1)
 
-    im1 = ax1.imshow(flux_list[0] + add_background,origin='lower',cmap="gist_heat", norm=norm, vmax = flux_list[0].max())
+    im1 = ax1.imshow(flux_list[0] + add_background,origin='lower',cmap=my_cmap, norm=norm, vmax = flux_list[0].max())
     clim=im1.properties()['clim']
     frame_size = len(flux_list[0])
     ax1.set_ylabel(target_ID, fontsize=15, weight='bold')
@@ -598,7 +601,7 @@ def total_compare(label_list, flux_list, zp=27.0, target_ID = 'target_ID',
 #    posE_o = axE.get_position() # get the original position
 #    posE = [posE_o.x0 -0.1, pos3_o.y0 +0.025, pos3_o.width, pos3_o.height]
 #    axE.set_position(posE) # set a new position
-    imE = axE.imshow((flux_list[0] - flux_list[1])*msk_image, origin='lower',cmap='gist_heat', norm=norm, clim=clim)
+    imE = axE.imshow((flux_list[0] - flux_list[1])*msk_image, origin='lower',cmap=my_cmap, norm=norm, clim=clim)
     axE.text(frame_size*0.05, frame_size*0.9, 'data - Point Source', weight='bold',
          fontsize=17, color='white')
     scale_bar(axE, frame_size, dist=1/delatPixel, text='1"', color = 'white')
@@ -1009,7 +1012,31 @@ def min_sub(ini, img, mask_list=None, test_n=20):
 def gaussian(x, mean, amplitude, standard_deviation):
     return amplitude * np.exp( - ((x - mean) / standard_deviation) ** 2)
 
-def fit_bkg_as_gaussian(data, thre=0.03):
+def fit_data_as_gaussian(data, ifplot=1):
+    bin_heights, bin_borders = np.histogram(data, bins='auto')
+    bin_widths = np.diff(bin_borders)
+    bin_centers = bin_borders[:-1] + bin_widths / 2
+    plt.bar(bin_centers, bin_heights, width=bin_widths, label='histogram')
+    from scipy.optimize import curve_fit
+    popt, pcov = curve_fit(gaussian, bin_centers, bin_heights, p0=[0., bin_heights.max(), 0.01])
+    x_interval_for_fit = np.linspace(bin_borders[0], bin_borders[-1], 10000)
+    gauss_grid = gaussian(x_interval_for_fit, *popt)
+    plt.plot(x_interval_for_fit, gauss_grid, label='fit',c='red')
+    fit_center_idx = np.where(gauss_grid==gauss_grid.max())[0][0]   
+    line = np.linspace(0,10000,10)
+    peak_loc = x_interval_for_fit[fit_center_idx]
+    plt.plot(peak_loc*np.ones_like(line), line, 'black')
+    plt.plot(peak_loc*np.ones_like(line) + popt[2], line, 'black')
+    plt.plot(peak_loc*np.ones_like(line) - popt[2], line, 'black')
+    plt.ylim((0, bin_heights.max()*5./4.))
+    plt.legend()
+    if ifplot == 1:
+        plt.show()
+    else:
+        plt.close()
+    return peak_loc, popt[2]
+
+def fit_bkg_light_as_gaussian(data, thre=0.03):
     bin_heights, bin_borders = np.histogram(data[abs(data)<thre], bins='auto')
     bin_widths = np.diff(bin_borders)
     bin_centers = bin_borders[:-1] + bin_widths / 2
@@ -1027,3 +1054,4 @@ def fit_bkg_as_gaussian(data, thre=0.03):
     plt.legend()
     plt.show()
     return QSO_peak_loc
+

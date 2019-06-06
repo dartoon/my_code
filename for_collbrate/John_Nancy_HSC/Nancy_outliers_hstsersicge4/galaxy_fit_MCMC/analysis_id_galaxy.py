@@ -26,12 +26,15 @@ from matplotlib.colors import LogNorm
 import copy
 import time
 import pickle
+import sys
 
+#import sys
+#sys.path.insert(0,'../../py_tools/')
 from gen_fit_id import gen_fit_id
 from fit_qso import fit_galaxy
 from transfer_to_result import transfer_obj_to_result
 from mask_objects import detect_obj
-from flux_profile import flux_profile, concentration_profile
+from flux_profile import flux_profile, concentration_profile, fit_bkg_as_gaussian
 
 
 t1 = time.time()
@@ -42,12 +45,24 @@ pltshow = 1 #Note that setting plt.ion() in line27, the plot won't show anymore 
 fitting_strategy =  None # you can set as 'add_galaxy_center_mask' or 'boost_galaxy_center_rms'
 sub_bkg = True
 image_folder = '../data/'
-run_MCMC = True
-fit_frame_size =41
+run_MCMC = False
+#fit_frame_size =61
+size_list = [51, 61, 71, 81, 91, 101, 111]
 
-galaxy_ID = '18184' 
-galaxy_RA = 150.121811
-galaxy_DEC = 2.394572
+#galaxy_ID = sys.argv[1]
+#galaxy_RA = float(sys.argv[2])
+#galaxy_DEC = float(sys.argv[3])
+
+galaxy_ID = '5694' 
+#galaxy_RA = 150.193475
+#galaxy_DEC = 2.243132
+galaxy_RA = 150.193497
+galaxy_DEC = 2.243126
+
+
+#galaxy_ID = '18184' 
+#galaxy_RA = 150.121811
+#galaxy_DEC = 2.394572
 
 #galaxy_ID = '6310'
 #galaxy_RA = 150.154602
@@ -99,6 +114,18 @@ for i in range(len(band_seq)):
     #==============================================================================
     # quickly evaluate the background rms
     #==============================================================================
+for cut_size in size_list:
+    ct = (len(galaxy_im_list[0])-cut_size)/2
+    cut_data = galaxy_im_list[0][ct:-ct,ct:-ct]
+    edge_data = np.concatenate([cut_data[0,:],cut_data[-1,:],cut_data[:,0], cut_data[:,-1]])
+    gauss_mean, gauss_1sig = fit_bkg_as_gaussian(edge_data, ifplot=0)
+    up_limit = gauss_mean + 2 * gauss_1sig
+    percent = np.sum(edge_data>up_limit)/float(len(edge_data))
+    if percent<0.03:
+        break
+print "The right frame size to fit:", cut_size      
+fit_frame_size = cut_size
+
 background_rms_list = []
 for i in range(len(band_seq)):
         if i in run_list:
@@ -150,13 +177,15 @@ if reg_file != []:
     regs_pix = regs_pixpos - galaxy_fr_center
     regs_pix_target = regs_pix[(abs(regs_pix[:,0])<fit_frame_size/2) & (abs(regs_pix[:,1])<fit_frame_size/2)]  # derive all the reg in the frame
     re_target = re_list[(abs(regs_pix[:,0])<fit_frame_size/2) & (abs(regs_pix[:,1])<fit_frame_size/2)]  # derive all the reg in the frame
+    print re_target, regs_pix_target
     selet_galaxy = ((abs(regs_pix_target[:,0])<2) & (abs(regs_pix_target[:,1])<2))
     galaxy_info = [regs_pix_target[selet_galaxy][0], re_target[selet_galaxy][0]] # The galaxy pixel position
-    selet_obj = ((abs(regs_pix_target[:,0])>2) & (abs(regs_pix_target[:,1])>2))
+    selet_obj = ((abs(regs_pix_target[:,0])>2) + (abs(regs_pix_target[:,1])>2))
     obj_pos = regs_pix_target[selet_obj] # The objects pixel position
     obj_re = re_target[selet_obj]
     obj = [[obj_pos[i], obj_re[i]] for i in range(len(obj_pos))]  #Change the objects position list to right format
     print "the number of nearby objs:", len(obj)
+
 else:
     for k in run_list:
             objs, Q_index = detect_obj(galaxy_img_l[k],pltshow = 1, snr=1.2)
