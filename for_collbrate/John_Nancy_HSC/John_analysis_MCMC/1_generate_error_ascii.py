@@ -67,4 +67,4 @@ for QSO_id in QSO_id_list:
         else:
             ascii_err.write(" {0} {1}".format(round(m_m,3), round(m_err,3)))
     ascii_err.write("\n")
-    ascii_err.close()
+ascii_err.close()

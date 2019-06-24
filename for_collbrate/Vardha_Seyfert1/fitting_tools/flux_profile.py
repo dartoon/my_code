@@ -548,7 +548,7 @@ def cr_mask(image, filename='test_circle.reg', mask_reg_cut = 0.):
 
 def total_compare(label_list, flux_list, zp=27.0, target_ID = 'target_ID',
                   add_background=0.0, data_mask_list = None, data_cut = 0.,plot_compare=False,
-                  pix_sz = 'drz06', msk_image=None, if_annuli=False, arrows=False):
+                  pix_sz = 'drz06', msk_image=None, if_annuli=False, arrows=False, host_comp_name=None, host_comp=None):
     if pix_sz == 'swarp':
         delatPixel = 0.127985
     elif pix_sz == 'drz06':
@@ -581,7 +581,7 @@ def total_compare(label_list, flux_list, zp=27.0, target_ID = 'target_ID',
     if arrows == True:
         coordinate_arrows(ax1, frame_size, arrow_size=0.03, color = 'white')
     cb1 = f.colorbar(im1, ax=ax1, shrink=0.48, pad=0.01,  orientation="horizontal", aspect=15, ticks= [1.e-4, 1.e-3, 1.e-2,1.e-1,0, 10])
-    cb1.set_ticks([1.e-5, 1.e-4, 1.e-3, 1.e-2,1.e-1,0,1])   
+    cb1.set_ticks([1.e-5, 1.e-4, 1.e-3, 1.e-2,1.e-1,0,1,10,100])   
 #    cb1.ax.()
     
     im2 = ax2.imshow(flux_list[1] + flux_list[2] + add_background,origin='lower',cmap="gist_heat", norm=norm, clim=clim)
@@ -596,7 +596,7 @@ def total_compare(label_list, flux_list, zp=27.0, target_ID = 'target_ID',
     ax2.get_xaxis().set_visible(False)
     ax2.get_yaxis().set_visible(False)
     cb2 = f.colorbar(im2, ax=ax2, shrink=0.48, pad=0.01,   orientation="horizontal", aspect=15) 
-    cb2.set_ticks([1.e-5, 1.e-4, 1.e-3, 1.e-2,1.e-1,0,1])  
+    cb2.set_ticks([1.e-5, 1.e-4, 1.e-3, 1.e-2,1.e-1,0,1,10,100])  
     
 #    posE_o = axE.get_position() # get the original position
 #    posE = [posE_o.x0 -0.1, pos3_o.y0 +0.025, pos3_o.width, pos3_o.height]
@@ -610,7 +610,7 @@ def total_compare(label_list, flux_list, zp=27.0, target_ID = 'target_ID',
     axE.get_xaxis().set_visible(False)
     axE.get_yaxis().set_visible(False)
     cbE =f.colorbar(imE, ax=axE, shrink=0.48, pad=0.01,   orientation="horizontal", aspect=15) 
-    cbE.set_ticks([1.e-5, 1.e-4, 1.e-3, 1.e-2,1.e-1,0,1])  
+    cbE.set_ticks([1.e-5, 1.e-4, 1.e-3, 1.e-2,1.e-1,0,1,10,100])  
     
     norm_residual = (flux_list[0]-(flux_list[1]+flux_list[2]))/flux_list[3] * msk_image
 #    pos3_o = ax3.get_position() # get the original position
@@ -655,11 +655,17 @@ def total_compare(label_list, flux_list, zp=27.0, target_ID = 'target_ID',
 #                r_max =  r_grids[ind]
             else:
                 ax4.plot(r_grids, r_mag, '-', label=label_SB_list[i])
+        if host_comp_name is not None and host_comp is not None:
+            for i in range(len(host_comp_name)):
+                center = len(host_comp[i])/2, len(host_comp[i])/2
+                r_SB, r_grids = SB_profile(host_comp[i], center, gridspace = 'log', radius= radi,grids = 30, mask_list=None)
+                r_mag = - 2.5 * np.log10(r_SB) + zp 
+                ax4.plot(r_grids, r_mag, '-', label=host_comp_name[i])
         ax4.set_xlabel('pixel', fontsize=15)
         ax4.xaxis.set_label_position('top')
         ax4.xaxis.tick_top() 
         ax4.set_xscale('log')
-        ax4.set_xticks([2,4,6,10,15,20,30])
+        ax4.set_xticks([2,4,6,10,15,20,30,50,100,150])
         from matplotlib.ticker import ScalarFormatter
         ax4.xaxis.set_major_formatter(ScalarFormatter())
         ax4.set_xlim([(r_grids).min()*0.85,r_grids.max()+6])
@@ -670,7 +676,6 @@ def total_compare(label_list, flux_list, zp=27.0, target_ID = 'target_ID',
         ax4.yaxis.tick_right()
         ax4.yaxis.set_ticks_position('both') 
         plt.gca().invert_yaxis()
-        
         ax4.legend()
         x = np.linspace(1.e-4, 100, 2)
         y = x * 0
@@ -683,7 +688,7 @@ def total_compare(label_list, flux_list, zp=27.0, target_ID = 'target_ID',
         ax5.set_ylabel('$\Delta\mu$', fontsize=15)
         ax5.set_xlabel('arcsec', fontsize=15)
         ax5.set_xscale('log')
-        ax5.set_xticks([0.1, 0.2, 0.5, 1, 2])
+        ax5.set_xticks([0.1, 0.2, 0.5, 1, 2,5,10,20])
         ax5.set_yticks([-0.5,-0.25, 0., 0.25])
         import matplotlib
         ax5.get_xaxis().set_major_formatter(matplotlib.ticker.ScalarFormatter())
@@ -697,7 +702,7 @@ def total_compare(label_list, flux_list, zp=27.0, target_ID = 'target_ID',
         for i in range(len(label_SB_list)):
             center = len(flux_SB_list[i])/2, len(flux_SB_list[i])/2
             if label_SB_list[i] == 'data':
-                print "data_mask_lists:\t", data_mask_list
+#                print "data_mask_lists:\t", data_mask_list
                 r_SB, r_grids = SB_profile(flux_SB_list[i], center, gridspace = 'log',
                                            radius= radi, grids = 50, mask_list=data_mask_list,
                                            mask_cut = data_cut, msk_image=msk_image, fits_plot=False, if_annuli = if_annuli)
@@ -705,11 +710,16 @@ def total_compare(label_list, flux_list, zp=27.0, target_ID = 'target_ID',
             else:
                 r_SB, r_grids = SB_profile(flux_SB_list[i], center, gridspace = 'log', radius=radi,grids = 30, mask_list=None, if_annuli = if_annuli)
                 ax4.plot(r_grids, r_SB, '-', label=label_SB_list[i])
+        if host_comp_name is not None and host_comp is not None:
+            for i in range(len(host_comp_name)):
+                center = len(host_comp[i])/2, len(host_comp[i])/2
+                r_SB, r_grids = SB_profile(host_comp[i], center, gridspace = 'log', radius= radi,grids = 30, mask_list=None)
+                ax4.plot(r_grids, r_SB, '-', label=host_comp_name[i])        
         ax4.set_xlabel('pixel', fontsize=15)
         ax4.xaxis.set_label_position('top')
         ax4.xaxis.tick_top() 
         ax4.set_xscale('log')
-        ax4.set_xticks([2,4,6,10,15,20,30])
+        ax4.set_xticks([2,4,6,10,15,20,30,50,100,150])
         from matplotlib.ticker import ScalarFormatter
         ax4.xaxis.set_major_formatter(ScalarFormatter())
         ax4.set_xlim([(r_grids).min()*0.85,(r_grids).max()+6])
@@ -731,7 +741,7 @@ def total_compare(label_list, flux_list, zp=27.0, target_ID = 'target_ID',
         ax5.set_ylabel('$\Delta SB$', fontsize=15)
         ax5.set_xlabel('arcsec', fontsize=15)
         ax5.set_xscale('log')
-        ax5.set_xticks([0.1, 0.2, 0.5, 1, 2])
+        ax5.set_xticks([0.1, 0.2, 0.5, 1, 2,5,10,20])
         import matplotlib
         ax5.get_xaxis().set_major_formatter(matplotlib.ticker.ScalarFormatter())
         ax5.plot(x, y, 'k--')  

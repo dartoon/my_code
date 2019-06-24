@@ -87,13 +87,13 @@ v_m=np.percentile(mcmc_new_list[:,idx],50,axis=0)
 v_h=np.percentile(mcmc_new_list[:,idx],84,axis=0)
 print labels_new[idx], ":", v_l, v_m, v_h
 
-#%%Too save inividual fits file (Take host 0 as example):
-host_id = 0
-center_QSO = np.array([2053, 2475])   #!!! The is the array of the QSO position that introduced in 0_cutout.py
-fitsFile = pyfits.open(ID+"_sci.fits")
-file_header = copy.deepcopy(fitsFile[0].header)
-file_header['CRPIX1'] = file_header['CRPIX1']-center_QSO[0]+len(flux_list[0])/2
-file_header['CRPIX2'] = file_header['CRPIX2']-center_QSO[1]+len(flux_list[0])/2
-pyfits.PrimaryHDU(image_host[host_id],header=file_header).writeto(ID+'fitted_host{0}.fits'.format(host_id),overwrite=True)
-#thdu_fluxlist.writeto(ID+'_flux_list.fits', overwrite=True)
+##%%To save inividual fits file (Take host 0 as example):
+#host_id = 0
+#center_QSO = np.array([2053, 2475])   #!!! The is the array of the QSO position that introduced in 0_cutout.py
+#fitsFile = pyfits.open(ID+"_sci.fits")
+#file_header = copy.deepcopy(fitsFile[0].header)
+#file_header['CRPIX1'] = file_header['CRPIX1']-center_QSO[0]+len(flux_list[0])/2
+#file_header['CRPIX2'] = file_header['CRPIX2']-center_QSO[1]+len(flux_list[0])/2
+#pyfits.PrimaryHDU(image_host[host_id],header=file_header).writeto(ID+'fitted_host{0}.fits'.format(host_id),overwrite=True)
+##thdu_fluxlist.writeto(ID+'_flux_list.fits', overwrite=True)
 

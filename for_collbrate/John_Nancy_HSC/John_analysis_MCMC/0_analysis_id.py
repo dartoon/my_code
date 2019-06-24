@@ -42,7 +42,7 @@ fix_on_I_band = 1 # input("Do you want, based on I band's inference, fix the oth
 pltshow = 1 #Note that setting plt.ion() in line27, the plot won't show anymore if running in terminal.
 sub_bkg = True
 fit_frame_size = 71
-image_folder = '../images_directory/'
+image_folder = '/Users/Dartoon/Astro/for_collbrate/for_John_ascii_folder/images_directory/'
 run_MCMC = True
 
 #QSO_id = sys.argv[1]

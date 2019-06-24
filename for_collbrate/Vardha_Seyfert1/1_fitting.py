@@ -83,6 +83,8 @@ else:
             mask += (np.array(deblend_sources)==block_id[i])
         
         QSO_msk = 1- mask
+        
+#QSO_msk[-10:,-10:] = 0
 print "The QSO mask for the fitting:"
 plt.imshow(QSO_msk, origin='lower')
 if pltshow == 0:
@@ -192,8 +194,8 @@ for i in range(len(source_result)):
 fit_result.write('======================\n')
 fit_result.close()    
 
-print "Total Magnitude Result:"
-print "AGN magnitude:", -2.5*np.log10(image_ps.sum()) + zp
-print "Buldge magnitude:", -2.5*np.log10(image_host[0].sum()) + zp
-print "Disk magnitude:", -2.5*np.log10(image_host[1].sum()) + zp
-print "Bar magnitude:", -2.5*np.log10(image_host[2].sum()) + zp
+#print "Total Magnitude Result:"
+#print "AGN magnitude:", -2.5*np.log10(image_ps.sum()) + zp
+#print "Buldge magnitude:", -2.5*np.log10(image_host[0].sum()) + zp
+#print "Disk magnitude:", -2.5*np.log10(image_host[1].sum()) + zp
+#print "Bar magnitude:", -2.5*np.log10(image_host[2].sum()) + zp

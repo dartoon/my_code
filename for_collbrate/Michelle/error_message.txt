@@ -1,0 +1,124 @@
+ValueError                                Traceback (most recent call last)
+<ipython-input-57-65ecd3d9bc8a> in <module>()
+      3     fitsfile = dir + fitsarrayi[i]
+      4     print(fitsfile, psffile)
+----> 5     itsfits(fitsfile, psffile, False, False, False)
+
+C:\Users\Michelle\!!!Thesis!!!\AGN_decomposition_example\itsfits.py in itsfits(fitsfile, psffile, deepseed, fix_center, runMCMC)
+     98                                                                      pix_sz = pix_scale, no_MCMC = (run_MCMC==False),
+     99                                                                      QSO_std =QSO_std, tag=tag, deep_seed= deep_seed, pltshow=pltshow,
+--> 100                                                                      corner_plot=False, flux_ratio_plot=True, dump_result=run_MCMC)
+    101 
+    102     if pltshow == 0:
+
+C:\Users\Michelle\!!!Thesis!!!\AGN_decomposition_example\py_tools\fit_qso.pyc in fit_qso(QSO_im, psf_ave, psf_std, source_params, ps_param, background_rms, pix_sz, exp_time, fix_n, image_plot, corner_plot, flux_ratio_plot, deep_seed, fixcenter, QSO_msk, QSO_std, tag, no_MCMC, pltshow, return_Chisq, dump_result, pso_diag)
+    190 
+    191     start_time = time.time()
+--> 192     chain_list, param_list, samples_mcmc, param_mcmc, dist_mcmc = fitting_seq.fit_sequence(fitting_kwargs_list)
+    193     lens_result, source_result, lens_light_result, ps_result, cosmo_temp = fitting_seq.best_fit()
+    194     end_time = time.time()
+
+C:\Users\Michelle\AppData\Roaming\Python\Python27\site-packages\lenstronomy\Workflow\fitting_sequence.pyc in fit_sequence(self, fitting_list)
+     64                 self.align_images(**kwargs)
+     65             elif fitting_type == 'PSO':
+---> 66                 lens_result, source_result, lens_light_result, ps_result, cosmo_result, chain, param = self.pso(**kwargs)
+     67                 self._lens_temp, self._source_temp, self._lens_light_temp, self._ps_temp, self._cosmo_temp = lens_result, source_result, lens_light_result, ps_result, cosmo_result
+     68                 chain_list.append(chain)
+
+C:\Users\Michelle\AppData\Roaming\Python\Python27\site-packages\lenstronomy\Workflow\fitting_sequence.pyc in pso(self, n_particles, n_iterations, sigma_scale, print_key, threadCount)
+    201         sampler = Sampler(likelihoodModule=self.likelihoodModule)
+    202         result, chain = sampler.pso(n_particles, n_iterations, lowerLimit, upperLimit, init_pos=init_pos,
+--> 203                                        threadCount=threadCount, mpi=self._mpi, print_key=print_key)
+    204         lens_result, source_result, lens_light_result, ps_result, cosmo_result = param_class.args2kwargs(result,
+    205                                                                                                          bijective=True)
+
+C:\Users\Michelle\AppData\Roaming\Python\Python27\site-packages\lenstronomy\Sampling\sampler.pyc in pso(self, n_particles, n_iterations, lower_start, upper_start, threadCount, init_pos, mpi, print_key)
+     57             pso.gbest.position = init_pos
+     58             pso.gbest.velocity = [0]*len(init_pos)
+---> 59             pso.gbest.fitness, _ = self.chain.likelihood(init_pos)
+     60         X2_list = []
+     61         vel_list = []
+
+C:\Users\Michelle\AppData\Roaming\Python\Python27\site-packages\lenstronomy\Sampling\likelihood.pyc in likelihood(self, a)
+    176 
+    177     def likelihood(self, a):
+--> 178         return self.logL(a)
+    179 
+    180     def computeLikelihood(self, ctx):
+
+C:\Users\Michelle\AppData\Roaming\Python\Python27\site-packages\lenstronomy\Sampling\likelihood.pyc in logL(self, args)
+    115                 return logL, None
+    116         if self._image_likelihood is True:
+--> 117             logL += self.image_likelihood.logL(kwargs_lens, kwargs_source, kwargs_lens_light, kwargs_ps)
+    118         if self._time_delay_likelihood is True:
+    119             logL += self.time_delay_likelihood.logL(kwargs_lens, kwargs_ps, kwargs_cosmo)
+
+C:\Users\Michelle\AppData\Roaming\Python\Python27\site-packages\lenstronomy\Sampling\Likelihoods\image_likelihood.pyc in logL(self, kwargs_lens, kwargs_source, kwargs_lens_light, kwargs_ps)
+     43 
+     44         logL = self.imSim.likelihood_data_given_model(kwargs_lens, kwargs_source, kwargs_lens_light, kwargs_ps,
+---> 45                                                       source_marg=self._source_marg)
+     46 
+     47         if self._force_minimum_source_surface_brightness is True and len(kwargs_source) > 0:
+
+C:\Users\Michelle\AppData\Roaming\Python\Python27\site-packages\lenstronomy\ImSim\MultiBand\multi_linear.pyc in likelihood_data_given_model(self, kwargs_lens, kwargs_source, kwargs_lens_light, kwargs_ps, source_marg)
+     59                 logL += self._imageModel_list[i].likelihood_data_given_model(kwargs_lens, kwargs_source,
+     60                                                                              kwargs_lens_light, kwargs_ps,
+---> 61                                                                              source_marg=source_marg)
+     62         return logL
+
+C:\Users\Michelle\AppData\Roaming\Python\Python27\site-packages\lenstronomy\ImSim\MultiBand\single_band_multi_model.pyc in likelihood_data_given_model(self, kwargs_lens, kwargs_source, kwargs_lens_light, kwargs_ps, source_marg)
+     80         logL = self._likelihood_data_given_model(kwargs_lens_i, kwargs_source_i,
+     81                                                             kwargs_lens_light_i, kwargs_ps_i,
+---> 82                                                             source_marg=source_marg)
+     83         return logL
+     84 
+
+C:\Users\Michelle\AppData\Roaming\Python\Python27\site-packages\lenstronomy\ImSim\image_linear_solve.pyc in _likelihood_data_given_model(self, kwargs_lens, kwargs_source, kwargs_lens_light, kwargs_ps, source_marg)
+    146         im_sim, model_error, cov_matrix, param = self._image_linear_solve(kwargs_lens, kwargs_source,
+    147                                                                          kwargs_lens_light, kwargs_ps,
+--> 148                                                                          inv_bool=source_marg)
+    149         # compute X^2
+    150         logL = self.Data.log_likelihood(im_sim, self.likelihood_mask, model_error)
+
+C:\Users\Michelle\AppData\Roaming\Python\Python27\site-packages\lenstronomy\ImSim\image_linear_solve.pyc in _image_linear_solve(self, kwargs_lens, kwargs_source, kwargs_lens_light, kwargs_ps, inv_bool)
+     69         """
+     70         A = self._linear_response_matrix(kwargs_lens, kwargs_source, kwargs_lens_light, kwargs_ps)
+---> 71         C_D_response, model_error = self._error_response(kwargs_lens, kwargs_ps)
+     72         d = self.data_response
+     73         param, cov_param, wls_model = de_lens.get_param_WLS(A.T, 1 / C_D_response, d, inv_bool=inv_bool)
+
+C:\Users\Michelle\AppData\Roaming\Python\Python27\site-packages\lenstronomy\ImSim\image_linear_solve.pyc in _error_response(self, kwargs_lens, kwargs_ps)
+    113         :return: 1d numpy array of response, 2d array of additonal errors (e.g. point source uncertainties)
+    114         """
+--> 115         model_error = self._error_map(kwargs_lens, kwargs_ps)
+    116         C_D_response = self.image2array_masked(self.Data.C_D + model_error)
+    117         return C_D_response, model_error
+
+C:\Users\Michelle\AppData\Roaming\Python\Python27\site-packages\lenstronomy\ImSim\image_linear_solve.pyc in _error_map(self, kwargs_lens, kwargs_ps)
+    301                     ra_pos, dec_pos, amp, n_points = self.PointSource.linear_response_set(kwargs_ps, kwargs_lens, k=k)
+    302                     for i in range(0, n_points):
+--> 303                         error_map_add = self.ImageNumerics.psf_error_map(ra_pos[i], dec_pos[i], amp[i], self.Data.data)
+    304                         error_map += error_map_add
+    305         return error_map
+
+C:\Users\Michelle\AppData\Roaming\Python\Python27\site-packages\lenstronomy\ImSim\Numerics\point_source_rendering.pyc in psf_error_map(self, ra_pos, dec_pos, amp, data, fix_psf_error_map)
+     60             else:
+     61                 amp_estimated = kernel_util.estimate_amp(data, x_pos[i], y_pos[i], psf_kernel)
+---> 62             error_map = image_util.add_layer2image(error_map, x_pos[i], y_pos[i], psf_error_map * (psf_kernel * amp_estimated) ** 2)
+     63         return error_map
+
+C:\Users\Michelle\AppData\Roaming\Python\Python27\site-packages\lenstronomy\Util\image_util.pyc in add_layer2image(grid2d, x_pos, y_pos, kernel, order)
+     24     shift_y = y_int - y_pos
+     25     kernel_shifted = interp.shift(kernel, [-shift_y, -shift_x], order=order)
+---> 26     return add_layer2image_int(grid2d, x_int, y_int, kernel_shifted)
+     27 
+     28 
+
+C:\Users\Michelle\AppData\Roaming\Python\Python27\site-packages\lenstronomy\Util\image_util.pyc in add_layer2image_int(grid2d, x_pos, y_pos, kernel)
+     61     kernel_re_sized = kernel[min_yk:max_yk, min_xk:max_xk]
+     62     new = grid2d.copy()
+---> 63     new[min_y:max_y, min_x:max_x] += kernel_re_sized
+     64     return new
+     65 
+
+ValueError: operands could not be broadcast together with shapes (43,41) (41,41) (43,41) 

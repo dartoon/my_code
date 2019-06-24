@@ -48,3 +48,63 @@ obj 1 result:
 obj 2 result:
     {'n_sersic': 0.5, 'host_mag': 23.679, 'R_sersic': 5.594, 'q': 0.753, 'center_x': -0.016, 'center_y': 0.428, 'host_amp': 3.695, 'phi_G': 1.56, 'amp': 0.201}
 ======================
+Result for target l106:
+point source result:
+    {'point_amp': array([805.72914205]), 'ra_image': array([-0.02594585]), 'PSF_mag': array([17.83302732]), 'dec_image': array([0.00121989])}
+obj 0 result:
+    {'n_sersic': 4.676, 'host_mag': 17.203, 'R_sersic': 2.076, 'q': 0.607, 'center_x': -0.056, 'center_y': 0.045, 'host_amp': 1440.052, 'phi_G': -0.395, 'amp': 44.08}
+obj 1 result:
+    {'n_sersic': 1.0, 'host_mag': 18.525, 'R_sersic': 7.918, 'q': 0.323, 'center_x': -0.197, 'center_y': 0.01, 'host_amp': 426.002, 'phi_G': 0.595, 'amp': 13.537}
+obj 2 result:
+    {'n_sersic': 0.5, 'host_mag': 19.316, 'R_sersic': 1.934, 'q': 0.262, 'center_x': 0.573, 'center_y': 0.421, 'host_amp': 205.518, 'phi_G': 0.493, 'amp': 34.776}
+======================
+Result for target l106:
+point source result:
+    {'point_amp': array([833.47707952]), 'ra_image': array([-0.02515209]), 'PSF_mag': array([17.79626585]), 'dec_image': array([0.00136924])}
+obj 0 result:
+    {'n_sersic': 3.531, 'host_mag': 17.089, 'R_sersic': 1.584, 'q': 0.671, 'center_x': -0.068, 'center_y': 0.056, 'host_amp': 1598.168, 'phi_G': -0.083, 'amp': 77.012}
+obj 1 result:
+    {'n_sersic': 1.0, 'host_mag': 18.542, 'R_sersic': 9.992, 'q': 0.916, 'center_x': 0.991, 'center_y': 0.173, 'host_amp': 419.339, 'phi_G': -0.598, 'amp': 10.26}
+obj 2 result:
+    {'n_sersic': 0.5, 'host_mag': 22.119, 'R_sersic': 4.632, 'q': 0.611, 'center_x': -0.175, 'center_y': 0.167, 'host_amp': 15.547, 'phi_G': 1.271, 'amp': 0.884}
+======================
+Result for target l106:
+point source result:
+    {'point_amp': array([834.43700214]), 'ra_image': array([-0.02525163]), 'PSF_mag': array([17.79501611]), 'dec_image': array([0.00195705])}
+obj 0 result:
+    {'n_sersic': 3.936, 'host_mag': 17.073, 'R_sersic': 2.026, 'q': 0.664, 'center_x': -0.064, 'center_y': 0.052, 'host_amp': 1623.129, 'phi_G': -0.119, 'amp': 52.25}
+obj 1 result:
+    {'n_sersic': 1.0, 'host_mag': 19.729, 'R_sersic': 10.682, 'q': 0.342, 'center_x': -0.119, 'center_y': 0.974, 'host_amp': 140.542, 'phi_G': -0.056, 'amp': 4.316}
+obj 2 result:
+    {'n_sersic': 0.5, 'host_mag': 19.013, 'R_sersic': 4.674, 'q': 0.333, 'center_x': -0.068, 'center_y': -0.407, 'host_amp': 271.785, 'phi_G': 0.767, 'amp': 17.843}
+======================
+Result for target l106:
+point source result:
+    {'point_amp': array([832.71367501]), 'ra_image': array([-0.0254508]), 'PSF_mag': array([17.79726076]), 'dec_image': array([0.00162844])}
+obj 0 result:
+    {'n_sersic': 3.375, 'host_mag': 17.112, 'R_sersic': 1.474, 'q': 0.668, 'center_x': -0.059, 'center_y': 0.053, 'host_amp': 1565.652, 'phi_G': -0.092, 'amp': 85.877}
+obj 1 result:
+    {'n_sersic': 1.0, 'host_mag': 19.222, 'R_sersic': 8.877, 'q': 0.617, 'center_x': -0.071, 'center_y': -0.046, 'host_amp': 224.098, 'phi_G': 0.311, 'amp': 5.717}
+obj 2 result:
+    {'n_sersic': 0.5, 'host_mag': 19.126, 'R_sersic': 4.675, 'q': 0.517, 'center_x': -0.035, 'center_y': -0.03, 'host_amp': 244.847, 'phi_G': 1.088, 'amp': 14.194}
+======================
+Result for target l106:
+point source result:
+    {'point_amp': array([876.00815041]), 'ra_image': array([-0.0266886]), 'PSF_mag': array([17.74222963]), 'dec_image': array([0.0049273])}
+obj 0 result:
+    {'n_sersic': 1.071, 'host_mag': 17.687, 'R_sersic': 0.494, 'q': 0.637, 'center_x': -0.052, 'center_y': 0.037, 'host_amp': 921.403, 'phi_G': -0.446, 'amp': 489.05}
+obj 1 result:
+    {'n_sersic': 1.0, 'host_mag': 17.868, 'R_sersic': 10.09, 'q': 0.184, 'center_x': -0.022, 'center_y': 0.14, 'host_amp': 780.315, 'phi_G': 0.389, 'amp': 28.294}
+obj 2 result:
+    {'n_sersic': 0.5, 'host_mag': 18.879, 'R_sersic': 5.946, 'q': 0.876, 'center_x': -0.05, 'center_y': 0.453, 'host_amp': 307.447, 'phi_G': -0.833, 'amp': 16.506}
+======================
+Result for target l106:
+point source result:
+    {'point_amp': array([835.38891609]), 'ra_image': array([-0.02513429]), 'PSF_mag': array([17.79377823]), 'dec_image': array([0.00121183])}
+obj 0 result:
+    {'n_sersic': 3.365, 'host_mag': 17.096, 'R_sersic': 1.489, 'q': 0.661, 'center_x': -0.065, 'center_y': 0.058, 'host_amp': 1588.778, 'phi_G': -0.079, 'amp': 86.775}
+obj 1 result:
+    {'n_sersic': 1.0, 'host_mag': 20.371, 'R_sersic': 10.211, 'q': 0.875, 'center_x': 0.092, 'center_y': -0.133, 'host_amp': 77.839, 'phi_G': 1.565, 'amp': 1.823}
+obj 2 result:
+    {'n_sersic': 0.5, 'host_mag': 18.696, 'R_sersic': 6.402, 'q': 0.693, 'center_x': 0.214, 'center_y': 0.041, 'host_amp': 363.781, 'phi_G': -0.605, 'amp': 19.577}
+======================
