@@ -1,0 +1,2 @@
+#ID, flux_g, flux_g_err, flux_r, flux_r_err, flux_i, flux_i_err, flux_z, flux_z_err, flux_y, flux_y_err
+000017.88+002612.6 -99.0 -99.0 240.935 0.571 490.951 3.09 -99.0 -99.0 -99.0 -99.0

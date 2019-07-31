@@ -19,7 +19,7 @@ To do:
 
 Update based on Lenstronomy version 0.8.2
 Including the input for kwargs_psf
-
+Debug the missing of lightModel for None-sersic case.
 """
 
 from matplotlib.pylab import plt
@@ -139,6 +139,7 @@ def fit_qso(QSO_im, psf_ave, psf_std=None, source_params=None,ps_param=None, bac
     
     if source_params == []:   #fitting image as Point source only.
         kwargs_params = {'point_source_model': ps_param}
+        lightModel = None
         kwargs_model = {'point_source_model_list': point_source_list }
         imageModel = ImageModel(data_class, psf_class, point_source_class=pointSource, kwargs_numerics=kwargs_numerics)
         kwargs_likelihood = {'check_bounds': True,  #Set the bonds, if exceed, reutrn "penalty"

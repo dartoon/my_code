@@ -15,7 +15,7 @@ import astropy.io.fits as pyfits
 from matplotlib.colors import LogNorm
 import copy
 
-ID = 'l106'
+ID = 'l106vardha'
 picklename = ID+'_fitting.pkl'
 result = pickle.load(open(picklename,'rb'))
 [best_fit,pso_fit,mcmc_fit, trans_paras] = result
@@ -50,28 +50,30 @@ mag_l, mag_m , mag_h = [ (-2.5*np.log10(flux) + zp) for flux in [flux_h, flux_m,
 print "Bulge mag :", round(mag_m,3), '-',round(mag_m-mag_l,3), '+',round(mag_h-mag_m,3)
 
 #Read the fitting result for disk, which is the second fitting component:
-Disk_id = 1
-Reff_idx = Reff_idxs[Disk_id] #The index for Reff
-if source_result[Disk_id]['n_sersic'] !=1:
-    print "Warning: the Disk's Sersic index is not n=1 !!!"
-flux_idx = Disk_id+1 #The first is QSO
-Reff_l, Reff_m, Reff_h=[np.percentile(samples_mcmc[:,Reff_idx],percent,axis=0) for percent in [16, 50, 84]]
-print "Disk", param_mcmc[Reff_idx], "(arcsec):",round(Reff_m,3), '-',round(Reff_m-Reff_l,3), '+',round(Reff_h-Reff_m,3)
-flux_l, flux_m, flux_h = [np.percentile(mcmc_new_list[:,flux_idx],percent,axis=0) for percent in [16, 50, 84]]
-mag_l, mag_m , mag_h = [ (-2.5*np.log10(flux) + zp) for flux in [flux_h, flux_m, flux_l]]
-print "Disk mag:", round(mag_m,3), '-',round(mag_m-mag_l,3), '+',round(mag_h-mag_m,3)
+if len(Reff_idxs)>1:
+    Disk_id = 1
+    Reff_idx = Reff_idxs[Disk_id] #The index for Reff
+    if source_result[Disk_id]['n_sersic'] !=1:
+        print "Warning: the Disk's Sersic index is not n=1 !!!"
+    flux_idx = Disk_id+1 #The first is QSO
+    Reff_l, Reff_m, Reff_h=[np.percentile(samples_mcmc[:,Reff_idx],percent,axis=0) for percent in [16, 50, 84]]
+    print "Disk", param_mcmc[Reff_idx], "(arcsec):",round(Reff_m,3), '-',round(Reff_m-Reff_l,3), '+',round(Reff_h-Reff_m,3)
+    flux_l, flux_m, flux_h = [np.percentile(mcmc_new_list[:,flux_idx],percent,axis=0) for percent in [16, 50, 84]]
+    mag_l, mag_m , mag_h = [ (-2.5*np.log10(flux) + zp) for flux in [flux_h, flux_m, flux_l]]
+    print "Disk mag:", round(mag_m,3), '-',round(mag_m-mag_l,3), '+',round(mag_h-mag_m,3)
 
 #Read the fitting result for disk, which is the second fitting component:
-Bar_id = 2
-Reff_idx = Reff_idxs[Bar_id] #The index for Reff
-if source_result[Bar_id]['n_sersic'] !=0.5:
-    print "Warning: the Bar's Sersic index is not n=0.5 !!!"
-flux_idx = Bar_id+1 #The first is QSO
-Reff_l, Reff_m, Reff_h=[np.percentile(samples_mcmc[:,Reff_idx],percent,axis=0) for percent in [16, 50, 84]]
-print "Bar", param_mcmc[Reff_idx], "(arcsec):",round(Reff_m,3), '-',round(Reff_m-Reff_l,3), '+',round(Reff_h-Reff_m,3)
-flux_l, flux_m, flux_h = [np.percentile(mcmc_new_list[:,flux_idx],percent,axis=0) for percent in [16, 50, 84]]
-mag_l, mag_m , mag_h = [ (-2.5*np.log10(flux) + zp) for flux in [flux_h, flux_m, flux_l]]
-print "Bar mag:", round(mag_m,3), '-',round(mag_m-mag_l,3), '+',round(mag_h-mag_m,3)
+if len(Reff_idxs)>2:    
+    Bar_id = 2
+    Reff_idx = Reff_idxs[Bar_id] #The index for Reff
+    if source_result[Bar_id]['n_sersic'] !=0.5:
+        print "Warning: the Bar's Sersic index is not n=0.5 !!!"
+    flux_idx = Bar_id+1 #The first is QSO
+    Reff_l, Reff_m, Reff_h=[np.percentile(samples_mcmc[:,Reff_idx],percent,axis=0) for percent in [16, 50, 84]]
+    print "Bar", param_mcmc[Reff_idx], "(arcsec):",round(Reff_m,3), '-',round(Reff_m-Reff_l,3), '+',round(Reff_h-Reff_m,3)
+    flux_l, flux_m, flux_h = [np.percentile(mcmc_new_list[:,flux_idx],percent,axis=0) for percent in [16, 50, 84]]
+    mag_l, mag_m , mag_h = [ (-2.5*np.log10(flux) + zp) for flux in [flux_h, flux_m, flux_l]]
+    print "Bar mag:", round(mag_m,3), '-',round(mag_m-mag_l,3), '+',round(mag_h-mag_m,3)
 
 #%% To save the result fits file:
 #[0] original image
@@ -82,7 +84,7 @@ print "Bar mag:", round(mag_m,3), '-',round(mag_m-mag_l,3), '+',round(mag_h-mag_
 #[5] bar model (if present)
 #[6] residual (original - total model)
 center_QSO = np.array([2053, 2475])   #!!! The is the position array for the QSO that introduced in 0_cutout.py
-fitsFile = pyfits.open(ID+"_sci.fits")
+fitsFile = pyfits.open('l106'+"_sci.fits")
 file_header = copy.deepcopy(fitsFile[0].header)
 
 flux_hdulist = pyfits.open(ID+'_flux_list.fits')  #includes [agn_image,image_ps, extended_source, error_map, QSO_msk]
@@ -137,6 +139,8 @@ flux_hdulist = pyfits.open(ID+'_flux_list.fits')  # includes [agn_image,image_ps
 flux_list = [flux_hdulist[i].data for i in range(4)]
 QSO_msk = flux_hdulist[4].data
 label = ['data', 'QSO', 'extended sources', 'model', 'normalized residual']
+host_comp = [image_host[i] for i in range(len(image_host))]
+host_comp = ['bulge', 'disk', 'bar']
 fig = total_compare(label_list = label, flux_list = flux_list, target_ID = ID, pix_sz=pix_sz, zp = zp,
-                    plot_compare = False, msk_image = QSO_msk, host_comp_name=['bulge', 'disk', 'bar'], host_comp=[image_host[0], image_host[1], image_host[2]])
+                    plot_compare = False, msk_image = QSO_msk, host_comp_name=host_comp, host_comp=host_comp)
 plt.show()

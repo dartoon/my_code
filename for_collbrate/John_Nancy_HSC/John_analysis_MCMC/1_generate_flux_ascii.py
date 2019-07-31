@@ -29,11 +29,11 @@ folder = 'result/'
 QSO_id_address = glob.glob(folder + '*_HSC-R.pkl')
 QSO_id_list = [QSO_id_address[i].split('_')[-2] for i in range(len(QSO_id_address))]
 
-filename_ascii = folder + '/ascii_mag_error.txt'
+filename_ascii = folder + '/ascii_flux_error.txt'
 if_file = glob.glob(filename_ascii)   
 if if_file == []:
     ascii_err =  open(filename_ascii,'w') 
-    ascii_err.write("#ID, mag_g, mag_g_err, mag_r, mag_r_err, mag_i, mag_i_err, mag_z, mag_z_err, mag_y, mag_y_err\
+    ascii_err.write("#ID, flux_g, flux_g_err, flux_r, flux_r_err, flux_i, flux_i_err, flux_z, flux_z_err, flux_y, flux_y_err\
 \n")
     ascii_err.close()
 ascii_err = open(filename_ascii,"r+")
@@ -58,9 +58,9 @@ for QSO_id in QSO_id_list:
             v_m=np.percentile(mcmc_new_list[:,idx],50,axis=0)
             v_h=np.percentile(mcmc_new_list[:,idx],84,axis=0)
             #print labels_new[idx], ":", v_l, v_m, v_h
-            m_l = -2.5 * np.log10(v_h) + zp
-            m_m = -2.5 * np.log10(v_m) + zp
-            m_h = -2.5 * np.log10(v_l) + zp
+            m_l = v_l #-2.5 * np.log10(v_h) + zp
+            m_m = v_m #-2.5 * np.log10(v_m) + zp
+            m_h = v_h #-2.5 * np.log10(v_l) + zp
             m_err = ((m_h-m_m)**2 + (m_m-m_l)**2)**0.5
         if band == 'G':
             ascii_err.write("{0} {1} {2}".format(QSO_id, round(m_m,3), round(m_err,3)))
