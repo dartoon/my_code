@@ -1,0 +1,2 @@
+#ID, RA, DEC, zp, pixel_scale, galaxy_x, galaxy_y, galaxy_flux, galaxy_mag, Reff(arcsec), n_sersic, galaxy_q, Kron_radius(arcsec), galaxy_Kron_flux, galaxy_Kron_mag, concentration, reduced_Chisq , local_bkg_light(pixel/flux)
+5694_HSC-I 150.193497 2.243126 27.0 0.168 -0.196 -0.068 415.509 20.454 1.431 2.537 0.577 3.0 375.676 20.563 2.657 4.34548984777 -0.00226

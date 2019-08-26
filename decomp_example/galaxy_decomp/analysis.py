@@ -70,7 +70,7 @@ source_result, image_host, error_map, reduced_Chisq=fit_galaxy(galaxy_img, psf_a
                                                       pix_sz = pix_scale, no_MCMC = (run_MCMC==False),
                                                       galaxy_std =galaxy_std, tag=tag, deep_seed= deep_seed,
                                                       pltshow=pltshow, return_Chisq=True,  corner_plot=False, 
-                                                      dump_result=run_MCMC, flux_corner_plot = True)
+                                                      dump_result=run_MCMC, flux_corner_plot = True, pso_diag=True)
 if pltshow == 0:
     plot_compare=False
     fits_plot =False

@@ -1,0 +1,4 @@
+#ID, RA, DEC, zp, pixel_scale, galaxy_x, galaxy_y, galaxy_flux, galaxy_mag, Reff(arcsec), n_sersic, galaxy_q, Kron_radius(arcsec), galaxy_Kron_flux, galaxy_Kron_mag, concentration, reduced_Chisq , local_bkg_light(pixel/flux)
+18184_HSC-I 150.121811 2.394572 27.0 0.168 -0.027 -0.093 191.522 21.294 0.855 2.531 0.739 3.0 177.685 21.376 3.167 1.26362881152 -0.00284
+18184_HSC-I 150.121811 2.394572 27.0 0.168 -0.027 -0.091 194.433 21.278 0.883 2.619 0.737 3.0 179.787 21.363 3.266 1.25881585689 -0.00284
+18184_HSC-I 150.121811 2.394572 27.0 0.168 -0.028 -0.091 195.427 21.273 0.896 2.695 0.738 3.0 179.964 21.362 3.266 1.26156212674 -0.00284

@@ -1,0 +1,8 @@
+Result for target l20:
+point source result:
+    [{'point_amp': array([2120.4169845]), 'ra_image': array([0.02686037]), 'PSF_mag': array([16.79394681]), 'dec_image': array([-0.03998846])}]
+obj 0 result:
+    {'n_sersic': 2.957, 'host_mag': 15.848, 'R_sersic': 2.247, 'q': 0.634, 'center_x': 0.04, 'center_y': -0.036, 'host_amp': 5068.332, 'phi_G': 0.551, 'amp': 82.428}
+obj 1 result:
+    {'n_sersic': 5.8, 'host_mag': 15.443, 'R_sersic': 7.761, 'q': 0.707, 'center_x': 2.241, 'center_y': -11.265, 'host_amp': 7355.456, 'phi_G': 1.197, 'amp': 9.965}
+======================

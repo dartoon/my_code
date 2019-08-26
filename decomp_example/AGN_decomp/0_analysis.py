@@ -31,7 +31,7 @@ deep_seed = False  #Set as True to put more seed and steps to fit.
 pltshow = 1 #Note that setting plt.ion() in line27, the plot won't show anymore if running in terminal.
 pix_scale = 0.0642 
 fixcenter = False
-run_MCMC = False
+run_MCMC = True
 zp=26.4524
 
 psf, QSO_img, QSO_std = pyfits.getdata('PSF.fits'),  pyfits.getdata('QSO_im.fits'),  pyfits.getdata('QSO_err.fits')
@@ -100,7 +100,7 @@ source_result, ps_result, image_ps, image_host, error_map=fit_qso(QSO_img, psf_a
                                                                   source_params=source_params, QSO_msk = QSO_msk, fixcenter=fixcenter,
                                                                   pix_sz = pix_scale, no_MCMC = (run_MCMC==False),
                                                                   QSO_std =QSO_std, tag=tag, deep_seed= deep_seed, pltshow=pltshow,
-                                                                  corner_plot=False, flux_ratio_plot=True, dump_result=run_MCMC)
+                                                                  corner_plot=False, flux_ratio_plot=True, dump_result=run_MCMC, pso_diag =True)
 
 if pltshow == 0:
     plot_compare=False
@@ -112,5 +112,6 @@ else:
 result = transfer_to_result(data=QSO_img, pix_sz = pix_scale,
                             source_result=source_result, ps_result=ps_result, image_ps=image_ps, image_host=image_host, error_map=error_map,
                             zp=zp, fixcenter=fixcenter,ID='Example', QSO_msk = QSO_msk, tag=tag, plot_compare = plot_compare)
+
 
 #%%
