@@ -26,14 +26,14 @@ cmap = matplotlib.cm.get_cmap('viridis')
 from flux_profile import total_compare
 
 ID = 'l106'
-pltshow = 0  #Change to 1 to show the plot while fitting.
+pltshow = 1  #Change to 1 to show the plot while fitting.
 
 #Input the fitting ingredients:
 agn_image = pyfits.getdata('{0}_cutout.fits'.format(ID))
 agn_stdd = pyfits.getdata('{0}_stdd.fits'.format(ID))
 
 #Activate this part if one need to cut to a smaller size such as 81:
-fit_frame_size = 81
+fit_frame_size = 301
 ct = (len(agn_image)-fit_frame_size)/2     # If want to cut to 81, agn_image[ct:-ct,ct:-ct]
 agn_image = agn_image[ct:-ct,ct:-ct]
 agn_stdd = agn_stdd[ct:-ct,ct:-ct]
@@ -61,7 +61,7 @@ else:
 # Creat the QSO mask
 # =============================================================================
 from mask_objects import mask_obj
-_ , _, deblend_sources = mask_obj(agn_image, snr=1, npixels=200, return_deblend = True)
+_ , _, deblend_sources = mask_obj(agn_image, snr=1., npixels=200, return_deblend = True)
 
 print "deblend image to find the ID for the Objects for the mask:"
 plt.imshow(deblend_sources, origin='lower',cmap=deblend_sources.cmap(random_state=12345))

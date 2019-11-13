@@ -12,14 +12,17 @@ Imporve the way for to pickle.dump
 
 Update based on Lenstronomy version 0.8.1
 Including:
-    The lenstronomy package be universal to overall function
-        
+    The lenstronomy package be universal to overall function     
 To do:
     1. PSF std should be put to the PSF class.
 
 Update based on Lenstronomy version 0.8.2
 Including the input for kwargs_psf
+Debug the missing of lightModel for None-sersic case.
 
+Update based on Lenstronomy version 0.9.1
+Notes:
+    package dynesty would be needed. 
 """
 
 from matplotlib.pylab import plt
@@ -36,7 +39,7 @@ from lenstronomy.ImSim.image_model import ImageModel
 from lenstronomy.LightModel.light_model import LightModel
 from lenstronomy.Workflow.fitting_sequence import FittingSequence
 from lenstronomy.ImSim.image_linear_solve import ImageLinearFit
-from lenstronomy.Plots.output_plots import LensModelPlot  
+from lenstronomy.Plots.output_plots import ModelPlot
 import lenstronomy.Plots.output_plots as out_plot  
 from lenstronomy.Sampling.parameters import Param
 
@@ -139,6 +142,7 @@ def fit_qso(QSO_im, psf_ave, psf_std=None, source_params=None,ps_param=None, bac
     
     if source_params == []:   #fitting image as Point source only.
         kwargs_params = {'point_source_model': ps_param}
+        lightModel = None
         kwargs_model = {'point_source_model_list': point_source_list }
         imageModel = ImageModel(data_class, psf_class, point_source_class=pointSource, kwargs_numerics=kwargs_numerics)
         kwargs_likelihood = {'check_bounds': True,  #Set the bonds, if exceed, reutrn "penalty"
@@ -171,7 +175,7 @@ def fit_qso(QSO_im, psf_ave, psf_std=None, source_params=None,ps_param=None, bac
     image_band = [kwargs_data, kwargs_psf, kwargs_numerics]
     multi_band_list = [image_band]
 
-    kwargs_data_joint = {'multi_band_list': multi_band_list, 'image_type': 'multi-linear'}  # 'single-band', 'multi-linear', 'joint-linear'
+    kwargs_data_joint = {'multi_band_list': multi_band_list, 'multi_band_type': 'multi-linear'}  # 'single-band', 'multi-linear', 'joint-linear'
     fitting_seq = FittingSequence(kwargs_data_joint, kwargs_model, kwargs_constraints, kwargs_likelihood, kwargs_params)
     
     if deep_seed == False:
@@ -189,8 +193,13 @@ def fit_qso(QSO_im, psf_ave, psf_std=None, source_params=None,ps_param=None, bac
                                ]        
 
     start_time = time.time()
-    chain_list, param_list, samples_mcmc, param_mcmc, dist_mcmc = fitting_seq.fit_sequence(fitting_kwargs_list)
-    lens_result, source_result, lens_light_result, ps_result, cosmo_temp = fitting_seq.best_fit()
+    chain_list = fitting_seq.fit_sequence(fitting_kwargs_list)
+    kwargs_result = fitting_seq.best_fit()
+    ps_result = kwargs_result['kwargs_ps']
+    source_result = kwargs_result['kwargs_source']
+    if no_MCMC == False:
+        sampler_type, samples_mcmc, param_mcmc, dist_mcmc  = chain_list[1]    
+    
     end_time = time.time()
     print(end_time - start_time, 'total time needed for computation')
     print('============ CONGRATULATION, YOUR JOB WAS SUCCESSFUL ================ ')
@@ -200,37 +209,35 @@ def fit_qso(QSO_im, psf_ave, psf_std=None, source_params=None,ps_param=None, bac
                                     kwargs_numerics=kwargs_numerics)    
     image_reconstructed, error_map, _, _ = imageLinearFit.image_linear_solve(kwargs_source=source_result, kwargs_ps=ps_result)
     # this is the linear inversion. The kwargs will be updated afterwards
-    lensPlot = LensModelPlot(kwargs_data, kwargs_psf, kwargs_numerics, kwargs_model, lens_result, source_result,
-                             lens_light_result, ps_result, arrow_size=0.02, cmap_string="gist_heat", likelihood_mask=QSO_msk)
+    modelPlot = ModelPlot(multi_band_list, kwargs_model, kwargs_result,
+                          arrow_size=0.02, cmap_string="gist_heat", likelihood_mask_list=[QSO_msk])
     image_host = []  #!!! The linear_solver before and after LensModelPlot could have different result for very faint sources.
     for i in range(len(source_result)):
         image_host.append(imageModel.source_surface_brightness(source_result, de_lensed=True,unconvolved=False,k=i))
     image_ps = imageModel.point_source(ps_result)
     
     if pso_diag == True:
-        for i in range(len(chain_list)):
-            if len(param_list[i]) > 0:
-                f, axes = out_plot.plot_chain(chain_list[i], param_list[i])
-            if pltshow == 0:
-                plt.close()
-            else:
-                plt.show()
+        f, axes = out_plot.plot_chain_list(chain_list,0)
+        if pltshow == 0:
+            plt.close()
+        else:
+            plt.show()
 
     # let's plot the output of the PSO minimizer
-    reduced_Chisq =  lensPlot._reduced_x2
+    reduced_Chisq =  imageLinearFit.reduced_chi2(image_reconstructed, error_map)
     if image_plot:
         f, axes = plt.subplots(3, 3, figsize=(16, 16), sharex=False, sharey=False)
-        lensPlot.data_plot(ax=axes[0,0], text="Data")
-        lensPlot.model_plot(ax=axes[0,1])
-        lensPlot.normalized_residual_plot(ax=axes[0,2], v_min=-6, v_max=6)
+        modelPlot.data_plot(ax=axes[0,0], text="Data")
+        modelPlot.model_plot(ax=axes[0,1])
+        modelPlot.normalized_residual_plot(ax=axes[0,2], v_min=-6, v_max=6)
         
-        lensPlot.decomposition_plot(ax=axes[1,0], text='Host galaxy', source_add=True, unconvolved=True)
-        lensPlot.decomposition_plot(ax=axes[1,1], text='Host galaxy convolved', source_add=True)
-        lensPlot.decomposition_plot(ax=axes[1,2], text='All components convolved', source_add=True, lens_light_add=True, point_source_add=True)
+        modelPlot.decomposition_plot(ax=axes[1,0], text='Host galaxy', source_add=True, unconvolved=True)
+        modelPlot.decomposition_plot(ax=axes[1,1], text='Host galaxy convolved', source_add=True)
+        modelPlot.decomposition_plot(ax=axes[1,2], text='All components convolved', source_add=True, lens_light_add=True, point_source_add=True)
         
-        lensPlot.subtract_from_data_plot(ax=axes[2,0], text='Data - Point Source', point_source_add=True)
-        lensPlot.subtract_from_data_plot(ax=axes[2,1], text='Data - host galaxy', source_add=True)
-        lensPlot.subtract_from_data_plot(ax=axes[2,2], text='Data - host galaxy - Point Source', source_add=True, point_source_add=True)
+        modelPlot.subtract_from_data_plot(ax=axes[2,0], text='Data - Point Source', point_source_add=True)
+        modelPlot.subtract_from_data_plot(ax=axes[2,1], text='Data - host galaxy', source_add=True)
+        modelPlot.subtract_from_data_plot(ax=axes[2,2], text='Data - host galaxy - Point Source', source_add=True, point_source_add=True)
         
         f.tight_layout()
         #f.subplots_adjust(left=None, bottom=None, right=None, top=None, wspace=0., hspace=0.05)
@@ -258,7 +265,9 @@ def fit_qso(QSO_im, psf_ave, psf_std=None, source_params=None,ps_param=None, bac
         mcmc_new_list = []
         labels_new = ["Quasar flux"] +  ["host{0} flux".format(i) for i in range(len(source_params[0]))]
         for i in range(len(samples_mcmc)):
-            kwargs_lens_out, kwargs_light_source_out, kwargs_light_lens_out, kwargs_ps_out, kwargs_cosmo = param.args2kwargs(samples_mcmc[i])
+            kwargs_out = param.args2kwargs(samples_mcmc[i])
+            kwargs_light_source_out = kwargs_out['kwargs_source']
+            kwargs_ps_out =  kwargs_out['kwargs_ps']
             image_reconstructed, _, _, _ = imageLinearFit.image_linear_solve(kwargs_source=kwargs_light_source_out, kwargs_ps=kwargs_ps_out)
             image_ps = imageModel.point_source(kwargs_ps_out)
             flux_quasar = np.sum(image_ps)
@@ -287,9 +296,10 @@ def fit_qso(QSO_im, psf_ave, psf_std=None, source_params=None,ps_param=None, bac
             trans_paras = []
         picklename= tag + '.pkl'
         best_fit = [source_result, image_host, ps_result, image_ps,'source_result, image_host, ps_result, image_ps']
-        pso_fit = [chain_list, param_list, 'chain_list, param_list']
-        mcmc_fit = [samples_mcmc, param_mcmc, dist_mcmc, 'samples_mcmc, param_mcmc, dist_mcmc']
-        pickle.dump([best_fit,pso_fit,mcmc_fit, trans_paras], open(picklename, 'wb'))
+#        pso_fit = [chain_list, param_list, 'chain_list, param_list']
+#        mcmc_fit = [samples_mcmc, param_mcmc, dist_mcmc, 'samples_mcmc, param_mcmc, dist_mcmc']
+        chain_list_result = [chain_list, 'chain_list']
+        pickle.dump([best_fit, chain_list_result, trans_paras], open(picklename, 'wb'))
     if return_Chisq == False:
         return source_result, ps_result, image_ps, image_host, noise_map
     elif return_Chisq == True:
@@ -397,7 +407,7 @@ def fit_galaxy(galaxy_im, psf_ave, psf_std=None, source_params=None, background_
     image_band = [kwargs_data, kwargs_psf, kwargs_numerics]
     multi_band_list = [image_band]
     
-    kwargs_data_joint = {'multi_band_list': multi_band_list, 'image_type': 'multi-linear'}  # 'single-band', 'multi-linear', 'joint-linear'
+    kwargs_data_joint = {'multi_band_list': multi_band_list, 'multi_band_type': 'multi-linear'}  # 'single-band', 'multi-linear', 'joint-linear'
     fitting_seq = FittingSequence(kwargs_data_joint, kwargs_model, kwargs_constraints, kwargs_likelihood, kwargs_params)
     
     if deep_seed == False:
@@ -420,8 +430,16 @@ def fit_galaxy(galaxy_im, psf_ave, psf_std=None, source_params=None, background_
                                ]        
     
     start_time = time.time()
-    chain_list, param_list, samples_mcmc, param_mcmc, dist_mcmc = fitting_seq.fit_sequence(fitting_kwargs_list)
-    lens_result, source_result, lens_light_result, ps_result, cosmo_temp = fitting_seq.best_fit()
+    chain_list = fitting_seq.fit_sequence(fitting_kwargs_list)
+    kwargs_result = fitting_seq.best_fit()
+    ps_result = kwargs_result['kwargs_ps']
+    source_result = kwargs_result['kwargs_source']
+    
+    if no_MCMC == False:
+        sampler_type, samples_mcmc, param_mcmc, dist_mcmc  = chain_list[1]      
+    
+#    chain_list, param_list, samples_mcmc, param_mcmc, dist_mcmc = fitting_seq.fit_sequence(fitting_kwargs_list)
+#    lens_result, source_result, lens_light_result, ps_result, cosmo_temp = fitting_seq.best_fit()
     end_time = time.time()
     print(end_time - start_time, 'total time needed for computation')
     print('============ CONGRATULATION, YOUR JOB WAS SUCCESSFUL ================ ')
@@ -439,23 +457,22 @@ def fit_galaxy(galaxy_im, psf_ave, psf_std=None, source_params=None, background_
 #        image_host.append(image_host_i)  
         
     # let's plot the output of the PSO minimizer
-    lensPlot = LensModelPlot(kwargs_data, kwargs_psf, kwargs_numerics, kwargs_model, lens_result, source_result,
-                             lens_light_result, ps_result, arrow_size=0.02, cmap_string="gist_heat", likelihood_mask=galaxy_msk)
+    modelPlot = ModelPlot(multi_band_list, kwargs_model, kwargs_result,
+                          arrow_size=0.02, cmap_string="gist_heat", likelihood_mask_list=[galaxy_msk])  
+    
     if pso_diag == True:
-        for i in range(len(chain_list)):
-            if len(param_list[i]) > 0:
-                f, axes = out_plot.plot_chain(chain_list[i], param_list[i])    
-            if pltshow == 0:
-                plt.close()
-            else:
-                plt.show()  
+        f, axes = out_plot.plot_chain_list(chain_list,0)
+        if pltshow == 0:
+            plt.close()
+        else:
+            plt.show()
                 
-    reduced_Chisq =  lensPlot._reduced_x2
+    reduced_Chisq =  imageLinearFit.reduced_chi2(image_reconstructed, error_map)
     if image_plot:
         f, axes = plt.subplots(1, 3, figsize=(16, 16), sharex=False, sharey=False)
-        lensPlot.data_plot(ax=axes[0])
-        lensPlot.model_plot(ax=axes[1])
-        lensPlot.normalized_residual_plot(ax=axes[2], v_min=-6, v_max=6)
+        modelPlot.data_plot(ax=axes[0])
+        modelPlot.model_plot(ax=axes[1])
+        modelPlot.normalized_residual_plot(ax=axes[2], v_min=-6, v_max=6)
         f.tight_layout()
         #f.subplots_adjust(left=None, bottom=None, right=None, top=None, wspace=0., hspace=0.05)
         if tag is not None:
@@ -487,7 +504,9 @@ def fit_galaxy(galaxy_im, psf_ave, psf_std=None, source_params=None, background_
         mcmc_new_list = []
         labels_new = ["host{0} flux".format(i) for i in range(len(source_params[0]))]
         for i in range(len(samples_mcmc)):
-            kwargs_lens_out, kwargs_light_source_out, kwargs_light_lens_out, kwargs_ps_out, kwargs_cosmo = param.args2kwargs(samples_mcmc[i])
+            kwargs_out = param.args2kwargs(samples_mcmc[i])
+            kwargs_light_source_out = kwargs_out['kwargs_source']
+            kwargs_ps_out =  kwargs_out['kwargs_ps']
             image_reconstructed, _, _, _ = imageLinearFit.image_linear_solve(kwargs_source=kwargs_light_source_out, kwargs_ps=kwargs_ps_out)
             fluxs = []
             for j in range(len(source_params[0])):
@@ -516,11 +535,11 @@ def fit_galaxy(galaxy_im, psf_ave, psf_std=None, source_params=None, background_
             trans_paras = []
         picklename= tag + '.pkl'
         best_fit = [source_result, image_host, 'source_result, image_host']
-        pso_fit = [chain_list, param_list, 'chain_list, param_list']
-        mcmc_fit = [samples_mcmc, param_mcmc, dist_mcmc, 'samples_mcmc, param_mcmc, dist_mcmc']
-        pickle.dump([best_fit, pso_fit, mcmc_fit, trans_paras], open(picklename, 'wb'))
+#        pso_fit = [chain_list, param_list, 'chain_list, param_list']
+#        mcmc_fit = [samples_mcmc, param_mcmc, dist_mcmc, 'samples_mcmc, param_mcmc, dist_mcmc']
+        chain_list_result = [chain_list, 'chain_list']
+        pickle.dump([best_fit, chain_list_result, trans_paras], open(picklename, 'wb'))
         
-               
     if return_Chisq == False:
         return source_result, image_host, noise_map
     elif return_Chisq == True:
@@ -675,7 +694,7 @@ def fit_qso_multiband(QSO_im_list, psf_ave_list, psf_std_list=None, source_param
 #    mpi = False  # MPI possible, but not supported through that notebook.
     # The Params for the fitting. kwargs_init: initial input. kwargs_sigma: The parameter uncertainty. kwargs_fixed: fixed parameters;
     #kwargs_lower,kwargs_upper: Lower and upper limits.
-    kwargs_data_joint = {'multi_band_list': multi_band_list, 'image_type': 'multi-linear'}  # 'single-band', 'multi-linear', 'joint-linear'
+    kwargs_data_joint = {'multi_band_list': multi_band_list, 'multi_band_type': 'multi-linear'}  # 'single-band', 'multi-linear', 'joint-linear'
     fitting_seq = FittingSequence(kwargs_data_joint, kwargs_model, kwargs_constraints, kwargs_likelihood, kwargs_params)
     
     if deep_seed == False:
@@ -718,7 +737,7 @@ def fit_qso_multiband(QSO_im_list, psf_ave_list, psf_std_list=None, source_param
 #        imageModel_k = ImageModel(data_class_k, psf_class_k, source_model_class=lightModel,
 #                                point_source_class=pointSource, kwargs_numerics=kwargs_numerics_list[k])
         imageModel_k = imageModel_list[k]
-        lensPlot = LensModelPlot(kwargs_data_list[k], kwargs_psf_list[k], kwargs_numerics_list[k], kwargs_model, lens_result, source_result,
+        modelPlot = ModelPlot(multi_band_list[k], kwargs_model, lens_result, source_result,
                                  lens_light_result, ps_result, arrow_size=0.02, cmap_string="gist_heat", likelihood_mask=QSO_im_list[k])
         print "source_result", 'for', "k", source_result
         image_host_k = []
@@ -739,17 +758,17 @@ def fit_qso_multiband(QSO_im_list, psf_ave_list, psf_std_list=None, source_param
             shift_RADEC_list.append([0,0])
         if image_plot:
             f, axes = plt.subplots(3, 3, figsize=(16, 16), sharex=False, sharey=False)
-            lensPlot.data_plot(ax=axes[0,0], text="Data")
-            lensPlot.model_plot(ax=axes[0,1])
-            lensPlot.normalized_residual_plot(ax=axes[0,2], v_min=-6, v_max=6)
+            modelPlot.data_plot(ax=axes[0,0], text="Data")
+            modelPlot.model_plot(ax=axes[0,1])
+            modelPlot.normalized_residual_plot(ax=axes[0,2], v_min=-6, v_max=6)
             
-            lensPlot.decomposition_plot(ax=axes[1,0], text='Host galaxy', source_add=True, unconvolved=True)
-            lensPlot.decomposition_plot(ax=axes[1,1], text='Host galaxy convolved', source_add=True)
-            lensPlot.decomposition_plot(ax=axes[1,2], text='All components convolved', source_add=True, lens_light_add=True, point_source_add=True)
+            modelPlot.decomposition_plot(ax=axes[1,0], text='Host galaxy', source_add=True, unconvolved=True)
+            modelPlot.decomposition_plot(ax=axes[1,1], text='Host galaxy convolved', source_add=True)
+            modelPlot.decomposition_plot(ax=axes[1,2], text='All components convolved', source_add=True, lens_light_add=True, point_source_add=True)
             
-            lensPlot.subtract_from_data_plot(ax=axes[2,0], text='Data - Point Source', point_source_add=True)
-            lensPlot.subtract_from_data_plot(ax=axes[2,1], text='Data - host galaxy', source_add=True)
-            lensPlot.subtract_from_data_plot(ax=axes[2,2], text='Data - host galaxy - Point Source', source_add=True, point_source_add=True)
+            modelPlot.subtract_from_data_plot(ax=axes[2,0], text='Data - Point Source', point_source_add=True)
+            modelPlot.subtract_from_data_plot(ax=axes[2,1], text='Data - host galaxy', source_add=True)
+            modelPlot.subtract_from_data_plot(ax=axes[2,2], text='Data - host galaxy - Point Source', source_add=True, point_source_add=True)
             f.tight_layout()
             if tag is not None:
                 f.savefig('{0}_fitted_image_band{1}.pdf'.format(tag,new_band_seq[k]))

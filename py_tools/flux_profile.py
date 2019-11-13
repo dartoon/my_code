@@ -458,7 +458,7 @@ def profiles_compare(prf_list, scal_list, prf_name_list = None, gridspace = None
         elif len(prf_name_list)==len(prf_list) and y_log == False:
             plt.plot(r_grids, r_SB, 'x-', label=prf_name_list[i])
         elif len(prf_name_list)==len(prf_list) and y_log == True:
-            plt.plot(np.log10(r_grids), r_SB, 'x-', label=prf_name_list[i])
+            plt.plot(r_grids, np.log10(r_SB), 'x-', label=prf_name_list[i])
             plt.ylim(0, 0.5) 
         else:
             raise ValueError("The profile name is not in right length")

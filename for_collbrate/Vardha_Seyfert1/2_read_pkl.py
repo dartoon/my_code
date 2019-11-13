@@ -15,8 +15,8 @@ import astropy.io.fits as pyfits
 from matplotlib.colors import LogNorm
 import copy
 
-ID = 'l106vardha'
-picklename = ID+'_fitting.pkl'
+ID = 'l10'
+picklename = ID+'_sersic.pkl'
 result = pickle.load(open(picklename,'rb'))
 [best_fit,pso_fit,mcmc_fit, trans_paras] = result
 

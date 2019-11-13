@@ -41,14 +41,20 @@ deep_seed = False  #Set as True to put more seed and steps to fit.
 fix_on_I_band = 1 # input("Do you want, based on I band's inference, fix the other band's Reff and n???\n input 1 means yes, input others means no. \n")
 pltshow = 1 #Note that setting plt.ion() in line27, the plot won't show anymore if running in terminal.
 sub_bkg = True
-fit_frame_size = 71
+fit_frame_size = 51
 image_folder = '/Users/Dartoon/Astro/for_collbrate/for_John_ascii_folder/images_directory/'
-run_MCMC = True
+run_MCMC = False
 
 #QSO_id = sys.argv[1]
 #QSO_RA = float(sys.argv[2])
 #QSO_DEC = float(sys.argv[3])
 ##print isinstance(QSO_id,str), isinstance(QSO_RA,float), isinstance(QSO_DEC,float)
+
+
+#QSO_id = "092554.15+043159.7"
+#QSO_RA = 141.475631714
+#QSO_DEC = 4.53327322006 
+
 
 QSO_id = "000017.88+002612.6"
 QSO_RA = 0.07452999800443649
@@ -89,7 +95,7 @@ if if_file == []:
 band_run_list = [2,0,1,3,4]  #run I band first
 run_list = copy.deepcopy(band_run_list)
 band_seq = ['G', 'R', 'I', 'Z', 'Y']
-filename_list = [QSO_id+'_HSC-{0}.fits'.format(band_seq[i]) for i in range(5)]
+filename_list = [QSO_id+'_HSC-{0}.fits'.format(band_seq[i]) for i in range(len(band_seq))]
 QSO_im_list, err_map_list, QSO_bkg_list, PSF_list=[], [], [], []
 zp_list = []
 qso_center_list, frm_c_RA_DEC_list = [], []
@@ -159,7 +165,7 @@ for k in range(len(band_seq)):
         QSO_std_l.append([])            
 
 for k in run_list:
-    objs, Q_index = detect_obj(QSO_img_l[k],pltshow = pltshow)
+    objs, Q_index = detect_obj(QSO_img_l[k], pltshow = pltshow)
     qso_info = objs[Q_index]
     obj_temp = [objs[i] for i in range(len(objs)) if i != Q_index]
     if k == run_list[0]:
@@ -174,6 +180,10 @@ for k in run_list:
             if count == 0:
                 obj.append(obj_temp[i])
     print "the number of nearby objs:", len(obj)
+
+#obj.append(((1.076683804036059, 15.578274102161252),
+#  1.4221242256014077,
+#  0.6782126709100431))
 
 data_host_list = []
 Iband_inf = []
