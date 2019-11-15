@@ -19,7 +19,6 @@ cmap = matplotlib.cm.get_cmap('viridis')
 
 filename = 'test2_select-eff_correct_sigmalogdiv3_20.txt'
 #filename = 'few_tests/right_answer_test1_conv_lognorm_20.txt'
-#pre_result = np.loadtxt('test3_result/test3_mode1_level20_npy.txt')
 #bool_1 = (pre_result[:,1]>2.7)
 #bool_2 = (pre_result[:,3]>95)
 #bools = np.invert(bool_1+bool_2)

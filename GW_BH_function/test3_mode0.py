@@ -20,7 +20,6 @@ a0, a1, mbh_max, mbh_min = 2.35, 0.1, 80., 5.     #mode0
 
 #filename = 'test3_sim_a_{0}_max_{1}_min_{2}'.format(round(a,2), round(mbh_max,1), round(mbh_min,1))
 #if_file = glob.glob(filename)  
-!
 seed = 1
 np.random.seed(seed)
 test = gene_BHBH(h0=70)

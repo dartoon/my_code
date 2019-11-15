@@ -38,7 +38,7 @@ fig = corner.corner(numbers, labels=[r"$\alpha_0$", r"$\alpha_1$", "M$_{max}$", 
                     quantiles=[0.16, 0.5, 0.84],show_titles=True, smooth = 0.7,
                     title_kwargs={"fontsize": 15}, label_kwargs = {"fontsize": 25},
 #                    plot_datapoints=True,smooth=1.0,smooth1d=1.0,
-#                    levels=1.0 - np.exp(-0.5 * np.array([1.,2.]) ** 2),
+                    levels=1.0 - np.exp(-0.5 * np.array([1.,2.]) ** 2),
                     title_fmt='.2f')
 for ax in fig.get_axes():
       ax.tick_params(axis='both', labelsize=20)

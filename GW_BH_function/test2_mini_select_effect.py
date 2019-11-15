@@ -8,6 +8,8 @@ Created on Mon Nov 26 21:57:36 2018
 Test if whether the likelihood would recover the para
 if all the m1 are measureable.
 With error bar
+
+The script for run scenario0
 """
 
 
@@ -31,7 +33,8 @@ import random
 import scipy.optimize as op
 import time
 
-a, mbh_max, mbh_min = 2.35, 80., 5.
+#a, mbh_max, mbh_min = 2.35, 80., 5.
+a, mbh_max, mbh_min = 1.6, 50., 5.
 filename = 'sim_a_{0}_max_{1}_min_{2}'.format(round(a,2), round(mbh_max,1), round(mbh_min,1))
 if_file = glob.glob(filename)  
 test = gene_BHBH(h0=70)
@@ -76,7 +79,7 @@ from cal_likelihood import random_Theta  #The prior given dl and chirpmass, no e
     
 def posterior(para, m1_obs,m_noise_level,sf_factor):
     a,mbh_max,mbh_min  = para
-    if 1.1 < a < 3 and 50 < mbh_max < 100 and 2 < mbh_min < 8:
+    if 1.1 < a < 3 and 30 < mbh_max < 80 and 2 < mbh_min < 8:   #!!!
         x = np.logspace(np.log10(m1_obs.min()/1.1), np.log10(m1_obs.max()*1.1),300)
         y = cov_twofun(x, a=a, mbh_max=mbh_max, mbh_min=mbh_min,sigma=m_noise_level)
         f = interpolate.interp1d(x, y)
@@ -91,33 +94,34 @@ def posterior(para, m1_obs,m_noise_level,sf_factor):
         return np.inf       
 #    even
 
-def each_likeli(para, m1_obs,m1_sig,prior):
-    a,mbh_max,mbh_min  = para
-    if 1.1 < a < 3 and 50 < mbh_max < 100 and 2 < mbh_min < 8:
-        x = np.logspace(np.log10(m1_obs.min()/np.exp(m_noise_level)**5/1.1), np.log10(m1_obs.max()*np.exp(m_noise_level)**5*1.1),300)
-        y = cov_twofun(x, a=a, mbh_max=mbh_max, mbh_min=mbh_min,sigma=m_noise_level)
-        f = interpolate.interp1d(x, y)
-#        poss_m1_i = likelihood(m1_obs,m1_sig, a=a, mbh_max=mbh_max, mbh_min=mbh_min, use_method='med', f=f)
-        poss_m1_i = f(m1_obs)
-        post = poss_m1_i #(1/ prior)
-#        print a, mbh_max, mbh_min, chisq
-        return post
-    else:
-        return np.inf
+#def each_likeli(para, m1_obs,m1_sig,prior):
+#    a,mbh_max,mbh_min  = para
+#    if 1.1 < a < 3 and 30 < mbh_max < 80 and 2 < mbh_min < 8:
+#        x = np.logspace(np.log10(m1_obs.min()/np.exp(m_noise_level)**5/1.1), np.log10(m1_obs.max()*np.exp(m_noise_level)**5*1.1),300)
+#        y = cov_twofun(x, a=a, mbh_max=mbh_max, mbh_min=mbh_min,sigma=m_noise_level)
+#        f = interpolate.interp1d(x, y)
+##        poss_m1_i = likelihood(m1_obs,m1_sig, a=a, mbh_max=mbh_max, mbh_min=mbh_min, use_method='med', f=f)
+#        poss_m1_i = f(m1_obs)
+#        post = poss_m1_i #(1/ prior)
+##        print a, mbh_max, mbh_min, chisq
+#        return post
+#    else:
+#        return np.inf
 
 
 m_noise_level = 0.20
 thetas = random_Theta()
 
 para_ini = [a, mbh_max, mbh_min]
-filename = 'test2_select-eff_correct_sigmalogdiv3_{0}.txt'.format(int(m_noise_level*100)) 
+#filename = 'test2_select-eff_correct_sigmalogdiv3_{0}.txt'.format(int(m_noise_level*100))   #First file
+filename = '201911_newrun/model0_a-{1}_mbhmax-{2}_noizl-{0}.txt'.format(int(m_noise_level*100), a , mbh_max) 
 if_file = glob.glob(filename)
 if if_file == []:
     para_result =  open(filename,'w') 
 else:
     para_result =  open(filename,'r+') 
 t1 = time.time()
-rounds = 200
+rounds = 500
 index = np.arange(len(m1_all))
 
 # =============================================================================
@@ -176,23 +180,6 @@ for loop in range(rounds):
     time_total = time_ave * rounds
     t_left = time_total - time_sp
     print mini
-    print "loop:", loop, "m_noise_level", m_noise_level
+    print "loop:", loop, "m_noise_level", m_noise_level, "Test alpha:", a
     print "Finish percent:",round(time_sp/time_total*100,2),"%" ,"total time needed :", round(time_total/60,2), "mins", "time_left", round(t_left/60,2), 'mins'
 
-#m1_put = m1_obs
-#dis_likeli_true = each_likeli(para_ini, m1_put, m1_put * m_noise_level,prior)
-#dis_likeli_mini = each_likeli(mini, m1_put, m1_put * m_noise_level,prior)
-#
-#plt.figure(figsize=(10, 8))
-#plt.plot(m1_put, np.log(dis_likeli_true)/prior, 'r.')
-#plt.plot(m1_put, np.log(dis_likeli_mini)/prior, '.')
-##plt.xlim([20,40])
-##plt.ylim([0,0.05])
-#plt.show()
-##print dis_likeli_true
-##print dis_likeli_mini
-#Chisq_true =-0.5*np.sum(np.log(dis_likeli_true)) 
-#Chisq_mini =-0.5*np.sum(np.log(dis_likeli_mini))
-#print Chisq_true
-#print Chisq_mini
-#print Chisq_true- Chisq_mini
