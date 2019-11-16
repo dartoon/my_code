@@ -53,7 +53,7 @@ def posterior(para, m1_obs,m_noise_level,sf_factor,z):
 #    a_z = a0 + a1 * z
 #    if 1.1 < a0 < 3 and -0.5 < a1 < 0.5  and 50 < mbh_max < 100 and 2 < mbh_min < 8:
     a_z = a0 + a1 * z/(1+z)
-    if 1.1 < a0 < 3.5 and -0.5 < a1 < 1.5 and 50 < mbh_max < 115 and 2 < mbh_min < 8:
+    if 1.1 < a0 < 3.5 and -1.5 < a1 < 3.0 and 50 < mbh_max < 115 and 2 < mbh_min < 8:
         post = []
         for i in range(len(z)): 
             poss_m1_i = cov_twofun(m1_obs[i], a=a_z[i], mbh_max=mbh_max, mbh_min=mbh_min,sigma=m_noise_level)
@@ -79,7 +79,7 @@ from cal_likelihood import fac_s_eff_v
 rounds = 250
 count = 0
 
-part = 0
+part = 7
 for loop in range(part*rounds,(part+1)*rounds):
     mini_count = 0 
     print "Calculating loop:", loop
