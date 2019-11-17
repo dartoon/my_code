@@ -17,7 +17,11 @@ import matplotlib as matt
 matt.rcParams['font.family'] = 'STIXGeneral'
 cmap = matplotlib.cm.get_cmap('viridis')
 
-filename = 'test2_select-eff_correct_sigmalogdiv3_20.txt'
+truth = [2.4, 50.0, 5.]
+alpha, Mmax, Mmin = truth
+
+filename = '201911_newrun/model0_a-{0}_mbhmax-{1}_noizl-20.txt'.format(alpha, Mmax)
+#filename = 'test2_select-eff_correct_sigmalogdiv3_20.txt'
 #filename = 'few_tests/right_answer_test1_conv_lognorm_20.txt'
 #bool_1 = (pre_result[:,1]>2.7)
 #bool_2 = (pre_result[:,3]>95)
@@ -36,7 +40,7 @@ lines = [lines[i] for i in range(len(lines)) if len(lines[i]) ==3]
 numbers = np.asarray(lines).astype(float)
 #samples = numbers#[numbers[:,1]<3]
 fig = corner.corner(numbers, labels=[r"$\alpha$", "M$_{max}$", "M$_{min}$"],
-                    truths=[2.35, 80., 5.],
+                    truths=truth,
                     quantiles=[0.16, 0.5, 0.84],show_titles=True, smooth = 0.7,
                     title_kwargs={"fontsize": 15}, label_kwargs = {"fontsize": 25},
 #                    plot_datapoints=True,smooth=1.0,smooth1d=1.0,

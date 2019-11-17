@@ -16,11 +16,11 @@ import time
 import pickle
 
 solve_z = np.vectorize(solve_z)
-#a0, a1, mbh_max, mbh_min = 2.35, 0.1, 80., 5.
-a0, a1, mbh_max, mbh_min = 2.35, 0.7, 80., 5.   #mode1
+#a0, a1, mbh_max, mbh_min = 2.35, 0.7, 80., 5.   #mode1
+a0, a1, mbh_max, mbh_min = 1.6, 0.7, 50., 5.   #mode1
 
 seed = 2
-filename = 'test3_seed{0}_data'.format(seed)
+filename = 'sim_a0_{0}_a1_{1}_max_{2}'.format(a0, a1, mbh_max)
 if_file = glob.glob(filename)  
 if if_file==[]:
     np.random.seed(seed)
@@ -32,7 +32,7 @@ if if_file==[]:
 else:
     event_rate, zs_detected, masses, rhos_detected, dl_zs=pickle.load(open(filename,'rb'))
 
-np.random.seed(seed)
+#np.random.seed(seed)
 #event_rate0, zs_detected0, masses0, rhos_detected0 = test.mc_year_rate(a=a, mbh_max=mbh_max, mbh_min=mbh_min, ev_type = 'const')
 #event_rate1, zs_detected1, masses1, rhos_detected1 = test.mc_year_rate(a=[2.35,0.1], mbh_max=mbh_max, mbh_min=mbh_min, ev_type = 'mode0')
 #event_rate2, zs_detected2, masses2, rhos_detected2 = test.mc_year_rate(a=[a0, a1], mbh_max=mbh_max, mbh_min=mbh_min, ev_type = 'mode1')
@@ -53,7 +53,7 @@ def posterior(para, m1_obs,m_noise_level,sf_factor,z):
 #    a_z = a0 + a1 * z
 #    if 1.1 < a0 < 3 and -0.5 < a1 < 0.5  and 50 < mbh_max < 100 and 2 < mbh_min < 8:
     a_z = a0 + a1 * z/(1+z)
-    if 1.1 < a0 < 3.5 and -1.5 < a1 < 3.0 and 50 < mbh_max < 115 and 2 < mbh_min < 8:
+    if 0.1 < a0 < 3.5 and -3. < a1 < 3.0 and 30 < mbh_max < 115 and 2 < mbh_min < 8:
         post = []
         for i in range(len(z)): 
             poss_m1_i = cov_twofun(m1_obs[i], a=a_z[i], mbh_max=mbh_max, mbh_min=mbh_min,sigma=m_noise_level)
@@ -62,7 +62,7 @@ def posterior(para, m1_obs,m_noise_level,sf_factor,z):
         chisq = -0.5*np.sum(np.log(post)*sf_factor)
 #        print para, chisq
     	global mini_count
-        if mini_count/20 > (mini_count-1)/20:
+        if mini_count/50 > (mini_count-1)/50:
             print "State of count {0}".format(mini_count), para, chisq
         mini_count = mini_count+1
         return chisq
@@ -76,11 +76,11 @@ t1 = time.time()
 
 index = np.arange(len(m1_all))
 from cal_likelihood import fac_s_eff_v
-rounds = 250
+rounds = 2500
 count = 0
 
-part = 7
-for loop in range(part*rounds,(part+1)*rounds):
+#part = 7
+for loop in range(0,rounds):
     mini_count = 0 
     print "Calculating loop:", loop
     seed_i = loop
@@ -103,7 +103,8 @@ for loop in range(part*rounds,(part+1)*rounds):
     sf_factor = sf_factor/np.exp(sf_sigma**2/2)
     print "m1_obs.min(), m1_obs.max():",m1_obs.min(), m1_obs.max()
     mini=fmin(posterior,para_ini,maxiter=1000, args=(m1_obs, m_noise_level, sf_factor,z_inf))
-    datafile = 'test3_mode1_take2_level{0}_p{1}.txt'.format(int(m_noise_level*100),part) 
+#    datafile = 'mode1_take2_level{0}.txt'.format(int(m_noise_level*100)) 
+    datafile = '201911_newrun/model1_a0{1}_a1{2}_mbhmax-{3}_noizl-{0}.txt'.format(int(m_noise_level*100), a0, a1, mbh_max) 
     if count ==0:
         if_file = glob.glob(datafile)
         if if_file == []:
@@ -123,5 +124,7 @@ for loop in range(part*rounds,(part+1)*rounds):
     time_ave = (t2-t1)/(count+1)
     time_total = time_ave * rounds
     t_left = time_total - time_sp
+    print mini
+    print "loop:", loop, "m_noise_level", m_noise_level, "Test alpha:", a0, a1    
     print "Finish percent:",round(time_sp/time_total*100,2),"%" ,"total time needed :", round(time_total/60,2), "mins", "time_left", round(t_left/60,2), 'mins'
     count = count+1
