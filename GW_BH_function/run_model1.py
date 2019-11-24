@@ -17,7 +17,8 @@ import pickle
 
 solve_z = np.vectorize(solve_z)
 #a0, a1, mbh_max, mbh_min = 2.35, 0.7, 80., 5.   #mode1
-a0, a1, mbh_max, mbh_min = 1.6, 0.7, 50., 5.   #mode1
+a0, a1, mbh_max, mbh_min = 1.6, 1.2, 50., 5.   #mode1
+part = 1
 
 seed = 2
 filename = 'sim_a0_{0}_a1_{1}_max_{2}'.format(a0, a1, mbh_max)
@@ -76,14 +77,12 @@ t1 = time.time()
 
 index = np.arange(len(m1_all))
 from cal_likelihood import fac_s_eff_v
-rounds = 2500
+rounds = 1500
 count = 0
-
-#part = 7
 for loop in range(0,rounds):
     mini_count = 0 
     print "Calculating loop:", loop
-    seed_i = loop
+    seed_i = rounds*part+loop
     np.random.seed(seed_i)
     idx = np.random.choice(index, 1000)
     m1 = m1_all[idx]
