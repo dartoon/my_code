@@ -16,9 +16,10 @@ import time
 import pickle
 
 solve_z = np.vectorize(solve_z)
-#a0, a1, mbh_max, mbh_min = 2.35, 0.7, 80., 5.   #mode1
-a0, a1, mbh_max, mbh_min = 1.6, 1.2, 50., 5.   #mode1
-part = 1
+#a0, a1, mbh_max, mbh_min = 1.6, 1.2, 50., 5.   #mode1  a0: 0.8, 1.6, 2.4  a1: 0.2. 0.7, 1.2
+a0, a1, mbh_max, mbh_min = 2.4, 1.2, 50., 5.   #mode1
+
+part = 0
 
 seed = 2
 filename = 'sim_a0_{0}_a1_{1}_max_{2}'.format(a0, a1, mbh_max)
@@ -79,10 +80,27 @@ index = np.arange(len(m1_all))
 from cal_likelihood import fac_s_eff_v
 rounds = 1500
 count = 0
+past_count = 0
 for loop in range(0,rounds):
-    mini_count = 0 
-    print "Calculating loop:", loop
+    datafile = '201911_newrun/model1_a0{1}_a1{2}_mbhmax-{3}_noizl-{0}.txt'.format(int(m_noise_level*100), a0, a1, mbh_max) 
+    if count ==0:
+        if_file = glob.glob(datafile)
+        if if_file == []:
+            para_result =  open(datafile,'w') 
+            string = ''
+        else:
+#            print "HAHAHA"
+            para_result =  open(datafile,'r+')
+            string = para_result.read()
+    elif count > 0:
+        para_result = open(datafile,'r+')
+        string =para_result.read()
     seed_i = rounds*part+loop
+    if 'seed = {0},'.format(seed_i) in string:
+        past_count = past_count+1
+        continue
+    mini_count = 0 
+    print "Calculating loop: ", loop,  ", seed: ", seed_i, ", Test alpha: ", a0, a1            
     np.random.seed(seed_i)
     idx = np.random.choice(index, 1000)
     m1 = m1_all[idx]
@@ -94,36 +112,24 @@ for loop in range(0,rounds):
     m1_sigstar= np.exp(m_noise_level)  #Not useful in the generate generation, but useful in understand the upper lower level.
     m1_obs = np.random.lognormal(m1_mu, m_noise_level, size=m1.shape)  #Generating for the mu as med, 
     m1_sig_fake = m1_obs * m_noise_level      #The fake "sigma", (m1_obs * m_noise_level) and (m1 * m_noise_level)
+    print "m1_obs.min(), m1_obs.max():",m1_obs.min(), m1_obs.max()
     prior = fac_s_eff_v(dl=dl_noised, mass_Chirp=mass_Chirp_noised, thetas=thetas)
     prior[prior==0] = 0.001
     sf_factor = 1/prior
     z_inf = solve_z(np.array(dl_noised))
     sf_sigma = np.log(sf_factor)/3
     sf_factor = sf_factor/np.exp(sf_sigma**2/2)
-    print "m1_obs.min(), m1_obs.max():",m1_obs.min(), m1_obs.max()
     mini=fmin(posterior,para_ini,maxiter=1000, args=(m1_obs, m_noise_level, sf_factor,z_inf))
 #    datafile = 'mode1_take2_level{0}.txt'.format(int(m_noise_level*100)) 
-    datafile = '201911_newrun/model1_a0{1}_a1{2}_mbhmax-{3}_noizl-{0}.txt'.format(int(m_noise_level*100), a0, a1, mbh_max) 
-    if count ==0:
-        if_file = glob.glob(datafile)
-        if if_file == []:
-            para_result =  open(datafile,'w') 
-        else:
-#            print "HAHAHA"
-            para_result =  open(datafile,'r+')
-            para_result.read()
-    if count > 0:
-        para_result = open(datafile,'r+')
-        para_result.read()
     para_result.write("seed = {0}, ".format(seed_i))    
     para_result.write(repr(mini)+"\n")
     para_result.close()    
     t2 = time.time()
     time_sp = t2-t1
     time_ave = (t2-t1)/(count+1)
-    time_total = time_ave * rounds
+    time_total = time_ave * (rounds-past_count)
     t_left = time_total - time_sp
     print mini
-    print "loop:", loop, "m_noise_level", m_noise_level, "Test alpha:", a0, a1    
+#    print "loop:", loop, "seed", seed_i, "Test alpha:", a0, a1    
     print "Finish percent:",round(time_sp/time_total*100,2),"%" ,"total time needed :", round(time_total/60,2), "mins", "time_left", round(t_left/60,2), 'mins'
     count = count+1

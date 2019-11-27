@@ -19,6 +19,8 @@ from BH_mass_function import gene_BHBH, dl, solve_z
 import time
 import pickle
 
+from cal_likelihood import poss_ln_gaussian
+
 solve_z = np.vectorize(solve_z)
 #a0, a1, mbh_max, mbh_min = 2.35, 0.1, 80., 5.
 a0, a1, mbh_max, mbh_min = 2.35, 0.7, 80., 5.   #mode1
@@ -65,7 +67,7 @@ count = 0
 
 part = 0
 
-np.random.seed(1)
+np.random.seed(5)
 idx = np.random.choice(index, 1)[0]
 m1 = np.ones(1000)*m1_all[idx]
 dl = np.ones(1000)*lumi_dis_all[idx]
@@ -81,10 +83,24 @@ sf_factor = 1/prior
 prior_noi = fac_s_eff_v(dl=dl_noised, mass_Chirp=mass_Chirp_noised, thetas=thetas)
 prior_noi[prior_noi==0] = 0.001
 sf_factor_noi = 1/prior_noi
-plt.hist(sf_factor_noi,bins=20)
+
+
+#%%
+plt.hist(sf_factor_noi,bins=20, histtype=u'step', linewidth = 2)
 x = sf_factor
 y = np.linspace(0,250)
-plt.plot(y*0+x , y, linewidth = 4,color='orange',linestyle=('dashed'))
-plt.show()
+#plt.plot(y*0+x , y, linewidth = 4,color='orange',linestyle=('dashed'))
 
+x_line = np.linspace(1,25)
+
+x_infer = np.median(sf_factor_noi)
+sf_sigma = np.log(x_infer)/3.
+x_guess = x_infer/np.exp(sf_sigma**2/2)
+
+y_line = poss_ln_gaussian(x_line, np.log(x_infer), sf_sigma)
+plt.plot(x_line , y_line*1500, linewidth = 4,color='orange',linestyle=('dashed'))
+
+print x_guess, sf_factor
+
+plt.show()
 #sf_sigma = np.log(sf_factor)/3

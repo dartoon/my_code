@@ -17,9 +17,28 @@ matt.rcParams['font.family'] = 'STIXGeneral'
 cmap = matplotlib.cm.get_cmap('viridis')
 
 import corner
-#filename = 'test2_select-eff_correct_sigmalogdiv3_20.txt'
-#filename = 'few_tests/right_answer_test1_conv_lognorm_20.txt'
-result = np.loadtxt('test3_result_secondrun/test3_mode1_take2_level20.txt')
+#truths=[1.6, 0.2, 50.0, 5.]
+#truths=[1.6, 0.7, 50.0, 5.]
+#truths=[1.6, 1.2, 50.0, 5.]
+
+truths=[2.4, 0.2, 50.0, 5.]
+
+f = open("201911_newrun/model1_a0{0}_a1{1}_mbhmax-50.0_noizl-20.txt".format(truths[0],truths[1]),"r")
+string = f.read()
+lines = string.split('\n')   # Split in to \n
+result = []
+
+for i in range(len(lines)-1):
+    line = lines[i].split('([')[-1]
+    line = line.split('])')[0]
+    if len(line)>2:
+        line = [float(stri) for stri in line.split(',')]
+        result.append(line)
+        
+result = np.asarray(result)
+
+#
+#result = np.loadtxt('201911_newrun/model1_a01.6_a10.2_mbhmax-50.0_noizl-20.txt')
 numbers = result
 
 
@@ -34,7 +53,7 @@ numbers = result
 #numbers = np.asarray(lines).astype(float)
 samples = numbers#[numbers[:,1]<3]
 fig = corner.corner(numbers, labels=[r"$\alpha_0$", r"$\alpha_1$", "M$_{max}$", "M$_{min}$"],
-                    truths=[2.35, 0.7, 80., 5.],
+                    truths=truths,
                     quantiles=[0.16, 0.5, 0.84],show_titles=True, smooth = 0.7,
                     title_kwargs={"fontsize": 15}, label_kwargs = {"fontsize": 25},
 #                    plot_datapoints=True,smooth=1.0,smooth1d=1.0,
@@ -45,3 +64,4 @@ for ax in fig.get_axes():
 #fig.savefig("fig_results_4para.pdf")
 #####
 plt.show()  
+print len(numbers)
