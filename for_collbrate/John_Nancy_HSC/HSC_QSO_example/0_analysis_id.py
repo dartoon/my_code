@@ -52,9 +52,9 @@ size_list = [51, 61, 71, 81, 91, 101, 111]
 #QSO_DEC = float(sys.argv[3])
 ##print isinstance(QSO_id,str), isinstance(QSO_RA,float), isinstance(QSO_DEC,float)
 
-QSO_id = "000017.88+002612.6"
-QSO_RA = 0.07452999800443649
-QSO_DEC = 0.4368380010128021
+#QSO_id = "000017.88+002612.6"
+#QSO_RA = 0.07452999800443649
+#QSO_DEC = 0.4368380010128021
 
 #QSO_id = '084702.80+013001.4'
 #QSO_RA = 131.7616729736328

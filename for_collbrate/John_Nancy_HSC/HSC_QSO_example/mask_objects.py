@@ -178,3 +178,42 @@ def find_loc_max(data, neighborhood_size = 4, threshold = 5):
         y_center = (dy.start + dy.stop - 1)/2    
         y.append(y_center)
     return x, y
+
+def measure_FWHM(image, measure_radius = 10):
+    seed_num = 2*measure_radius+1
+    frm = len(image)
+    q_frm = frm/4
+    x_center = np.where(image == image[q_frm:-q_frm,q_frm:-q_frm].max())[1][0]
+    y_center = np.where(image == image[q_frm:-q_frm,q_frm:-q_frm].max())[0][0]
+    
+    x_n = np.asarray([image[y_center][x_center+i] for i in range(-measure_radius, measure_radius+1)]) # The x value, vertcial 
+    y_n = np.asarray([image[y_center+i][x_center] for i in range(-measure_radius, measure_radius+1)]) # The y value, horizontal 
+    xy_n = np.asarray([image[y_center+i][x_center+i] for i in range(-measure_radius, measure_radius+1)]) # The up right value, horizontal
+    xy__n =  np.asarray([image[y_center-i][x_center+i] for i in range(-measure_radius, measure_radius+1)]) # The up right value, horizontal
+#    print xy_n
+#    print xy__n
+    #popt, pcov = curve_fit(func, x, yn)
+    from astropy.modeling import models, fitting
+    g_init = models.Gaussian1D(amplitude=y_n.max(), mean=measure_radius, stddev=1.5)
+    fit_g = fitting.LevMarLSQFitter()
+    g_x = fit_g(g_init, range(seed_num), x_n)
+    g_y = fit_g(g_init, range(seed_num), y_n)
+    g_xy = fit_g(g_init, range(seed_num), xy_n)
+    g_xy_ = fit_g(g_init, range(seed_num), xy__n)
+    
+    FWHM_ver = g_x.stddev.value * 2.355  # The FWHM = 2*np.sqrt(2*np.log(2)) * stdd = 2.355*stdd
+    FWHM_hor = g_y.stddev.value * 2.355
+    FWHM_xy = g_xy.stddev.value * 2.355 * np.sqrt(2.)
+    FWHM_xy_ = g_xy_.stddev.value * 2.355 * np.sqrt(2.)
+#    if (FWHM_hor-FWHM_ver)/FWHM_ver > 0.20:
+#        print "Warning, the {0} have inconsistent FWHM".format(count), FWHM_ver, FWHM_hor
+#    fig = plt.figure()
+#    p_range = np.linspace(0, seed_num,50)
+#    ax = fig.add_subplot(111)
+#    ax.plot(p_range, g_x(p_range), c='b', label='x_Gaussian')
+#    ax.plot(p_range, g_y(p_range), c='r', label='y_Gaussian')
+#    ax.legend()
+#    ax.scatter(range(seed_num), xy_n, color = 'b')
+#    ax.scatter(range(seed_num), xy__n, color = 'r')
+#    plt.show()
+    return FWHM_ver, FWHM_hor, FWHM_xy, FWHM_xy_
