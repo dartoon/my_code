@@ -23,6 +23,11 @@ Debug the missing of lightModel for None-sersic case.
 Update based on Lenstronomy version 0.9.1
 Notes:
     package dynesty would be needed. 
+    
+Update based on Lenstronomy version 1.2.0
+Notes: 
+    Require schwimmbad and multiprocess packages.
+    Require emcee at >= 3.0.2 version.
 """
 
 from matplotlib.pylab import plt
@@ -39,8 +44,8 @@ from lenstronomy.ImSim.image_model import ImageModel
 from lenstronomy.LightModel.light_model import LightModel
 from lenstronomy.Workflow.fitting_sequence import FittingSequence
 from lenstronomy.ImSim.image_linear_solve import ImageLinearFit
-from lenstronomy.Plots.output_plots import ModelPlot
-import lenstronomy.Plots.output_plots as out_plot  
+from lenstronomy.Plots.model_plot import ModelPlot
+from lenstronomy.Plots import chain_plot
 from lenstronomy.Sampling.parameters import Param
 
 def fit_qso(QSO_im, psf_ave, psf_std=None, source_params=None,ps_param=None, background_rms=0.04, pix_sz = 0.168,
@@ -217,7 +222,7 @@ def fit_qso(QSO_im, psf_ave, psf_std=None, source_params=None,ps_param=None, bac
     image_ps = imageModel.point_source(ps_result)
     
     if pso_diag == True:
-        f, axes = out_plot.plot_chain_list(chain_list,0)
+        f, axes = chain_plot.plot_chain_list(chain_list,0)
         if pltshow == 0:
             plt.close()
         else:
@@ -401,8 +406,6 @@ def fit_galaxy(galaxy_im, psf_ave, psf_std=None, source_params=None, background_
         kwargs_data['noise_map'] = galaxy_std
     if psf_std is not None:
         kwargs_psf['psf_error_map'] = psf_std
-    
-    
                   
     image_band = [kwargs_data, kwargs_psf, kwargs_numerics]
     multi_band_list = [image_band]
@@ -461,7 +464,7 @@ def fit_galaxy(galaxy_im, psf_ave, psf_std=None, source_params=None, background_
                           arrow_size=0.02, cmap_string="gist_heat", likelihood_mask_list=[galaxy_msk])  
     
     if pso_diag == True:
-        f, axes = out_plot.plot_chain_list(chain_list,0)
+        f, axes = chain_plot.plot_chain_list(chain_list,0)
         if pltshow == 0:
             plt.close()
         else:
