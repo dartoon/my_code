@@ -21,7 +21,7 @@ import corner
 #truths=[1.6, 0.7, 50.0, 5.]
 #truths=[1.6, 1.2, 50.0, 5.]
 
-truths=[2.4, 0.2, 50.0, 5.]
+#truths=[2.4, 0.2, 50.0, 5.]
 
 f = open("201911_newrun/model1_a0{0}_a1{1}_mbhmax-50.0_noizl-20.txt".format(truths[0],truths[1]),"r")
 string = f.read()

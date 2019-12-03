@@ -242,7 +242,7 @@ class gene_BHBH:
         self.n0 = self.bhbh[:,scenario]*10**(-9) 
     def num_year_rate(self, ave_chirp_mass = 6.7):
         '''
-        Numerically calcualte the rate as show in Arxiv: 1409.8360
+        Numerically calculate the rate as show in Arxiv: 1409.8360
         '''
         dH=self.c/self.h0
         z = self.z
