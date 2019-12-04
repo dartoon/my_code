@@ -121,7 +121,7 @@ for loop in range(0,5):
         para_result =  open(datafile,'w') 
     else:
         para_result = open(datafile,'r+')
-	print "HAHAHA"
+        para_result.read()
     para_result.write("seed = {0}, ".format(seed_i))    
     para_result.write(repr(mini)+"\n")
     para_result.close()    
