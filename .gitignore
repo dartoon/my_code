@@ -56,3 +56,4 @@ fit_result*/
 *.blg
 *.aux
 *.dat
+GW_BH_function/sim*max_*

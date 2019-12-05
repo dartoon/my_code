@@ -17,7 +17,7 @@ matt.rcParams['font.family'] = 'STIXGeneral'
 cmap = matplotlib.cm.get_cmap('viridis')
 
 import corner
-#truths=[1.6, 0.2, 50.0, 5.]
+truths=[1.6, 0.2, 50.0, 5.]
 #truths=[1.6, 0.7, 50.0, 5.]
 #truths=[1.6, 1.2, 50.0, 5.]
 

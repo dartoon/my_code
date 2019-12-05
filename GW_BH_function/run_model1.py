@@ -16,10 +16,10 @@ import time
 import pickle
 
 solve_z = np.vectorize(solve_z)
-a0, a1, mbh_max, mbh_min = 1.6, 0.0, 50., 5.   #mode1  a0: 0.8, 1.6, 2.4  a1: 0.2. 0.7, 1.2
+a0, a1, mbh_max, mbh_min = 1.6, -0.7, 50., 5.   #mode1  a0: 0.8, 1.6, 2.4  a1: 0.2. 0.7, 1.2
 #a0, a1, mbh_max, mbh_min = 2.4, 1.2, 50., 5.   #mode1
 
-part = 1
+part = 3
 
 seed = 2
 filename = 'sim_a0_{0}_a1_{1}_max_{2}'.format(a0, a1, mbh_max)
@@ -81,7 +81,7 @@ from cal_likelihood import fac_s_eff_v
 rounds = 1500
 count = 0
 past_count = 0
-for loop in range(0,5):
+for loop in range(0, rounds):
     datafile = '201911_newrun/model1_a0{1}_a1{2}_mbhmax-{3}_noizl-{0}.txt'.format(int(m_noise_level*100), a0, a1, mbh_max) 
     if_file = glob.glob(datafile)
     if if_file == []:
@@ -114,8 +114,7 @@ for loop in range(0,5):
     z_inf = solve_z(np.array(dl_noised))
     sf_sigma = np.log(sf_factor)/3
     sf_factor = sf_factor/np.exp(sf_sigma**2/2)
-#    mini=fmin(posterior,para_ini,maxiter=1000, args=(m1_obs, m_noise_level, sf_factor,z_inf))
-    mini = 'test123'
+    mini=fmin(posterior,para_ini,maxiter=1000, args=(m1_obs, m_noise_level, sf_factor,z_inf))
     if_file = glob.glob(datafile)
     if if_file == []:
         para_result =  open(datafile,'w') 
