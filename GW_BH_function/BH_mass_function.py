@@ -225,21 +225,24 @@ def random_z(itera = 1, fname='../data/BHBHrates.dat'):
     return zs
 
 class gene_BHBH:
-    def __init__(self, h0=70.):
+    def __init__(self, h0=70., m_type = "BHBH", rho0 = 8., scenario = 2 ):
         self.h0 = h0
 #        global n0, om, rho0, r0, c
         self.c=299790. # speed of light [km/s]
-        self.rho0 = 8.
         self.r0 = 1527.;	# in [Mpc] value for ET - polynomial Noise curve
 #        self.r0 = 1591.;	# ET-D sensitivity
 #       self. r0 = 1918.;    # ET - xylophone
-        f=open('../data/BHBHrates.dat')
+        self.m_type = m_type
+        self.rho0 = rho0
+        self.scenario = scenario
+        filename = '../data/{0}rates.dat'.format(self.m_type)
+        f=open(filename)
         bhbh = np.loadtxt(f)
         self.bhbh=bhbh[bhbh[:,0].argsort()]
         self.z = self.bhbh[:,0]
         self.om = 0.3
-        scenario = 2        # 2 is standard low
-        self.n0 = self.bhbh[:,scenario]*10**(-9) 
+        self.n0 = self.bhbh[:,self.scenario]*10**(-9)
+        print filename, 'scenario', self.scenario, self.rho0
     def num_year_rate(self, ave_chirp_mass = 6.7):
         '''
         Numerically calculate the rate as show in Arxiv: 1409.8360

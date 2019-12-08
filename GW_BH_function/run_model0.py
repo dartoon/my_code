@@ -121,7 +121,7 @@ if if_file == []:
 else:
     para_result =  open(filename,'r+') 
 t1 = time.time()
-rounds = 500
+rounds = 200
 index = np.arange(len(m1_all))
 
 # =============================================================================

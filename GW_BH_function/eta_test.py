@@ -23,10 +23,11 @@ from cal_likelihood import poss_ln_gaussian
 
 solve_z = np.vectorize(solve_z)
 #a0, a1, mbh_max, mbh_min = 2.35, 0.1, 80., 5.
-a0, a1, mbh_max, mbh_min = 2.35, 0.7, 80., 5.   #mode1
+a0, a1, mbh_max, mbh_min = 2.4, 0.7, 50., 5.   #mode1
 
 seed = 2
-filename = 'test3_seed{0}_data'.format(seed)
+#filename = 'test3_seed{0}_data'.format(seed)
+filename = 'sim_a0_{0}_a1_{1}_max_{2}'.format(a0, a1, mbh_max)
 if_file = glob.glob(filename)  
 if if_file==[]:
     np.random.seed(seed)
@@ -67,7 +68,7 @@ count = 0
 
 part = 0
 
-np.random.seed(5)
+np.random.seed(2)
 idx = np.random.choice(index, 1)[0]
 m1 = np.ones(1000)*m1_all[idx]
 dl = np.ones(1000)*lumi_dis_all[idx]
@@ -86,21 +87,42 @@ sf_factor_noi = 1/prior_noi
 
 
 #%%
-plt.hist(sf_factor_noi,bins=20, histtype=u'step', linewidth = 2)
-x = sf_factor
-y = np.linspace(0,250)
-#plt.plot(y*0+x , y, linewidth = 4,color='orange',linestyle=('dashed'))
+import matplotlib as mat
+mat.rcParams['font.family'] = 'STIXGeneral'
 
-x_line = np.linspace(1,25)
+fig, ax = plt.subplots(figsize=(12, 10))
+
+a, b, c =plt.hist(sf_factor_noi,bins=60, histtype=u'step', linewidth = 2, normed=True, 
+         label= r"1$/{\rm \eta}$ histogram.")
+
+x = sf_factor
+y = np.linspace(0,100,200)
+#plt.plot(y*0+x , y, linewidth = 4,color='orange',linestyle=('dashed'), label = "True")
 
 x_infer = np.median(sf_factor_noi)
+x_line = np.linspace(x_infer/3,x_infer*4,200)
 sf_sigma = np.log(x_infer)/3.
 x_guess = x_infer/np.exp(sf_sigma**2/2)
 
+x = x_guess
+#plt.plot(y*0+x , y, linewidth = 4,color='blue',linestyle=('dashed'), label = "Corrected")
+
+x = x_infer
+#plt.plot(y*0+x , y, linewidth = 4,color='red',linestyle=('dashed'), label = "median")
+
+
 y_line = poss_ln_gaussian(x_line, np.log(x_infer), sf_sigma)
-plt.plot(x_line , y_line*1500, linewidth = 4,color='orange',linestyle=('dashed'))
+plt.plot(x_line , y_line, linewidth = 4,color='orange',linestyle=('dashed'),
+         label= r"The Log-Normal distribution with $\sigma = -\log(\eta_{median})/3$.")
 
-print x_guess, sf_factor
-
+plt.xlim(0.5,8)
+plt.ylim(0,a.max()*1.2)
+plt.xlabel(r"The distribution of 1$/{\rm \eta}$",fontsize=27)
+plt.ylabel("PDF",fontsize=37)
+plt.tick_params(labelsize=30)
+handles, labels = ax.get_legend_handles_labels()
+plt.legend(handles[::-1], labels[::-1], prop={'size':18})
+#print x_guess, sf_factor
+plt.savefig("eta_distribution.pdf")
 plt.show()
 #sf_sigma = np.log(sf_factor)/3

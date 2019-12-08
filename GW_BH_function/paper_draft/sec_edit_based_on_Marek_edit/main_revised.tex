@@ -1,0 +1,383 @@
+\documentclass[twocolumn]{aastex62}
+
+\newcommand{\vdag}{(v)^\dagger}
+\newcommand\aastex{AAS\TeX}
+\newcommand\latex{La\TeX}
+\newcommand\s{$\sim$}
+\newcommand{\e}{\'{e}}
+\newcommand{\amen}[1]{\textbf{\textit{#1}}}
+
+\usepackage{amsmath}
+\usepackage{xcolor}
+\usepackage{mathrsfs}
+\usepackage[caption=false]{subfig}
+\usepackage{float}
+\usepackage{multirow}
+\usepackage{enumitem} 
+
+\shorttitle{Black hole mass function and its redshift evolution by ET}
+\shortauthors{Ding et al.}
+
+\newcommand{\kai}[1]{\textcolor{red}{[{\bf Kai}: #1]}} 
+\newcommand{\blue}[1]{\textcolor{blue}{#1}} 
+\newcommand{\ding}[1]{\textcolor{red}{[{\bf Xuheng}: #1]}} 
+
+\begin{document}
+
+\newcommand{\mbh}{$\mathcal M_{\rm BH}$}
+\newcommand{\cmass}{${\cal M}_0$}
+\newcommand{\dl}{$d_L$}
+\newcommand{\mone}{$m_1$}
+\newcommand{\mtwo}{$m_2$}
+\newcommand{\snr}{$\rho$}
+
+\title{Black hole mass function and its evolution -- the first prediction for the Einstein Telescope}
+
+\correspondingauthor{Xuheng Ding}
+\email{dingxh@whu.edu.cn}
+
+\author%[0000-0001-8917-2148]
+{Xuheng Ding}
+\affiliation{School of Physics and Technology, Wuhan University, Wuhan 430072, China}
+\affiliation{Department of Physics and Astronomy, University of California, Los Angeles, CA, 90095-1547, USA}
+
+%\author{Lilan Yang}
+%\affiliation{School of Physics and Technology, Wuhan University, Wuhan 430072, China}
+%\affiliation{Department of Physics and Astronomy, University of California, Los Angeles, CA, 90095-1547, USA}
+
+\author%[0000-0002-4359-5994]
+{Kai Liao}
+\affiliation{School of Science, Wuhan University of Technology, Wuhan 430070, China}
+
+\author%[0000-0003-1308-7304]
+{Marek Biesiada}
+\affiliation{Department of Astronomy, Beijing Normal University, Beijing 100875, China}
+%\affiliation{Department of Astrophysics and Cosmology, Institute of Physics, University of Silesia, 75 Pu{\l}ku Piechoty 1, 41-500 Chorz{\'o}w,
+%Poland}
+\affiliation{National Centre for Nuclear Research, Pasteura 7, 02-093 Warsaw, Poland}
+
+\author%[0000-0002-3567-6743]
+{Zong-Hong Zhu}
+\affiliation{School of Physics and Technology, Wuhan University, Wuhan 430072, China}
+\affiliation{Department of Astronomy, Beijing Normal University, Beijing 100875, China}
+
+
+\begin{abstract}
+The knowledge about the  black hole mass function (BHMF) and its evolution would help to understand the origin of the BHs and how BH binaries formed at different stages of the history of the Universe. We demonstrate the ability of future third generation gravitational wave (GW) detector -- the Einstein Telescope (ET) to infer the slope of the BHMF and its evolution with redshift.  We perform the Monte Carlo simulation of the measurements of chirp signals from binary BH systems (BBH) that could be detected by ET, including the BH masses and their luminosity distances (\dl). We use the mass of a primary black hole in each binary system to infer the BHMF as a power-law function with slope parameter as $\alpha$. Taking into account the bias that could be introduced by the uncertainty of measurements and by the selection effect, we \blue{carried out the numerical tests for three different sets of parameters and} find that only one thousand of GW events registered by ET ($\sim1\%$ amount of its yearly detection rate) could accurately infer the $\alpha$ \blue{with a precision of $\alpha\sim0.1$. Furthermore, assuming four sets of parameters, we investigate the validity of our method to recover a scenario where $\alpha$ evolves with redshift as $\alpha(z) = \alpha_0 + \alpha_1\frac{z}{1+z}$. Our result shows, taking a thousand GW events and using \dl\ as the redshift estimator, one could infer the value of evolving parameter $\alpha_1$ accurately at the uncertainty level of $\sim0.5$. Our numerical tests verify the reliability of our method; however, the uncertainty levels of the inferred parameters only applies for the assumed sets of the parameters which shouldn't be considered as a universal value for the general case.
+}
+\end{abstract}
+
+%\keywords{keywords TBD}
+
+\section{Introduction} \label{sec_intro}
+%As first identified as a solution to Einstein's field equations by Schwarzschild in 1916 \citep{Schwarzschild1999}, black holes (BHs) have been predicted to remain a bunches of fundamental questions in unifying GR with quantum physics \citep{Hawking1976, Giddings2017}. 
+
+The masses of astrophysical black holes (BHs) are known to cover a wide range from stellar-mass to supermassive level ($\sim10^{10} M_{\odot}$). The discovery of 
+coalescing binary black holes (BBHs) in LIGO gravitational-wave (GW) detectors is a substantial evidence of stellar-mass BHs \citep{Abbott2016}, while supermassive BHs are supposed to exist in the centers of almost all the galaxies \citep{Lynden-Bell1969, Kormendy1995}. 
+%Recently, the first image of a supermassive BH in the center of the giant elliptical galaxy M87 has been reconstructed from radio observations performed by the Event Horizon Telescope \citep{Alberdi2019}. 
+GWs provide a direct way to study the inspiralling BBH systems, enabling one to derive their basic parameters including mass, spin and luminosity distances~\citep{Abbott2017phy, Abbott2018}. This creates the opportunity not only to measure the properties of BHs ~\citep{Abbott2018b}, but also answer some fundamental questions concerning cosmography~\citep{Liao2017, Ding2019, Cai2017}, the GW speed~\citep{Fan2017, Collett2017} or the strong lensing of GWs ~\citep{Ola2013, Biesiada2014, Ding2015}. %\kai{seems the references are almost related with lensing. I suggest to cite more LIGO references}
+
+Nevertheless, it is still unclear of how the BHs are formed \citep{Fryer1999, Fryer2001, Mirabel2016}. In particular, the number and mass distribution of stellar-mass BHs in the Universe still need to be clarified.
+The recent detections of GW events have brought us a new era of gravitational wave astronomy \citep[e.g.,][]{Abbott2016, Abbott2016_sum, Abbott2018} and opened up a  brand new possibility concerning studying BBH system formation channels. 
+At present, however, observations cannot firmly select the basic formation scenarios like the evolution of isolated pairs of stars \citep{Bethe1998, Portegies1998}, chemically homogeneous evolution \citep{Marchant2016, deMink2016}, dynamic binary formation in dense clusters \citep{Portegies2000, Kulkarni1993} and other channels introduced in \citet{Abbott2018b}.
+The inference of the distributions of BH mass could be the key to distinguish these scenarios and help to address questions including the physical process and evolutionary environment of binary BH formation.
+
+Current GWTC-1 catalog of binary coalescences detected by LIGO/Virgo GW interferometers includes ten BH-BH binaries and one NS-NS (GW170817) binary \citep{Abbott2018}.  Assuming the BH mass function (BHMF) parametrized as a two-sided truncated power-law, \citet{Kovetz2017PhRvD} estimated that further LIGO measurements would provide thousands of BBHs and constrain the BHMF slope parameter $\alpha$ at 10\% precison. More recently, the LIGO collaboration has used ten BBH merger events and constrained the BHMF power-law index to $\alpha~=~1.6\substack{+1.5\\-1.7}$ (90\% credibility) \citep{Abbott2018b}. 
+In the next decade, the number of detected coalescences of BBH systems is expected to be increasing rapidly with the improvements of the detector sensitivities. Especially, the third-generation gravitational wave detector Einstein Telescope (ET) is capable of \textbf{detecting $10^4-10^8$} \textbf{coalescing BBHs} per year \citep{Abernathy2011}. Moreover, since this instrument would detect the GW events from the distant Universe up to $z\sim17$ \citep{Abernathy2011}, the wide redshift range of the BBH \textbf{inspiral events} enable us to study the $\alpha$ as a function of redshift. In this study, we use the Monte Carlo (MC) approach to simulate the GW events from BBH \textbf{mergers} that could be measured by the ET. We construct a mock BBH \textbf{merger} catalog to examine their ability to constrain the BHMFs, taking into account the data noise level and selection bias realistically.
+
+This paper is organized as follows. In Section~\ref{sec_simulation} we describe the simulation of the BBH \textbf{inspiral} events detectable by ET using the Monte Carlo approach. In this section, we assume the initial assumptions for the BH mass function used further as true values to be recovered from the data. In Section~\ref{sec_theory}, we introduce the theoretical framework to reconstruct the BHMFs, considering the noise realization and the selection effects. Furthermore, we make a further step by considering the power-law index $\alpha$ as a function of redshift and explore the way to use luminosity distance as redshift estimator and detect such evolution. We present our results in the Section~\ref{sec_result}. The discussion and conclusions are given in the Section~\ref{sec_summary}. Throughout this paper, we assume a standard concordance cosmology with $H_0= 70$ km s$^{-1}$ Mpc$^{-1}$, $\Omega{_m} = 0.30$, and $\Omega{_\Lambda} = 0.70$.
+
+
+
+\vspace{1cm}
+\section{Data simulation} \label{sec_simulation}
+In this section we describe the simulation of a realistic mock catalog of GW signals from BBHs detectable by future ET interferometric detector. Numerical predictions of BBH inspirals detectable by ET 
+have been discussed in many works, and it has been forecasted that the yearly detection rate of BBHs would be of \textbf{order $\sim10^{4-8}$ \citep{Abernathy2011} or at least $\sim10^{5}$ according to less optimistic yet realistic scenarios\citep{Ola2013, Biesiada2014}}. More recently, \citet{Yang2019} developed the approach of a Monte Carlo (MC) simulation to predict the detection rate by explicitly considering each BBH inspiral event sampled from the outcome of the population synthesis model, which provides the way to mimic a realistic BBH GW catalog. The backbone of this approach is to use random seeds to build up a mock universe which includes a sufficient volume of BBH \textbf{inspiral} events with essential parameters that related to this study. We refer the readers for the details in \citet[][Section 2, therein]{Yang2019}  and briefly recall the key points below.
+
+\subsection{Detection Criteria} \label{subsec_criteria}
+%We randomly generate the key parameters to determine the signal-to-noise ratio $\rho$ of each GW system. 
+For a specific BBH inspiral event at redshift $z_s$, the ET's corresponding signal-to-noise ratio $\rho$ is defined as \citep{Abernathy2011}:
+
+\begin{equation} \label{SNR}
+\rho = 8 \Theta \frac{r_0}{d_L(z_s)} \left( \frac{(1+z){\cal M}_0}{1.2 M_{\odot}} \right)^{5/6}
+\sqrt {\zeta(f_{max})},
+\end{equation}
+where $r_0$ is the detector's characteristic distance parameter and $\zeta(f_{max})$ is the dimensionless function reflecting the overlap between the GW signal and the ET's effective bandwidth which is usually simplified as unity. ${\cal M}_0$ is the intrinsic chirp mass defined as $ {\cal M}_0 = \frac{(m_1m_2)^{3/5}}{(m_1+m_2)^{1/5}}$, where \mone\ and \mtwo\ are the
+respective masses of the BBH components. $\Theta$ is the orientation factor determined by four angles as \citep{Finn93}:
+ \begin{equation} \label{Theta}
+ \Theta = 2 [ F_{+}^2(1 + \cos^2{\iota} )^2 + 4 F_{\times}^2 \cos^2{\iota} ]^{1/2},
+ \end{equation}
+where: $F_{+} = \frac{1}{2} (1 + \cos^2{\theta}) \cos{2\phi} \cos{2 \psi} - \cos{\theta} \sin{2 \phi} \sin{ 2 \psi}$, and
+$F_{\times} = \frac{1}{2} (1 + \cos^2{\theta}) \sin{2\phi} \cos{2 \psi} + \cos{\theta} \sin{2 \phi} \cos{ 2 \psi}$ are so-called antenna patterns. The four angles ($\theta, \phi, \psi, \iota$) describe respectively the
+direction to the BBH system relative to the detector and the binary orientation relative to the line of sight between it and the detector. 
+They are independent and one can assume that $(\cos\theta, \phi/\pi, \psi/\pi, \cos\iota)$ distributed uniformly over the range $[-1, 1]$. The GW signal is considered as detectable if its \snr\ is over the detecting threshold, i.e., $\rho > \rho_0 = 8$.
+
+\subsection{Monte Carlo Approach} \label{MC}
+
+We aim to build up a sufficient volume of BBH systems in the mock universe by randomly generating the key parameters for each BBH system \textbf{as specified below. First key parameter is the redshift $z_s$.}  We sample the \textbf{merging BBH systems} according to the yearly merger rate in a redshift interval  $[z_{s}, z_{s}+dz_{s}]$:
+ \begin{equation}
+ d\dot{N} (z_s)=4\pi\left(\frac{c}{H_{0}}\right)^3\frac{\dot{n}_{0}(z_{s})}{1+z_{s}}\frac{\tilde{r}^2(z_{s})}{E(z_{s})}dz_{s}. 
+ \end{equation}
+where the intrinsic BBH merger rate $\dot{n}_{0}(z_{s})$ is the one predicted by the population synthesis model (using {\tt StarTrack} code\footnote{The data is taken from the website \url{http://www.syntheticuniverse.org}.}) in \citet{Dominik13}, $\tilde{r}(z_{s})$ is the dimensionless comoving distance to the source, and $E (z_s)$ is
+the dimensionless expansion rate of the universe at redshift $z_s$. 
+%Note that the cosmological model we adopted is comply with the one in \citet{Dominik13}.
+%For each BBH system, we sample the probability distribution of the key parameters to randomly generate their values. These 
+{\bf Other key parameters include the four angles $(\theta, \phi, \psi, \iota)$ in the Equation~(\ref{Theta})  and the masses of each BH in the binary system (i.e., \mone\ and \mtwo).}
+For the purpose of randomly generating the BH masses, we follow the previous works \citep{Kovetz2017PhRvD, Abbott2018b, Fishbach2018} and assume that \mone\ follows a power-law distribution with a hard cut at both maximum and minimum mass:
+ \begin{equation} \label{equ_powlaw}
+{\bf P(m_1|\alpha, M_{max}, M_{min}) = m_1^{\alpha} \mathcal{H}(m_1-M_{min}) \mathcal{H}(M_{max}-m_1),}
+ \end{equation}
+where $\mathcal{H}$ is the Heaviside step function. Then, the secondary mass, \mtwo, is %fixed
+\textbf{sampled from a uniform distribution} 
+between $[M_{min}, m_1]$. Let us note that, we only take the \mone\ to reconstruct the BHMF, thus the assumption of the distribution for \mtwo\ actually does not affect the inference for the shape of BHMF. 
+\textbf{For the purpose of the simulation, however, all these parameters are necessary to} determine the value of $\Theta$ and ${\cal M}_0$ in Equation~(\ref{SNR}). We combine them with their redshift $z_s$ to generate the $\rho$ of each BBH \textbf{inspiraling} system. We only collect the events which have $\rho > \rho_0 = 8$, meaning that those events with $\rho < 8$ are too faint to detect. 
+
+Concerning the BHMF we consider two scenarios. In the first scenario, the exponent $\alpha$ is constant, hence the shape of the BHMF is fixed throughout the redshfit range probed by the ET. In the second scenario, we consider that $\alpha$ varies as a function of redshift according to:
+ \begin{equation} \label{equ_alphaz}
+\alpha(z) = \alpha_0 + \alpha_1\frac{z}{1+z} , 
+ \end{equation}
+% \kai{From my view, I would parameterize $M_{max}$ and $M_{min}$ rather than the shape of mass function, it is like the CDM hieratical model. BH mass grows with time maybe?}
+so that the $\alpha(z)$ would transform gradually from $\alpha_0$ to $\alpha_0+\alpha_1$ through low$-z$ to high$-z$. \textbf{The above form is not motivated by any physical model.}
+This is actually the first order Taylor expansion in the scale factor $a(t)$ for any function.
+
+\subsection{Estimation of Parameter Error} \label{sec_noiselevel}
+We aim to produce the mock dataset of the future GW events representative of the ET  measurements. In order to consider the measurement uncertainties in the realistic way, we distribute random statistical uncertainties into the simulated data as described below.
+
+\textbf{The parameters \it{measurable} from the BBH inspiral waveform comprised of \dl, redshifted chirp mass $(1+z){\cal M}_0 $ and $\rho$.} Individual masses \mone\ and \mtwo\ are derived from the combination of the chirp mass and the total mass \mone+\mtwo, which can also be extracted from the chirp waveform. 
+\blue{We note the fact that LIGO detections usually infer the properties an asymmetry upper and lower limit with ${\it skewed}$ possibility distributions. Therefore, instead of the symmetric Gaussian distribution, we assume that the simulated mock measurements follow the Log-Normal distribution with the standard deviation of  ${\cal M}_0$, \dl, and \mone\ equal to 0.17, 0.35 and 0.2, respectively.}
+For instance, if the $m_{1,fid}$ is the true value for \mone, \blue{the probability density as used to simulate the measured value} is:
+ \begin{equation} \label{equ_lognorm}
+P(m_1) = \frac{1}{m_1 \sigma_{m_1} \sqrt{2\pi}} exp \left[- \frac{log(m_1)-log(m_{1,fid})}{2\sigma_{m_1}} \right].
+ \end{equation}
+\blue{We set up the standard errors for ${\cal M}_0$, \dl, and \mone\ by taking results by \citet{Ghosh2016} as the reference, who explored the expected statistical uncertainties with which the parameters of black hole binaries can be measured from GW observations by next generation ground-based GW observatories. Note that the assumed uncertainty level of these properties should only affect the uncertainty (i.e., precision) of the inferred parameters, which wouldn't affect the validity (i.e., accuracy) test of our method.
+}
+ 
+
+Having clarified the MC approach and defined data the uncertainty level, we are capable of producing the mock GW dataset. For demonstrating propose, we list an example of one thousand BBH inspiral events as simulated in one realization of the MCMC seeding process. %\kai{In my understandings, as a prediction paper, only the uncertainties matter. The best-fit values must be deviated from the inputs for one MC process and are meaningless. Xuheng Totally agree.}
+
+\begin{deluxetable}{lcccc}
+\tablecolumns{5}
+\tabletypesize{\footnotesize}
+\tablewidth{0pt}
+\tablecaption{Illustration of the mock GW catalog} 
+\tablehead{ 
+\colhead{Object ID} &
+\colhead{\mone}&
+\colhead{Luminosity Distance} & 
+\colhead{Chirp Mass} &
+\colhead{SNR}
+\\ 
+\colhead{} &
+\colhead{($M_\odot$)}&
+\colhead{(Mpc)} & 
+\colhead{($M_\odot$)} &
+\colhead{(\snr)}
+\\
+\colhead{(1)} &
+\colhead{(2)} &
+\colhead{(3)} &
+\colhead{(4)} &
+\colhead{(5)}
+} 
+\startdata
+%\multicolumn{5}{c}{Sample presented in \citet{Treu+07}}\\
+%\\
+ID1 & $95.85\substack{+21.22\\-17.37}$  & $87120.7\substack{+19288.8\\-15792.3}$  & $61.87\substack{+13.70\\-11.21}$ & 28.707 \\
+ID2 & $13.31\substack{+2.95\\-2.41}$  & $81476.5\substack{+18039.1\\-14769.2}$  & $11.68\substack{+2.59\\-2.12}$ & 10.468 \\
+ID3 & $7.40\substack{+1.64\\-1.34}$  & $7456.8\substack{+1651.0\\-1351.7}$  & $6.82\substack{+1.51\\-1.24}$ & 39.673 \\
+ID4 & $19.02\substack{+4.21\\-3.45}$  & $96201.9\substack{+21299.4\\-17438.4}$  & $19.11\substack{+4.23\\-3.46}$ & 12.227 \\
+ID5 & $15.12\substack{+3.35\\-2.74}$  & $47645.3\substack{+10548.8\\-8636.6}$  & $14.24\substack{+3.15\\-2.58}$ & 12.672 \\
+ID6 & $18.95\substack{+4.20\\-3.43}$  & $23937.4\substack{+5299.8\\-4339.1}$  & $13.86\substack{+3.07\\-2.51}$ & 16.027 \\
+ID7 & $8.65\substack{+1.92\\-1.57}$  & $44053.0\substack{+9753.4\\-7985.4}$  & $6.99\substack{+1.55\\-1.27}$ & 8.383 \\
+ID8 & $40.03\substack{+8.86\\-7.26}$  & $60432.5\substack{+13379.9\\-10954.6}$  & $25.53\substack{+5.65\\-4.63}$ & 17.917 \\
+ID9 & $32.58\substack{+7.21\\-5.91}$  & $4293.5\substack{+950.6\\-778.3}$  & $18.58\substack{+4.11\\-3.37}$ & 34.190 \\
+ID10 & $9.88\substack{+2.19\\-1.79}$  & $50294.8\substack{+11135.4\\-9116.9}$  & $4.65\substack{+1.03\\-0.84}$ & 9.608 \\
+... & $...$ & ... & ... & ...\\
+ID991 & $7.90\substack{+1.75\\-1.43}$  & $10175.7\substack{+2252.9\\-1844.5}$  & $7.31\substack{+1.62\\-1.32}$ & 9.354 \\
+ID992 & $15.48\substack{+3.43\\-2.81}$  & $8058.1\substack{+1784.1\\-1460.7}$  & $17.14\substack{+3.80\\-3.11}$ & 11.149 \\
+ID993 & $6.11\substack{+1.35\\-1.11}$  & $9566.9\substack{+2118.1\\-1734.2}$  & $4.11\substack{+0.91\\-0.75}$ & 10.703 \\
+ID994 & $17.41\substack{+3.85\\-3.16}$  & $232095.1\substack{+51386.5\\-42071.7}$  & $14.46\substack{+3.20\\-2.62}$ & 8.444 \\
+ID995 & $23.76\substack{+5.26\\-4.31}$  & $127615.4\substack{+28254.4\\-23132.7}$  & $16.97\substack{+3.76\\-3.08}$ & 14.972 \\
+ID996 & $10.43\substack{+2.31\\-1.89}$  & $65546.6\substack{+14512.2\\-11881.6}$  & $6.96\substack{+1.54\\-1.26}$ & 9.497 \\
+ID997 & $5.79\substack{+1.28\\-1.05}$  & $24315.0\substack{+5383.4\\-4407.6}$  & $6.93\substack{+1.53\\-1.26}$ & 14.177 \\
+ID998 & $12.48\substack{+2.76\\-2.26}$  & $98731.2\substack{+21859.3\\-17896.9}$  & $6.85\substack{+1.52\\-1.24}$ & 13.340 \\
+ID999 & $6.95\substack{+1.54\\-1.26}$  & $75187.9\substack{+16646.8\\-13629.2}$  & $3.40\substack{+0.75\\-0.62}$ & 9.437 \\
+ID1000 & $6.53\substack{+1.45\\-1.18}$  & $27801.3\substack{+6155.3\\-5039.5}$  & $9.79\substack{+2.17\\-1.77}$ & 8.390 \\
+%... & $...$ & ... & ... \\
+\enddata
+\label{tab_GW_mock_data}
+\tablecomments{The catalog of simulated thousand BBH inspiral events is used to test the inference of the BHMF from the data attainable in forthcoming next generation GW detector -- the ET. The reported values are the medians, with errors corresponding to the 16th and 84th percentiles.
+}
+\end{deluxetable}
+
+\vspace{1cm}
+\section{Theoretical Framework}  \label{sec_theory}
+In this section, we describe the fitting procedure for the parameterized BHMFs. 
+In principle, the modeling for a dataset which follows a power-law distribution as Equation~(\ref{equ_powlaw}) is very straightforward. To derive the posterior of the parameters, one only needs to combine all the measured median values together in a joint likelihood:
+ \begin{equation} \label{equ_lik_powlaw}
+ P(\alpha, M_{max}, M_{min}|m_{1}) \propto  \prod_{i=1}^{total} P(m_{1,i}|\alpha, M_{max}, M_{min})
+ \end{equation}
+ \textbf{where $m_{1,i}$ is the primary mass inferred from the $i$~-~$th$ GW event.}
+However, the median values of simulated \mone, as shown in Table~\ref{tab_GW_mock_data}, actually deviate from the initial power-law distribution. This deviation stems from several effects that exist in reality. In Section~\ref{sec_likelihood_noise} and \ref{sec_likelihood_sf}, we introduce them and explore the ways to account for them.
+
+\subsection{Measurement Uncertainty}\label{sec_likelihood_noise}
+The intrinsic value of primary BH mass (i.e., $m_{1,fid}$) follows a power-law distribution, however the measured  \mone\ is scattered by the Log-Normal distribution which does not follow a power-law function anymore \citep{Koen2009}. In theory, if the event $X$ follows a power-law distribution and its observed values are subject to the Gaussian uncertainty, then $X + e$ is distributed according to the convolution of the power-law and Gaussian distributions. Likewise, given that the noised data follow the Log-Normal distribution, the intrinsic power-law should be convolved with it and enter the likelihood as:
+ \begin{equation} \label{equ_lik_conv}
+ P(\alpha, M_{max}, M_{min}{\bf |m_{1}}) \propto  \prod_{i=1}^{total} \hat{P}(m_{1,i}|\alpha, M_{max}, M_{min}),
+ \end{equation}
+where the $\hat{P}$ is the a power-law function convolved with the Log-Normal distribution using the standard deviation as 0.2 as we assumed. We illustrate the effect of such convolution in the Figure~\ref{fig:result_slope}.
+
+\begin{figure}%[!b]
+\includegraphics[width=1.05\linewidth]{convolving.pdf}
+\caption{
+Figure illustrating the convolution of a power-law distribution with a Log-Normal distribution having $\sigma = 0.2$. One can see that the convolution make distribution shallower, smoothes the breaking edge at $m_1 = 5 M_{\odot}$ and makes the slope less steep.
+}
+\label{fig:result_slope}
+\end{figure}
+
+\subsection{Selection Effect}\label{sec_likelihood_sf}
+The GW observations have a tendency to discover more significant events, known as Malmquist bias. \blue{For example, the} GW systems with higher values \mone\ \blue{trend to} produce stronger signals and thus have a higher probability to be detected. \blue{As a result, the final BHMFs would be biased to the high mass end, if this effect is not correctly taken into account}.
+
+To overcome this selection effect, we introduce the selection factor $\eta$ for the GW event, which is the detecting probability of one event in a repeated simulation. 
+The meaning of this factor $\eta$ is straightforward -- if one GW event has $\eta=0.2$, it means that this event has 80\% probability of being be missed. In other words, four equivalent events would have been missed. Thus, for this event, one needs to re-calibrate \blue{this influence by enhancing the likelihood by a power of 5 (i.e., $L^{1/0.2} = L^5$) to recover the possibility to its intrinsic value. Hence, to account for the selection effect, we calculate the likelihood as:}
+ \begin{equation} \label{equ_lik_sf}
+ P(\alpha, M_{max}, M_{min}{\bf |m_{1}}) \propto  \prod_{i=1}^{total} \hat{P}(m_{1,i}|\alpha, M_{max}, M_{min})^{1/\eta},
+ \end{equation}
+where $\eta$ is directly determined by the probability distribution of $\rho$, i.e. $\eta = P(\rho>8)$. In order to \blue{adopt the Equation~(\ref{SNR}) to derive the $\rho$}, the distribution function of $\Theta$ is \blue{taken} from the MC simulations; the \cmass\ and \dl\ are \blue{adopted from} the mock dataset as demonstrated in Table~\ref{tab_GW_mock_data}. Yet, the redshift $z_s$ is the unknown parameter since it is non-measurable in the GW detectors; one can only take the \dl\ as redshift estimator.
+\blue{Note that the observed \dl\ and \cmass\ are both considered to have random noise which follows the asymmetric distribution (i.e., Log-Normal). Thus, the distribution of their product $\eta$ is also asymmetric. Considering the random distributions of the \dl\ and \cmass, we performed the numerical tests and found that the distribution of $1/\eta$ could be well described by the Log-Normal distribution with multiplicative standard deviation as $\sigma=-log(\eta_{\rm median})/3$, see Figure~\ref{fig_eta}. Note that in a Log-Normal distribution, the expected value are higher than the true value (i.e., median value) by a factor of $e^{\sigma^2/2}$.
+We consider this skewness and recalibrate the inferred expected value of $1/\eta$ into the median value, in order to assign a non-biased $1/\eta$ to the calculation.
+}
+
+\begin{figure}%[!b]
+\includegraphics[width=1.0\linewidth]{eta_distribution.pdf}
+\caption{
+\blue{
+Assuming a set of \dl\ and \cmass\ as Log-Normal distribution, we randomly produce the the corresponding histogram of the $1/\eta$ distribution. The result shows that the skewed distribution could be well described by a Log-Normal distribution with $\sigma = -\log(\eta_{\rm median})/3$.
+}
+}
+\label{fig_eta}
+\end{figure}
+
+\subsection{Luminosity Distance as Redshift Estimator} 
+\label{sec_dl_z}
+%The redshift is not detectable by GW, however, can be inferred from the DL. 
+In the previous section, we take \dl\ as the redshift estimator to derive the redshift and hence selection factor $\eta$. The way to derive the \textbf{inferred redshift $z_{inf}$} is an inverse solution of integral function when knowing the \dl$(z)$ and fixing the cosmological model.
+
+Once the cosmological model is assumed, indirect inference of $z_s$ offers an opportunity to model the BHMF slope as a function of redshift. Therefore, we are able to investigate the second scenario described by the Equation~(\ref{equ_alphaz}) as:
+ \begin{equation} \label{equ_lik_alphaz}
+ \begin{split}
+ P&(\alpha_0, \alpha_1, M_{max}, M_{min}{\bf |m_{1},d_L(z)}) \propto \\
+  &\prod_{i=1}^{total} \hat{P}(m_{1i}, z_{inf,i} |\alpha_0, \alpha_1, M_{max}, M_{min})^{1/\eta}.
+  \end{split}
+ \end{equation}
+ 
+ We present our inference for the BHMF using the mock data in the next section. 
+
+
+\vspace{1cm}
+\section{Result}\label{sec_result}
+%We present the result in this section.
+%One thousand of data points.
+%An appendix to introduce the correction for the skewness for the $\eta$.
+We fit the mock data to the BHMF model to infer the distribution of the best-fit parameters. To avoid the bias and estimate the scatter, we adopt the realization approach. In each realization, we simulate a thousand of BBH inspiral GW events and infer the best-fit parameters using minimization of the chi-square objective function. \blue{We keep increasing the volume of realizations until the inferred best-fit parameters converged.}
+
+In the first scenario, we consider the slope $\alpha$ as a constant. \blue{ We performed numerical tests assuming three different sets of parameters taking $\alpha$ as 0.8, 1.6 and 2.4, with $M_{min}~=~5M_{\odot}$, $M_{max}~=~50M_{\odot}$. We calculate the likelihood by Equation~(\ref{equ_lik_sf}) to infer the best-fit parameters in each realization. It has been discussed that no black holes with mass over $50M_{\odot}$ are expected from stellar evolution and through supernovae~\citep{Woosley2017, Wiktorowicz2019}.
+In Figure~\ref{fig_result_a}, we present the posterior distribution of the inferred parameters for the three parameter sets. We find that all the parameters are recovered accurately which confirms the validity of our method. The uncertainties for the inferred parameters are $\Delta\alpha\sim0.1$, $\Delta M_{max}\sim1-2M_{\odot}$ and $\Delta M_{min}\sim0.2-0.3M_{\odot}$. Note that these uncertainty levels are not ready to be treated as a universal for the general case, but only apply when the initial parameter sets are close to the tested ones. Moreover, these uncertainty levels are related to the standard deviation of the measurements including ${\cal M}_0$, \dl, and \mone, as discussed in Section~\ref{sec_noiselevel}.
+}
+
+\begin{figure*}%[!b]
+\centering
+\begin{tabular}{c c c}
+\subfloat[\blue{assuming $\alpha=0.8$, $M_{min}=5M_{\odot}$ and $M_{max}=50M_{\odot}$.}]
+{\includegraphics[width=0.3\linewidth]{3para_contour_a0_08.pdf}}&
+\subfloat[\blue{assuming $\alpha=1.6$, $M_{min}=5M_{\odot}$ and $M_{max}=50M_{\odot}$.}]
+{\includegraphics[width=0.3\linewidth]{3para_contour_a0_16.pdf}}&
+\subfloat[\blue{assuming $\alpha=2.4$, $M_{min}=5M_{\odot}$ and $M_{max}=50M_{\odot}$.}]
+{\includegraphics[width=0.3\linewidth]{3para_contour_a0_24.pdf}}
+\end{tabular}
+\caption{
+One- and two-dimensional distributions for the best-fitted parameters in the \blue{first scenario, based on three sets of parameters with a thousand of BBH inspiral GW events}. The BHMF is assumed as a power-law with hard cut at the $M_{min}$ and $M_{max}$, with a constant slope ($\alpha$) across all the redshifts. The blue lines indicate the true value as assumed in the simulation.
+}
+\label{fig_result_a}
+\end{figure*}
+
+In the second scenario, the $\alpha$ evolves with redshift according to the Equation~(\ref{equ_alphaz}). \blue{We consider four sets of parameters assuming $\alpha_0$ as  0.8, 1.6, 2.4 and $\alpha_1$ including 0.7 and 1.2. We present the results in Figure~\ref{fig_result_b} and find that all the assumed parameters could be recovered accurately. With one more parameters included in the second scenario, the uncertainty level are extended as \ding{The following values still need to confirm} $\Delta\alpha_0\sim0.4$, $\Delta\alpha_1\sim0.5-0.7$, $\Delta M_{max}\sim2-4M_{\odot}$ and $\Delta M_{min}\sim0.2-0.3M_{\odot}$. We note that there is a degeneracy between the $\alpha_0$ and $\alpha_1$, which is understandable given that they are strongly connected by the Equation~\ref{equ_alphaz}. However, for the four sets of parameters we tested, this degeneracy does not affect the inferred uncertainty level for the $\alpha_0$ and $\alpha_1$.
+}
+
+We highlight that in this \blue{second} scenario, it is the inferred uncertainty of $\alpha_1$ that matters the most. \blue{Our result show that, with only one thousand of GW measurements in the future, the inferred value of $\alpha_1$ would reach to precision of $\Delta\alpha_1\sim0.5-0.7$. Limited by the computing power, we couldn't use numerical test to get a universal uncertainty level as for the general case. However, given the fours sets of tests as shown the Figure~\ref{fig_result_b}, it is likely to be true that one thousand of GW measurement could distinguish the evolution of BHMF at 1-$\sigma$ confidence level when $\alpha_1$ is deviated from 0 by a value of 0.5. 
+Moreover, we conjecture that the precision of inference is increasing with the sample size as a function of $\sqrt{N}$. Thus, for the four sets of tests, the one year measurements of ET ($\sim10^5$ in total) would increase the uncertainty levels by a factor of 10.}
+We also note that the distribution of the best-fitted parameters ($\alpha_0$, $\alpha_1$) does not follow the Gaussian distribution, but rather a large fraction of it is concentrated at the center.
+%As a result, the 1-$\sigma$ confidence interval in 2-D parameter space are narrower than the ones in 1-D space. %\textcolor{blue}{(What does this suggest?)} 
+
+\begin{figure*}%[!b]
+\centering
+\begin{tabular}{c c}
+\subfloat[\blue{assuming $\alpha_0=0.8$, $\alpha_1=0.7$, $M_{min}=5M_{\odot}$ and $M_{max}=50M_{\odot}$.}]
+{\includegraphics[width=0.4\linewidth]{4para_contour_a0_08_a1_07.pdf}}&
+\subfloat[\blue{assuming $\alpha_0=0.8$, $\alpha_1=0.7$, $M_{min}=5M_{\odot}$ and $M_{max}=50M_{\odot}$.}]
+{\includegraphics[width=0.4\linewidth]{4para_contour_a0_16_a1_07.pdf}}\\
+\subfloat[\blue{assuming $\alpha_0=0.8$, $\alpha_1=0.7$, $M_{min}=5M_{\odot}$ and $M_{max}=50M_{\odot}$.}]
+{\includegraphics[width=0.4\linewidth]{4para_contour_a0_24_a1_07.pdf}}&
+\subfloat[\blue{assuming $\alpha_0=0.8$, $\alpha_1=1.2$, $M_{min}=5M_{\odot}$ and $M_{max}=50M_{\odot}$.}]
+{\includegraphics[width=0.4\linewidth]{4para_contour_a0_16_a1_12.pdf}}
+\end{tabular}
+\caption{
+\blue{Same} as Figure~\ref{fig_result_a} but for the second scenario, where the $\alpha$ of BHMF is evolving with redshift as $\alpha(z) = \alpha_0 + \alpha_1\frac{z}{1+z}$\blue{, four sets of parameters assumed.}
+}
+\label{fig_result_b}
+\end{figure*}
+
+\vspace{1cm}
+\section{Conclusion \& Discussion} \label{sec_summary}
+%\kai{Can you discuss what if the distribution is not power-law? Can your method test this model?}
+The third-generation gravitational wave detector, the Einstein Telescope, is very powerful and capable of detecting $\sim10^5$ GW events per year, with redshift up to $z\sim17$. In this study, we investigated how the detections of the BBH mergers could improve our knowledge of the black hole mass function \blue{(BHMF)}.
+
+We performed the Monte Carlo simulation to estimate the uncertainty level of BHMF parameters inferred from GW signals by BBHs that would be detected by ET. As a starting point, we assumed that the BHMF for the primary BH mass followed a power-law distribution \blue{with a hard cuts as Equation~(\ref{equ_powlaw})}. Based on the BBH intrinsic merger rate predicted by {\tt StarTrack}, we randomly simulated the key parameters of the BBH systems, including the chirp masses, redshifts and orientation factors and calculated  their corresponding signal-to-noise ratio \snr\ for the ET. We collected the events whose \snr\ exceeds the detecting threshold and injected Log-Normal noise to the detected parameter, including BH mass, chirp mass, luminosity distance as mock data.
+
+We built up a theoretical framework and explore to use the mock measurements to infer the BHMF. We took into account the measurement uncertainties and the selection effect which would bias the inference. We \blue{performed the test using realizations, one thousand GW events per realization}, and estimated the distribution of the best-fitted parameters of the BHMF, including the power-law slope $\alpha$, the maximum BH mass $M_{max}$ and the minimum BH mass $M_{min}$ \blue{in the first scenario}. Furthermore, \blue{in the second scenario, we consider the $\alpha$ evolves as a function of redshift and used the luminosity distance as redshift estimator to test the evolution}. We summarize our main results as follows:
+\blue{
+\begin{enumerate}
+\item Using our method based on Equation~(\ref{equ_lik_sf}), all the tested parameters are all recovered accurately, which confirms the validity of our tests and highlights the importance of correctly considering the measurement uncertainty and selection effect.
+\item Taking the measured \dl\ as redshift estimator, we tested to recover the $\alpha$ with a scenario which is evolving with redshift as $\alpha(z) = \alpha_0 + \alpha_1\frac{z}{1+z}$. Testing with four parameters sets, we are able to successfully recovered the true value of $\alpha_1$ accurately.
+\item Given the fixed sets of parameters, our results show that a volume of one thousand measurements of BBHs events could infer the parameters with uncertainties level at $\Delta\alpha\sim0.1$, $\Delta M_{max}\sim1-2M_{\odot}$ and $\Delta M_{min}\sim0.2-0.3M_{\odot}$ for the first scenario. For the second scenario, the inferred uncertainties are $\Delta\alpha_0\sim0.4$, $\Delta\alpha_1\sim0.5-0.7$, $\Delta M_{max}\sim2-4M_{\odot}$ and $\Delta M_{min}\sim0.2-0.3M_{\odot}$. In the future, the one year detection rate of ET ($\sim10^5$ in total) increase the sample size by a factor of 100. According to the fact that the precision of the inference increases with the sample size, as a function of $\sqrt{N}$, we conclude that one year BBH sample by ET would be able to deliver the parameters at higher uncertainty improved by a factor of 10 as tested.
+\end{enumerate}
+}
+
+We point out a few limitations of this work. First, we have adopted a template of intrinsic BBH merger rate based on the predictions by a standard model in {\tt StarTrack}, which can be different from the realistic one. Of course, the intrinsic BBH merger rate is unknown yet, which is related to 
+lack of detailed knowledge of different elements such as BBH masses, explosion mechanism, the metallicity history and the time delay distribution. Also, for the sake of simplicity, we simulated the value of the secondary BH mass \mtwo\ by assuming that two masses of BBHs have independent distributions, which probably is not exactly true. However, one can expect that these limitations would more strongly affect the prediction of the yearly detection rate of the GW events and their redshift distribution, rather than the inference of the parameters in the BHMF.
+\blue{Last, the numerical tests as done in this works confirms the validity of our method. However, limited by the sets of tests, the inferred uncertainty for both scenario applies for the fixed sets of parameters which shouldn't be considered as a general value.}
+
+In this work, we focused on the inference of the BHMF using the mass properties by the BBH. However, it is worth to note that our approach could be extended to address other problems. For example, one could infer the spin of BH \citep{Abbott2018b}, the mass function for the binary of NS-NS, NS-BH system, though these events are detectable at lower redshift ($z<4$). In addition, using the luminosity as redshift estimator, one should also be able to reconstruct the BBH intrinsic merger rate \citep{Fishbach2018}, the cosmological parameter.
+
+
+\acknowledgments
+We thank Hosek Jr., M.W for the useful discussion.
+
+This work was supported by the National Natural Science Foundation of China under grant Nos. 11633001 and 11373014, the Strategic Priority Research Program of the Chinese Academy of Sciences, grant No. XDB23000000, and the Interdiscipline Research Funds of Beijing Normal University.
+
+X. Ding acknowledges support by China Postdoctoral Science Foundation Funded Project (No. 2017M622501).
+%L. Yang is supported from the China Scholarship Council. 
+M.B. was supported by the Key Foreign Expert Program for the Central Universities No. X2018002.
+K. Liao was supported by the National Natural Science Foundation of China (NSFC) No. {\bf 11973034}..
+\software{  {\sc corner}, \citep{corner},
+        Matplotlib \citep{Matplotlib},
+        and standard Python libraries.
+        }
+
+\bibliography{reference}
+%\input{reference.bbl}
+
+%\newpage
+%\appendix
+%\section{section}\label{appendix_section}
+%TEXTTEXTTEXTTEXTTEXTTEXTTEXTTEXTTEXT
+%\newpage
+
+%\newpage
+%\appendix
+%\section{Correction for the skewness of the selection factor}\label{appA}
+%1. Describe the bias of the selection.
+%2. The correction by $\eta/3.$
+
+
+\end{document}
