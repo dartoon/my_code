@@ -19,7 +19,7 @@ solve_z = np.vectorize(solve_z)
 #a0, a1, mbh_max, mbh_min = 1.6, 0.7, 50., 5.   #mode1  a0: 0.8, 1.6, 2.4  a1: 0.2. 0.7, 1.2
 a0, a1, mbh_max, mbh_min = 2.4, 0.7, 50., 5.   #mode1
 
-part = 12
+part = 23
 
 seed = 2
 filename = 'sim_a0_{0}_a1_{1}_max_{2}'.format(a0, a1, mbh_max)
