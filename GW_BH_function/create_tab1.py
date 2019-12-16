@@ -31,7 +31,7 @@ import random
 import scipy.optimize as op
 import time
 
-a, mbh_max, mbh_min = 2.35, 80., 5.
+a, mbh_max, mbh_min = 1.6, 50., 5.
 filename = 'sim_a_{0}_max_{1}_min_{2}'.format(round(a,2), round(mbh_max,1), round(mbh_min,1))
 if_file = glob.glob(filename)  
 test = gene_BHBH(h0=70)
