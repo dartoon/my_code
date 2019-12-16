@@ -1,0 +1,59 @@
+Hi all,
+
+As discussed in the telecon, perhaps we can show how terribly the H0 would be inferred if one uses the 'simple' way to fit for H0. To test, I fit the six mocks only consider the lensed QSO position and the time-delay as constraints and fitting with power-law and SIE model. I adopted the same uncertainty level for the time delay (i.e., ~0.25 days) and astrometric uncertainties for the lensed QSO positions as 0.001 arcsec. The fitting is done using Lenstronomy with Simon's notebook (Thank you Simon!).
+ 
+Following is the inferred H0 with three times of fitting. Not surprisingly, the inferred H0 is strongly biased. Very interesting, the inferred H0 is more related to how the lens ellipticity biased rather than the slope value. Maybe I can put more narrow prior to the ellipticity. However, it might not worth it. Given that some of them are strongly biased, do we still show these values or only leave some comments such as we have done some tests and found that this simple method couldn't constrain the H0? Let me know if you have any questions.
+
+Cheers,
+Xuheng
+
+Results:
+Truth: H0 = 70.7 Km/s/Mpc ;  q ~ 0.9; gamma = 2.0
+
+Power-law:
+seed = 1: H_0: 86.632±5.290, total_Chisq:2.978, gamma: 2.05±0.02 q: 0.874±0.008 
+seed = 2: H_0: 89.025±4.498, total_Chisq:0.112, gamma: 2.00±0.04 q: 0.863±0.007 
+seed = 3: H_0: 151.076±6.604, total_Chisq:1.488, gamma: 1.98±0.01 q: 0.725±0.008 
+seed = 4: H_0: 169.206±8.270, total_Chisq:5.671, gamma: 1.87±0.02 q: 0.726±0.011 
+seed = 5: H_0: 78.871±3.777, total_Chisq:1.597, gamma: 1.91±0.02 q: 0.729±0.013 
+seed = 6: H_0: 164.632±12.958, total_Chisq:9.979, gamma: 1.80±0.01 q: 0.572±0.007 
+
+seed = 1: H_0: 67.475±3.503, total_Chisq:3.083, gamma: 1.92±0.02,  q: 0.905±0.006 
+seed = 2: H_0: 57.289±2.587, total_Chisq:0.556, gamma: 1.85±0.02,  q: 0.912±0.006 
+seed = 3: H_0: 146.413±6.978, total_Chisq:1.580, gamma: 1.93±0.01,  q: 0.741±0.010 
+seed = 4: H_0: 137.754±6.946, total_Chisq:1.836, gamma: 1.279±0.001,  q: 0.773±0.009 
+seed = 5: H_0: 116.640±1.791, total_Chisq:5.908, gamma: 0.630±0.001,  q: 0.568±0.005 
+seed = 6: H_0: 137.941±4.465, total_Chisq:9.769, gamma: -0.195±0.001,  q: 0.628±0.008 
+
+
+seed = 1: H_0: 63.829±4.085, total_Chisq:3.451, gamma: 0.102±0.001,  q: 0.912±0.006 
+seed = 2: H_0: 39.237±1.676, total_Chisq:2.384, gamma: 0.047±0.097,  q: 0.943±0.004 
+seed = 3: H_0: 134.105±5.673, total_Chisq:2.237, gamma: -0.874±0.001,  q: 0.763±0.008 
+seed = 4: H_0: 142.527±5.226, total_Chisq:1.892, gamma: 1.283±0.001,  q: 0.756±0.008 
+seed = 5: H_0: 112.342±2.092, total_Chisq:4.093, gamma: 0.624±0.001,  q: 0.601±0.003 
+seed = 6: H_0: 172.732±4.606, total_Chisq:13.938, gamma: -0.196±0.001,  q: 0.542±0.006 
+
+
+SIE:
+seed = 1: H_0: 68.687±5.866, total_Chisq:2.986,  q: 0.902±0.008 
+seed = 2: H_0: 71.411±6.241, total_Chisq:0.009,  q: 0.887±0.009 
+seed = 3: H_0: 153.123±5.216, total_Chisq:1.450,  q: 0.722±0.003 
+seed = 4: H_0: 186.053±6.229, total_Chisq:1.346,  q: 0.684±0.004 
+seed = 5: H_0: 86.194±1.458, total_Chisq:1.725,  q: 0.694±0.002 
+seed = 6: H_0: 264.682±49.762, total_Chisq:51.797,  q: 0.386±0.005 
+
+seed = 1: H_0: 76.332±4.234, total_Chisq:2.847,  q: 0.892±0.005 
+seed = 2: H_0: 84.341±4.965, total_Chisq:1.697,  q: 0.865±0.008 
+seed = 3: H_0: 158.852±4.704, total_Chisq:1.584,  q: 0.712±0.003 
+seed = 4: H_0: 112.752±4.934, total_Chisq:2.152,  q: 0.797±0.007 
+seed = 5: H_0: 84.126±1.707, total_Chisq:2.001,  q: 0.698±0.002 
+seed = 6: H_0: 172.568±4.576, total_Chisq:70.461,  q: 0.518±0.004 
+
+seed = 1: H_0: 85.101±5.107, total_Chisq:3.043,  q: 0.881±0.006 
+seed = 2: H_0: 79.362±5.857, total_Chisq:1.263,  q: 0.879±0.008 
+seed = 3: H_0: 147.783±4.205, total_Chisq:1.464,  q: 0.732±0.002 
+seed = 4: H_0: 169.846±5.903, total_Chisq:1.260,  q: 0.710±0.005 
+seed = 5: H_0: 78.117±1.510, total_Chisq:1.377,  q: 0.718±0.003 
+seed = 6: H_0: 230.572±31.792, total_Chisq:26.701,  q: 0.413±0.004 
+
+
