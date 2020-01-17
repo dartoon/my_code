@@ -12,7 +12,7 @@ import corner
 import astropy.io.fits as pyfits
 
 import sys
-sys.path.insert(0,'../../py_tools/')
+sys.path.insert(0,'../../../py_tools/')
 
 picklename = 'example.pkl'
 result = pickle.load(open(picklename,'rb'))
@@ -82,8 +82,16 @@ plt.show()
 #%% Plot the image again:
 pix_scale = 0.0642 
 from flux_profile import total_compare
-psf, agn_image, error_map = pyfits.getdata('PSF.fits'),  pyfits.getdata('QSO_im.fits'),  pyfits.getdata('QSO_err.fits')
+psf, QSO_img, QSO_std = pyfits.getdata('psf_77.fits'),  pyfits.getdata('CID1174_cutout.fits'),  pyfits.getdata('wht_err.fits')
 
+frame_size = 61
+#frame = '{0}'.format(frame_size)
+QSO_fm = len(QSO_img)
+ct = (QSO_fm-frame_size)/2     # If want to cut to 61, i.e. (121-61)/2=30
+
+QSO_img = QSO_img[ct:-ct,ct:-ct]
+QSO_std = QSO_std[ct:-ct,ct:-ct]
+psf = psf[ct:-ct,ct:-ct]   
 if len(image_host) == 1:
     host = image_host[0]
     label = ['data', 'QSO', 'host', 'model', 'normalized residual']
@@ -93,9 +101,14 @@ elif len(image_host) >1:
         host += image_host[i]
     label = ['data', 'QSO', 'host as {0} components'.format(i+1), 'model', 'normalized residual']  #Print the numbers of objects
 #error_map = err_map[ct:-ct,ct:-ct]
-flux_list = [agn_image, image_ps, host, error_map]
+flux_list = [QSO_img, image_ps, host, QSO_std]
 
 total_compare(label_list = label, flux_list = flux_list, target_ID = 'example', pix_sz=pix_scale, zp = zp,
-                    plot_compare = False, msk_image = np.ones_like(agn_image))
+                    plot_compare = False, msk_image = np.ones_like(QSO_img))
 
 #fig.savefig("{0}_SB_profile.pdf".format(name_save), bbox_inches = 'tight')
+
+from transfer_to_result import transfer_to_result
+result = transfer_to_result(data=QSO_img, pix_sz = pix_scale,
+                            source_result=source_result, ps_result=ps_result, image_ps=image_ps, image_host=image_host, error_map=QSO_std,
+                            zp=zp, fixcenter=False,ID='Example', plot_compare = False)

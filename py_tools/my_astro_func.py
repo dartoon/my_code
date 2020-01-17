@@ -38,10 +38,12 @@ def auto_cut_PSFs(img, radius=100, view=True):
     if view ==True:
         for i in range(len(PSFx)):
             cut_img = cut_image(img, [PSFx[i], PSFy[i]], radius=radius)
-            print "plot for position:", PSFx[i], PSFy[i], "idx:", i
-            cut_img[np.isnan(cut_img)] = 0
-            print "total flux:", cut_img.sum()
-            plt_fits(cut_img)
+            if True not in np.isnan(cut_img) and np.max(cut_img) == cut_img[len(cut_img)/2][len(cut_img)/2]:
+                print "plot for position: [{0}, {1}]".format(PSFx[i], PSFy[i]), "idx:", i
+                cut_img[np.isnan(cut_img)] = 0
+                print "total flux:", cut_img.sum()
+                plt_fits(cut_img)
+                print "================"
     return  PSFx, PSFy  
     
     

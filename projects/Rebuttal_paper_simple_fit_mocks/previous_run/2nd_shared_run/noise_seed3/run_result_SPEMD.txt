@@ -1,6 +1,0 @@
-seed = 1: H_0: 67.301pm2.992, total_Chisq:3.083, gamma: 1.986pm0.021, q: 0.905pm0.006 
-seed = 2: H_0: 57.190pm2.293, total_Chisq:0.556, gamma: 1.966pm0.032, q: 0.912pm0.005 
-seed = 3: H_0: 146.317pm6.295, total_Chisq:1.580, gamma: 1.940pm0.016, q: 0.741pm0.009 
-seed = 4: H_0: 137.776pm6.762, total_Chisq:1.836, gamma: 1.878pm0.014, q: 0.773pm0.009 
-seed = 5: H_0: 116.748pm1.591, total_Chisq:5.908, gamma: 2.185pm0.003, q: 0.568pm0.003 
-seed = 6: H_0: 137.854pm4.185, total_Chisq:9.769, gamma: 1.751pm0.010, q: 0.627pm0.008 

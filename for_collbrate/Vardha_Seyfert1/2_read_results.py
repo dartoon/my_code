@@ -13,8 +13,10 @@ import astropy.io.fits as pyfits
 from matplotlib.colors import LogNorm
 import copy
 
-ID = 'l106'
-picklename = ID+'_fitting.pkl'
+#ID = 'l106'
+#picklename = ID+'_fitting.pkl'
+picklename = 'result_vardha/'+ 'l24_sersicdisk.pkl'
+
 result = pickle.load(open(picklename,'rb'))
 [best_fit,pso_fit,mcmc_fit, trans_paras] = result
 
@@ -23,34 +25,38 @@ chain_list, param_list, _ = pso_fit
 samples_mcmc, param_mcmc, dist_mcmc, _ = mcmc_fit
 _, _, mcmc_new_list, labels_new, _ = trans_paras
 
+plot = corner.corner(samples_mcmc, labels=param_mcmc, show_titles=True)
+plt.show()
+
 print "best-fit source_result:", source_result
 print "best-fit ps_result:", ps_result
 pix_sz = 0.04
 
-#%%Replot the profiles
-import sys
-sys.path.insert(0,'./fitting_tools/')
-from flux_profile import total_compare
-zp = 25.0985
-
-flux_hdulist = pyfits.open(ID+'_flux_list.fits')  # includes [agn_image,image_ps, extended_source, error_map, QSO_msk]
-flux_list = [flux_hdulist[i].data for i in range(4)]
-QSO_msk = flux_hdulist[4].data
-label = ['data', 'QSO', 'extended sources', 'model', 'normalized residual']
-fig = total_compare(label_list = label, flux_list = flux_list, target_ID = ID, pix_sz=pix_sz, zp = zp,
-                    plot_compare = False, msk_image = QSO_msk)
-plt.show()
-
-print "plot individual frame:"
-plt.imshow(flux_list[0] - flux_list[1], norm=LogNorm(),origin='low')
-plt.colorbar()
-frame_size = len(flux_list[0])
-plt.text(frame_size*0.05, frame_size*0.9, 'data - Point Source', weight='bold',
-         fontsize=17, color='white')
-plt.show()
+##%%Replot the profiles
+#import sys
+#sys.path.insert(0,'./fitting_tools/')
+#from flux_profile import total_compare
+#zp = 25.0985
+#
+#flux_hdulist = pyfits.open(ID+'_flux_list.fits')  # includes [agn_image,image_ps, extended_source, error_map, QSO_msk]
+#flux_list = [flux_hdulist[i].data for i in range(4)]
+#QSO_msk = flux_hdulist[4].data
+#label = ['data', 'QSO', 'extended sources', 'model', 'normalized residual']
+#fig = total_compare(label_list = label, flux_list = flux_list, target_ID = ID, pix_sz=pix_sz, zp = zp,
+#                    plot_compare = False, msk_image = QSO_msk)
+#plt.show()
+#
+#print "plot individual frame:"
+#plt.imshow(flux_list[0] - flux_list[1], norm=LogNorm(),origin='low')
+#plt.colorbar()
+#frame_size = len(flux_list[0])
+#plt.text(frame_size*0.05, frame_size*0.9, 'data - Point Source', weight='bold',
+#         fontsize=17, color='white')
+#plt.show()
 
 #%%diagnose the PSO chain convergency
-import lenstronomy.Plots.output_plots as out_plot
+#import lenstronomy.Plots.output_plots as out_plot
+import lenstronomy.Plots.chain_plot as out_plot
 for i in range(len(chain_list)):
     if len(param_list[i]) > 0:
         f, axes = out_plot.plot_chain(chain_list[i], param_list[i])
@@ -81,7 +87,7 @@ print param_mcmc[idx], ":", v_l, v_m, v_h
 
 #For the translated totol flux.
 mcmc_new_list = np.asarray(mcmc_new_list)
-idx = 2
+idx = 1
 v_l=np.percentile(mcmc_new_list[:,idx],16,axis=0)
 v_m=np.percentile(mcmc_new_list[:,idx],50,axis=0)
 v_h=np.percentile(mcmc_new_list[:,idx],84,axis=0)

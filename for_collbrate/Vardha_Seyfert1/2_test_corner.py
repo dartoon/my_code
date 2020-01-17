@@ -10,7 +10,8 @@ import matplotlib.pyplot as plt
 import pickle
 import corner
 
-picklename = 'dump_fitting.pkl' 
+#picklename = 'dump_fitting.pkl' 
+picklename = 'result_vardha/'+ 'l24_sersic.pkl'
 result = pickle.load(open(picklename,'rb'))
 [source_result, image_host, ps_result, image_ps, samples_mcmc, param_mcmc, paras] = result
 

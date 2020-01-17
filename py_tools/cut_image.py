@@ -77,7 +77,7 @@ def cut_center_bright(image, center, radius,kernel = 'gaussian', return_center=F
         return cut_c_b, center_f
  
 def save_loc_png(img, center_QSO, c_psf_list=None,extra_psfs=None,ID=None, label= None,
-                 reg_ty=None,ifsave=True, label_shift_NO=(), shift_where=None):
+                 reg_ty=None,ifsave=True, label_shift_NO=(), shift_where=None, v_max = None, v_min = None):
     '''
     label shift_where: 1,2,3,4 --- up, right, down, left
     '''
@@ -106,6 +106,10 @@ def save_loc_png(img, center_QSO, c_psf_list=None,extra_psfs=None,ID=None, label
         vmin = 1.e-3
         QSO_box_size = 100
         PSF_box_size = 60 
+    if v_max != None:
+        vmax = v_max
+    if v_min != None:
+        vmin = v_min
     cax=ax.imshow(img,origin='lower', cmap=my_cmap, norm=LogNorm(), vmin=vmin, vmax=vmax)
     QSO_reg = pix_region(center_QSO, radius= QSO_box_size)
     QSO_mask = QSO_reg.to_mask(mode='center')

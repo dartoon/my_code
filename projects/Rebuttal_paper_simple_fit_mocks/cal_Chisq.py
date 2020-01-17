@@ -21,11 +21,10 @@ from  lenstronomy.Plots import lens_plot
 import glob
 import matplotlib.pyplot as plt
 import pickle
-from astrofunc.Cosmo.lens_unit_conversion import LensUnits
-def cal_Ddt(zl, zs, H0=70, om=0.27):
-    H0_ini = 100
+
+def cal_Ddt(zl, zs, H0_ini=100, om=0.27):
     cosmo = FlatLambdaCDM(H0=H0_ini, Om0=0.27) 
-    lensunits=LensUnits(z_lens=zl, z_source=zs,cosmo= cosmo)
+    lensunits=LensCosmo(z_lens=zl, z_source=zs,cosmo= cosmo)
     D_l=lensunits.D_d
     D_s=lensunits.D_s
     D_ls=lensunits.D_ds 
@@ -33,14 +32,19 @@ def cal_Ddt(zl, zs, H0=70, om=0.27):
     return Ddt_corr
 
 def cal_h0(zl, zs, Ddt, om=0.27):
-    Ddt_corr = cal_Ddt(zl, zs, H0=100)
+    Ddt_corr = cal_Ddt(zl, zs, H0_ini=100)
     ratio = Ddt_corr/Ddt
     return 100 * ratio
 
 H0_true = 70.65595
 #noise_seed = 2
-for fix_gamma in [True, False]:
-    for seed in [211, 212, 213, 214, 215, 216]:
+
+#folder = 'MCsteps[1000, 10000]_first_run_linear_True/'
+#folder = 'MCsteps1000_10000_second_run_linear_True/'
+folder = 'MCsteps1000_10000_deflector_10mas/'
+
+for fix_gamma in [False]:
+    for seed in [216]:
         if seed == 211:
             z_lens ,z_source = [0.640, 2.408]
             ximg = [0.41530, 0.17330, 1.22509, -1.18836]  # image positions in relative RA (arc seconds)
@@ -128,8 +132,8 @@ for fix_gamma in [True, False]:
         #kwargs_lens_init.append(kwargs_lens[0])
         kwargs_lens_init.append({'theta_E': 1.20, 'gamma': 2., 'center_x': 0, 'center_y': 0, 'e1': e1, 'e2': e2})
         kwargs_lens_sigma.append({'theta_E': .1, 'e1': 0.1, 'e2': 0.1, 'gamma': 0.1, 'center_x': 0.1, 'center_y': 0.1})
-        kwargs_lower_lens.append({'theta_E': 0.01, 'e1': -0.5, 'e2': -0.5, 'gamma': 1.5, 'center_x': e1-0.08, 'center_y': e2-0.08})
-        kwargs_upper_lens.append({'theta_E': 10, 'e1': 0.5, 'e2': 0.5, 'gamma': 2.5, 'center_x': e1+0.08, 'center_y': e2+0.08})
+        kwargs_lower_lens.append({'theta_E': 0.01, 'e1': -0.5, 'e2': -0.5, 'gamma': 1., 'center_x': e1-0.08, 'center_y': e2-0.08})
+        kwargs_upper_lens.append({'theta_E': 10, 'e1': 0.5, 'e2': 0.5, 'gamma': 3, 'center_x': e1+0.08, 'center_y': e2+0.08})
         
         # combine all parameter options for lenstronomy
         lens_params = [kwargs_lens_init, kwargs_lens_sigma, fixed_lens, kwargs_lower_lens, kwargs_upper_lens]
@@ -189,7 +193,7 @@ for fix_gamma in [True, False]:
         
         # we can define un-correlated Gaussian priors on specific parameters explicitly
         # e.g. power-law mass slope of the main deflector
-        prior_lens = [[0, 'gamma', 2, 0.15]] # [[index_model, 'param_name', mean, 1-sigma error], [...], ...]
+        #prior_lens = [[0, 'gamma', 2, 0.15]] # [[index_model, 'param_name', mean, 1-sigma error], [...], ...]
         # e.g. source size of the emission region
         #prior_special = []
             
@@ -198,7 +202,7 @@ for fix_gamma in [True, False]:
                              'source_position_likelihood': True,  # evaluates how close the different image positions match the source positons
                              'image_position_likelihood': True, # evaluate point source likelihood given the measured image positions
                              'time_delay_likelihood': time_delay_likelihood,  # evaluating the time-delay likelihood
-                             'prior_lens': prior_lens,
+                             #'prior_lens': prior_lens,
         #                     'prior_special': prior_special,
                              'check_solver': True, # check non-linear solver and disgard non-solutions
                              'solver_tolerance': 0.001,
@@ -208,11 +212,23 @@ for fix_gamma in [True, False]:
         from lenstronomy.Workflow.fitting_sequence import FittingSequence
         fitting_seq = FittingSequence(kwargs_data_joint, kwargs_model, kwargs_constraints, kwargs_likelihood, kwargs_params)
         if fix_gamma == True:
-            result = pickle.load(open('Final-MCMC_4000_steps/sampler_results_SIE#{0}.pkl'.format(seed-210),'rb'))
+            result = pickle.load(open(folder+'sampler_results_SIE#{0}.pkl'.format(seed-210),'rb'))
         elif fix_gamma == False:
-            result = pickle.load(open('Final-MCMC_4000_steps/sampler_results_SPEMD#{0}.pkl'.format(seed-210),'rb'))
+            result = pickle.load(open(folder+'sampler_results_SPEMD#{0}.pkl'.format(seed-210),'rb'))
         fit_result, trans_result = result 
-        kwargs_result, _, _ = fit_result
+        kwargs_result, chain_list_mcmc, chain_list_pso = fit_result
         args_result = fitting_seq.param_class.kwargs2args(**kwargs_result)
+        mcmc_new_list, labels_new = trans_result
         logL = fitting_seq.likelihoodModule.logL(args_result, verbose=True)
-        print "note:", seed-210, fix_gamma, round(-logL*2,3)
+#        print "note:", seed-210, fix_gamma, round(-logL*2,3)
+        if fix_gamma == True:
+            print "seed = {0}: ".format(seed-210), 'H_0: {0:.3f}pm{1:.3f}, total_Chisq:{2:.3f}, '.format(np.median(mcmc_new_list[:,-1]), 
+                          (np.percentile(mcmc_new_list[:,-1],84,axis=0) - np.percentile(mcmc_new_list[:,-1],16,axis=0))/2.
+                          , -logL* 2),  'q: {0:.3f}pm{1:.3f} \n'.format(np.median(mcmc_new_list[:,-3]), 
+                          (np.percentile(mcmc_new_list[:,-3],84,axis=0) - np.percentile(mcmc_new_list[:,-3],16,axis=0))/2.)
+        elif fix_gamma == False:
+            print "seed = {0}: ".format(seed-210), 'H_0: {0:.3f}pm{1:.3f}, total_Chisq:{2:.3f}, '.format(np.median(mcmc_new_list[:,-1]), 
+                          (np.percentile(mcmc_new_list[:,-1],84,axis=0) - np.percentile(mcmc_new_list[:,-1],16,axis=0))/2.
+                          , -logL* 2), 'gamma: {0:.3f}pm{1:.3f}, '.format(np.median(mcmc_new_list[:,1]),
+                              (np.percentile(mcmc_new_list[:,1],84,axis=0) - np.percentile(mcmc_new_list[:,1],16,axis=0))/2.),  'q: {0:.3f}pm{1:.3f} \n'.format(np.median(mcmc_new_list[:,-3]), 
+                          (np.percentile(mcmc_new_list[:,-3],84,axis=0) - np.percentile(mcmc_new_list[:,-3],16,axis=0))/2.)            
