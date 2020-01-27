@@ -9,7 +9,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import pickle
 import corner
-
+#!!!Need to update
 #picklename = 'dump_fitting.pkl' 
 picklename = 'result_vardha/'+ 'l24_sersic.pkl'
 result = pickle.load(open(picklename,'rb'))
