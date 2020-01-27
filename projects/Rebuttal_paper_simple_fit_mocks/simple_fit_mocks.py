@@ -39,8 +39,8 @@ def cal_h0(zl, zs, Ddt, om=0.27):
 
 steps = [1000, 10000]
 H0_true = 70.65595
-for fix_gamma in [False]:
-    for seed in [216]:
+for fix_gamma in [True, False]:
+    for seed in [211, 212, 213, 214, 215, 216]:
         print "Runing seed:", seed, "fix_gamma:", fix_gamma, "MC steps:", steps
         if seed == 211:
             z_lens ,z_source = [0.640, 2.408]

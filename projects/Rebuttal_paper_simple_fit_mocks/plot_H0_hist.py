@@ -16,25 +16,25 @@ mat.rcParams['font.family'] = 'STIXGeneral'
 #folder = 'MCsteps[1000, 10000]_first_run_linear_True/'
 #folder = 'MCsteps1000_10000_second_run_linear_True/'
 #folder = 'MCsteps1000_10000_deflector_10mas/'
-folder = 'MCsteps1000_10000_1.3.0_non-linear_False/'
-#folder = 'MCsteps1000_10000_1.3.0_non-linear_True/'
+#folder = 'MCsteps1000_10000_1.3.0_non-linear_False/'
+folder = 'MCsteps1000_10000_1.3.0_non-linear_True_2ndrun/'
 
-H0_lists = []
-for i in range(1,7):
-    result = pickle.load(open(folder+'sampler_results_SIE#{0}.pkl'.format(i),'rb'))
-    _, trans_result = result
-    mcmc_new_list, labels_new = trans_result
-    H0_list = mcmc_new_list[:,-1]
-    H0_lists.append(H0_list) 
-pickle.dump([H0_lists], open(folder+'H0_SIE.pkl', 'wb'))         
-H0_lists = []
-for i in range(1,7):
-    result = pickle.load(open(folder+'sampler_results_SPEMD#{0}.pkl'.format(i),'rb'))
-    _, trans_result = result
-    mcmc_new_list, labels_new = trans_result
-    H0_list = mcmc_new_list[:,-1]
-    H0_lists.append(H0_list) 
-pickle.dump([H0_lists], open(folder+'H0_SPEMD.pkl', 'wb'))         
+#H0_lists = []
+#for i in range(1,7):
+#    result = pickle.load(open(folder+'sampler_results_SIE#{0}.pkl'.format(i),'rb'))
+#    _, trans_result = result
+#    mcmc_new_list, labels_new = trans_result
+#    H0_list = mcmc_new_list[:,-1]
+#    H0_lists.append(H0_list) 
+#pickle.dump([H0_lists], open(folder+'H0_SIE.pkl', 'wb'))         
+#H0_lists = []
+#for i in range(1,7):
+#    result = pickle.load(open(folder+'sampler_results_SPEMD#{0}.pkl'.format(i),'rb'))
+#    _, trans_result = result
+#    mcmc_new_list, labels_new = trans_result
+#    H0_list = mcmc_new_list[:,-1]
+#    H0_lists.append(H0_list) 
+#pickle.dump([H0_lists], open(folder+'H0_SPEMD.pkl', 'wb'))         
 
 #%%
 H0_true = 70.65595
