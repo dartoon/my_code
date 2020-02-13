@@ -14,6 +14,8 @@ from astropy.wcs import WCS
 from matplotlib.colors import LogNorm
 import matplotlib
 import copy
+import sys
+sys.path.insert(0,'../../../py_tools/')
 
 from est_bkg import est_bkg
 from cut_image import cut_image

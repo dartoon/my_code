@@ -39,9 +39,9 @@ def cal_h0(zl, zs, Ddt, om=0.27):
 
 steps = [1000, 10000]
 H0_true = 70.65595
-for fix_gamma in [True, False]:
-    for seed in [211, 212, 213, 214, 215, 216]:
-        print "Runing seed:", seed, "fix_gamma:", fix_gamma, "MC steps:", steps
+for fix_gamma in [False]:
+    for seed in [211]:
+        print("Runing seed:", seed, "fix_gamma:", fix_gamma, "MC steps:", steps)
         if seed == 211:
             z_lens ,z_source = [0.640, 2.408]
             ximg = [0.41530, 0.17330, 1.22509, -1.18836]  # image positions in relative RA (arc seconds)
@@ -129,8 +129,8 @@ for fix_gamma in [True, False]:
         #kwargs_lens_init.append(kwargs_lens[0])
         kwargs_lens_init.append({'theta_E': 1.20, 'gamma': 2., 'center_x': 0, 'center_y': 0, 'e1': e1, 'e2': e2})
         kwargs_lens_sigma.append({'theta_E': .1, 'e1': 0.1, 'e2': 0.1, 'gamma': 0.1, 'center_x': 0.005, 'center_y': 0.005}) #previous: 'center_x': 0.1, 'center_y': 0.1
-        kwargs_lower_lens.append({'theta_E': 0.01, 'e1': -0.5, 'e2': -0.5, 'gamma': 1., 'center_x': 0-0.01, 'center_y': 0-0.01})
-        kwargs_upper_lens.append({'theta_E': 10, 'e1': 0.5, 'e2': 0.5, 'gamma': 3., 'center_x': 0+0.01, 'center_y': 0+0.01})
+        kwargs_lower_lens.append({'theta_E': 0.01, 'e1': -0.5, 'e2': -0.5, 'gamma': 1.5, 'center_x': 0-0.01, 'center_y': 0-0.01})
+        kwargs_upper_lens.append({'theta_E': 10, 'e1': 0.5, 'e2': 0.5, 'gamma': 2.5, 'center_x': 0+0.01, 'center_y': 0+0.01})
         
         # combine all parameter options for lenstronomy
         lens_params = [kwargs_lens_init, kwargs_lens_sigma, fixed_lens, kwargs_lower_lens, kwargs_upper_lens]
@@ -184,7 +184,7 @@ for fix_gamma in [True, False]:
         image_position_likelihood = True  # bool, evaluating the image position likelihood (in combination with astrometric errors)
         
         kwargs_constraints = {'num_point_source_list': [len(ximg)],  
-                              'solver_type': 'NONE',  # 'PROFILE_SHEAR', 'NONE', # any proposed lens model must satisfy the image positions appearing at the position of the point sources being sampeld
+                              'solver_type': 'PROFILE',  # 'PROFILE_SHEAR', 'NONE', # any proposed lens model must satisfy the image positions appearing at the position of the point sources being sampeld
                               'Ddt_sampling': time_delay_likelihood,  # sampling of the time-delay distance                      
                              }
         
@@ -261,7 +261,7 @@ for fix_gamma in [True, False]:
             labels_new = [r"$\theta_E$", r"$\gamma$", r"$\phi_{lens}$", r"$q$",r"$D_{dt}$", r"$H_0$"]
             
     #        for i in range(len(samples_mcmc)):
-        trans_steps = np.min([len(samples_mcmc)/10, 40000])
+        trans_steps = int(np.min([len(samples_mcmc)/10, 40000]))
         for i in range(trans_steps):
             # transform the parameter position of the MCMC chain in a lenstronomy convention with keyword arguments #
             kwargs_out = param.args2kwargs(samples_mcmc[-trans_steps+i])
@@ -285,23 +285,23 @@ for fix_gamma in [True, False]:
             #source_size = np.random.uniform(high=1, low=0)
             mcmc_new_list.append(np.array(new_chain))
             if i/2000 > (i-1)/2000 :
-                print "total",len(samples_mcmc), "finished translate:", i    
+                print("total",len(samples_mcmc), "finished translate:", i)
         
-        plot = corner.corner(mcmc_new_list, labels=labels_new, show_titles=True,
-                             quantiles=[0.16, 0.5, 0.84],
-                             title_kwargs={"fontsize": 15}, label_kwargs = {"fontsize": 25},
-                             levels=1.0 - np.exp(-0.5 * np.array([1.,2.]) ** 2))
+        # plot = corner.corner(mcmc_new_list, labels=labels_new, show_titles=True,
+        #                      quantiles=[0.16, 0.5, 0.84],
+        #                      title_kwargs={"fontsize": 15}, label_kwargs = {"fontsize": 25},
+        #                      levels=1.0 - np.exp(-0.5 * np.array([1.,2.]) ** 2))
         
         import os
         if os.path.exists('./MCsteps{0}_{1}'.format(steps[0], steps[1]))==False:
             os.mkdir('./MCsteps{0}_{1}'.format(steps[0], steps[1]))
         
         if fix_gamma:
-            plot.savefig("MCsteps{0}_{1}/corner_plot_SIE#{2}.pdf".format(steps[0], steps[1], seed-210))
+            # plot.savefig("MCsteps{0}_{1}/corner_plot_SIE#{2}.pdf".format(steps[0], steps[1], seed-210))
             datafile = 'MCsteps{0}_{1}/run_result_SIE.txt'.format(steps[0], steps[1])
             picklename = 'MCsteps{0}_{1}/sampler_results_SIE#{2}.pkl'.format(steps[0], steps[1], seed-210)
         else:
-            plot.savefig("MCsteps{0}_{1}/corner_plot_SPEMD#{2}.pdf".format(steps[0], steps[1], seed-210))                     
+            # plot.savefig("MCsteps{0}_{1}/corner_plot_SPEMD#{2}.pdf".format(steps[0], steps[1], seed-210))                     
             datafile = 'MCsteps{0}_{1}/run_result_SPEMD.txt'.format(steps[0], steps[1])
             picklename = 'MCsteps{0}_{1}/sampler_results_SPEMD#{2}.pkl'.format(steps[0], steps[1], seed-210)
         plt.close()

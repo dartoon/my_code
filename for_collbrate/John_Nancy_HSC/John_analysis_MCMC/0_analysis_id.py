@@ -27,6 +27,7 @@ import os
 #plt.ion()
 
 import sys
+sys.path.insert(0,'../../../py_tools/')
 from fit_qso import fit_qso
 from transfer_to_result import transfer_to_result, transfer_obj_to_result
 from mask_objects import detect_obj
@@ -39,10 +40,10 @@ import pickle
 #Setting the fitting condition:
 deep_seed = False  #Set as True to put more seed and steps to fit.
 fix_on_I_band = 1 # input("Do you want, based on I band's inference, fix the other band's Reff and n???\n input 1 means yes, input others means no. \n")
-pltshow = 1 #Note that setting plt.ion() in line27, the plot won't show anymore if running in terminal.
+pltshow = 0 #Note that setting plt.ion() in line27, the plot won't show anymore if running in terminal.
 sub_bkg = True
-fit_frame_size = 51
-image_folder = '/Users/Dartoon/Astro/for_collbrate/for_John_ascii_folder/images_directory/'
+fit_frame_size = 61
+image_folder = '/lhome/dxh/HSC_data/'
 run_MCMC = False
 
 #QSO_id = sys.argv[1]
@@ -51,18 +52,18 @@ run_MCMC = False
 ##print isinstance(QSO_id,str), isinstance(QSO_RA,float), isinstance(QSO_DEC,float)
 
 
-#QSO_id = "092554.15+043159.7"
-#QSO_RA = 141.475631714
-#QSO_DEC = 4.53327322006 
+# QSO_id = "092554.15+043159.7"
+# QSO_RA = 141.475631714
+# QSO_DEC = 4.53327322006 
 
 
-QSO_id = "000017.88+002612.6"
-QSO_RA = 0.07452999800443649
-QSO_DEC = 0.4368380010128021
+# QSO_id = "000017.88+002612.6"
+# QSO_RA = 0.07452999800443649
+# QSO_DEC = 0.4368380010128021
 
-#QSO_id = '084702.80+013001.4'
-#QSO_RA = 131.7616729736328
-#QSO_DEC = 1.5004160404205322
+QSO_id = '084702.80+013001.4'
+QSO_RA = 131.7616729736328
+QSO_DEC = 1.5004160404205322
 
 #QSO_id = '084940.34+014638.4' 
 #QSO_RA = 132.4180908203125

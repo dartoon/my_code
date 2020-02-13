@@ -32,7 +32,7 @@ filename = '201911_newrun/model0_a-{0}_mbhmax-{1}_noizl-20.txt'.format(alpha, Mm
 #result_new_edge = np.loadtxt('test3_result/test3_edge.txt')
 #numbers = np.concatenate((result_rm_edge,result_new_edge))
 #%%
-print filename
+print(filename)
 with open(filename) as f:
         content = f.readlines()
 lines = [x.strip() for x in content] 
@@ -50,6 +50,6 @@ fig = corner.corner(numbers, labels=[r"$\alpha$", r"M$_{\rm max}$", r"M$_{\rm mi
                     title_fmt='.2f')
 for ax in fig.get_axes():
       ax.tick_params(axis='both', labelsize=20)
-fig.savefig("3para_contour_a0_{0}.pdf".format(alpha))
+# fig.savefig("3para_contour_a0_{0}.pdf".format(alpha))
 #####
 plt.show()  

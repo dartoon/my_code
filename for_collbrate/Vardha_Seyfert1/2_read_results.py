@@ -16,7 +16,8 @@ import copy
 #ID = 'l106'
 #picklename = ID+'_fitting.pkl'
 #picklename = 'result_vardha/second_share_Jan_24/'+ 'l24_sersic.pkl'
-picklename = 'result_vardha/first_share_middle_Jan/'+ 'l24_sersic.pkl'
+# picklename = 'result_vardha/first_share_middle_Jan/'+ 'l24_sersic.pkl'
+picklename = 'result_vardha/third_0203/'+ 'l24_sersicdisk.pkl'
 
 result = pickle.load(open(picklename,'rb'))
 [best_fit,pso_fit,mcmc_fit, trans_paras] = result
