@@ -40,7 +40,7 @@ def cal_h0(zl, zs, Ddt, om=0.27):
 steps = [1000, 10000]
 H0_true = 70.65595
 for fix_gamma in [False]:
-    for seed in [216]:
+    for seed in [211,212]:
         print("Runing seed:", seed, "fix_gamma:", fix_gamma, "MC steps:", steps)
         if seed == 211:
             z_lens ,z_source = [0.640, 2.408]
@@ -184,7 +184,7 @@ for fix_gamma in [False]:
         image_position_likelihood = True  # bool, evaluating the image position likelihood (in combination with astrometric errors)
         
         kwargs_constraints = {'num_point_source_list': [len(ximg)],  
-                              'solver_type': 'NONE',  # 'PROFILE_SHEAR', 'NONE', # any proposed lens model must satisfy the image positions appearing at the position of the point sources being sampeld
+                              'solver_type': 'PROFILE',  # 'PROFILE_SHEAR', 'NONE', # any proposed lens model must satisfy the image positions appearing at the position of the point sources being sampeld
                               'Ddt_sampling': time_delay_likelihood,  # sampling of the time-delay distance                      
                              }
         
@@ -211,9 +211,7 @@ for fix_gamma in [False]:
         fitting_seq = FittingSequence(kwargs_data_joint, kwargs_model, kwargs_constraints, kwargs_likelihood, kwargs_params)
         
         fitting_kwargs_list = [#['update_settings', {'lens_add_fixed': [[0, ['gamma']]]}],  # you can add additional fixed parameters if you want
-                               ['PSO', {'sigma_scale': 1., 'n_particles': 300, 'n_iterations': 300}],
-                               ['PSO', {'sigma_scale': 1., 'n_particles': 300, 'n_iterations': 200}],
-                               ['PSO', {'sigma_scale': 1., 'n_particles': 300, 'n_iterations': 200}]
+                               ['PSO', {'sigma_scale': 1., 'n_particles': 100, 'n_iterations': 100}]
                                ]
         
         start_time = time.time()
@@ -293,17 +291,17 @@ for fix_gamma in [False]:
         #                      levels=1.0 - np.exp(-0.5 * np.array([1.,2.]) ** 2))
         
         import os
-        if os.path.exists('./MCsteps{0}_{1}'.format(steps[0], steps[1]))==False:
-            os.mkdir('./MCsteps{0}_{1}'.format(steps[0], steps[1]))
+        if os.path.exists('./MCsteps{0}_{1}_PROFILE'.format(steps[0], steps[1]))==False:
+            os.mkdir('./MCsteps{0}_{1}_PROFILE'.format(steps[0], steps[1]))
         
         if fix_gamma:
             # plot.savefig("MCsteps{0}_{1}/corner_plot_SIE#{2}.pdf".format(steps[0], steps[1], seed-210))
-            datafile = 'MCsteps{0}_{1}/run_result_SIE.txt'.format(steps[0], steps[1])
-            picklename = 'MCsteps{0}_{1}/sampler_results_SIE#{2}.pkl'.format(steps[0], steps[1], seed-210)
+            datafile = 'MCsteps{0}_{1}_PROFILE/run_result_SIE.txt'.format(steps[0], steps[1])
+            picklename = 'MCsteps{0}_{1}_PROFILE/sampler_results_SIE#{2}.pkl'.format(steps[0], steps[1], seed-210)
         else:
             # plot.savefig("MCsteps{0}_{1}/corner_plot_SPEMD#{2}.pdf".format(steps[0], steps[1], seed-210))                     
-            datafile = 'MCsteps{0}_{1}/run_result_SPEMD.txt'.format(steps[0], steps[1])
-            picklename = 'MCsteps{0}_{1}/sampler_results_SPEMD#{2}.pkl'.format(steps[0], steps[1], seed-210)
+            datafile = 'MCsteps{0}_{1}_PROFILE/run_result_SPEMD.txt'.format(steps[0], steps[1])
+            picklename = 'MCsteps{0}_{1}_PROFILE/sampler_results_SPEMD#{2}.pkl'.format(steps[0], steps[1], seed-210)
         plt.close()
         
         mcmc_new_list = np.asarray(mcmc_new_list)
