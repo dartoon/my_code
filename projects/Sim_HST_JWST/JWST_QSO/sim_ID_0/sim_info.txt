@@ -1,0 +1,11 @@
+Filter:	F444W
+oversample:	4
+z_s:	6.0
+host position (x, y):	(0.11114, 0.02521) arcsec
+host_flux:	100
+host (phi, q):	(3.424, 0.741) arcsec
+host_n:	2.5
+host_Reff_kpc:	3.5
+host_Reff:	0.61277 arcsec
+AGN_flux:	150
+AGN position (x, y):	(0.11114, 0.02521) arcsec

@@ -11,43 +11,46 @@ import matplotlib.pyplot as plt
 from matplotlib.colors import LogNorm
 #import sys
 from astropy.cosmology import FlatLambdaCDM
+import glob
 
-#%%
+#%%Set up data basic information
+filt  = 'F444W'
+oversample = 4
+z_s =6.0        #AGN redshift
+host_flux = 100 #Units in counts per sec
+point_flux = 150 #Units in counts per sec
+host_n = 2.5   #Host effective radius, unit: Kpc
+host_Reff_kpc = 3.5   #Host effective radius, unit: Kpc
+cosmo = FlatLambdaCDM(H0=70, Om0=0.3)
+
+numPix = 321  #  pixel size
+ID= 0  #The ID for this simulation
 
 #%%Generate PSF:
 import webbpsf
 nc = webbpsf.NIRCam()
 nc.filter =  'F444W'
-print("Generate PSF higher resolution by factor of 4:")
-oversample = 4
-psf = nc.calc_psf(oversample=oversample)     # returns an astropy.io.fits.HDUlist containing PSF and header
-#plt.imshow(psf[0].data, origin='lower',cmap='gist_heat', norm=LogNorm())
-#plt.colorbar()
-#plt.show()
-print("Done.")
+psf_name = 'psf_{0}_sub{1}.fits'.format(nc.filter, oversample)
+if glob.glob(psf_name) == []:
+    print("Generate PSF higher resolution by factor of 4:")
+    psf = nc.calc_psf(oversample=oversample)     # returns an astropy.io.fits.HDUlist containing PSF and header
+    pyfits.PrimaryHDU(psf[0].data,header=psf[0].header).writeto(psf_name,overwrite=False)
+psf = pyfits.open(psf_name)
+plt.imshow(psf[0].data, origin='lower',cmap='gist_heat', norm=LogNorm())
+plt.colorbar()
+plt.show()
 
-#%%Set up the simulation parameters:
-cosmo = FlatLambdaCDM(H0=70, Om0=0.3)
+#%%Build up the simulation:
 pix_s = psf[0].header['PIXELSCL'] #* oversample
-#host_total_flux = 27.0    #AB magnitude.
-#host_ratio = 0.5     #Host to total flux ratio. 
-
-z_s =6.0        #AGN redshift
 scale_relation = cosmo.angular_diameter_distance(z_s).value * 10**3 * (1/3600./180.*np.pi)  #Kpc/arc
-
-host_flux = 100
-point_flux = 150
 
 host_Reff_kpc = 3.5   #Host effective radius, unit: Kpc
 host_Reff = host_Reff_kpc/scale_relation   #In arcsec
-host_n = 2.5   #Host effective radius, unit: Kpc
 
 import lenstronomy.Util.simulation_util as sim_util
 from lenstronomy.Data.psf import PSF
 from lenstronomy.Data.imaging_data import ImageData
 
-numPix = 321  #  pixel size
-ID= 12
 sim_folder_name = 'sim_ID_'+repr(ID)
 np.random.seed(seed = ID)
 
@@ -157,3 +160,17 @@ plt.imshow(image_data_noz[0], origin='lower',cmap='gist_heat', norm=LogNorm())
 plt.colorbar()
 plt.show()
 
+filename_ascii = sim_folder_name+'/sim_info.txt'
+data_info =  open(filename_ascii,'w') 
+data_info.write("Filter:\t{0}\n".format(filt))
+data_info.write("oversample:\t{0}\n".format(oversample))     
+data_info.write("z_s:\t{0}\n".format(z_s))
+data_info.write("host position (x, y):\t({0}, {1}) arcsec\n".format(round(center_x,5),round(center_y,5))) 
+data_info.write("host_flux:\t{0}\n".format(host_flux))   
+data_info.write("host (phi, q):\t({0}, {1}) arcsec\n".format(round(phi,3),round(q,3))) 
+data_info.write("host_n:\t{0}\n".format(host_n))
+data_info.write("host_Reff_kpc:\t{0}\n".format(host_Reff_kpc)) 
+data_info.write("host_Reff:\t{0} arcsec\n".format(round(host_Reff,5))) 
+data_info.write("AGN_flux:\t{0}\n".format(point_flux))
+data_info.write("AGN position (x, y):\t({0}, {1}) arcsec\n".format(round(center_x,5),round(center_y,5))) 
+data_info.close()
