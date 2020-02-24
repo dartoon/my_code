@@ -16,7 +16,7 @@ import corner
 mat.rcParams['agg.path.chunksize'] = 10000
 
 # folder = 'MCsteps1000_10000_1.3.0_non-linear_True_2ndrun/'
-folder = 'MCsteps100_100/'
+folder = 'final_confirmed_MCsteps1000_10000/'
 # folder = 'MCsteps1000_10000_1.3.0_non-linear_False/'
 
 model = 'SPEMD'
@@ -41,7 +41,7 @@ plt.show()
 #%%
 print("plot how value change with chains:")
 print(labels_new)
-i = 3
+i = 1
 plt.figure(figsize=(12, 8))
 plt.plot(range(chain_num), mcmc_new_list[:,i], '-' ,linewidth = 0.1, color='gray')
 plt.xlabel("number of Chains",fontsize=27)

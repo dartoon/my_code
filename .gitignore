@@ -62,3 +62,4 @@ GW_BH_function/sim*max_*
 *.doc
 *.eps
 predict_GW/*
+*/*/image_library/*

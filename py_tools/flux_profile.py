@@ -258,7 +258,7 @@ def concentration_profile(image, center, total_flux=None, radius=35,start_p=1.5,
     index.append(np.where(abs(r20_flux - r_flux) == abs(r20_flux - r_flux).min())[0][0])
     index.append(np.where(abs(r80_flux - r_flux) == abs(r80_flux - r_flux).min())[0][0])
     index.append(np.where(abs(r100_flux - r_flux) == abs(r100_flux - r_flux).min())[0][0])
-    print index
+    print(index)
     if fits_plot == True:
         ax=plt.subplot(1,1,1)
         cax=ax.imshow((image),norm=LogNorm(),origin='lower')#,cmap=my_cmap)
@@ -339,7 +339,7 @@ def QSO_psfs_compare(QSO, psfs,QSO_msk=None, psf_mask_list=None, PSF_mask_img=No
 #    frm_qrt = int(len(QSO)/2.5)
     if include_QSO == True:
         if plt_QSO ==True:
-            print "Plot for QSO:"
+            print("Plot for QSO:")
         center_QSO = np.array([len(QSO)/2,len(QSO)/2])
         r_SB_QSO, r_grids_QSO = SB_profile(QSO, center=center_QSO, start_p=start_p, radius=radius, grids=grids, 
                                            fits_plot=plt_QSO, gridspace=gridspace, if_annuli=if_annuli,
@@ -356,15 +356,15 @@ def QSO_psfs_compare(QSO, psfs,QSO_msk=None, psf_mask_list=None, PSF_mask_img=No
             j = plt_which_PSF[i]
             if PSF_mask_img is None:
                 msk_counts, mask_lists = text_in_string_list("PSF{0}_".format(j), psf_mask_list)
-                print "Plot for fits: PSF{0}.fits".format(j)
+                print("Plot for fits: PSF{0}.fits".format(j))
                 if msk_counts == 0:
                     SB_profile(psfs[j], center, start_p=start_p, radius=radius, grids=grids, fits_plot=True, gridspace=gridspace)
                 elif msk_counts >0:
-                    print mask_lists
+                    print(mask_lists)
                     SB_profile(psfs[j], center, start_p=start_p, radius=radius, grids=grids, fits_plot=True, gridspace=gridspace,
                                            mask_plot = False, mask_list=mask_lists)
             else:
-                print "Plot for fits: PSF{0}.fits".format(j)
+                print("Plot for fits: PSF{0}.fits".format(j))
                 SB_profile(psfs[j], center, start_p=start_p, radius=radius, grids=grids, fits_plot=True, gridspace=gridspace,
                                            mask_plot = False, msk_image=PSF_mask_img[j])
     minorLocator = AutoMinorLocator()
@@ -535,7 +535,7 @@ def cr_mask(image, filename='test_circle.reg', mask_reg_cut = 0.):
         x_r, y_r = reg_info[2:4]  # x_r is the length of the x, y_r is the length of the y
         box = np.zeros([np.int(x_r)+1, np.int(y_r)+1]).T
     else:
-        print reg_string
+        print(reg_string)
         raise ValueError("The input reg is un-defined yet")
     frame_size = image.shape
     box_size = box.shape
@@ -559,7 +559,7 @@ def total_compare(label_list, flux_list, zp=27.0, target_ID = 'target_ID',
         delatPixel = pix_sz
     else:
         delatPixel = 1.
-        print "Warning: The pix_sz is inappropriate and thus delatPixel=1.0"  
+        print("Warning: The pix_sz is inappropriate and thus delatPixel=1.0")
     
     norm = LogNorm() #ImageNormalize(stretch=SqrtStretch())
     f = plt.figure(0, figsize=(20.1,4))
@@ -782,7 +782,7 @@ def galaxy_total_compare(label_list, flux_list, zp=27.0, pix_sz=1., target_ID = 
         delatPixel = pix_sz
     else:
         delatPixel = 1.
-        print "Warning: The pix_sz is inappropriate and thus delatPixel=1.0"
+        print("Warning: The pix_sz is inappropriate and thus delatPixel=1.0")
     
     norm = LogNorm() #ImageNormalize(stretch=SqrtStretch())
     f = plt.figure(0, figsize=(17,4))
@@ -904,7 +904,7 @@ def galaxy_total_compare(label_list, flux_list, zp=27.0, pix_sz=1., target_ID = 
         for i in range(len(label_SB_list)):
             center = len(flux_SB_list[i])/2, len(flux_SB_list[i])/2
             if label_SB_list[i] == 'data':
-                print "data_mask_lists:\t", data_mask_list
+                print("data_mask_lists:\t", data_mask_list)
                 r_SB, r_grids = SB_profile(flux_SB_list[i], center, gridspace = 'log',
                                            radius= radi, grids = 50, mask_list=data_mask_list,
                                            mask_cut = data_cut, msk_image=msk_image, fits_plot=False, if_annuli = if_annuli)
