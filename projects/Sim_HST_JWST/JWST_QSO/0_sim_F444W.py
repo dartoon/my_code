@@ -49,8 +49,8 @@ from lenstronomy.Data.imaging_data import ImageData
 numPix = 321  #  pixel size
 
 psf_data = psf[0].data
-psf_data /= psf_data.sum()
 psf_data = psf_data[1:,1:]
+psf_data /= psf_data.sum()
 kwargs_psf_high_res = {'psf_type': 'PIXEL', 'kernel_point_source': psf_data, 'pixel_size': pix_s}
 kwargs_data_high_res = sim_util.data_configure_simple(numPix, pix_s)
 data_class = ImageData(**kwargs_data_high_res)
@@ -96,7 +96,7 @@ plt.show()
 ## #Bin the image res. from high to low. 
 ##==============================================================================
 import rebin
-factor=4
+factor=oversample
 pattern_x=[0,2,0,2,1,3,1,3]
 pattern_y=[0,0,2,2,3,3,1,1]      #from the info. given by observation
 ################Bin the lensed image################
@@ -109,6 +109,22 @@ for i in range(len(pattern_x)):
 plt.imshow(image_bin[0], origin='lower',cmap='gist_heat', norm=LogNorm())
 plt.colorbar()
 plt.show()
+################Bin the PSF and save it################
+#exp_psf=rebin.expend_grid(psf_pixel_high_res)
+cut_fd=int((len(psf_data)-((int(len(psf_data)/8*2)-1)*4+3))/2)
+exp_psf_o=psf_data[1+cut_fd:-cut_fd,1+cut_fd:-cut_fd]+ 0  # To change it from 251 to 247.
+exp_psf=rebin.expend_grid(exp_psf_o)
+cut_len=int(round(len(exp_psf_o)/factor)*factor)
+cut_out_psf=np.zeros([len(pattern_x),cut_len,cut_len])
+image_bin_psf=np.zeros([len(pattern_x),int(cut_len/factor),int(cut_len/factor)])
+for i in range(len(pattern_x)):
+    cut_out_psf[i]=exp_psf[pattern_x[i]:cut_len+pattern_x[i],pattern_y[i]:cut_len+pattern_y[i]]   #the size before bin
+    image_bin_psf[i]=rebin.block(cut_out_psf[i],(int(cut_len/factor),int(cut_len/factor)),factor=factor)
+    image_bin_psf[i] /= np.sum(image_bin_psf[i])  #unify the psf value
+#    pyfits.PrimaryHDU(image_bin_psf[i]).writeto('../../../../TDLMC_material/mock_data/{2}/{3}/{4}-seed{0}/non_drizzled_psf-{1}.fits'.format(seed,i+1,rung,code,filt),overwrite=False)
+plt.imshow(image_bin_psf[0], origin='lower',cmap='gist_heat', norm=LogNorm())
+plt.colorbar()
+plt.show()
 
 #==============================================================================
 # Add the noise same as Ding et al. 2017a 
@@ -118,7 +134,8 @@ bf_noz = image_bin#input simulate data to bf_noz
 rms = np.zeros_like(image_bin) #input rms
 noiz = np.zeros_like(image_bin) #input noiz
 image_data_noz=np.zeros_like(image_bin) #image after noiz
-stddlong=0.016  #!!! Need to be confirmed
+#stddlong=0.016  #!!! Need to be confirmed For 10000s, 0.016. 
+stddlong=0.042  #!!! Need to be confirmed For 1250s, 0.042. 
 explong=1250.  #units of seconds.
 for i in range(len(pattern_x)):
     rms[i]=(bf_noz[i]/(explong)+stddlong**2)**0.5
@@ -126,8 +143,6 @@ for i in range(len(pattern_x)):
     noiz[i]=np.random.normal(0, bkg_noise, size=rms[i].shape)
     image_data_noz[i]=noiz[i]+np.random.poisson(lam=bf_noz[i]*2*explong)/(2*explong)
 #    pyfits.PrimaryHDU(image_data_noz[i]).writeto('../../../../TDLMC_material/mock_data/{2}/{3}/{4}-seed{0}/non_drizzled-lens-image-{1}.fits'.format(seed,i+1,rung,code,filt),overwrite=False)
-#    pyfits.PrimaryHDU(rms[i]).writeto('../../../../TDLMC_material/mock_data/{2}/{3}/{4}-seed{0}/non_drizzled-noise_map-{1}.fits'.format(seed,i+1,rung,code,filt),overwrite=False)
-#    pyfits.PrimaryHDU(rms[i]**2).writeto('../../../../TDLMC_material/mock_data/{2}/{3}/{4}-seed{0}/rmsSQ-{1}.fits'.format(seed,i+1,rung,code,filt),overwrite=False)
 plt.imshow(image_data_noz[0], origin='lower',cmap='gist_heat', norm=LogNorm())
 plt.colorbar()
 plt.show()
