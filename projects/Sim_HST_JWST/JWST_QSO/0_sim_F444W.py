@@ -47,6 +47,15 @@ from lenstronomy.Data.psf import PSF
 from lenstronomy.Data.imaging_data import ImageData
 
 numPix = 321  #  pixel size
+ID= 0
+sim_folder_name = 'sim_ID_'+repr(ID)
+np.random.seed(seed = ID)
+
+import os
+if os.path.exists(sim_folder_name)==True:
+    import shutil 
+    shutil.rmtree(sim_folder_name)
+os.mkdir(sim_folder_name)
 
 psf_data = psf[0].data
 psf_data = psf_data[1:,1:]
@@ -56,8 +65,7 @@ kwargs_data_high_res = sim_util.data_configure_simple(numPix, pix_s)
 data_class = ImageData(**kwargs_data_high_res)
 
 psf_class = PSF(**kwargs_psf_high_res)
-center_x = 0.02
-center_y = 0.01
+center_x, center_y = np.random.normal(0, pix_s*oversample, 2)
 
 point_amp = point_flux
 from lenstronomy.PointSource.point_source import PointSource
@@ -69,7 +77,9 @@ from lenstronomy.LightModel.light_model import LightModel
 light_model_list = ['SERSIC_ELLIPSE']
 lightModel = LightModel(light_model_list=light_model_list)
 import lenstronomy.Util.param_util as param_util
-e1, e2 = param_util.phi_q2_ellipticity(phi=0.3, q=0.6)
+q = np.random.uniform(0.5,0.9)
+phi = np.random.uniform(0.,2*np.pi)
+e1, e2 = param_util.phi_q2_ellipticity(phi=phi, q=q)
 
 kwargs_sersic_init = {'amp': 1, 'n_sersic': host_n, 'R_sersic': host_Reff, 'e1': e1, 'e2': e2,
                  'center_x': center_x, 'center_y': center_y}
@@ -121,7 +131,7 @@ for i in range(len(pattern_x)):
     cut_out_psf[i]=exp_psf[pattern_x[i]:cut_len+pattern_x[i],pattern_y[i]:cut_len+pattern_y[i]]   #the size before bin
     image_bin_psf[i]=rebin.block(cut_out_psf[i],(int(cut_len/factor),int(cut_len/factor)),factor=factor)
     image_bin_psf[i] /= np.sum(image_bin_psf[i])  #unify the psf value
-#    pyfits.PrimaryHDU(image_bin_psf[i]).writeto('../../../../TDLMC_material/mock_data/{2}/{3}/{4}-seed{0}/non_drizzled_psf-{1}.fits'.format(seed,i+1,rung,code,filt),overwrite=False)
+    pyfits.PrimaryHDU(image_bin_psf[i]).writeto(sim_folder_name+'/non_drizzled_psf-{0}.fits'.format(i+1),overwrite=False)
 plt.imshow(image_bin_psf[0], origin='lower',cmap='gist_heat', norm=LogNorm())
 plt.colorbar()
 plt.show()
@@ -142,7 +152,7 @@ for i in range(len(pattern_x)):
     bkg_noise=(1/2.*stddlong**2)**0.5
     noiz[i]=np.random.normal(0, bkg_noise, size=rms[i].shape)
     image_data_noz[i]=noiz[i]+np.random.poisson(lam=bf_noz[i]*2*explong)/(2*explong)
-#    pyfits.PrimaryHDU(image_data_noz[i]).writeto('../../../../TDLMC_material/mock_data/{2}/{3}/{4}-seed{0}/non_drizzled-lens-image-{1}.fits'.format(seed,i+1,rung,code,filt),overwrite=False)
+    pyfits.PrimaryHDU(image_data_noz[i]).writeto(sim_folder_name+'/non_drizzled-image-{0}.fits'.format(i+1),overwrite=False)
 plt.imshow(image_data_noz[0], origin='lower',cmap='gist_heat', norm=LogNorm())
 plt.colorbar()
 plt.show()
