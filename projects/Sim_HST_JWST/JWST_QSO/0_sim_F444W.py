@@ -21,9 +21,9 @@ nc.filter =  'F444W'
 print("Generate PSF higher resolution by factor of 4:")
 oversample = 4
 psf = nc.calc_psf(oversample=oversample)     # returns an astropy.io.fits.HDUlist containing PSF and header
-plt.imshow(psf[0].data, origin='lower',cmap='gist_heat', norm=LogNorm())
-plt.colorbar()
-plt.show()
+#plt.imshow(psf[0].data, origin='lower',cmap='gist_heat', norm=LogNorm())
+#plt.colorbar()
+#plt.show()
 print("Done.")
 
 #%%Set up the simulation parameters:
@@ -36,9 +36,9 @@ z_s =6.0        #AGN redshift
 scale_relation = cosmo.angular_diameter_distance(z_s).value * 10**3 * (1/3600./180.*np.pi)  #Kpc/arc
 
 host_flux = 100
-point_flux = 50
+point_flux = 150
 
-host_Reff_kpc = 2.5   #Host effective radius, unit: Kpc
+host_Reff_kpc = 3.5   #Host effective radius, unit: Kpc
 host_Reff = host_Reff_kpc/scale_relation   #In arcsec
 host_n = 2.5   #Host effective radius, unit: Kpc
 
@@ -47,7 +47,7 @@ from lenstronomy.Data.psf import PSF
 from lenstronomy.Data.imaging_data import ImageData
 
 numPix = 321  #  pixel size
-ID= 0
+ID= 12
 sim_folder_name = 'sim_ID_'+repr(ID)
 np.random.seed(seed = ID)
 
@@ -132,9 +132,9 @@ for i in range(len(pattern_x)):
     image_bin_psf[i]=rebin.block(cut_out_psf[i],(int(cut_len/factor),int(cut_len/factor)),factor=factor)
     image_bin_psf[i] /= np.sum(image_bin_psf[i])  #unify the psf value
     pyfits.PrimaryHDU(image_bin_psf[i]).writeto(sim_folder_name+'/non_drizzled_psf-{0}.fits'.format(i+1),overwrite=False)
-plt.imshow(image_bin_psf[0], origin='lower',cmap='gist_heat', norm=LogNorm())
-plt.colorbar()
-plt.show()
+#plt.imshow(image_bin_psf[0], origin='lower',cmap='gist_heat', norm=LogNorm())
+#plt.colorbar()
+#plt.show()
 
 #==============================================================================
 # Add the noise same as Ding et al. 2017a 
