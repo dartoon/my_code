@@ -26,8 +26,6 @@ ompiled source #
 *.log
 *.sql
 *.sqlitei
-*_ima.fits
-coadd*fits
 *.xml
 
 # OS generated files #
@@ -56,7 +54,6 @@ fit_result*/
 *.blg
 *.aux
 *.dat
-GW_BH_function/sim*max_*
 *.bst
 *.cls
 *.doc
