@@ -9,22 +9,24 @@ import numpy as np
 import astropy.io.fits as pyfits
 import matplotlib.pyplot as plt
 from matplotlib.colors import LogNorm
-#import sys
+import sys
 from astropy.cosmology import FlatLambdaCDM
 import glob
+sys.path.insert(0, '../share_tools')
 
 #%%Set up data basic information
 filt  = 'F444W'
 oversample = 4
 z_s =6.0        #AGN redshift
+
 host_flux = 100 #Units in counts per sec
-point_flux = 150 #Units in counts per sec
+point_flux = 50 #Units in counts per sec
 host_n = 2.5   #Host effective radius, unit: Kpc
-host_Reff_kpc = 3.5   #Host effective radius, unit: Kpc
+host_Reff_kpc = 2.5   #Host effective radius, unit: Kpc
 cosmo = FlatLambdaCDM(H0=70, Om0=0.3)
 
 numPix = 321  #  pixel size
-ID= 0  #The ID for this simulation
+ID= 1  #The ID for this simulation
 
 #%%Generate PSF:
 import webbpsf
@@ -36,15 +38,14 @@ if glob.glob(psf_name) == []:
     psf = nc.calc_psf(oversample=oversample)     # returns an astropy.io.fits.HDUlist containing PSF and header
     pyfits.PrimaryHDU(psf[0].data,header=psf[0].header).writeto(psf_name,overwrite=False)
 psf = pyfits.open(psf_name)
-plt.imshow(psf[0].data, origin='lower',cmap='gist_heat', norm=LogNorm())
-plt.colorbar()
-plt.show()
+#plt.imshow(psf[0].data, origin='lower',cmap='gist_heat', norm=LogNorm())
+#plt.colorbar()
+#plt.show()
 
 #%%Build up the simulation:
 pix_s = psf[0].header['PIXELSCL'] #* oversample
 scale_relation = cosmo.angular_diameter_distance(z_s).value * 10**3 * (1/3600./180.*np.pi)  #Kpc/arc
 
-host_Reff_kpc = 3.5   #Host effective radius, unit: Kpc
 host_Reff = host_Reff_kpc/scale_relation   #In arcsec
 
 import lenstronomy.Util.simulation_util as sim_util
@@ -84,20 +85,25 @@ q = np.random.uniform(0.5,0.9)
 phi = np.random.uniform(0.,2*np.pi)
 e1, e2 = param_util.phi_q2_ellipticity(phi=phi, q=q)
 
-kwargs_sersic_init = {'amp': 1, 'n_sersic': host_n, 'R_sersic': host_Reff, 'e1': e1, 'e2': e2,
+from scipy.special import gamma
+re = host_Reff/pix_s
+k = 2.*host_n-1./3+4./(405.*host_n)+46/(25515.*host_n**2)
+amp = host_flux/((re**2)*np.exp(k)*host_n*(k**(-2*host_n))*gamma(2*host_n)*2*np.pi) * 4179.2388
+
+kwargs_sersic = {'amp': amp, 'n_sersic': host_n, 'R_sersic': host_Reff/np.sqrt(q), 'e1': e1, 'e2': e2,
                  'center_x': center_x, 'center_y': center_y}
-kwargs_host_ini = [kwargs_sersic_init]
+kwargs_host = [kwargs_sersic]
 from lenstronomy.ImSim.image_model import ImageModel
 kwargs_numerics = {'supersampling_factor': 3, 'supersampling_convolution': False}
 imageModel = ImageModel(data_class, psf_class, lens_light_model_class=lightModel,
                                 point_source_class=pointSource, kwargs_numerics=kwargs_numerics)
 # simulate image with the parameters we have defined above #
-image_host = imageModel.image(kwargs_lens_light=kwargs_host_ini, unconvolved=True)
-amp = host_flux/image_host.sum()
+image_pure_host = imageModel.image(kwargs_lens_light=kwargs_host, unconvolved=True)
+plt.imshow(image_pure_host, origin='lower',cmap='gist_heat', norm=LogNorm())
+plt.colorbar()
+plt.show()
+print(image_pure_host.sum())
 
-kwargs_sersic = {'amp': amp, 'n_sersic': host_n, 'R_sersic': host_Reff, 'e1': e1, 'e2': e2,
-                 'center_x': center_x, 'center_y': center_y}
-kwargs_host = [kwargs_sersic]
 image_host = imageModel.image(kwargs_lens_light=kwargs_host, kwargs_ps=kwargs_ps, unconvolved=False)
 
 plt.imshow(image_host, origin='lower',cmap='gist_heat', norm=LogNorm())
@@ -166,7 +172,7 @@ data_info.write("Filter:\t{0}\n".format(filt))
 data_info.write("oversample:\t{0}\n".format(oversample))     
 data_info.write("z_s:\t{0}\n".format(z_s))
 data_info.write("host position (x, y):\t({0}, {1}) arcsec\n".format(round(center_x,5),round(center_y,5))) 
-data_info.write("host_flux:\t{0}\n".format(host_flux))   
+data_info.write("host_flux (within frame):\t{0}\n".format(round(image_pure_host.sum(),3)))   
 data_info.write("host (phi, q):\t({0}, {1}) arcsec\n".format(round(phi,3),round(q,3))) 
 data_info.write("host_n:\t{0}\n".format(host_n))
 data_info.write("host_Reff_kpc:\t{0}\n".format(host_Reff_kpc)) 
@@ -174,3 +180,4 @@ data_info.write("host_Reff:\t{0} arcsec\n".format(round(host_Reff,5)))
 data_info.write("AGN_flux:\t{0}\n".format(point_flux))
 data_info.write("AGN position (x, y):\t({0}, {1}) arcsec\n".format(round(center_x,5),round(center_y,5))) 
 data_info.close()
+#%%
