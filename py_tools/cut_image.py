@@ -27,7 +27,7 @@ def cut_center_bright(image, center, radius,kernel = 'gaussian', return_center=F
         kernel: define the center.
     """
     temp_center = np.asarray(center)
-#    print temp_center.astype(int)
+#    print(temp_center.astype(int))
     radius = radius
     img_test = cut_image(image=image, center=temp_center.astype(int), radius=radius)
     if kernel == 'gaussian':
@@ -36,17 +36,17 @@ def cut_center_bright(image, center, radius,kernel = 'gaussian', return_center=F
             from photutils import centroid_2dg
             test_center = frm_q + centroid_2dg(img_test[frm_q:-frm_q,frm_q:-frm_q])
             if i ==2 and plot==True :
-                print test_center
+                print(test_center)
                 fig, ax = plt.subplots(1, 1)
                 ax.imshow(img_test[frm_q:-frm_q,frm_q:-frm_q], origin='lower')
                 marker = '+'
                 ms, mew = 30, 2.
                 plt.plot(test_center[0]-frm_q, test_center[1]-frm_q, color='b', marker=marker, ms=ms, mew=mew)
                 plt.show()
-                print 'test_center - radius', test_center, radius
+                print('test_center - radius', test_center, radius)
             center_shift = np.array((test_center - radius))
             if i ==2 and plot==True :
-                print 'center_shift',center_shift
+                print('center_shift',center_shift)
             center = (center.astype(int) + np.round(center_shift))
             center_f = center.astype(int) + center_shift
             img_test = cut_image(image=image, center=center, radius=radius)
@@ -148,7 +148,7 @@ def save_loc_png(img, center_QSO, c_psf_list=None,extra_psfs=None,ID=None, label
             else:
                 if count in label_shift_NO:
                     shift = shift_label_index(shift_where[count_shift])
-                    print extra_psfs[i][0], shift[0]*PSF_box_size
+                    print(extra_psfs[i][0], shift[0]*PSF_box_size)
                     ax.text(extra_psfs[i][0]+shift[0]*PSF_box_size, extra_psfs[i][1]+shift[1]*PSF_box_size,
                             '{1}{0}?'.format(count,name),color='white', fontsize=15)
                     count_shift += 1
