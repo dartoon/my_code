@@ -96,7 +96,6 @@ lens_model_class = LensModel(lens_model_list)
 # #########source light
 #==============================================================================
 source_pos=[-0.0, 0.01]  #Seed 220  cored-Powerlaw
-
 source_model_list = ['SERSIC_ELLIPSE']
 source_para=para.source_light()
 source_amp= mva.getAmp(SERSIC_in_mag=source_para,zp=zp,deltaPix=deltaPix)
@@ -119,7 +118,6 @@ from lenstronomy.ImSim.image_model import ImageModel
 imageModel_arc = ImageModel(data_class, psf_class, lens_model_class=lens_model_class,
                         source_model_class=source_model_class, kwargs_numerics=kwargs_numerics)
 
-
 # generate the arc image
 image_arc = imageModel_arc.image(kwargs_lens_list, kwargs_source_list, unconvolved=True)
 
@@ -134,14 +132,13 @@ if image_arc[pc,pc]/image_arc[pc,pc+1]>20:
     print("Average center arc light for seed:", seed)
 #    image_arc[pc,pc]= (image_arc[pc,pc-2] + image_arc[pc,pc+2] + image_arc[pc-2,pc] + image_arc[pc+2,pc])/4  #This makes no sense
     
-#import scipy.signal as signal
-#image_arc_conv= signal.fftconvolve(image_arc, psf_class.kernel_point_source, mode='same')  #convolve the image
-image_arc_conv = imageModel_arc.image(kwargs_lens_list, kwargs_source_list, unconvolved=False)
+import scipy.signal as signal
+image_arc_conv= signal.fftconvolve(image_arc, psf_class.kernel_point_source, mode='same')  #convolve the image
+#image_arc_conv = imageModel_arc.image(kwargs_lens_list, kwargs_source_list, unconvolved=False)
 ###The place to derive the truncated lensed arc
 plt.imshow(np.log10(image_arc_conv),origin='lower',vmin=-4.5)
 plt.colorbar()
 plt.show()
-
 
 #==============================================================================
 # #The information of the QSO as PSF
@@ -151,6 +148,10 @@ from lenstronomy.LensModel.Solver.lens_equation_solver import LensEquationSolver
 np.random.seed(seed)
 amp_qRh_s_plane=np.random.uniform(0.8,1./0.8)
 qso_amp= 10.**(-0.4*(source_para['mag_sersic']-zp))*amp_qRh_s_plane
+
+add_qso = int(input("add QSO?:\n input 0 no qso, others add qso:\t"))
+if add_qso == 0:
+	qso_amp = 0
               
 lensEquationSolver = LensEquationSolver(lens_model_class)
 x_image, y_image = lensEquationSolver.findBrightImage(source_pos[0], source_pos[1], kwargs_lens_list, numImages=4,
@@ -167,11 +168,6 @@ imageModel_without_arc = ImageModel(data_class, psf_class,
 image_without_arc = imageModel_without_arc.image(kwargs_lens = kwargs_lens_list, kwargs_source = [{}],
                                          kwargs_lens_light = kwargs_lens_light_list, kwargs_ps = [kwargs_ps])
 
-#Calcualte the frame magnitude
-#imageModel_deflector = ImageModel(data_class, psf_class,
-#                               lens_model_class=lens_model_class, source_model_class=None,    # No arc, i.e. source_model_class=None
-#                               lens_light_model_class= lens_light_model_class, point_source_class= point_source_class,
-#                               kwargs_numerics=kwargs_numerics)
 image_deflector = imageModel_without_arc.image(kwargs_lens = kwargs_lens_list, kwargs_source = [{}],
                                          kwargs_lens_light = kwargs_lens_light_list, kwargs_ps = [kwargs_ps], point_source_add=False, unconvolved=True)
 imageModel_source = ImageModel(data_class, psf_class, lens_model_class=None,
@@ -184,13 +180,16 @@ plt.imshow(np.log10(image_without_arc),origin='lower',vmin=-4.5)
 plt.colorbar()
 plt.show()
 image_highres = image_without_arc + image_arc_conv
-print('total_mag:', -2.5*np.log10(np.sum(image_highres))+zp)
-                                 
-plt.imshow(np.log10(image_without_arc),origin='lower',vmin=-4.5)
+print('total flux:', np.sum(image_highres))
+#print('total_mag:', -2.5*np.log10(np.sum(image_highres))+zp)
+plt.imshow(np.log10(image_highres),origin='lower',vmin=-4.5)
 plt.colorbar()
 plt.show()
-sim_folder_name = 'sim_lens_ID_'+repr(seed)
 
+if add_qso == 0:
+	sim_folder_name = 'sim_lens_noqso_ID_'+repr(seed)
+else:
+	sim_folder_name = 'sim_lens_ID_'+repr(seed)
 #==============================================================================
 # Creat a folder save the fits file
 #==============================================================================
@@ -259,24 +258,20 @@ plt.show()
 # Time delay
 #==============================================================================
 TD_distance=(1+para.z_lens)*para.D_l*para.D_s/para.D_ls
-if qso_amp != 0 :
-    fermat_po=lens_model_class.fermat_potential(x_image, y_image, x_source=source_pos[0], y_source=source_pos[1], kwargs_lens=kwargs_lens_list)
-#    ra_pos, dec_pos= kwargs_else['ra_pos'], kwargs_else['dec_pos']
-    pix_ra, pix_dec= x_image/deltaPix+numPix/2., y_image/deltaPix+numPix/2.
-    abc_list = ['A', 'B', 'C', 'D']
-    fig = plt.figure()
-    ax = fig.add_subplot(111)
-    for i in range(len(pix_ra)):
-        x_, y_ =pix_ra[i], pix_dec[i]
-        ax.plot(x_, y_, 'or')
-        ax.text(x_, y_, abc_list[i], fontsize=20, color='k') 
-        ax.matshow(np.log10(image_highres),origin='lower')
-#    plt.axis('off')
-    fig.savefig(sim_folder_name+'/ABCD.png')
-    plt.show()        
-    # The time delay between images, T_d in Mpc, out put in days.
-    TD = TD_distance/const.c * fermat_po / const.day_s * const.arcsec**2 * const.Mpc
-    print("Time delay of ABCD - A :\n\t", TD-TD[0])
+fermat_po=lens_model_class.fermat_potential(x_image, y_image, x_source=source_pos[0], y_source=source_pos[1], kwargs_lens=kwargs_lens_list)
+pix_ra, pix_dec= x_image/deltaPix+numPix/2., y_image/deltaPix+numPix/2.
+abc_list = ['A', 'B', 'C', 'D']
+fig = plt.figure()
+ax = fig.add_subplot(111)
+for i in range(len(pix_ra)):
+	x_, y_ =pix_ra[i], pix_dec[i]
+	ax.plot(x_, y_, 'or')
+	ax.text(x_, y_, abc_list[i], fontsize=20, color='k') 
+	ax.matshow(np.log10(image_highres),origin='lower')
+fig.savefig(sim_folder_name+'/ABCD.png')
+plt.show()  
+TD = TD_distance/const.c * fermat_po / const.day_s * const.arcsec**2 * const.Mpc
+print("Time delay of ABCD - A :\n\t", TD-TD[0])
 
 #%%Save infor
 qso_mag=-2.5*np.log10(np.sum(kwargs_ps['point_amp']))+zp
@@ -286,12 +281,11 @@ lens_info = open(sim_folder_name+'/lens_all_info.txt','w')
 lens_info.write("Unit:\n\tLength in arcsecond scale, 'phi_G' is Angle in radian system start from x axis anticlockwise.")
 lens_info.write("\nCosmological para\n\tFlatLambdaCDM, with Om=0.27 and H0: "+repr(roundme(para.H0))+ "km/s/Mpc")
 lens_info.write("\nPixel size is 0.13'' and 0.08'' before and after drizzle")
-if qso_amp != 0:
-    lens_info.write("\nTime delay distance: TD_distance=(1+z_l)*D_l*D_s/D_ls:"+ repr(roundme(TD_distance)) + "Mpc")
-    if len(TD)==4:
-        lens_info.write("\nTime delay of BCD - A :\n\t" + repr(roundme(TD-TD[0])[1:])  + "days")
-    if len(TD)==2:
-        lens_info.write("\nTime delay of B - A :\n\t" + repr(roundme(TD-TD[0])[1:])  + "days")
+lens_info.write("\nTime delay distance: TD_distance=(1+z_l)*D_l*D_s/D_ls:"+ repr(roundme(TD_distance)) + "Mpc")
+if len(TD)==4:
+	lens_info.write("\nTime delay of BCD - A :\n\t" + repr(roundme(TD-TD[0])[1:])  + "days")
+if len(TD)==2:
+	lens_info.write("\nTime delay of B - A :\n\t" + repr(roundme(TD-TD[0])[1:])  + "days")
 lens_info.write("\nZeropoint of filter (AB system): \t"+ repr(zp))
 lens_info.write("\nLens/Source redshift:\t"+ repr([roundme(para.z_lens), roundme(para.z_source)]))
 re_shear=para.shear()
