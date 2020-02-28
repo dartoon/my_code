@@ -62,6 +62,6 @@ predict_GW/*
 */*/image_library/*
 *.cpkl
 sim_*ID*/
-*/Test_fil_file/SED_files/*txt
-*/Test_fil_file/SED_files/*PA00*
+*/JWST_SED_abmag_esti/SED_files/*txt
+*/JWST_SED_abmag_esti/SED_files/*PA00*
 
