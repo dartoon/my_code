@@ -64,4 +64,5 @@ predict_GW/*
 sim_*ID*/
 */JWST_SED_abmag_esti/SED_files/*txt
 */JWST_SED_abmag_esti/SED_files/*PA00*
+.*/
 
