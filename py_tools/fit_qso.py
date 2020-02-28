@@ -282,7 +282,7 @@ def fit_qso(QSO_im, psf_ave, psf_std=None, source_params=None,ps_param=None, bac
                 fluxs.append(np.sum(image_j))
             mcmc_new_list.append([flux_quasar] + fluxs )
             if i/1000 > (i-1)/1000 :
-                print len(samples_mcmc), "MCMC samplers in total, finished translate:", i    
+                print(len(samples_mcmc), "MCMC samplers in total, finished translate:", i    )
         plot = corner.corner(mcmc_new_list, labels=labels_new, show_titles=True)
         if tag is not None:
             plot.savefig('{0}_HOSTvsQSO_corner.pdf'.format(tag))
@@ -455,8 +455,8 @@ def fit_galaxy(galaxy_im, psf_ave, psf_std=None, source_params=None, background_
 #    image_host = []   #!!! The linear_solver before and after could have different result for very faint sources.
 #    for i in range(len(source_result)):
 #        image_host_i = imageModel.source_surface_brightness(source_result,de_lensed=True,unconvolved=False, k=i)
-#        print "image_host_i", source_result[i]
-#        print "total flux", image_host_i.sum()
+#        print("image_host_i", source_result[i])
+#        print("total flux", image_host_i.sum())
 #        image_host.append(image_host_i)  
         
     # let's plot the output of the PSO minimizer
@@ -487,8 +487,8 @@ def fit_galaxy(galaxy_im, psf_ave, psf_std=None, source_params=None, background_
     image_host = []    
     for i in range(len(source_result)):
         image_host_i = imageModel.source_surface_brightness(source_result,de_lensed=True,unconvolved=False, k=i)
-#        print "image_host_i", source_result[i]
-#        print "total flux", image_host_i.sum()
+#        print("image_host_i", source_result[i])
+#        print("total flux", image_host_i.sum())
         image_host.append(image_host_i)  
         
     if corner_plot==True and no_MCMC==False:
@@ -517,7 +517,7 @@ def fit_galaxy(galaxy_im, psf_ave, psf_std=None, source_params=None, background_
                 fluxs.append(np.sum(image_j))
             mcmc_new_list.append( fluxs )
             if i/1000 > (i-1)/1000 :
-                print len(samples_mcmc), "MCMC samplers in total, finished translate:", i    
+                print(len(samples_mcmc), "MCMC samplers in total, finished translate:", i    )
         plot = corner.corner(mcmc_new_list, labels=labels_new, show_titles=True)
         if tag is not None:
             plot.savefig('{0}_HOSTvsQSO_corner.pdf'.format(tag))
@@ -742,7 +742,7 @@ def fit_qso_multiband(QSO_im_list, psf_ave_list, psf_std_list=None, source_param
         imageModel_k = imageModel_list[k]
         modelPlot = ModelPlot(multi_band_list[k], kwargs_model, lens_result, source_result,
                                  lens_light_result, ps_result, arrow_size=0.02, cmap_string="gist_heat", likelihood_mask=QSO_im_list[k])
-        print "source_result", 'for', "k", source_result
+        print("source_result", 'for', "k", source_result)
         image_host_k = []
         for i in range(len(source_result)):
             image_host_k.append(imageModel_list[k].source_surface_brightness(source_result,de_lensed=True,unconvolved=False, k=i))
