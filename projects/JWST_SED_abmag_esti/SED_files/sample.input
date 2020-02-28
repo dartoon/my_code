@@ -25,11 +25,11 @@ FILTER		444,204 #!!! Using my only created 444.fit
 #
 # Params for SED
 #
-AGE			0.625 #!!! 0.01,0.03,0.1,0.3,0.5,0.7,1.0,2.0,3.0 #I only select one value
-ZMAX		0.0 # Max metalicity
-ZMIN		0.0 # Min metalicity
+AGE			0.23 #!!! 0.01,0.03,0.1,0.3,0.5,0.7,1.0,2.0,3.0 #I only select one value
+ZMAX		-0.68 # Max metalicity
+ZMIN		-0.69 # Min metalicity
 #ZFIX		0.0 # logZ/Zsun
-DELZ		0.0  # Should be smaller than the gap between ZMAX and ZMIN.
+DELZ		0.005  # Should be smaller than the gap between ZMAX and ZMIN.
 ZEVOL		0 # Evolution in Z; 1=yes, 2=no.
 AVMIN		0.0
 AVMAX		0.0
