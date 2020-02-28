@@ -20,7 +20,6 @@ from lenstronomy.Data.psf import PSF
 from lenstronomy.Data.imaging_data import ImageData
 from lenstronomy.PointSource.point_source import PointSource
 from lenstronomy.LightModel.light_model import LightModel
-import webbpsf
 
 sys.path.insert(0, '../share_tools')
 
@@ -46,10 +45,12 @@ cosmo = FlatLambdaCDM(H0=70, Om0=0.3)
 ID= 0  #The ID for this simulation
 
 #%%Generate PSF:
-nc = webbpsf.NIRCam()
-nc.filter =  'F444W'
-psf_name = 'psf_{0}_sub{1}.fits'.format(nc.filter, oversample)
+nc_filter = 'F444W'
+psf_name = 'psf_{0}_sub{1}.fits'.format(nc_filter, oversample)
 if glob.glob(psf_name) == []:
+    import webbpsf
+    nc = webbpsf.NIRCam()
+    nc.filter =  nc_filter
     print("Generate PSF higher resolution by factor of 4:")
     psf = nc.calc_psf(oversample=oversample)     # returns an astropy.io.fits.HDUlist containing PSF and header
     pyfits.PrimaryHDU(psf[0].data,header=psf[0].header).writeto(psf_name,overwrite=False)
