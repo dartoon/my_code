@@ -33,16 +33,19 @@ z_s = 6.0        #AGN redshift
 zp = 28. #Using ETC, (616-556) total flux for 23.5 ab mag objects.
 
 host_mag = 23.797 ##
+ID= 0  #The ID for this simulation
+np.random.seed(seed = ID)
+
 
 host_flux = 10**(0.4*(zp - host_mag))
+host_ratio = np.random.uniform(0.4, 0.7) #Set the random host flux ratio [40% - 70%].
+point_flux = host_flux/host_ratio - host_flux #Calculate the point source flux.
 
-point_flux = np.random.uniform(0.6, 1/0.6) * host_flux#Units in counts per sec
 
 host_n = 2.5   #Host effective radius, unit: Kpc
 host_Reff_kpc = 2.0   #Host effective radius, unit: Kpc
 cosmo = FlatLambdaCDM(H0=70, Om0=0.3)
 
-ID= 0  #The ID for this simulation
 
 #%%Generate PSF:
 nc_filter = 'F444W'
@@ -66,7 +69,6 @@ scale_relation = cosmo.angular_diameter_distance(z_s).value * 10**3 * (1/3600./1
 host_Reff = host_Reff_kpc/scale_relation   #In arcsec
 
 sim_folder_name = 'sim_ID_'+repr(ID)
-np.random.seed(seed = ID)
 
 import os
 if os.path.exists(sim_folder_name)==True:
