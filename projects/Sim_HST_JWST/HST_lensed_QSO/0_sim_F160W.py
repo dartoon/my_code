@@ -84,12 +84,13 @@ kwargs_spemd = para.spemd()
 
 kwargs_spemd['q'] = 0.9 + np.random.normal(0,0.01)
 kwargs_spemd['e1'], kwargs_spemd['e2'] = param_util.phi_q2_ellipticity(phi=kwargs_spemd['phi_G'], q=kwargs_spemd['q'])
-lens_model_list = ['SPEMD']
+lens_model_list = ['SPEMD','SHEAR']
 #kwargs_spemd['gamma'] = 2.
 kwargs_mass_copy = copy.deepcopy([kwargs_spemd])
 del kwargs_spemd['phi_G']
 del kwargs_spemd['q']    
-kwargs_lens_list = [kwargs_spemd]
+ex_shear = {'gamma1': para.shear()[0]['e1'], 'gamma2': para.shear()[0]['e2']}
+kwargs_lens_list = [kwargs_spemd, ex_shear]
 
 lens_model_class = LensModel(lens_model_list)
 #==============================================================================
@@ -325,6 +326,10 @@ if qso_amp != 0:
     if len(TD)==2:
         lens_info_4Goodteam.write("\nTime delay of B - A :\n\t" + repr(roundme(TD_obs_err)[1:])  + "days, error level: " + repr(roundme(TD_err_l, prec=2)[1:]) + "days")
 lens_info_4Goodteam.close()
+
+import pickle
+picklename = sim_folder_name + '/sim_kwargs.pkl'
+pickle.dump([kwargs_lens_list, kwargs_lens_light_list, kwargs_source_list, kwargs_ps], open(picklename, 'wb'))
 
 #%%
 ###################Active this part if need to see the caustic and critical line
