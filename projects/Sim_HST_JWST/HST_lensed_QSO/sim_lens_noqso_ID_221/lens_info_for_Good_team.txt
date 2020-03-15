@@ -1,0 +1,4 @@
+Pixel size is 0.13'' and 0.08'' before and after drizzle
+Zeropoint of filter (AB system): 	25.9463
+Lens/Source redshift:	[0.782, 1.943]
+External Convergence: Kext= 0 +/- 0.025
