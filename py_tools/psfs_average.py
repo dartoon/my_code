@@ -50,7 +50,7 @@ def psf_ave(psfs_list, not_count=(), mode = 'CI',  mask_list=['default.reg'], ma
     psfs_l_msk = np.ones_like(psfs_list)  # To load the PSF plus masked area 
     for i in range(psf_NO):
         if i in not_count:
-            print "The PSF{0} is not count".format(i)
+            print("The PSF{0} is not count".format(i))
             psfs_l_msk[i] = np.zeros_like(psfs_list[i])
         else:
             if mask_img_list is None:
@@ -63,7 +63,7 @@ def psf_ave(psfs_list, not_count=(), mode = 'CI',  mask_list=['default.reg'], ma
                 mask = mask_img_list[i]
             psfs_l_msk[i] = psfs_list[i] * mask
 #    for i in range(psf_NO):
-#            print "plot psfs_list", i
+#            print("plot psfs_list", i)
 #            plt.matshow(psfs_l_msk[i], origin= 'low', norm=LogNorm())
 #            plt.colorbar()
 #            plt.show()  
@@ -72,9 +72,9 @@ def psf_ave(psfs_list, not_count=(), mode = 'CI',  mask_list=['default.reg'], ma
         for i in range(psf_NO):
             if psfs_l_msk[i].sum() != 0:
                 psfs_l_msk[i] /= psfs_l_msk[i].sum()  # scale the image to a same level
-#        print np.where(np.isclose(psfs_l_msk,0))
+#        print(np.where(np.isclose(psfs_l_msk,0)))
         psf_ave = np.nanmean(np.where(np.isclose(psfs_l_msk,0), np.nan, psfs_l_msk), axis=0)
-#        print psf_ave.sum()
+#        print(psf_ave.sum())
         psf_std = np.nanstd(np.where(np.isclose(psfs_l_msk,0), np.nan, psfs_l_msk), axis=0)
         psf_std /= psf_ave.sum()
         psf_ave /= psf_ave.sum()
@@ -85,10 +85,10 @@ def psf_ave(psfs_list, not_count=(), mode = 'CI',  mask_list=['default.reg'], ma
             box_r = len(psfs_l_msk[i])/6
             if psfs_l_msk[i].sum() != 0:
                 weights[i] = np.sqrt(np.sum(psfs_l_msk[i][box_c-box_r:box_c+box_r,box_c-box_r:box_c+box_r]))  # set weight based on their intensity (SNR)
-                print "Sum flux for PSF center",i , ":", psfs_l_msk[i][box_c-box_r:box_c+box_r,box_c-box_r:box_c+box_r].sum()
+                print("Sum flux for PSF center",i , ":", psfs_l_msk[i][box_c-box_r:box_c+box_r,box_c-box_r:box_c+box_r].sum())
                 psfs_l_msk[i] /= weights[i] **2  # scale the image to a same level
-        print "The final weights for doing the average:\n", weights
-#        print abs(psfs_l_msk[3]).min()
+        print("The final weights for doing the average:\n", weights)
+#        print(abs(psfs_l_msk[3]).min())
         psfs_msk2nan=np.where(np.isclose(psfs_l_msk,0, rtol=1e-10, atol=1e-09), np.nan, psfs_l_msk)
         cleaned_psfs = np.ma.masked_array(psfs_msk2nan,np.isnan(psfs_msk2nan))
 #        plt.imshow(cleaned_psfs.mask[5],origin = 'low')
@@ -108,10 +108,10 @@ def psf_ave(psfs_list, not_count=(), mode = 'CI',  mask_list=['default.reg'], ma
         for i in range(psf_NO):
             if psfs_l_msk[i].sum() != 0:
                 weights[i] = np.sqrt(np.sum(psfs_l_msk[i]))  # set weight based on their intensity (SNR)
-                print "Sum flux for PSF",i , ":", psfs_l_msk[i].sum()
+                print("Sum flux for PSF",i , ":", psfs_l_msk[i].sum())
                 psfs_l_msk[i] /= psfs_l_msk[i].sum()  # scale the image to a same level
-        print "The final weights for doing the average:\n", weights
-#        print abs(psfs_l_msk[3]).min()
+        print("The final weights for doing the average:\n", weights)
+#        print(abs(psfs_l_msk[3]).min())
         psfs_msk2nan=np.where(np.isclose(psfs_l_msk,0, rtol=1e-10, atol=1e-09), np.nan, psfs_l_msk)
         cleaned_psfs = np.ma.masked_array(psfs_msk2nan,np.isnan(psfs_msk2nan))
 #        plt.imshow(cleaned_psfs.mask[5],origin = 'low')
@@ -153,7 +153,7 @@ def psf_ave(psfs_list, not_count=(), mode = 'CI',  mask_list=['default.reg'], ma
 #            psfs_high_list[i] /= np.sqrt(np.sum(psfs_high_list[0]))
 #        psf_high_total = np.sum(psfs_high_list, axis=0)
 #        sum_4ave = np.sum(mask_high_list, axis=0)
-#        print sum_4ave
+#        print(sum_4ave)
 #        psf_high_final = psf_high_total/sum_4ave
 #        psf_final = rebin(psf_high_final, scale = scale)
     else:
@@ -190,18 +190,18 @@ def psf_shift_ave(psfs_list, not_count=None, mode = 'direct',  mask_list=['defau
                   mask_list=mask_list)
     psf_final, psf_final_std = psf_init_ave, psf_std
     for iters in range(num_iter):
-#        print "!!!!!iters is ", iters
+#        print("!!!!!iters is ", iters)
         shifted_psf_list = np.zeros_like(psfs_list)
         for i in range(len(psfs_list)):
             fitted_PSF = psfs_list[i]
-            print "fiting PSF", i
+            print("fiting PSF", i)
             if count_psf_std == True:
                 ra_image, dec_image = fit_psf_pos(fitted_PSF, psf_final, psf_final_std)
             else:
                 ra_image, dec_image = fit_psf_pos(fitted_PSF, psf_final)
-            print ra_image, dec_image
+            print(ra_image, dec_image)
             if abs(ra_image)>0.3 or abs(dec_image)>0.3:
-                print "Warning, the fitted ra_image, dec_image for psf", i ,'is too large!!!:', ra_image, dec_image 
+                print("Warning, the fitted ra_image, dec_image for psf", i ,'is too large!!!:', ra_image, dec_image )
             shifted_psf_list[i] = de_shift_kernel(fitted_PSF, -ra_image, -dec_image)
             plt.imshow(shifted_psf_list[i], norm = LogNorm(),origin='low')
             plt.show()
