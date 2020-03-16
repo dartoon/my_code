@@ -3,4 +3,4 @@ Zeropoint of filter (AB system): 	25.9463
 Lens/Source redshift:	[0.782, 1.943]
 External Convergence: Kext= 0 +/- 0.025
 Time delay of BCD - A :
-	array([ 3.505, 11.056, 12.43 ])days, error level: array([0.25, 0.25, 0.25])days
+	array([ 3.606, 11.318, 12.12 ])days, error level: array([0.25, 0.25, 0.25])days

@@ -303,7 +303,7 @@ lens_info.write("\nAGN light:" +\
                 "\n\tAGN amplitude in image plane:\t"+repr(roundme(kwargs_ps['point_amp'])))
 lens_info.write("\nHost galaxy mag in the image plane: "+ repr(roundme(src_mag))+" mag, AGN total mag in the image plane: "+ repr(roundme(qso_mag))+" mag")
 np.random.seed(seed)
-k_ext=np.random.normal(scale=0.025)
+k_ext= 0 #np.random.normal(scale=0.025)
 TD_obs=TD*(1-k_ext)
 lens_info.write("\nkappa_ext: \n\t"+repr(roundme(k_ext, prec=4)))
 lens_info.write("\nTime delay with external kappa i.e. TD_obs=TD*(1-k_ext):\n\t" + repr(roundme(TD_obs-TD_obs[0])[1:])  + "days")
@@ -329,7 +329,10 @@ lens_info_4Goodteam.close()
 
 import pickle
 picklename = sim_folder_name + '/sim_kwargs.pkl'
-pickle.dump([kwargs_lens_list, kwargs_lens_light_list, kwargs_source_list, kwargs_ps], open(picklename, 'wb'))
+model_lists = [lens_model_list, lens_light_model_list, source_model_list, point_source_list]
+para_s = [kwargs_lens_list, kwargs_lens_light_list, kwargs_source_list, kwargs_ps]
+lens_info = [para.z_lens, para.z_source, TD_distance, TD_obs_t, TD_obs_err, TD_err_l]
+pickle.dump([model_lists, para_s, lens_info], open(picklename, 'wb'))
 
 #%%
 ###################Active this part if need to see the caustic and critical line

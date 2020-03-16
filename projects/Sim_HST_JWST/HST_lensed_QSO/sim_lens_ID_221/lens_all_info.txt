@@ -22,6 +22,6 @@ AGN light:
 	AGN amplitude in image plane:	array([842.311, 993.23 , 840.963, 801.285])
 Host galaxy mag in the image plane: 18.53 mag, AGN total mag in the image plane: 17.093 mag
 kappa_ext: 
-	0.0131
+	0
 Time delay with external kappa i.e. TD_obs=TD*(1-k_ext):
-	array([ 3.546, 11.21 , 12.114])days
+	array([ 3.593, 11.359, 12.274])days
