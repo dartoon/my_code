@@ -36,7 +36,7 @@ zp= 28.
 psf, QSO_img = pyfits.getdata('sim_ID_0/Drz_PSF.fits'),  pyfits.getdata('sim_ID_0/Drz_QSO_image.fits')
 
 framesize = 60
-ct = (len(QSO_img) - framesize)/2
+ct = int((len(QSO_img) - framesize)/2)
 QSO_img = QSO_img[ct:-ct,ct:-ct]
 
 exptime = 625.0 * 8
