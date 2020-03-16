@@ -33,7 +33,7 @@ age_idx = [i for i in range(len(name)) if 'T_MW' in str(name[i])][0]
 
 age = str(round(10**table[1][age_idx],3)) # 'AGE:' Gyr
 
-fnu_ini = 0.5 #Input fit always 10.0
+fnu_ini = 0.5 #Input fit always 0.5
 
 #Template used :
 print('age:', age, 'mel', round(mel,3), 'sample redshift', z)
