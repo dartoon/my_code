@@ -20,7 +20,7 @@ DIR_TEMP	/Users/Dartoon/Astro/Packages/gsf/gsf/example/templates/ # Directory of
 DIR_EXTR	./ # Directory of extracted spectra.
 DIR_FILT	/Users/Dartoon/Astro/Packages/gsf/gsf/example/filter/ 
 CAT_BB		./sample.cat # Directory of extracted spectra.
-FILTER		444,204 #!!! Using my only created 444.fit
+FILTER		318,204 #!!! Using my only created 444.fit
 
 #
 # Params for SED

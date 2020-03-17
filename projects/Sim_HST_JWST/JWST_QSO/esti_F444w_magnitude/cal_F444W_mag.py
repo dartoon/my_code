@@ -52,10 +52,10 @@ def cal_filt_flam(array_spec, fil):
     
 
 #Download from SDSS: http://classic.sdss.org/dr5/algorithms/spectemplates/
-filename_p  = 'sdss_temp/spDR2-029.fit'  #QSO
+filename_p  = 'sdss_temp/spDR2-029.fit'  #QSO ID: 30
 #filename_p  = 'sdss_temp/spDR2-030.fit'  #QSO with some BAL activity (QSO)
 #filename_p  = 'sdss_temp/spDR2-031.fit'  #QSO with some BAL activity (QSO)
-##filename_p  = 'sdss_temp/spDR2-032.fit'  #High-luminosity QSO (QSO) !!! Not work, no short Wavelen information
+#filename_p  = 'sdss_temp/spDR2-032.fit'  #High-luminosity QSO (QSO) !!! Not work, no short Wavelen information
 hdul = pyfits.open(filename_p)
 spec_header = hdul[0].header
 spec_data = hdul[0].data
@@ -79,7 +79,7 @@ plt.scatter(1450, array_spec[idx,1], c='r')
 plt.tick_params(labelsize=15)
 plt.xlabel("A",fontsize=27)
 plt.ylabel(r"f$_\lambda$ erg/s/cm$^2$/A",fontsize=27)
-plt.close()
+plt.show()
 
 #%%Shift to redshift z = 6 and norm based on M1450 value
 M1450, m_zAB, m_yAB, z = -23.82, 22.775, 22.942, 6.10
@@ -134,8 +134,8 @@ f444w_fil = f444w_fil[:,1:]
 f444w_fil[:,1] = f444w_fil[:,1]/f444w_fil[:,1].max()* array_spec[:,1].max()/6
 plt.plot(f444w_fil[:,0], f444w_fil[:,1], label='JWST F444W filter response', c='firebrick')
 f444w_lam = np.median(f444w_fil[:,0])
-f444w_filt_lam = cal_filt_flam(array_spec, f444w_fil) 
-f444w_mag = -2.5 * np.log10(f444w_filt_lam ) - 2.402 - 5.0 * np.log10(f444w_lam)
+f444w_filt_flam = cal_filt_flam(array_spec, f444w_fil) 
+f444w_mag = -2.5 * np.log10(f444w_filt_flam ) - 2.402 - 5.0 * np.log10(f444w_lam)
 
 plt.tick_params(labelsize=15)
 plt.xlabel("A",fontsize=27)
@@ -146,7 +146,6 @@ plt.ylim(10**-19.5,10**-17.5)
 #plt.yscale('log',basey=10) 
 plt.legend(prop={'size':15})
 plt.show()
-
 
 z_mag = -2.5 * np.log10(z_filt_flam ) - 2.402 - 5.0 * np.log10(HSC_z_lam)
 y_mag = -2.5 * np.log10(y_filt_flam ) - 2.402 - 5.0 * np.log10(HSC_y_lam)
