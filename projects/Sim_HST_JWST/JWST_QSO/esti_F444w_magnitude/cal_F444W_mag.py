@@ -78,7 +78,7 @@ idx = np.where( abs(array_spec[:,0] - 1450.) == np.min(abs(array_spec[:,0] - 145
 plt.scatter(1450, array_spec[idx,1], c='r')
 plt.tick_params(labelsize=15)
 plt.xlabel("A",fontsize=27)
-plt.ylabel(r"f$_\lambda$ erg/s/cm$^2$/A",fontsize=27)
+plt.ylabel(r"f$_\lambda$ erg/s/cm$^2$/$\AA$",fontsize=27)
 plt.show()
 
 #%%Shift to redshift z = 6 and norm based on M1450 value

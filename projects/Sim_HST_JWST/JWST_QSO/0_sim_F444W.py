@@ -32,20 +32,21 @@ numPix = 321  # total frame pixel size
 z_s = 6.0        #AGN redshift
 zp = 28. #Using ETC, (616-556) total flux for 23.5 ab mag objects.
 
-host_mag = 23.797 ##
-ID= 0  #The ID for this simulation
+#AGN
+tot_mag = 21.826
+host_mag = 22.26
+
+ID= 1  #The ID for this simulation
+
 np.random.seed(seed = ID)
-
-
+#host_ratio = np.random.uniform(0.4, 0.7) #Set the random host flux ratio [40% - 70%].
 host_flux = 10**(0.4*(zp - host_mag))
-host_ratio = np.random.uniform(0.4, 0.7) #Set the random host flux ratio [40% - 70%].
-point_flux = host_flux/host_ratio - host_flux #Calculate the point source flux.
-
+total_flux = 10**(0.4*(zp - tot_mag))
+point_flux = total_flux - host_flux #Calculate the point source flux.
 
 host_n = 2.5   #Host effective radius, unit: Kpc
 host_Reff_kpc = 2.0   #Host effective radius, unit: Kpc
 cosmo = FlatLambdaCDM(H0=70, Om0=0.3)
-
 
 #%%Generate PSF:
 nc_filter = 'F444W'
@@ -98,7 +99,6 @@ phi = np.random.uniform(0.,2*np.pi)
 e1, e2 = param_util.phi_q2_ellipticity(phi=phi, q=q)
 kwargs_numerics = {'supersampling_factor': 3, 'supersampling_convolution': False}
 
-
 kwargs_sersic_medi = {'amp': 1. , 'n_sersic': host_n, 'R_sersic': host_Reff/np.sqrt(q), 'e1': e1, 'e2': e2,
                  'center_x': center_x, 'center_y': center_y}
 kwargs_host_medi = [kwargs_sersic_medi]
@@ -107,14 +107,24 @@ imageModel = ImageModel(data_class, psf_class, lens_light_model_class=lightModel
 medi_host_flux = np.sum(imageModel.image(kwargs_lens_light=kwargs_host_medi, unconvolved=True))
 amp = 1. / medi_host_flux * host_flux
 
-
 kwargs_sersic = {'amp': amp, 'n_sersic': host_n, 'R_sersic': host_Reff/np.sqrt(q), 'e1': e1, 'e2': e2,
                  'center_x': center_x, 'center_y': center_y}
 kwargs_host = [kwargs_sersic]
 
 ## simulate image with the parameters we have defined above #
-image_host = imageModel.image(kwargs_lens_light=kwargs_host, kwargs_ps=kwargs_ps, unconvolved=False)
-plt.imshow(image_host, origin='lower',cmap='gist_heat', norm=LogNorm())
+total_highres = imageModel.image(kwargs_lens_light=kwargs_host, kwargs_ps=kwargs_ps, unconvolved=False)
+host_highres = imageModel.image(kwargs_lens_light=kwargs_host, kwargs_ps=[{'ra_image': [center_x], 'dec_image': [center_y], 'point_amp': [0]}], unconvolved=False)
+point_highres = total_highres - host_highres
+
+plt.imshow(total_highres, origin='lower',cmap='gist_heat', norm=LogNorm())
+plt.colorbar()
+plt.show()
+
+plt.imshow(host_highres, origin='lower',cmap='gist_heat', norm=LogNorm())
+plt.colorbar()
+plt.show()
+
+plt.imshow(point_highres, origin='lower',cmap='gist_heat', norm=LogNorm())
 plt.colorbar()
 plt.show()
 
@@ -127,13 +137,33 @@ factor=oversample
 pattern_x=[0,2,0,2,1,3,1,3]
 pattern_y=[0,0,2,2,3,3,1,1]      #from the info. given by observation
 ################Bin the lensed image################
-exp_grid=rebin.expend_grid(image_host)
-cut_out=np.zeros([len(pattern_x),image_host.shape[0]-5,image_host.shape[1]-5])
-image_bin =np.zeros([len(pattern_x),int(image_host.shape[0]/factor)-1,int(image_host.shape[1]/factor)-1])
+total_exp_grid=rebin.expend_grid(total_highres)
+total_cut_out=np.zeros([len(pattern_x),total_highres.shape[0]-5,total_highres.shape[1]-5])
+total_image_bin =np.zeros([len(pattern_x),int(total_highres.shape[0]/factor)-1,int(total_highres.shape[1]/factor)-1])
+
+host_exp_grid=rebin.expend_grid(host_highres)
+host_cut_out=np.zeros([len(pattern_x),host_highres.shape[0]-5,host_highres.shape[1]-5])
+host_image_bin =np.zeros([len(pattern_x),int(host_highres.shape[0]/factor)-1,int(host_highres.shape[1]/factor)-1])
+
+point_exp_grid=rebin.expend_grid(point_highres)
+point_cut_out=np.zeros([len(pattern_x),point_highres.shape[0]-5,point_highres.shape[1]-5])
+point_image_bin =np.zeros([len(pattern_x),int(point_highres.shape[0]/factor)-1,int(point_highres.shape[1]/factor)-1])
+
+
 for i in range(len(pattern_x)):
-    cut_out[i]=exp_grid[pattern_x[i]:(numPix-5)+pattern_x[i],pattern_y[i]:(numPix-5)+pattern_y[i]]   #the size before bin
-    image_bin[i]=rebin.block(cut_out[i],(int(numPix/factor)-1,int(numPix/factor)-1),factor=factor)
-plt.imshow(image_bin[0], origin='lower',cmap='gist_heat', norm=LogNorm())
+    total_cut_out[i]=total_exp_grid[pattern_x[i]:(numPix-5)+pattern_x[i],pattern_y[i]:(numPix-5)+pattern_y[i]]   #the size before bin
+    total_image_bin[i]=rebin.block(total_cut_out[i],(int(numPix/factor)-1,int(numPix/factor)-1),factor=factor)
+    pyfits.PrimaryHDU(total_image_bin[i]).writeto(sim_folder_name+'/non_drizzled-AGNclean-{0}.fits'.format(i+1),overwrite=False)
+
+    host_cut_out[i]=host_exp_grid[pattern_x[i]:(numPix-5)+pattern_x[i],pattern_y[i]:(numPix-5)+pattern_y[i]]   #the size before bin
+    host_image_bin[i]=rebin.block(host_cut_out[i],(int(numPix/factor)-1,int(numPix/factor)-1),factor=factor)
+    pyfits.PrimaryHDU(host_image_bin[i]).writeto(sim_folder_name+'/non_drizzled-HOSTclean-{0}.fits'.format(i+1),overwrite=False)
+
+    point_cut_out[i]=point_exp_grid[pattern_x[i]:(numPix-5)+pattern_x[i],pattern_y[i]:(numPix-5)+pattern_y[i]]   #the size before bin
+    point_image_bin[i]=rebin.block(point_cut_out[i],(int(numPix/factor)-1,int(numPix/factor)-1),factor=factor)
+    pyfits.PrimaryHDU(point_image_bin[i]).writeto(sim_folder_name+'/non_drizzled-POINTclean-{0}.fits'.format(i+1),overwrite=False)
+
+plt.imshow(total_image_bin[0], origin='lower',cmap='gist_heat', norm=LogNorm())
 plt.colorbar()
 plt.show()
 ################Bin the PSF and save it################
@@ -154,10 +184,10 @@ for i in range(len(pattern_x)):
 # Add the noise same as Ding et al. 2017a 
 ######Since two long pics only ###########
 #==============================================================================
-bf_noz = image_bin#input simulate data to bf_noz
-rms = np.zeros_like(image_bin) #input rms
-noiz = np.zeros_like(image_bin) #input noiz
-image_data_noise=np.zeros_like(image_bin) #image after noiz
+bf_noz = total_image_bin#input simulate data to bf_noz
+rms = np.zeros_like(total_image_bin) #input rms
+noiz = np.zeros_like(total_image_bin) #input noiz
+image_data_noise=np.zeros_like(total_image_bin) #image after noiz
 #stdd=0.016  #!!! Need to be confirmed For 10000s, ~0.016. 
 #stdd=0.02 #!!! Need to be confirmed For 5000s, ~0.02. 
 #stdd=0.042  #!!! Need to be confirmed For 1250s, ~0.042. 
@@ -174,7 +204,7 @@ for i in range(len(pattern_x)):
     pyfits.PrimaryHDU(image_data_noise[i]).writeto(sim_folder_name+'/non_drizzled-image-{0}.fits'.format(i+1),overwrite=False)
 
 print("SNR map:")
-plt.imshow(image_bin[0]/rms[0], origin='lower')#,cmap='gist_heat', norm=LogNorm())
+plt.imshow(total_image_bin[0]/rms[0], origin='lower')#,cmap='gist_heat', norm=LogNorm())
 plt.colorbar()
 plt.show()
 

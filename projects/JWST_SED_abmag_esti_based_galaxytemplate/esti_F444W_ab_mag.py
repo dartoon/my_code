@@ -49,5 +49,7 @@ def esti_abmag(stellar , fnu_ini = fnu_ini, stellar_ini = stellar_ini):
 	ab_mag = -2.5*np.log10(fnu) + zp_fnu
 	return ab_mag
 
-s_mass = 10.3
+#s_mass = 10.3
+s_mass = np.log10(82. * 10 **9) 
+
 print("stellar mass", s_mass, "esti, AB mag:", esti_abmag(s_mass))
