@@ -13,4 +13,4 @@ python nordri.py
 rm -r uparm
 rm *.cl *.py
 rm *w.fits
-rm dri*.fits
+rm dr*.fits

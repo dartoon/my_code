@@ -29,14 +29,14 @@ filt  = 'F444W'
 oversample = 4
 numPix = 321  # total frame pixel size
 
-z_s = 6.0        #AGN redshift
+z_s = 6.10       #AGN redshift
 zp = 28. #Using ETC, (616-556) total flux for 23.5 ab mag objects.
 
 #AGN
 tot_mag = 21.826
 host_mag = 22.26
 
-ID= 1  #The ID for this simulation
+ID= 2  #The ID for this simulation
 
 np.random.seed(seed = ID)
 #host_ratio = np.random.uniform(0.4, 0.7) #Set the random host flux ratio [40% - 70%].
@@ -73,8 +73,16 @@ sim_folder_name = 'sim_ID_'+repr(ID)
 
 import os
 if os.path.exists(sim_folder_name)==True:
-    import shutil 
-    shutil.rmtree(sim_folder_name)
+    ifdel = input("Simulation of "+ sim_folder_name + " exist, delete the old folder?(Y/N):\n")
+    if ifdel == 'Y':
+        import shutil 
+        shutil.rmtree(sim_folder_name)
+    elif ifdel == 'N':
+        print("Simulation stop!")
+        from sys import exit
+        exit
+    else:
+        raise ValueError("Input is not right, stop simulation.")        
 os.mkdir(sim_folder_name)
 
 psf_data = psf[0].data
@@ -203,14 +211,14 @@ for i in range(len(pattern_x)):
     image_data_noise[i]=noiz[i]+np.random.poisson(lam=bf_noz[i]*exptim)/(exptim)  #Non-drizzled imaged
     pyfits.PrimaryHDU(image_data_noise[i]).writeto(sim_folder_name+'/non_drizzled-image-{0}.fits'.format(i+1),overwrite=False)
 
-print("SNR map:")
-plt.imshow(total_image_bin[0]/rms[0], origin='lower')#,cmap='gist_heat', norm=LogNorm())
-plt.colorbar()
-plt.show()
-
-plt.imshow(image_data_noise[0], origin='lower',cmap='gist_heat', norm=LogNorm())
-plt.colorbar()
-plt.show()
+#print("SNR map:")
+#plt.imshow(total_image_bin[0]/rms[0], origin='lower')#,cmap='gist_heat', norm=LogNorm())
+#plt.colorbar()
+#plt.show()
+#
+#plt.imshow(image_data_noise[0], origin='lower',cmap='gist_heat', norm=LogNorm())
+#plt.colorbar()
+#plt.show()
 
 filename_ascii = sim_folder_name+'/sim_info.txt'
 data_info =  open(filename_ascii,'w') 

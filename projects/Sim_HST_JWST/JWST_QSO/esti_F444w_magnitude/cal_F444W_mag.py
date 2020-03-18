@@ -79,7 +79,7 @@ plt.scatter(1450, array_spec[idx,1], c='r')
 plt.tick_params(labelsize=15)
 plt.xlabel("A",fontsize=27)
 plt.ylabel(r"f$_\lambda$ erg/s/cm$^2$/$\AA$",fontsize=27)
-plt.show()
+plt.close()
 
 #%%Shift to redshift z = 6 and norm based on M1450 value
 M1450, m_zAB, m_yAB, z = -23.82, 22.775, 22.942, 6.10

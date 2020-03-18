@@ -28,19 +28,20 @@ import pickle
 #Setting the fitting condition:
 deep_seed = True  #Set as True to put more seed and steps to fit.
 pltshow = 1 #Note that setting plt.ion() in line27, the plot won't show anymore if running in terminal.
-pix_scale = 0.04 
+pix_scale = 0.04 #After dirzzled
 fixcenter = False
 run_MCMC = False
 zp= 28.
 
-psf, QSO_img = pyfits.getdata('sim_ID_0/Drz_PSF.fits'),  pyfits.getdata('sim_ID_0/Drz_QSO_image.fits')
+folder = 'sim_ID_1'
+psf, QSO_img = pyfits.getdata(folder+'/Drz_PSF.fits'),  pyfits.getdata(folder+'/Drz_QSO_image.fits')
 
-framesize = 60
+framesize = 95
 ct = int((len(QSO_img) - framesize)/2)
 QSO_img = QSO_img[ct:-ct,ct:-ct]
 
 exptime = 625.0 * 8
-stdd =  0.0088  #Measurement from empty retion.
+stdd =  0.0088  #Measurement from empty retion: can also be estimated by: stdd/np.sqrt(8.)*0.04**2/0.063**2
 QSO_std = (abs(QSO_img/exptime)+stdd**2)**0.5
 #%%
 #==============================================================================
@@ -92,3 +93,38 @@ result = transfer_to_result(data=QSO_img, pix_sz = pix_scale,
 
 
 #%%
+print("The truth:")
+with open(folder+"/sim_info.txt") as f: # The with keyword automatically closes the file when you are done
+    print(f.read())
+                     
+print("The inferred results:")                     
+print("host_flux:",  result['host_amp'])
+print("host Reff:",  result['R_sersic'])
+print("host n:",  result['n_sersic'])
+print("host q:",  result['q'])
+print("AGN flux :",  result['QSO_amp'])
+
+#%%Print SNR map:
+print("Host galaxy SNR map:")
+host_clean = pyfits.getdata(folder+'/Drz_HOSTclean_image.fits')
+host_clean = host_clean[ct:-ct,ct:-ct]
+host_SNR = host_clean/QSO_std
+plt.imshow(host_SNR, origin='lower')#,cmap='gist_heat', norm=LogNorm())
+plt.colorbar()
+plt.show()
+
+print("Point source SNR map:")
+point_clean = pyfits.getdata(folder+'/Drz_POINTclean_image.fits')
+point_clean = point_clean[ct:-ct,ct:-ct]
+point_SNR = point_clean/QSO_std
+plt.imshow(point_SNR, origin='lower')#,cmap='gist_heat', norm=LogNorm())
+plt.colorbar()
+plt.show()
+
+print("AGN (total) SNR map:")
+AGN_clean = pyfits.getdata(folder+'/Drz_AGNclean_image.fits')
+AGN_clean = AGN_clean[ct:-ct,ct:-ct]
+Total_SNR = AGN_clean/QSO_std
+plt.imshow(Total_SNR, origin='lower')#,cmap='gist_heat', norm=LogNorm())
+plt.colorbar()
+plt.show()
