@@ -11,16 +11,20 @@ import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import glob
+
+
 from gen_fit_id_binary import gen_fit_id_binary
 from photutils import make_source_mask
 import os
+import sys
+sys.path.insert(0, '../../../py_tools/')
 
 from fit_qso import fit_qso, fit_galaxy
 from mask_objects import detect_obj
 from matplotlib.colors import LogNorm
 import copy
 from subprocess import call
-import sys
+
 
 #image_ID ='084710.40-001302.6' 
 #image_RA = 131.7934293
@@ -38,20 +42,20 @@ import sys
 #image_RA = 183.5213596
 #image_DEC = 1.034757599
 
-image_ID = sys.argv[1] #'141637.44+003352.2' 
-image_RA = float(sys.argv[2]) #214.15602111816406
-image_DEC = float(sys.argv[3]) #0.5645210146903992
+#image_ID = sys.argv[1] #'141637.44+003352.2' 
+#image_RA = float(sys.argv[2]) #214.15602111816406
+#image_DEC = float(sys.argv[3]) #0.5645210146903992
 
-#image_ID ='100043.13+020637.2' 
-#image_RA = 150.1797789
-#image_DEC = 2.110369603
+image_ID ='100043.13+020637.2' 
+image_RA = 150.1797789
+image_DEC = 2.110369603
 
 #image_ID = "000017.88+002612.6"
 #image_RA = 0.07452999800443649
 #image_DEC = 0.4368380010128021
 
 
-print image_ID, image_RA, image_DEC
+print(image_ID, image_RA, image_DEC)
 
 deep_seed = True  #Set as True to put more seed and steps to fit,
 pltshow = 1
@@ -74,7 +78,7 @@ zp_list = []
 for i in range(len(band_seq)):
     # The pixel scale is all 0.168
     if len(glob.glob(image_folder+filename_list[i])) == 0:
-        print filename_list[i] + " DOES NOT EXIST!!!"
+        print(filename_list[i] + " DOES NOT EXIST!!!")
         QSO_im, err_map, PSF, pix_scale, zp, qso_center, fr_c_RA_DEC = [], [], [], [], [], [], [], []
         run_list.remove(i)
     else:
@@ -105,7 +109,7 @@ for i in range(len(band_seq)):
         background_rms_list.append([])
 
 fit_frame_size = 81
-ct = (len(QSO_im)-fit_frame_size)/2     # If want to cut to 61, QSO_im[ct:-ct,ct:-ct]
+ct = int((len(QSO_im)-fit_frame_size)/2)     # If want to cut to 61, QSO_im[ct:-ct,ct:-ct]
 
 #==============================================================================
 # Start set up for fitting:
@@ -133,17 +137,17 @@ for k in run_list:
             for j in range(len(obj)):
                 dis = np.sqrt(np.sum((np.asarray(obj[j][0])-np.asarray(obj_temp[i][0]))**2))
                 if i ==1:
-                    print dis, (obj[j][1]+obj_temp[i][1])/2
+                    print(dis, (obj[j][1]+obj_temp[i][1])/2)
                 if dis < (obj[j][1]+obj_temp[i][1])/2:
                     count += 1
             if count == 0:
                 obj.append(obj_temp[i])
-        print "the number of nearby objs:", len(obj)
+        print("the number of nearby objs:", len(obj))
 
 from mask_objects import find_loc_max, measure_FWHM
 
 for k in run_list:  #['G', 'R', 'I', 'Z', 'Y']
-    print "Fiting the: "+ filename_list[k]
+    print("Fiting the: "+ filename_list[k])
     if_dual = False
     psf, QSO_img, QSO_std = psf_l[k], QSO_img_l[k], QSO_std_l[k]
         
@@ -169,8 +173,8 @@ for k in run_list:  #['G', 'R', 'I', 'Z', 'Y']
             arr_y = np.concatenate([arr_y,arr_y])
             claim = "This {0} is likely to be very closed dual AGN system!!!".format(filename_list[k])
     if if_dual == True:
-        print claim
-        print "Comparing the fitting Chisq:"
+        print(claim)
+        print("Comparing the fitting Chisq:")
         if os.path.exists('fit_result_detect/{0}/'.format(qsoid))==False:
             os.mkdir('fit_result_detect/{0}/'.format(qsoid))
         plt.imshow(QSO_img, origin='low', norm=LogNorm())
@@ -214,7 +218,7 @@ for k in run_list:  #['G', 'R', 'I', 'Z', 'Y']
             #==============================================================================
             fixcenter = False
             tag = 'fit_result_detect/{0}/fit_image0_PS+Sersic_fittime-{1}'.format(qsoid,fit_time+1)
-            print "fitting the QSO as one BH + Sersic "
+            print("fitting the QSO as one BH + Sersic ")
             source_result_0, ps_result_0, image_ps_0, image_host_0, error_map_0, reduced_Chisq_0=fit_qso(QSO_img, psf_ave=psf, psf_std = None,
                                                                               background_rms=background_rms_list[k],
                                                                               source_params=source_params_0, QSO_msk = None, fixcenter=fixcenter,
@@ -227,10 +231,10 @@ for k in run_list:  #['G', 'R', 'I', 'Z', 'Y']
             write_result.write("Reduced Chisq: "+repr(round(reduced_Chisq_0,3)))
             write_result.write("\nHost mag: "+repr(round(host_mag,3)))
             write_result.write("\nAGN mag: "+repr(round(AGN_mag,3)))
-            write_result.write("\nPS Sersic center offset (arcsec): "+repr(round(c_miss,3)) + "; ")
+            write_result.write("\nPS Sersic center offset (arcsec): "+repr(round(float(c_miss),3)) + "; ")
             write_result.write("\n=======================================================\n")
             tag_name = tag + "_fitted_image"
-            print call("mv {0} {1}".format(tag_name+'.pdf', tag+"_chisq_"+repr(round(reduced_Chisq_0,1)))+'.pdf', shell=True)
+            print(call("mv {0} {1}".format(tag_name+'.pdf', tag+"_chisq_"+repr(round(reduced_Chisq_0,1)))+'.pdf', shell=True))
         #==============================================================================
         # fitting the QSO as a BHBH        
         #==============================================================================
@@ -267,7 +271,7 @@ for k in run_list:  #['G', 'R', 'I', 'Z', 'Y']
                 kwargs_lower_ps.append({'ra_image': [ps_x[i]-0.6], 'dec_image': [ps_y[i]-0.6]})
                 kwargs_upper_ps.append({'ra_image': [ps_x[i]+0.6], 'dec_image': [ps_y[i]+0.6]})
             ps_param_1 = [kwargs_ps_init, kwargs_ps_sigma, fixed_ps, kwargs_lower_ps, kwargs_upper_ps]  
-            print "fitting the QSO as {0} point sources".format(len(arr_x))
+            print("fitting the QSO as {0} point sources".format(len(arr_x)))
             source_result_1, ps_result_1, image_ps_1, image_host_1, error_map_1, reduced_Chisq_1=fit_qso(QSO_img, psf_ave=psf, psf_std = None, ps_param = ps_param_1,
                                                                               background_rms=background_rms_list[k],
                                                                               source_params=source_params_1, QSO_msk = None,
@@ -291,12 +295,12 @@ for k in run_list:  #['G', 'R', 'I', 'Z', 'Y']
             write_result.write("\n")
             for i in range(len(ps_result_1)):
                 write_result.write("AGN{0} position: ".format(i))
-                write_result.write("x: "+repr(round(ps_result_1[i]['ra_image'],3))+' y: '+repr(round(ps_result_1[i]['dec_image'],3))+ "; ")            
-            write_result.write("\nPS PS center offset (arcsec): "+repr(round(c_miss,3)))
+                write_result.write("x: "+repr(round(ps_result_1[i]['ra_image'][0],3))+' y: '+repr(round(ps_result_1[i]['dec_image'][0],3))+ "; ")            
+            write_result.write("\nPS PS center offset (arcsec): "+repr(round(float(c_miss),3)))
             write_result.write("\n=======================================================\n")
             tag_name = tag + "_fitted_image"  
             tag_name = tag + "_fitted_image"                                      
-            print call("mv {0} {1}".format(tag_name+'.pdf', tag+"_chisq_"+repr(round(reduced_Chisq_1,1)))+'.pdf', shell=True)
+            print(call("mv {0} {1}".format(tag_name+'.pdf', tag+"_chisq_"+repr(round(reduced_Chisq_1,1)))+'.pdf', shell=True))
         #==============================================================================
         # fitting the QSO as a BHBH + Sersic       
         #==============================================================================
@@ -318,7 +322,7 @@ for k in run_list:  #['G', 'R', 'I', 'Z', 'Y']
                 kwargs_lower_ps.append({'ra_image': [ps_x[i]-0.6], 'dec_image': [ps_y[i]-0.6]})
                 kwargs_upper_ps.append({'ra_image': [ps_x[i]+0.6], 'dec_image': [ps_y[i]+0.6]})
             ps_param_2 = [kwargs_ps_init, kwargs_ps_sigma, fixed_ps, kwargs_lower_ps, kwargs_upper_ps] 
-            print "fitting the QSO as {0} point sources + Sersic".format(len(arr_x))
+            print("fitting the QSO as {0} point sources + Sersic".format(len(arr_x)))
             source_result_2, ps_result_2, image_ps_2, image_host_2, error_map_2, reduced_Chisq_2=fit_qso(QSO_img, psf_ave=psf, psf_std = None, ps_param = ps_param_2,
                                                                               background_rms=background_rms_list[k],
                                                                               source_params=source_params_0, QSO_msk = None, fixcenter=fixcenter,
@@ -342,8 +346,8 @@ for k in run_list:  #['G', 'R', 'I', 'Z', 'Y']
             write_result.write("\n")
             for i in range(len(ps_result_2)):
                 write_result.write("AGN{0} position: ".format(i))
-                write_result.write("x: "+repr(round(ps_result_2[i]['ra_image'],3))+' y: '+repr(round(ps_result_2[i]['dec_image'],3))+ "; ")
-            write_result.write("\nPS PS center offset (arcsec): "+repr(round(c_miss,3)))
+                write_result.write("x: "+repr(round(ps_result_2[i]['ra_image'][0],3))+' y: '+repr(round(ps_result_2[i]['dec_image'][0],3))+ "; ")
+            write_result.write("\nPS PS center offset (arcsec): "+repr(round(float(c_miss),3)))
             write_result.write("\n=======================================================\n")
             tag_name = tag + "_fitted_image"  
             objs_img = np.zeros_like(image_host_2[0])
@@ -355,7 +359,7 @@ for k in run_list:  #['G', 'R', 'I', 'Z', 'Y']
             file_header['CRPIX1'] = file_header['CRPIX1']-qso_center[0]+len(QSO_img)/2
             file_header['CRPIX2'] = file_header['CRPIX2']-qso_center[1]+len(QSO_img)/2
             pyfits.PrimaryHDU(QSO_img-image_ps_2-objs_img,header=file_header).writeto('fit_result_detect/{0}/data-BHBH(host).fits'.format(qsoid),overwrite=True)
-            print call("mv {0} {1}".format(tag_name+'.pdf', tag+"_chisq_"+repr(round(reduced_Chisq_2,1)))+'.pdf', shell=True)   
+            print(call("mv {0} {1}".format(tag_name+'.pdf', tag+"_chisq_"+repr(round(reduced_Chisq_2,1)))+'.pdf', shell=True)   )
         #==============================================================================
         # fitting the QSO as a sSersic + lSersic        
         #==============================================================================
@@ -389,7 +393,7 @@ for k in run_list:  #['G', 'R', 'I', 'Z', 'Y']
                     kwargs_lower_source.append({'e1': -0.5, 'e2': -0.5, 'R_sersic': obj[i][1] * pix_scale/5, 'n_sersic': 0.3, 'center_x': -obj[i][0][0]*pix_scale-0.5, 'center_y': obj[i][0][1]*pix_scale-0.5})
                     kwargs_upper_source.append({'e1': 0.5, 'e2': 0.5, 'R_sersic': 3., 'n_sersic': 7., 'center_x': -obj[i][0][0]*pix_scale+0.5, 'center_y': obj[i][0][1]*pix_scale+0.5})
             source_params_3 = [kwargs_source_init, kwargs_source_sigma, fixed_source, kwargs_lower_source, kwargs_upper_source]
-            print "fitting the QSO as {0} small Sersic + Sersic".format(len(arr_x))
+            print("fitting the QSO as {0} small Sersic + Sersic".format(len(arr_x)))
             source_result_3, image_host_3, error_map_3, reduced_Chisq_3=fit_galaxy(QSO_img, psf_ave=psf, psf_std = None,
                                                                               background_rms=background_rms_list[k],
                                                                               source_params=source_params_3, galaxy_msk = None,
@@ -415,10 +419,10 @@ for k in run_list:  #['G', 'R', 'I', 'Z', 'Y']
             for i in range(len(arr_x)):
                 write_result.write("AGN{0} position: ".format(i))
                 write_result.write("x: "+repr(round(source_result_3[i]['center_x'],3))+' y: '+repr(round(source_result_3[i]['center_y'],3))+ "; ")
-            write_result.write("\nPS PS center offset (arcsec): "+repr(round(c_miss,3)))
+            write_result.write("\nPS PS center offset (arcsec): "+repr(round(float(c_miss),3)))
             write_result.write("\n====================================================end\n")
             tag_name = tag + "_fitted_image"                                      
-            print call("mv {0} {1}".format(tag_name+'.pdf', tag+"_chisq_"+repr(round(reduced_Chisq_3,1)))+'.pdf', shell=True)       
+            print(call("mv {0} {1}".format(tag_name+'.pdf', tag+"_chisq_"+repr(round(reduced_Chisq_3,1)))+'.pdf', shell=True)       )
         write_result.close()                             
 #os.system('say "your program has finished"')
 print("Program has finished")
