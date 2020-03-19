@@ -182,7 +182,7 @@ def find_loc_max(data, neighborhood_size = 4, threshold = 5):
 def measure_FWHM(image, measure_radius = 10):
     seed_num = 2*measure_radius+1
     frm = len(image)
-    q_frm = frm/4
+    q_frm = int(frm/4)
     x_center = np.where(image == image[q_frm:-q_frm,q_frm:-q_frm].max())[1][0]
     y_center = np.where(image == image[q_frm:-q_frm,q_frm:-q_frm].max())[0][0]
     

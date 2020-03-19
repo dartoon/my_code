@@ -15,7 +15,7 @@ import matplotlib.pyplot as plt
 norm = ImageNormalize(stretch=SqrtStretch())         
 
 def est_bkg(image, pltshow=1):
-    print "Estimating the background light......"
+    print("Estimating the background light......")
     img = image # check the back grounp
     sigma_clip = SigmaClip(sigma=3., iters=10)
     bkg_estimator = SExtractorBackground()
