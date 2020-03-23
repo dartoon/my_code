@@ -10,10 +10,10 @@ im = pyfits.open(filename)[0].data.copy()
 im /=nimage
 pyfits.PrimaryHDU(im).writeto('Drz_QSO_image.fits')#,overwrite=True)
 
-filename='dripsf.fits'
-psf = pyfits.open(filename)[0].data.copy()
-psf /= np.sum(psf)  
-pyfits.PrimaryHDU(psf).writeto('Drz_PSF.fits')#,overwrite=True)
+# filename='dripsf.fits'
+# psf = pyfits.open(filename)[0].data.copy()
+# psf /= np.sum(psf)  
+# pyfits.PrimaryHDU(psf).writeto('Drz_PSF.fits')#,overwrite=True)
 
 filename='drAGNclean.fits'
 AGN = pyfits.open(filename)[0].data.copy()

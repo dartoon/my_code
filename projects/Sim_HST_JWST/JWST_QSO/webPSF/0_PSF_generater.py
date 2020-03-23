@@ -28,7 +28,6 @@ import webbpsf
 filt_l = ['F444W', 'F356W', 'F200W', 'F150W']
 filt  = filt_l[3]
 oversample = 4
-#Generate PSF:
 position_list= [(1024.0, 1024.0),
         (0.0, 0.0),
       (0.0, 1024.0),
@@ -65,4 +64,4 @@ if os.path.exists(PSF_folder_name)==True:
 os.mkdir(PSF_folder_name)
 for i in range(len(psf_list)):
     pyfits.PrimaryHDU(psf_list[i][0].data,header=psf_list[i][0].header).writeto(PSF_folder_name+'/'+'PSF_id{0}.fits'.format(i))
-    
+#    

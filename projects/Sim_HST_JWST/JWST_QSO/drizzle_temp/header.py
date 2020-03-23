@@ -7,9 +7,9 @@ for i in range(num):
 	hdu=pyfits.open('non_drizzled-image-{0}.fits'.format(i+1),mode = 'update')
 	hdu[0].header["EXPTIME"]=1
 	hdu.flush()
-	psf=pyfits.open('non_drizzled_psf-{0}.fits'.format(i+1),mode = 'update')
-	psf[0].header["EXPTIME"]=1
-	psf.flush()
+#	psf=pyfits.open('non_drizzled_psf-{0}.fits'.format(i+1),mode = 'update')
+#	psf[0].header["EXPTIME"]=1
+#	psf.flush()
 	hdu=pyfits.open('non_drizzled-AGNclean-{0}.fits'.format(i+1),mode = 'update')
 	hdu[0].header["EXPTIME"]=1
 	hdu.flush()
