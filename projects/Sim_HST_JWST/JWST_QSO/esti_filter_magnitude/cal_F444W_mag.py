@@ -82,7 +82,7 @@ plt.ylabel(r"f$_\lambda$ erg/s/cm$^2$/$\AA$",fontsize=27)
 plt.close()
 
 #%%Shift to redshift z = 6 and norm based on M1450 value
-M1450, m_zAB, m_yAB, z = -23.82, 22.775, 22.942, 6.10
+#M1450, m_zAB, m_yAB, z = -23.82, 22.775, 22.942, 6.10
 #M1450, m_zAB, m_yAB, z = -25.31, 21.827, 21.614, 6.37
 #M1450, m_zAB, m_yAB, z = -24.09, 22.768, 23.649, 6.39
 #M1450, m_zAB, m_yAB, z = -24.73, 22.121, 22.045, 6.2
@@ -138,7 +138,7 @@ f444w_filt_flam = cal_filt_flam(array_spec, f444w_fil)
 f444w_mag = -2.5 * np.log10(f444w_filt_flam ) - 2.402 - 5.0 * np.log10(f444w_lam)
 
 plt.tick_params(labelsize=15)
-plt.xlabel("A",fontsize=27)
+plt.xlabel("$\AA$",fontsize=27)
 plt.ylabel(r"f$_\lambda$ erg/s/cm$^2$/A",fontsize=27)
 plt.xlim(800, 60000)
 plt.ylim(10**-19.5,10**-17.5)

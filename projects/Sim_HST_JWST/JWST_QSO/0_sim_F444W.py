@@ -105,7 +105,7 @@ lightModel = LightModel(light_model_list=light_model_list)
 q = np.random.uniform(0.5,0.9)
 phi = np.random.uniform(0.,2*np.pi)
 e1, e2 = param_util.phi_q2_ellipticity(phi=phi, q=q)
-kwargs_numerics = {'supersampling_factor': 3, 'supersampling_convolution': False}
+kwargs_numerics = {'supersampling_factor': 2, 'supersampling_convolution': False}
 
 kwargs_sersic_medi = {'amp': 1. , 'n_sersic': host_n, 'R_sersic': host_Reff/np.sqrt(q), 'e1': e1, 'e2': e2,
                  'center_x': center_x, 'center_y': center_y}

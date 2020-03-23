@@ -54,7 +54,7 @@ file_text = np.asarray(file_text)
 
 plt.figure(figsize=(8, 6))
 plt.plot(array_spec[:,0]/10000., array_spec[:,2])
-plt.plot(sov_jwst_f144w_fil[:,0]/10000., sov_jwst_f144w_fil[:,1], label='NIRCam F444W response curve')
+plt.plot(sov_jwst_f144w_fil[:,0]/10000., sov_jwst_f144w_fil[:,1], label='NIRCam F444W response curve', c='firebrick')
 plt.xlim(0.25, 8)
 xmin, xmax, ymin, ymax = plt.axis()
 plt.text( (xmax-xmin)*0.45, (ymax-ymin)*0.75, 'stellar population with:', fontsize=17)
