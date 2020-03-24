@@ -1,11 +1,11 @@
 #!/bin/bash
 #Run using iraf27 environment
+read -p 'Drizzling filter:' filt
 read -p 'Simulation ID:' id
-cp -r drizzle_temp/* sim_ID_${id}
-cd sim_ID_${id}
+cp -r ${filt}_drizzle_temp/* sim_ID_${id}
+cd sim_${filt}_ID_${id}
 python header.py
 echo "cl<dri_img.cl; logout" | cl
-#echo "cl<dri_psf.cl; logout" | cl
 echo "cl<dri_AGNclean.cl; logout" | cl
 echo "cl<dri_HOSTclean.cl; logout" | cl
 echo "cl<dri_POINTclean.cl; logout" | cl
