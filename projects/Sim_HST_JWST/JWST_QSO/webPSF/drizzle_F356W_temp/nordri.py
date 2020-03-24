@@ -10,4 +10,4 @@ for i in range(id_num):
 	filename='dripsf_id{0}.fits'.format(i)
 	psf = pyfits.open(filename)[0].data.copy()
 	psf /= np.sum(psf)  
-	pyfits.PrimaryHDU(psf).writeto('Drz_PSF_id{0}.fits').format(i)#,overwrite=True)
+	pyfits.PrimaryHDU(psf).writeto('Drz_PSF_id{0}.fits'.format(i))#,overwrite=True)
