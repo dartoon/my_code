@@ -29,7 +29,7 @@ filt_id = 0
 filt  = filt_l[filt_id]
 
 oversample = 4
-numPix = 321  # total frame pixel size #!!!Need to be changed for different filter
+numPix = 341  # total frame pixel size #!!!Need to be changed for different filter
 z_s = 6.10       #AGN redshift
 zp = 28. #Using ETC, (616-556) total flux for 23.5 ab mag objects.  #!!!Need to check
 
@@ -39,7 +39,7 @@ host_mag = 22.26
 host_n = 2.5   #Host effective radius, unit: Kpc
 host_Reff_kpc = 2.0   #Host effective radius, unit: Kpc
 
-ID= 0  #The ID for this simulation
+ID= 2  #The ID for this simulation
 np.random.seed(seed = ID)
 #host_ratio = np.random.uniform(0.4, 0.7) #Set the random host flux ratio [40% - 70%].
 host_flux = 10**(0.4*(zp - host_mag))
@@ -47,7 +47,6 @@ total_flux = 10**(0.4*(zp - tot_mag))
 point_flux = total_flux - host_flux #Calculate the point source flux.
 cosmo = FlatLambdaCDM(H0=70, Om0=0.3)
 scale_relation = cosmo.angular_diameter_distance(z_s).value * 10**3 * (1/3600./180.*np.pi)  #Kpc/arc
-
 #%%Take the PSF: Use PSF 1 - 8 to simulate, but use PSF0 to model the data
 psf_take_id = np.random.randint(1,8)
 psf_take_name = 'webPSF/highres_PSF_'+filt+'/PSF_id{0}.fits'.format(psf_take_id)
@@ -56,7 +55,6 @@ psf = pyfits.open(psf_take_name)
 #%%Build up the simulation:
 pix_s = psf[0].header['PIXELSCL'] #* oversample
 host_Reff = host_Reff_kpc/scale_relation   #In arcsec
-
 sim_folder_name = 'sim_'+filt+ '_ID_'+repr(ID)
 import os
 if os.path.exists(sim_folder_name)==True:
@@ -71,28 +69,25 @@ if os.path.exists(sim_folder_name)==True:
     else:
         raise ValueError("Input is not right, stop simulation.")        
 os.mkdir(sim_folder_name)
-
 psf_data = psf[0].data
 psf_data = psf_data[1:,1:]
 psf_data /= psf_data.sum()
 kwargs_psf_high_res = {'psf_type': 'PIXEL', 'kernel_point_source': psf_data, 'pixel_size': pix_s}
 kwargs_data_high_res = sim_util.data_configure_simple(numPix, pix_s)
 data_class = ImageData(**kwargs_data_high_res)
-
 psf_class = PSF(**kwargs_psf_high_res)
-center_x, center_y = np.random.normal(0, pix_s*oversample, 2)
+#center_x, center_y = np.random.normal(0, pix_s*oversample, 2)
+center_x, center_y = np.random.uniform(-15,15) * pix_s, np.random.uniform(-15,15)* pix_s
 point_amp = point_flux
 point_source_list = ['UNLENSED']
 pointSource = PointSource(point_source_type_list=point_source_list)
 kwargs_ps = [{'ra_image': [center_x], 'dec_image': [center_y], 'point_amp': [point_amp]}]
-
 light_model_list = ['SERSIC_ELLIPSE']
 lightModel = LightModel(light_model_list=light_model_list)
 q = np.random.uniform(0.5,0.9)
 phi = np.random.uniform(0.,2*np.pi)
 e1, e2 = param_util.phi_q2_ellipticity(phi=phi, q=q)
 kwargs_numerics = {'supersampling_factor': 2, 'supersampling_convolution': False}
-
 kwargs_sersic_medi = {'amp': 1. , 'n_sersic': host_n, 'R_sersic': host_Reff/np.sqrt(q), 'e1': e1, 'e2': e2,
                  'center_x': center_x, 'center_y': center_y}
 kwargs_host_medi = [kwargs_sersic_medi]
@@ -100,7 +95,6 @@ imageModel = ImageModel(data_class, psf_class, lens_light_model_class=lightModel
                                 point_source_class=pointSource, kwargs_numerics=kwargs_numerics)
 medi_host_flux = np.sum(imageModel.image(kwargs_lens_light=kwargs_host_medi, unconvolved=True))
 amp = 1. / medi_host_flux * host_flux
-
 kwargs_sersic = {'amp': amp, 'n_sersic': host_n, 'R_sersic': host_Reff/np.sqrt(q), 'e1': e1, 'e2': e2,
                  'center_x': center_x, 'center_y': center_y}
 kwargs_host = [kwargs_sersic]
@@ -185,7 +179,6 @@ for i in range(len(pattern_x)):
 #plt.imshow(total_image_bin[0]/rms[0], origin='lower')#,cmap='gist_heat', norm=LogNorm())
 #plt.colorbar()
 #plt.show()
-#
 #plt.imshow(image_data_noise[0], origin='lower',cmap='gist_heat', norm=LogNorm())
 #plt.colorbar()
 #plt.show()
@@ -207,4 +200,3 @@ data_info.write("AGN_flux:\t{0}\n".format(point_flux))
 data_info.write("AGN position (x, y):\t({0}, {1}) arcsec\n".format(round(center_x,5),round(center_y,5))) 
 data_info.close()
 
-#%%

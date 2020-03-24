@@ -1,5 +1,5 @@
-drizzle.outnx=127
-drizzle.outny=127
+drizzle.outnx=135
+drizzle.outny=135
 drizzle.pixfrac=0.7
 drizzle.scale=0.63492063
 drizzle.kernel="gaussian"

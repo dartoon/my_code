@@ -33,8 +33,8 @@ def cal_h0(zl, zs, Ddt, om=0.27):
     ratio = Ddt_corr/Ddt
     return 100 * ratio
 
-folder = 'sim_lens_ID_221/'
-#folder = 'sim_lens_noqso_ID_221/'
+#folder = 'sim_lens_ID_221/'
+folder = 'sim_lens_noqso_ID_221/'
 
 model_lists, para_s, lens_info= pickle.load(open(folder+'sim_kwargs.pkl','rb'))
 lens_model_list, lens_light_model_list, source_model_list, point_source_list = model_lists

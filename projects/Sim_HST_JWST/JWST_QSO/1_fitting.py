@@ -33,17 +33,25 @@ fixcenter = False
 run_MCMC = False
 zp= 28.
 
-folder = 'sim_ID_1'
-psf, QSO_img = pyfits.getdata(folder+'/Drz_PSF.fits'),  pyfits.getdata(folder+'/Drz_QSO_image.fits')
+folder = 'sim_F444W_ID_0'
+psf, QSO_img = pyfits.getdata('webPSF/drizzle_PSF_F444W/Drz_PSF_id0.fits'),  pyfits.getdata(folder+'/Drz_QSO_image.fits')
 
-framesize = 95
-ct = int((len(QSO_img) - framesize)/2)
-QSO_img = QSO_img[ct:-ct,ct:-ct]
+framesize = 101
+half_r = int(framesize/2)
+peak = np.where(QSO_img==QSO_img.max())
+peak = [peak[0][0], peak[1][0]]
+QSO_img = QSO_img[peak[0]-half_r:peak[0]+half_r+1,peak[1]-half_r:peak[1]+half_r+1]
 
+psf_framesize = 111
+psf_half_r = int(psf_framesize/2)
+psf_peak = np.where(psf==psf.max())
+psf_peak = [psf_peak[0][0], psf_peak[1][0]]
+psf = psf[psf_peak[0]-psf_half_r:psf_peak[0]+psf_half_r+1,psf_peak[1]-psf_half_r:psf_peak[1]+psf_half_r+1]
+print(np.where(psf==psf.max()))
 exptime = 625.0 * 8
 stdd =  0.0088  #Measurement from empty retion: can also be estimated by: stdd/np.sqrt(8.)*0.04**2/0.063**2
 QSO_std = (abs(QSO_img/exptime)+stdd**2)**0.5
-#%%
+##%%
 #==============================================================================
 # input the objects components and parameteres
 #==============================================================================
@@ -73,7 +81,7 @@ source_params = [kwargs_source_init, kwargs_source_sigma, fixed_source, kwargs_l
 #==============================================================================
 # to fit and save the inference
 #==============================================================================
-tag = 'example'
+tag = folder+'/example'
 source_result, ps_result, image_ps, image_host, error_map=fit_qso(QSO_img, psf_ave=psf, psf_std = None,
                                                                   source_params=source_params, fixcenter=fixcenter,
                                                                   pix_sz = pix_scale, no_MCMC = (run_MCMC==False),
@@ -107,7 +115,7 @@ print("AGN flux :",  result['QSO_amp'])
 #%%Print SNR map:
 print("Host galaxy SNR map:")
 host_clean = pyfits.getdata(folder+'/Drz_HOSTclean_image.fits')
-host_clean = host_clean[ct:-ct,ct:-ct]
+host_clean = host_clean[peak[0]-half_r:peak[0]+half_r+1,peak[1]-half_r:peak[1]+half_r+1]
 host_SNR = host_clean/QSO_std
 plt.imshow(host_SNR, origin='lower')#,cmap='gist_heat', norm=LogNorm())
 plt.colorbar()
@@ -115,7 +123,7 @@ plt.show()
 
 print("Point source SNR map:")
 point_clean = pyfits.getdata(folder+'/Drz_POINTclean_image.fits')
-point_clean = point_clean[ct:-ct,ct:-ct]
+point_clean = point_clean[peak[0]-half_r:peak[0]+half_r+1,peak[1]-half_r:peak[1]+half_r+1]
 point_SNR = point_clean/QSO_std
 plt.imshow(point_SNR, origin='lower')#,cmap='gist_heat', norm=LogNorm())
 plt.colorbar()
@@ -123,7 +131,7 @@ plt.show()
 
 print("AGN (total) SNR map:")
 AGN_clean = pyfits.getdata(folder+'/Drz_AGNclean_image.fits')
-AGN_clean = AGN_clean[ct:-ct,ct:-ct]
+AGN_clean = AGN_clean[peak[0]-half_r:peak[0]+half_r+1,peak[1]-half_r:peak[1]+half_r+1]
 Total_SNR = AGN_clean/QSO_std
 plt.imshow(Total_SNR, origin='lower')#,cmap='gist_heat', norm=LogNorm())
 plt.colorbar()
