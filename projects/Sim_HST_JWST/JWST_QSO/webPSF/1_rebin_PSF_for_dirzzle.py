@@ -23,7 +23,7 @@ rebin_folder_name = 'drizzle_PSF_'+ filt
 os.mkdir(rebin_folder_name)
 #%%rebin each PSF ID
 for psf_id in range(9):
-    psf_name = 'PSF_' + filt + '/PSF_id{0}.fits'.format(psf_id)
+    psf_name = 'highres_PSF_' + filt + '/PSF_id{0}.fits'.format(psf_id)
     print(psf_name)
     psf = pyfits.open(psf_name)
     psf_data = psf[0].data

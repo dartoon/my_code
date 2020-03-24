@@ -49,7 +49,7 @@ for i in range(len(position_list)):
 #plt.show()    
 #%%Create the saving file folder
 import os
-PSF_folder_name = 'PSF_' + filt
+PSF_folder_name = 'highres_PSF_' + filt
 if os.path.exists(PSF_folder_name)==True:
     ifdel = input("Simulation of "+ PSF_folder_name + " exist, delete the old folder?(Y/N):\n")
     if ifdel == 'Y':

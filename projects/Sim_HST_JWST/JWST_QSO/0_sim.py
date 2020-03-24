@@ -50,7 +50,7 @@ scale_relation = cosmo.angular_diameter_distance(z_s).value * 10**3 * (1/3600./1
 
 #%%Take the PSF: Use PSF 1 - 8 to simulate, but use PSF0 to model the data
 psf_take_id = np.random.randint(1,8)
-psf_take_name = 'webPSF/PSF_'+filt+'/PSF_id{0}.fits'.format(psf_take_id)
+psf_take_name = 'webPSF/highres_PSF_'+filt+'/PSF_id{0}.fits'.format(psf_take_id)
 psf = pyfits.open(psf_take_name)
 
 #%%Build up the simulation:
