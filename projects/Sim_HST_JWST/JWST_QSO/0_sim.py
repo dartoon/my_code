@@ -22,24 +22,21 @@ from lenstronomy.PointSource.point_source import PointSource
 from lenstronomy.LightModel.light_model import LightModel
 
 sys.path.insert(0, '../share_tools')
-
 #%%Set up data basic information
+ID= int(input("input simulation ID:\n"))  #The ID for this simulation
 filt_l = ['F444W', 'F356W', 'F200W', 'F150W']
-filt_id = 0
-filt  = filt_l[filt_id]
-
+filt_i = int(input("which filter 0: 'F444W', 1: 'F356W', 2: 'F200W', 3: 'F150W':\n"))
+filt  = filt_l[filt_i]
 oversample = 4
-numPix = 341  # total frame pixel size #!!!Need to be changed for different filter
+numPix = [341, 341, 461, 461][filt_i]  # total frame pixel size #!!!Need to be changed for different filter
 z_s = 6.10       #AGN redshift
-zp = 28. #Using ETC, (616-556) total flux for 23.5 ab mag objects.  #!!!Need to check
-
+zp = [28., 27.9, 26.7, 27.75][filt_i]   #Using ETC, (616-556) total flux for 23.5 ab mag objects.  #Need to check
 #properties:
 tot_mag = 21.826
 host_mag = 22.26
+
 host_n = 2.5   #Host effective radius, unit: Kpc
 host_Reff_kpc = 2.0   #Host effective radius, unit: Kpc
-
-ID= 2  #The ID for this simulation
 np.random.seed(seed = ID)
 #host_ratio = np.random.uniform(0.4, 0.7) #Set the random host flux ratio [40% - 70%].
 host_flux = 10**(0.4*(zp - host_mag))
@@ -51,8 +48,7 @@ scale_relation = cosmo.angular_diameter_distance(z_s).value * 10**3 * (1/3600./1
 psf_take_id = np.random.randint(1,8)
 psf_take_name = 'webPSF/highres_PSF_'+filt+'/PSF_id{0}.fits'.format(psf_take_id)
 psf = pyfits.open(psf_take_name)
-
-#%%Build up the simulation:
+#Build up the simulation:
 pix_s = psf[0].header['PIXELSCL'] #* oversample
 host_Reff = host_Reff_kpc/scale_relation   #In arcsec
 sim_folder_name = 'sim_'+filt+ '_ID_'+repr(ID)
@@ -76,8 +72,7 @@ kwargs_psf_high_res = {'psf_type': 'PIXEL', 'kernel_point_source': psf_data, 'pi
 kwargs_data_high_res = sim_util.data_configure_simple(numPix, pix_s)
 data_class = ImageData(**kwargs_data_high_res)
 psf_class = PSF(**kwargs_psf_high_res)
-#center_x, center_y = np.random.normal(0, pix_s*oversample, 2)
-center_x, center_y = np.random.uniform(-15,15) * pix_s, np.random.uniform(-15,15)* pix_s
+center_x, center_y = np.random.uniform(-5,5) * pix_s*oversample, np.random.uniform(-5,5)* pix_s*oversample
 point_amp = point_flux
 point_source_list = ['UNLENSED']
 pointSource = PointSource(point_source_type_list=point_source_list)
@@ -162,26 +157,14 @@ bf_noz = total_image_bin#input simulate data to bf_noz
 rms = np.zeros_like(total_image_bin) #input rms
 noiz = np.zeros_like(total_image_bin) #input noiz
 image_data_noise=np.zeros_like(total_image_bin) #image after noiz
-#stdd=0.016  # Need to be confirmed For 10000s, ~0.016. 
-#stdd=0.02 # Need to be confirmed For 5000s, ~0.02. 
-#stdd=0.042  # Need to be confirmed For 1250s, ~0.042. 
-#stdd=0.07  # Need to be confirmed For 579.79s, ~0.07 
 exptim= 625.   #units of seconds. 
-stdd = 1.6/np.sqrt(exptim)   #An empirical formula for F444W #!!!
+stdd = [1.6, 1.06, 0.77, 0.75][filt_i] /np.sqrt(exptim)   #An empirical formula from ETC
 for i in range(len(pattern_x)):
     rms[i]=(bf_noz[i]/(exptim)+stdd**2)**0.5 #RMS not saved, thus its value not used here
     bkg_noise= stdd
     noiz[i]=np.random.normal(0, bkg_noise, size=rms[i].shape)
     image_data_noise[i]=noiz[i]+np.random.poisson(lam=bf_noz[i]*exptim)/(exptim)  #Non-drizzled imaged
     pyfits.PrimaryHDU(image_data_noise[i]).writeto(sim_folder_name+'/non_drizzled-image-{0}.fits'.format(i+1),overwrite=False)
-
-#print("SNR map:")
-#plt.imshow(total_image_bin[0]/rms[0], origin='lower')#,cmap='gist_heat', norm=LogNorm())
-#plt.colorbar()
-#plt.show()
-#plt.imshow(image_data_noise[0], origin='lower',cmap='gist_heat', norm=LogNorm())
-#plt.colorbar()
-#plt.show()
 
 filename_ascii = sim_folder_name+'/sim_info.txt'
 data_info =  open(filename_ascii,'w') 

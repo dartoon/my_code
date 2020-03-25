@@ -33,7 +33,7 @@ fixcenter = False
 run_MCMC = False
 zp= 28.
 
-folder = 'sim_F444W_ID_0'
+folder = 'sim_F444W_ID_2'
 psf, QSO_img = pyfits.getdata('webPSF/drizzle_PSF_F444W/Drz_PSF_id0.fits'),  pyfits.getdata(folder+'/Drz_QSO_image.fits')
 
 framesize = 101

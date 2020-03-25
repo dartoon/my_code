@@ -82,11 +82,19 @@ plt.ylabel(r"f$_\lambda$ erg/s/cm$^2$/$\AA$",fontsize=27)
 plt.close()
 
 #%%Shift to redshift z = 6 and norm based on M1450 value
-#M1450, m_zAB, m_yAB, z = -23.82, 22.775, 22.942, 6.10
-#M1450, m_zAB, m_yAB, z = -25.31, 21.827, 21.614, 6.37
-#M1450, m_zAB, m_yAB, z = -24.09, 22.768, 23.649, 6.39
-#M1450, m_zAB, m_yAB, z = -24.73, 22.121, 22.045, 6.2
-#M1450, m_zAB, m_yAB, z = -24.69, 22.402, 22.326, 6.26
+ID = 2 #1, 2, 3, 4, 5
+#The data information of the five system
+if ID ==1:
+    M1450, m_zAB, m_yAB, z, M_dyn = -23.82, 22.775, 22.942, 6.10, 82.
+elif ID ==2:    
+    M1450, m_zAB, m_yAB, z, M_dyn = -25.31, 21.827, 21.614, 6.37, 14.
+elif ID ==3:
+    M1450, m_zAB, m_yAB, z, M_dyn = -24.09, 22.768, 23.649, 6.39, 56.
+elif ID ==4:    
+    M1450, m_zAB, m_yAB, z, M_dyn = -24.73, 22.121, 22.045, 6.2, 13.
+elif ID ==5:
+    M1450, m_zAB, m_yAB, z, M_dyn = -24.69, 22.402, 22.326, 6.26, 290.
+
 
 array_spec = copy.deepcopy(array_spec_temp)
 array_spec[:,0] *= (1+z)
@@ -128,20 +136,43 @@ obs_y_filt_flam = 10**(-0.4*(m_yAB+2.402+5.0*np.log10(HSC_y_lam)))
 plt.scatter(HSC_z_lam, obs_z_filt_flam, c='green', marker="*", s =200, zorder = 10, label='observed z_mag')
 plt.scatter(HSC_y_lam, obs_y_filt_flam, c='orange', marker="*", s =200, zorder = 10, label='observed y_mag')
 
+lambda_mean = {'f150w':15104.23, 'f200w':20028.15, 'f356w':35934.49, 'f444w':44393.50}
 #Calculate F444 filter magnitude:
-f444w_fil = np.loadtxt('/Users/Dartoon/Astro/Packages/gsf/gsf/example/filter/444.fil')
-f444w_fil = f444w_fil[:,1:]
+#f444w_fil = np.loadtxt('/Users/Dartoon/Astro/Packages/gsf/gsf/example/filter/444.fil')
+#f444w_fil = f444w_fil[:,1:]
+f444w_fil = np.loadtxt('JWST_NIRCam.F444W.dat')
 f444w_fil[:,1] = f444w_fil[:,1]/f444w_fil[:,1].max()* array_spec[:,1].max()/6
 plt.plot(f444w_fil[:,0], f444w_fil[:,1], label='JWST F444W filter response', c='firebrick')
-f444w_lam = np.median(f444w_fil[:,0])
+f444w_lam = lambda_mean['f444w'] # np.median(f444w_fil[:,0])
 f444w_filt_flam = cal_filt_flam(array_spec, f444w_fil) 
 f444w_mag = -2.5 * np.log10(f444w_filt_flam ) - 2.402 - 5.0 * np.log10(f444w_lam)
+
+f356w_fil = np.loadtxt('JWST_NIRCam.F356W.dat')
+f356w_fil[:,1] = f356w_fil[:,1]/f356w_fil[:,1].max()* array_spec[:,1].max()/6
+plt.plot(f356w_fil[:,0], f356w_fil[:,1], label='JWST F356W filter response', c='tomato')
+f356w_lam = lambda_mean['f356w'] # np.median(f356w_fil[:,0])
+f356w_filt_flam = cal_filt_flam(array_spec, f356w_fil) 
+f356w_mag = -2.5 * np.log10(f356w_filt_flam ) - 2.402 - 5.0 * np.log10(f356w_lam)
+
+f200w_fil = np.loadtxt('JWST_NIRCam.F200W.dat')
+f200w_fil[:,1] = f200w_fil[:,1]/f200w_fil[:,1].max()* array_spec[:,1].max()/6
+plt.plot(f200w_fil[:,0], f200w_fil[:,1], label='JWST F200W filter response', c='lime')
+f200w_lam = lambda_mean['f200w'] #np.median(f200w_fil[:,0])
+f200w_filt_flam = cal_filt_flam(array_spec, f200w_fil) 
+f200w_mag = -2.5 * np.log10(f200w_filt_flam ) - 2.402 - 5.0 * np.log10(f200w_lam)
+
+f150w_fil = np.loadtxt('JWST_NIRCam.F150W.dat')
+f150w_fil[:,1] = f150w_fil[:,1]/f150w_fil[:,1].max()* array_spec[:,1].max()/6
+plt.plot(f150w_fil[:,0], f150w_fil[:,1], label='JWST F150W filter response', c='cyan')
+f150w_lam = lambda_mean['f150w'] # np.median(f150w_fil[:,0])
+f150w_filt_flam = cal_filt_flam(array_spec, f150w_fil) 
+f150w_mag = -2.5 * np.log10(f150w_filt_flam ) - 2.402 - 5.0 * np.log10(f150w_lam)
 
 plt.tick_params(labelsize=15)
 plt.xlabel("$\AA$",fontsize=27)
 plt.ylabel(r"f$_\lambda$ erg/s/cm$^2$/A",fontsize=27)
 plt.xlim(800, 60000)
-plt.ylim(10**-19.5,10**-17.5)
+#plt.ylim(10**-19.5,10**-17.5)
 #plt.ylim(10**-19.5,10**-17.5)
 #plt.yscale('log',basey=10) 
 plt.legend(prop={'size':15})
@@ -160,3 +191,7 @@ print("Estimate")
 print("z_mag", round(z_mag,3))
 print("y_mag", round(y_mag,3))
 print('F444W_mag', round(f444w_mag,3))
+print('f356w_mag', round(f356w_mag,3))
+print('f200w_mag', round(f200w_mag,3))
+print('f150w_mag', round(f150w_mag,3))
+
