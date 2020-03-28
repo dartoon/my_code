@@ -131,9 +131,9 @@ if glob.glob(folder+'model_result.pkl') == []:
     
     # point source choices
     fixed_ps = [{}]
-    #kwargs_ps_init = [kwargs_ps]
-    kwargs_ps_init = [{'ra_image': np.array([ 0.44375479, -0.19650614, -0.86265324,  1.10804188]),
-                       'dec_image': np.array([ 1.22573014, -0.88867742,  0.33737805, -0.19803038])}]
+    kwargs_ps_init = [kwargs_ps]
+#    kwargs_ps_init = [{'ra_image': np.array([ 0.44375479, -0.19650614, -0.86265324,  1.10804188]),
+#                       'dec_image': np.array([ 1.22573014, -0.88867742,  0.33737805, -0.19803038])}]
     kwargs_ps_sigma = [{'ra_image': 0.01 * np.ones(len(kwargs_ps['ra_image'])), 'dec_image': 0.01 * np.ones(len(kwargs_ps['ra_image']))}]
     kwargs_lower_ps = [{'ra_image': -10 * np.ones(len(kwargs_ps['ra_image'])), 'dec_image': -10 * np.ones(len(kwargs_ps['ra_image']))}]
     kwargs_upper_ps = [{'ra_image': 10* np.ones(len(kwargs_ps['ra_image'])), 'dec_image': 10 * np.ones(len(kwargs_ps['ra_image']))}]
