@@ -82,7 +82,7 @@ plt.ylabel(r"f$_\lambda$ erg/s/cm$^2$/$\AA$",fontsize=27)
 plt.close()
 
 #%%Shift to redshift z = 6 and norm based on M1450 value
-ID = 2 #1, 2, 3, 4, 5
+ID = 5 #1, 2, 3, 4, 5
 #The data information of the five system
 if ID ==1:
     M1450, m_zAB, m_yAB, z, M_dyn = -23.82, 22.775, 22.942, 6.10, 82.
@@ -94,7 +94,6 @@ elif ID ==4:
     M1450, m_zAB, m_yAB, z, M_dyn = -24.73, 22.121, 22.045, 6.2, 13.
 elif ID ==5:
     M1450, m_zAB, m_yAB, z, M_dyn = -24.69, 22.402, 22.326, 6.26, 290.
-
 
 array_spec = copy.deepcopy(array_spec_temp)
 array_spec[:,0] *= (1+z)
@@ -176,22 +175,22 @@ plt.xlim(800, 60000)
 #plt.ylim(10**-19.5,10**-17.5)
 #plt.yscale('log',basey=10) 
 plt.legend(prop={'size':15})
-plt.show()
+plt.close()
 
 z_mag = -2.5 * np.log10(z_filt_flam ) - 2.402 - 5.0 * np.log10(HSC_z_lam)
 y_mag = -2.5 * np.log10(y_filt_flam ) - 2.402 - 5.0 * np.log10(HSC_y_lam)
 
-print("Input:")
+
+print("ID", ID, "Input:")
 print("m_zAB", m_zAB)
 print("m_yAB", m_yAB)
 print("M_1450", round(M1450,3))
-
 print("================")
-print("Estimate")
+print("Estimate AGN total mag")
 print("z_mag", round(z_mag,3))
 print("y_mag", round(y_mag,3))
-print('F444W_mag', round(f444w_mag,3))
-print('f356w_mag', round(f356w_mag,3))
-print('f200w_mag', round(f200w_mag,3))
-print('f150w_mag', round(f150w_mag,3))
+print('AGN F444W mag', round(f444w_mag,3))
+print('AGN F356W mag', round(f356w_mag,3))
+print('AGN F200W mag', round(f200w_mag,3))
+print('AGN F150W mag', round(f150w_mag,3))
 

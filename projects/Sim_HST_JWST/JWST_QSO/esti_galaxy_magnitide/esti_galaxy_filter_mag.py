@@ -11,7 +11,7 @@ import astropy.io.fits as pyfits
 import matplotlib.pyplot as plt
 import glob
 
-ID = 1 #1, 2, 3, 4, 5
+ID = 5 #1, 2, 3, 4, 5
 #The data information of the five system
 if ID ==1:
     M1450, m_zAB, m_yAB, z, M_dyn = -23.82, 22.775, 22.942, 6.10, 82.
@@ -36,10 +36,10 @@ def esti_abmag(stellar , fnu_ini, stellar_ini):
     zp_fnu = 25
     ab_mag = -2.5*np.log10(fnu) + zp_fnu
     return ab_mag
-
 #%%
 filt_l = ['444','356', '200', '150']
 #To estimate the AB mag for a given stellar template
+print('================')
 for i in range(len(filt_l)):
     filt = filt_l[i]
     filename  = 'f{0}w/summary_{0}{1}_PA00.fits'.format(filt,ID)
@@ -62,8 +62,8 @@ for i in range(len(filt_l)):
     age = str(round(10**table[1][age_idx],3)) # 'AGE:' Gyr
     fnu_ini = 0.5 #Input fit always 0.5
     #Template used :
-    if i ==0:
-        print("ID", ID, 'age:', age, 'mel', round(mel,3), 'sample redshift', z) #Same for all the filters
-    #s_mass = 10.3
     s_mass = np.log10(M_dyn * 10 **9) 
-    print("\nintput stellar mass:", round(s_mass,3), "\nesti, F{0}W AB mag:".format(filt), round(esti_abmag(s_mass, fnu_ini, stellar_ini),3))
+    if i == 0:
+        print("ID", ID, 'age:', age, 'mel', round(mel,3), 'sample redshift', z, "\nintput stellar mass:", round(s_mass,3), '\nEstimates:') #Same for all the filters
+    #s_mass = 10.3
+    print("galaxy F{0}W mag:".format(filt), round(esti_abmag(s_mass, fnu_ini, stellar_ini),3))
