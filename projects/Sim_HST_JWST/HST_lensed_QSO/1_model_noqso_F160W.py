@@ -39,14 +39,15 @@ def cal_h0(zl, zs, Ddt, om=0.27):
 
 #folder = 'sim_lens_ID_221/'
 #folder = 'sim_lens_noqso_ID_221/'
-for ID in range(504, 505):  
-    folder = 'sim_lens_ID_{0}/'.format(ID)
+for ID in range(515, 522):  
+    folder = 'sim_lens_noqso_ID_{0}/'.format(ID)
     print(folder)
     model_lists, para_s, lens_info= pickle.load(open(folder+'sim_kwargs.pkl','rb'))
     lens_model_list, lens_light_model_list, source_model_list, point_source_list = model_lists
     z_l, z_s, TD_distance, TD_true, TD_obs, TD_err_l = lens_info
     kwargs_lens_list, kwargs_lens_light_list, kwargs_source_list, kwargs_ps = para_s
     solver_type = 'PROFILE_SHEAR'
+    
     if len(kwargs_ps['ra_image']) <4:
         kwargs_ps['ra_image'] = kwargs_ps['ra_image'][:2] 
         kwargs_ps['dec_image'] = kwargs_ps['dec_image'][:2]
@@ -60,13 +61,7 @@ for ID in range(504, 505):
                           'Ddt_sampling': True,
                                   }
     if glob.glob(folder+'model_result.pkl') == []:
-        #kwargs_source_list = [{'amp': 1,
-        #   'R_sersic': 0.8784227907369409,
-        #   'n_sersic': 3.8733867458785487,
-        #   'e1': 0.010325264468834038,
-        #   'e2': -0.040869672372401,
-        #   'center_x': 0.14608646418533153,
-        #   'center_y': 0.15464208237214588}]
+        _, _, kwargs_result, _, _ = pickle.load(open('sim_lens_ID_{0}/'.format(ID)+'model_result.pkl','rb'))
         
         #Setting up the fitting:
         lens_data = pyfits.getdata(folder+'Drz_QSO_image.fits')
@@ -77,35 +72,11 @@ for ID in range(504, 505):
         lens_mask = (1-lens_mask)[ct:-ct,ct:-ct]
         plt.imshow(lens_data, origin='lower',cmap='gist_heat', norm=LogNorm())
         plt.colorbar()
-
+        plt.show()
         exp_time = 599.* 2 * 8
         stdd =  0.0024  #Measurement from empty retion.
         len_std = (abs(lens_data/exp_time)+stdd**2)**0.5
         deltaPix = 0.08
-        
-        x, y =find_loc_max(lens_data)
-        center = (len(lens_data)-1)/2
-#        for i in range(len(x)):
-#            plt.plot(x[i], y[i], 'ro')
-#        plt.show()
-        x_s, y_s = [], []
-        count = 0
-        for i in range(len(x)):
-            x0, y0 =  (float(x[i]) - center) * deltaPix , (float(y[i]) - center) * deltaPix
-#            print(x0, y0)
-            ds = (x0- kwargs_ps['ra_image'] )**2 + (y0-kwargs_ps['dec_image'])**2
-            if ds.min()<0.01:
-                print(np.where(ds == ds.min()), ds.min())
-                print("shift: ", kwargs_ps['ra_image'][ds == ds.min()] - x0, kwargs_ps['dec_image'][ds == ds.min()]-y0)
-                kwargs_ps['ra_image'][ds == ds.min()] = x0
-                kwargs_ps['dec_image'][ds == ds.min()] = y0
-                count += 1
-        if count!= len(kwargs_ps['ra_image']):
-            raise ValueError("the PS positions is not assigned correctly")
-        for i in range(len(kwargs_ps['ra_image'])):
-            plt.plot(kwargs_ps['ra_image']/deltaPix+center, kwargs_ps['dec_image']/deltaPix+center, 'go')
-        plt.show()            
-        
         
         psf = pyfits.getdata(folder+'Drz_PSF.fits')
         psf_fsize = 65
@@ -171,7 +142,8 @@ for ID in range(504, 505):
         
         # point source choices
         fixed_ps = [{}]
-        kwargs_ps_init = [kwargs_ps]
+#        kwargs_ps_init = [kwargs_ps]
+        kwargs_ps_init = kwargs_result['kwargs_ps']
     #    kwargs_ps_init = [{'ra_image': np.array([ 0.44375479, -0.19650614, -0.86265324,  1.10804188]),
     #                       'dec_image': np.array([ 1.22573014, -0.88867742,  0.33737805, -0.19803038])}]
         kwargs_ps_sigma = [{'ra_image': 0.01 * np.ones(len(kwargs_ps['ra_image'])), 'dec_image': 0.01 * np.ones(len(kwargs_ps['ra_image']))}]
@@ -223,26 +195,27 @@ for ID in range(504, 505):
                                       kwargs_likelihood, kwargs_params)
         
         fitting_kwargs_list_0 = [
-                                ['PSO', {'sigma_scale': 1., 'n_particles': 300, 'n_iterations': 300}]
-                                ]
-        
-        fitting_seq.fit_sequence(fitting_kwargs_list_0)
-        
-        kwargs_psf_iter = {'num_iter': 100, 'psf_iter_factor': 0.2,
-                            'stacking_method': 'median', 
-                           'keep_psf_error_map': False, 
-                           'psf_symmetry': 1, 
-                           'block_center_neighbour': 0.05}
-        
-        fitting_kwargs_list_1 = [
-                                ['psf_iteration', kwargs_psf_iter],
-                                ['PSO', {'sigma_scale': 1., 'n_particles': 100, 'n_iterations': 100}],
-                                ['psf_iteration', kwargs_psf_iter],
-                                ['PSO', {'sigma_scale': 1., 'n_particles': 100, 'n_iterations': 100}],
+                                ['PSO', {'sigma_scale': 1., 'n_particles': 300, 'n_iterations': 300}],
                                 ['MCMC', {'n_burn': 20, 'n_run': 20, 'walkerRatio': 4, 'sigma_scale': .1}]
                                 ]
+        
         start_time = time.time()
-        chain_list = fitting_seq.fit_sequence(fitting_kwargs_list_1)
+        chain_list = fitting_seq.fit_sequence(fitting_kwargs_list_0)
+        
+#        kwargs_psf_iter = {'num_iter': 100, 'psf_iter_factor': 0.2,
+#                            'stacking_method': 'median', 
+#                           'keep_psf_error_map': False, 
+#                           'psf_symmetry': 1, 
+#                           'block_center_neighbour': 0.05}
+#        
+#        fitting_kwargs_list_1 = [
+#                                ['psf_iteration', kwargs_psf_iter],
+#                                ['PSO', {'sigma_scale': 1., 'n_particles': 100, 'n_iterations': 100}],
+#                                ['psf_iteration', kwargs_psf_iter],
+#                                ['PSO', {'sigma_scale': 1., 'n_particles': 100, 'n_iterations': 100}],
+#                                ['MCMC', {'n_burn': 20, 'n_run': 20, 'walkerRatio': 4, 'sigma_scale': .1}]
+#                                ]
+#        chain_list = fitting_seq.fit_sequence(fitting_kwargs_list_1)
         kwargs_result = fitting_seq.best_fit()
         end_time = time.time()
         print(end_time - start_time, 'total time needed for computation')
@@ -272,7 +245,7 @@ for ID in range(504, 505):
     
     for i in range(len(chain_list)):
         chain_plot.plot_chain_list(chain_list, i)
-    sampler_type, samples_mcmc, param_mcmc, dist_mcmc  = chain_list[2]
+    sampler_type, samples_mcmc, param_mcmc, dist_mcmc  = chain_list[1]
     plt.show()
     
     print("number of non-linear parameters in the MCMC process: ", len(param_mcmc))

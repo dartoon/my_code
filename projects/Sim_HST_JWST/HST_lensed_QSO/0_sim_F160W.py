@@ -40,7 +40,7 @@ kwargs_psf_high_res = {'psf_type': 'PIXEL', 'kernel_point_source': psf_data, 'pi
 psf_class = PSF(**kwargs_psf_high_res)
 
 zp= 25.9463
-kwargs_data_high_res = sim_util.data_configure_simple(numPix, deltaPix)
+kwargs_data_high_res = sim_util.data_configure_simple(numPix, deltaPix) #,inverse=True)
 data_class = Data(**kwargs_data_high_res)
 kwargs_numerics = {'supersampling_factor': 3, 'supersampling_convolution': False}
 
