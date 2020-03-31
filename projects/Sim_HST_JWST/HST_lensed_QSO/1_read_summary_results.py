@@ -39,7 +39,6 @@ def cal_h0(zl, zs, Ddt, om=0.27):
 
 result_dic = {}
 #folder_type = 'sim_lens_ID_'
-
 folder_type = 'sim_lens_noqso_ID_'
 id_range= [501, 522]
 for ID in range(id_range[0], id_range[1]):  

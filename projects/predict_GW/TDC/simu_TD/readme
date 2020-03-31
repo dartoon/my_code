@@ -1,0 +1,2 @@
+1.run "python ls.py" and input the data set number to generate zs_zl data result.
+2.run TDdist.py to generate the final result. The time delay distance are:  c/H_0*r_l*r_ls/r_s 

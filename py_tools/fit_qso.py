@@ -299,10 +299,9 @@ def fit_qso(QSO_im, psf_ave, psf_std=None, source_params=None,ps_param=None, bac
             trans_paras = [source_params[2], ps_param[2], mcmc_new_list, labels_new, 'source_params[2], ps_param[2], mcmc_new_list, labels_new']
         else:
             trans_paras = []
+            chain_list = None
         picklename= tag + '.pkl'
         best_fit = [source_result, image_host, ps_result, image_ps,'source_result, image_host, ps_result, image_ps']
-#        pso_fit = [chain_list, param_list, 'chain_list, param_list']
-#        mcmc_fit = [samples_mcmc, param_mcmc, dist_mcmc, 'samples_mcmc, param_mcmc, dist_mcmc']
         chain_list_result = [chain_list, 'chain_list']
         pickle.dump([best_fit, chain_list_result, trans_paras], open(picklename, 'wb'))
     if return_Chisq == False:

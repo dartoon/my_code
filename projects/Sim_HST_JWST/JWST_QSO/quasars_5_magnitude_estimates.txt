@@ -4,8 +4,8 @@ m_yAB 22.942
 M_1450 -23.82
 ================
 Estimate AGN total mag
-z_mag 22.046
-y_mag 22.74
+HSC z_mag 22.046
+HSC y_mag 22.74
 AGN F444W mag 21.809
 AGN F356W mag 22.223
 AGN F200W mag 22.372
@@ -25,8 +25,8 @@ m_yAB 21.614
 M_1450 -25.31
 ================
 Estimate AGN total mag
-z_mag 20.672
-y_mag 21.334
+HSC z_mag 20.672
+HSC y_mag 21.334
 AGN F444W mag 20.46
 AGN F356W mag 20.811
 AGN F200W mag 20.953
@@ -46,8 +46,8 @@ m_yAB 23.649
 M_1450 -24.09
 ================
 Estimate AGN total mag
-z_mag 21.916
-y_mag 22.549
+HSC z_mag 21.916
+HSC y_mag 22.549
 AGN F444W mag 21.691
 AGN F356W mag 22.039
 AGN F200W mag 22.178
@@ -68,8 +68,8 @@ m_yAB 22.045
 M_1450 -24.73
 ================
 Estimate AGN total mag
-z_mag 21.13
-y_mag 21.869
+HSC z_mag 21.13
+HSC y_mag 21.869
 AGN F444W mag 20.956
 AGN F356W mag 21.34
 AGN F200W mag 21.49
@@ -89,8 +89,8 @@ m_yAB 22.326
 M_1450 -24.69
 ================
 Estimate AGN total mag
-z_mag 21.199
-y_mag 21.934
+HSC z_mag 21.199
+HSC y_mag 21.934
 AGN F444W mag 21.027
 AGN F356W mag 21.394
 AGN F200W mag 21.544

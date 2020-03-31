@@ -39,7 +39,7 @@ def cal_h0(zl, zs, Ddt, om=0.27):
 
 #folder = 'sim_lens_ID_221/'
 #folder = 'sim_lens_noqso_ID_221/'
-for ID in range(504, 505):  
+for ID in range(501, 502):  
     folder = 'sim_lens_ID_{0}/'.format(ID)
     print(folder)
     model_lists, para_s, lens_info= pickle.load(open(folder+'sim_kwargs.pkl','rb'))
