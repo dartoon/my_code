@@ -62,6 +62,8 @@ for ID in range(516, 522):
                                   }
     if glob.glob(folder+'model_result.pkl') == []:
         raise ValueError("The first time run is not finished")
+    if glob.glob(folder+'2nd_model_result_improve.pkl') != []:
+        continue
     else:        
         #Load the result from the first run:
         _, _, kwargs_result, _, _ = pickle.load(open('sim_lens_ID_{0}/'.format(ID)+'model_result.pkl','rb'))
@@ -147,8 +149,9 @@ for ID in range(516, 522):
         fixed_ps = [{}]
         kwargs_ps_init = kwargs_result['kwargs_ps']
         kwargs_ps_sigma = [{'ra_image': 0.01 * np.ones(len(kwargs_ps_init[0]['ra_image'])), 'dec_image': 0.01 * np.ones(len(kwargs_ps_init[0]['ra_image']))}]
-        kwargs_lower_ps = [{'ra_image': -10 * np.ones(len(kwargs_ps_init[0]['ra_image'])), 'dec_image': -10 * np.ones(len(kwargs_ps_init[0]['ra_image']))}]
-        kwargs_upper_ps = [{'ra_image': 10* np.ones(len(kwargs_ps_init[0]['ra_image'])), 'dec_image': 10 * np.ones(len(kwargs_ps_init[0]['ra_image']))}]
+        kwargs_lower_ps = [{'ra_image': kwargs_ps_init[0]['ra_image']-0.004, 'dec_image': kwargs_ps_init[0]['dec_image']-0.004 }]
+        kwargs_upper_ps = [{'ra_image': kwargs_ps_init[0]['ra_image']+0.004, 'dec_image': kwargs_ps_init[0]['dec_image']+0.004 }]
+        ps_params = [kwargs_ps_init, kwargs_ps_sigma, fixed_ps, kwargs_lower_ps, kwargs_upper_ps]
          
         # Set cosmo
         fixed_cosmo = {}
@@ -157,7 +160,6 @@ for ID in range(516, 522):
         kwargs_lower_cosmo = {'D_dt': 0}
         kwargs_upper_cosmo = {'D_dt': 10000}
         cosmo_params = [kwargs_cosmo_init, kwargs_cosmo_sigma, fixed_cosmo, kwargs_lower_cosmo, kwargs_upper_cosmo]
-        ps_params = [kwargs_ps_init, kwargs_ps_sigma, fixed_ps, kwargs_lower_ps, kwargs_upper_ps]
         
         kwargs_params = {'lens_model': lens_params,
                         'source_model': source_params,
@@ -182,7 +184,8 @@ for ID in range(516, 522):
         multi_band_list = [image_band]
         kwargs_data_joint = {'multi_band_list': multi_band_list, 'multi_band_type': 'multi-linear',
                             'time_delays_measured': TD_obs[1:],
-                            'time_delays_uncertainties': TD_err_l[1:]}
+                            'time_delays_uncertainties': TD_err_l[1:],
+                            'ra_image_list': [kwargs_result['kwargs_ps'][0]['ra_image']], 'dec_image_list': [kwargs_result['kwargs_ps'][0]['dec_image']]}
         
         kwargs_model = {'lens_model_list': lens_model_list, 
                          'lens_light_model_list': lens_light_model_list,
@@ -230,13 +233,13 @@ for ID in range(516, 522):
             gamma = kwargs_result['kwargs_lens'][0]['gamma']
         #    phi_ext, gamma_ext = kwargs_result['kwargs_lens'][1]['gamma1'], kwargs_result['kwargs_lens'][1]['gamma2']
             mcmc_new_list.append([gamma, D_dt, cal_h0(z_l ,z_s, D_dt)])        
-        pickle.dump([multi_band_list, kwargs_model, kwargs_result, chain_list, fix_setting, mcmc_new_list], open(folder+'2nd_model_result.pkl', 'wb'))
+        pickle.dump([multi_band_list, kwargs_model, kwargs_result, chain_list, fix_setting, mcmc_new_list], open(folder+'2nd_model_result_improve.pkl', 'wb'))
     #%%Print fitting result:
-    multi_band_list, kwargs_model, kwargs_result, chain_list, fix_setting = pickle.load(open(folder+'2nd_model_result.pkl','rb'))
+    multi_band_list, kwargs_model, kwargs_result, chain_list, fix_setting, mcmc_new_list = pickle.load(open(folder+'2nd_model_result_improve.pkl','rb'))
     fixed_lens, fixed_source, fixed_lens_light, fixed_ps, fixed_cosmo = fix_setting
     from lenstronomy.Plots import chain_plot
     from lenstronomy.Plots.model_plot import ModelPlot
-    
+    labels_new = [r"$\gamma$", r"$D_{\Delta t}$","H$_0$" ]    
     modelPlot = ModelPlot(multi_band_list, kwargs_model, kwargs_result, arrow_size=0.02, cmap_string="gist_heat")
     f, axes = modelPlot.plot_main()
     f.show()
@@ -249,9 +252,9 @@ for ID in range(516, 522):
         chain_plot.plot_chain_list(chain_list, i)
     plt.show()
     
-    print("number of non-linear parameters in the MCMC process: ", len(param_mcmc))
-    print("parameters in order: ", param_mcmc)
-    print("number of evaluations in the MCMC process: ", np.shape(samples_mcmc)[0])
+#    print("number of non-linear parameters in the MCMC process: ", len(param_mcmc))
+#    print("parameters in order: ", param_mcmc)
+#    print("number of evaluations in the MCMC process: ", np.shape(samples_mcmc)[0])
     import corner
     # import the parameter handling class #
     # the number of non-linear parameters and their names #
