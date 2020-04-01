@@ -47,7 +47,14 @@ for ID in [1, 2, 3, 4, 5]:
         f = open(folder+"/sim_info.txt","r")
         string = f.read()
         lines = string.split('\n')   # Split in to \n
-        true_host_flux = float([lines[i] for i in range(len(lines)) if 'host_flux' in lines[i]][0].split('\t')[1])
+#        true_host_flux_text = float([lines[i] for i in range(len(lines)) if 'host_flux' in lines[i]][0].split('\t')[1])
+        true_host = pyfits.getdata(folder+'/Drz_HOSTclean_image.fits')
+        framesize = [101, 101, 81, 81][filt_i]
+        half_r = int(framesize/2)
+        peak = np.where(true_host==true_host.max())
+        peak = [peak[0][0], peak[1][0]]
+        true_host = true_host[peak[0]-half_r:peak[0]+half_r+1,peak[1]-half_r:peak[1]+half_r+1]        
+        true_host_flux = true_host.sum()
         true_host_mag = -2.5*np.log10(true_host_flux) + zp
         true_host_ratio = [lines[i] for i in range(len(lines)) if 'host_flux_ratio' in lines[i]][0].split('\t')[1]
         true_total_flux = true_host_flux/float(true_host_ratio[:-1])*100
@@ -71,5 +78,5 @@ for ID in [1, 2, 3, 4, 5]:
     plt.xlim(-0.2, 3.2)
     plt.ylim(-0.6, 0.6)    
     plt.tick_params(labelsize=20)
-    plt.savefig("host_mag_bias_ID{0}_seed{1}.pdf".format(ID, seed))
+#    plt.savefig("host_mag_bias_ID{0}_seed{1}.pdf".format(ID, seed))
     plt.show()
