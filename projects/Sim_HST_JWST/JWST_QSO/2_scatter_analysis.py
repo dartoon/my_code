@@ -33,11 +33,13 @@ mat.rcParams['font.family'] = 'STIXGeneral'
 color = {'F150W': 'cyan', 'F200W':'lime', 'F356W':'tomato', 'F444W':'firebrick'}
 seed = 0
 use_true_PSF = False
+
 if use_true_PSF == True:
     save_name = 'fit_result_truePSF'
 else:
     save_name = 'fit_result'
 for ID in [1, 2, 3, 4, 5]:
+    
     fig, ax = plt.subplots(figsize=(11,8))
     for filt_i in range(4):    
         filt  = ['F444W', 'F356W', 'F200W', 'F150W'][filt_i]
@@ -49,7 +51,8 @@ for ID in [1, 2, 3, 4, 5]:
         lines = string.split('\n')   # Split in to \n
 #        true_host_flux_text = float([lines[i] for i in range(len(lines)) if 'host_flux' in lines[i]][0].split('\t')[1])
         true_host = pyfits.getdata(folder+'/Drz_HOSTclean_image.fits')
-        framesize = [101, 101, 81, 81][filt_i]
+        result, framesize = pickle.load(open(folder+'/{0}.pkl'.format(save_name),'rb'))
+        
         half_r = int(framesize/2)
         peak = np.where(true_host==true_host.max())
         peak = [peak[0][0], peak[1][0]]
@@ -59,7 +62,6 @@ for ID in [1, 2, 3, 4, 5]:
         true_host_ratio = [lines[i] for i in range(len(lines)) if 'host_flux_ratio' in lines[i]][0].split('\t')[1]
         true_total_flux = true_host_flux/float(true_host_ratio[:-1])*100
         true_total_mag = -2.5*np.log10(true_total_flux) + zp
-        result = pickle.load(open(folder+'/{0}.pkl'.format(save_name),'rb'))
         fit_host_mag = result['host_mag'] 
         plt.scatter(filt_i, fit_host_mag - true_host_mag,
                 c=color[filt],s=580, marker=".",zorder=0, edgecolors='k',alpha=0.7)

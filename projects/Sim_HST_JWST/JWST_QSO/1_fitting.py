@@ -108,7 +108,7 @@ for ID in [5]:
                                         zp=zp, fixcenter=fixcenter,ID='ID'+repr(ID), tag=tag, plot_compare = plot_compare)
         
             print("Saving results:")
-            pickle.dump(result, open(folder+'/{0}.pkl'.format(save_name), 'wb'))
+            pickle.dump([result, framesize], open(folder+'/{0}.pkl'.format(save_name), 'wb'))
             filtname = folder+'/{0}.txt'.format(save_name)
             result_file =  open(filtname,'w') 
             result_file.write(repr(result))
