@@ -38,12 +38,15 @@ def cal_h0(zl, zs, Ddt, om=0.27):
     return 100 * ratio
 
 result_dic = {}
-folder_type = 'sim_lens_ID_'
+#folder_type = 'sim_lens_ID_'
+#file_type = '2nd_model_result_newlist.pkl'
+
 #folder_type = 'sim_lens_noqso_ID_'
+#file_type = '2nd_model_result_improve.pkl'
 id_range= [501, 522]
 for ID in range(id_range[0], id_range[1]):  
     folder = folder_type + '{0}/'.format(ID)
-    print(folder)
+#    print(folder)
     model_lists, para_s, lens_info= pickle.load(open(folder+'sim_kwargs.pkl','rb'))
     lens_model_list, lens_light_model_list, source_model_list, point_source_list = model_lists
     z_l, z_s, TD_distance, TD_true, TD_obs, TD_err_l = lens_info
@@ -64,29 +67,10 @@ for ID in range(id_range[0], id_range[1]):
     if glob.glob(folder+'2nd_model_result_newlist.pkl') == []:
         result_dic[folder] = [None, None]
         continue
-    multi_band_list, kwargs_model, kwargs_result, chain_list, fix_setting, mcmc_new_list = pickle.load(open(folder+'2nd_model_result_newlist.pkl','rb'))
+    multi_band_list, kwargs_model, kwargs_result, chain_list, fix_setting, mcmc_new_list = pickle.load(open(folder+file_type,'rb'))
     fixed_lens, fixed_source, fixed_lens_light, fixed_ps, fixed_cosmo = fix_setting
     mcmc_new_list = np.array(mcmc_new_list)
     H0_list = mcmc_new_list[:,2]
-#    from lenstronomy.Analysis.td_cosmography import TDCosmography
-#    from astropy.cosmology import FlatLambdaCDM
-#    cosmo = FlatLambdaCDM(H0=70, Om0=0.3, Ob0=0.)
-#    td_cosmo = TDCosmography(z_l, z_s, kwargs_model, cosmo_fiducial=cosmo)
-#    sampler_type, samples_mcmc, param_mcmc, dist_mcmc  = chain_list[-1]
-#    plt.close()
-##    import corner
-#    # import the parameter handling class #
-#    from lenstronomy.Sampling.parameters import Param
-#    # make instance of parameter class with given model options, constraints and fixed parameters #
-#    param = Param(kwargs_model, fixed_lens, fixed_source, fixed_lens_light, fixed_ps, fixed_cosmo, 
-#                  kwargs_lens_init=kwargs_result['kwargs_lens'], **kwargs_constraints)
-#    # the number of non-linear parameters and their names #
-#    num_param, param_list = param.num_param()
-#    H0_list = []
-#    for i in range(len(samples_mcmc)):
-#        _kwargs_result = param.args2kwargs(samples_mcmc[i])
-#        D_dt = _kwargs_result['kwargs_special']['D_dt']        
-#        H0_list.append(cal_h0(z_l ,z_s, D_dt))
     truth_dic = {}
     truth_dic['kwargs_lens'] =kwargs_lens_list
     truth_dic['kwargs_source'] =kwargs_source_list
