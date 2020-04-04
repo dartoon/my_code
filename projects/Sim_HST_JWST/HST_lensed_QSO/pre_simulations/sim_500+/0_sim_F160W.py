@@ -48,7 +48,7 @@ import sys
 sys.path.insert(0,'../share_tools/')
 from gene_para import gene_para
 #seed=221 #input("The seed for simulation:\n")
-for seed in range(601, 622):
+for seed in range(521, 522):
     print(seed)
     para=gene_para(seed=seed,fixh0=102)
     
@@ -92,11 +92,12 @@ for seed in range(601, 622):
     del kwargs_spemd['q']    
     ex_shear = {'gamma1': para.shear()[0]['e1'], 'gamma2': para.shear()[0]['e2']}
     kwargs_lens_list = [kwargs_spemd, ex_shear]
+    
     lens_model_class = LensModel(lens_model_list)
     #==============================================================================
     # #########source light
     #==============================================================================
-    source_pos=[-0.02, 0.02]  #Seed 220  cored-Powerlaw
+    source_pos=[-0.02, 0.01]  #Seed 220  cored-Powerlaw
     source_model_list = ['SERSIC_ELLIPSE']
     source_para=para.source_light()
     source_amp= mva.getAmp(SERSIC_in_mag=source_para,zp=zp,deltaPix=deltaPix)
@@ -151,8 +152,8 @@ for seed in range(601, 622):
     qso_amp= 10.**(-0.4*(source_para['mag_sersic']-zp))*amp_qRh_s_plane
     
 #    add_qso = int(input("add QSO?:\n input 0 no qso, others add qso:\t"))
-#    add_qso= 1
-    add_qso= 0
+    add_qso= 1
+#    add_qso= 0
     
     if add_qso == 0:
     	qso_amp = 0

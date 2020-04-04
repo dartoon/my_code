@@ -31,54 +31,56 @@ import pickle
 import matplotlib as mat
 mat.rcParams['font.family'] = 'STIXGeneral'
 color = {'F150W': 'cyan', 'F200W':'lime', 'F356W':'tomato', 'F444W':'firebrick'}
-seed = 0
+#seed = 0
 use_true_PSF = False
 
 if use_true_PSF == True:
     save_name = 'fit_result_truePSF'
 else:
     save_name = 'fit_result'
-for ID in [1, 2, 3, 4, 5]:
-    
+for ID in [1]:
     fig, ax = plt.subplots(figsize=(11,8))
     for filt_i in range(4):    
         filt  = ['F444W', 'F356W', 'F200W', 'F150W'][filt_i]
         zp = [28., 27.9, 26.7, 27.75][filt_i]
-        folder = 'sim'+'_ID'+repr(ID)+'_'+filt+'_seed'+repr(seed)    
-#        print("The truth:")
-        f = open(folder+"/sim_info.txt","r")
-        string = f.read()
-        lines = string.split('\n')   # Split in to \n
-#        true_host_flux_text = float([lines[i] for i in range(len(lines)) if 'host_flux' in lines[i]][0].split('\t')[1])
-        true_host = pyfits.getdata(folder+'/Drz_HOSTclean_image.fits')
-        result, framesize = pickle.load(open(folder+'/{0}.pkl'.format(save_name),'rb'))
-        
-        half_r = int(framesize/2)
-        peak = np.where(true_host==true_host.max())
-        peak = [peak[0][0], peak[1][0]]
-        true_host = true_host[peak[0]-half_r:peak[0]+half_r+1,peak[1]-half_r:peak[1]+half_r+1]        
-        true_host_flux = true_host.sum()
-        true_host_mag = -2.5*np.log10(true_host_flux) + zp
-        true_host_ratio = [lines[i] for i in range(len(lines)) if 'host_flux_ratio' in lines[i]][0].split('\t')[1]
-        true_total_flux = true_host_flux/float(true_host_ratio[:-1])*100
-        true_total_mag = -2.5*np.log10(true_total_flux) + zp
-        fit_host_mag = result['host_mag'] 
-        plt.scatter(filt_i, fit_host_mag - true_host_mag,
-                c=color[filt],s=580, marker=".",zorder=0, edgecolors='k',alpha=0.7)
-        plt.text(filt_i-0.1, fit_host_mag - true_host_mag+ 0.05, '{0}'.format(round(true_total_mag,2)), color='g',fontsize=14)
-        plt.text(filt_i-0.1, fit_host_mag - true_host_mag- 0.05, '{0}%'.format(round(float(true_host_ratio[:-1]),1)), color='crimson',fontsize=14)
-        plt.plot(np.linspace(-1, 5), np.linspace(-1, 5)*0,'k')   
+        bias_list = []
+        for seed in range(30):
+            folder = 'sim'+'_ID'+repr(ID)+'_'+filt+'_seed'+repr(seed)    
+            f = open(folder+"/sim_info.txt","r")
+            string = f.read()
+            lines = string.split('\n')   # Split in to \n
+            true_host = pyfits.getdata(folder+'/Drz_HOSTclean_image.fits')
+            result, framesize = pickle.load(open(folder+'/{0}.pkl'.format(save_name),'rb'))
+            half_r = int(framesize/2)
+            peak = np.where(true_host==true_host.max())
+            peak = [peak[0][0], peak[1][0]]
+            true_host = true_host[peak[0]-half_r:peak[0]+half_r+1,peak[1]-half_r:peak[1]+half_r+1]        
+            true_host_flux = true_host.sum()
+            true_host_mag = -2.5*np.log10(true_host_flux) + zp
+            true_host_ratio = [lines[i] for i in range(len(lines)) if 'host_flux_ratio' in lines[i]][0].split('\t')[1]
+            true_total_flux = true_host_flux/float(true_host_ratio[:-1])*100
+            true_total_mag = -2.5*np.log10(true_total_flux) + zp
+            fit_host_mag = result['host_mag'] 
+            bias= fit_host_mag - true_host_mag
+            bias_list.append(bias)
+            plt.scatter(filt_i, bias,
+                    c=color[filt],s=100, marker=".",zorder=0, edgecolors='w',alpha=0.5)
+#        plt.scatter(filt_i+0.1, np.mean(bias_list), c=color[filt], s=380, marker=".",zorder=0, edgecolors='black')
+        plt.errorbar(filt_i-0.1, np.mean(bias_list), yerr=np.std(bias_list), color=color[filt],ecolor='black', fmt='o',zorder=-500,markersize=10)
+        plt.text(filt_i-0.35, np.mean(bias_list)-0.05, '{0}\n$\pm${1}'.format(round(np.mean(bias_list),2),round(np.std(bias_list),2)), color='black',fontsize=14)
+        plt.text(filt_i, -1.4+0.05, '{0}'.format(round(true_total_mag,2)), color='g',fontsize=14)
+        plt.text(filt_i, -1.4-0.05, '{0}%'.format(round(float(true_host_ratio[:-1]),1)), color='crimson',fontsize=14)
+    plt.plot(np.linspace(-1, 5), np.linspace(-1, 5)*0,'k')   
     plt.title('Inferred mag bias for ID '+repr(ID), fontsize=27)
     #legend:
-    plt.scatter(2.2, -0.4, c='dimgrey',s=580, marker=".",zorder=0, edgecolors='k',alpha=0.7)
-    plt.text(2.2-0.1, -0.4+ 0.05, 'value: True AGN total magnitude', color='g',fontsize=14)
-    plt.text(2.2-0.1, -0.4- 0.05, 'value: True host flux ratio', color='crimson',fontsize=14)
+    plt.text(-0.5, -1.1 + 0.05, 'Total magnitude', color='g',fontsize=14)
+    plt.text(-0.5, -1.1 - 0.05, 'Host flux ratio', color='crimson',fontsize=14)
     labels = ['F444W', 'F356W', 'F200W', 'F150W']
     ax.set_xticks(range(4))
     ax.set_xticklabels(labels)
     plt.ylabel("$\Delta$mag (inferred - truth)",fontsize=27)
-    plt.xlim(-0.2, 3.2)
-    plt.ylim(-0.6, 0.6)    
+    plt.xlim(-0.5, 3.2)
+    plt.ylim(-1.5, 1.)    
     plt.tick_params(labelsize=20)
 #    plt.savefig("host_mag_bias_ID{0}_seed{1}.pdf".format(ID, seed))
     plt.show()

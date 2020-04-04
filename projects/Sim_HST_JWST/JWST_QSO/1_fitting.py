@@ -30,11 +30,11 @@ deep_seed = True  #Set as True to put more seed and steps to fit.
 pltshow = 1 #Note that setting plt.ion() in line27, the plot won't show anymore if running in terminal.
 fixcenter = False
 run_MCMC = False
-seed = 0
 use_true_PSF = False
 save_SNR = False
-for ID in [5]:
-    for filt_i in [2,3]:
+ID = 5    
+for seed in range(0, 30):
+    for filt_i in [3]:
         filt  = ['F444W', 'F356W', 'F200W', 'F150W'][filt_i]
         folder = 'sim'+'_ID'+repr(ID)+'_'+filt+'_seed'+repr(seed)
         if use_true_PSF == True:
@@ -50,21 +50,30 @@ for ID in [5]:
             continue
         else:
             #Setting the fitting condition:
+            print("Fitting "+folder)
             pix_org_scale = [0.063, 0.063, 0.0311, 0.0311][filt_i] #After dirzzled
             pix_scale = [0.04, 0.04, 0.02, 0.02][filt_i] #After dirzzled
             zp= [28.0, 27.9, 26.7, 27.75][filt_i]
-            psf, QSO_img = pyfits.getdata('webPSF/drizzle_PSF_{0}/Drz_PSF_id{1}.fits'.format(filt, psf_id)),  pyfits.getdata(folder+'/Drz_QSO_image.fits')
-            framesize = [101, 101, 81, 81][filt_i]
-            half_r = int(framesize/2)
-            peak = np.where(QSO_img==QSO_img.max())
-            peak = [peak[0][0], peak[1][0]]
-            QSO_img = QSO_img[peak[0]-half_r:peak[0]+half_r+1,peak[1]-half_r:peak[1]+half_r+1]
+            psf, QSO_img_org = pyfits.getdata('webPSF/drizzle_PSF_{0}/Drz_PSF_id{1}.fits'.format(filt, psf_id)),  pyfits.getdata(folder+'/Drz_QSO_image.fits')
+            for framesize in range(61, 111, 10):
+                half_r = int(framesize/2)
+                peak = np.where(QSO_img_org==QSO_img_org.max())
+                peak = [peak[0][0], peak[1][0]]
+                QSO_img = QSO_img_org[peak[0]-half_r:peak[0]+half_r+1,peak[1]-half_r:peak[1]+half_r+1]
+                edges_value = np.concatenate((QSO_img[0,:], QSO_img[-1,:], QSO_img[0,:], QSO_img[-1,:]))
+#                print(np.median(edges_value), np.std(edges_value))
+                if np.median(edges_value)*1.5-np.std(edges_value)<0:
+                    print("framesize", framesize)
+                    print("break")
+                    break
+            plt.imshow(QSO_img, origin='lower', cmap='gist_heat', norm=LogNorm())
+            plt.colorbar()
+            plt.show()                
             psf_framesize = [111, 111,75, 75][filt_i]
             psf_half_r = int(psf_framesize/2)
             psf_peak = np.where(psf==psf.max())
             psf_peak = [psf_peak[0][0], psf_peak[1][0]]
             psf = psf[psf_peak[0]-psf_half_r:psf_peak[0]+psf_half_r+1,psf_peak[1]-psf_half_r:psf_peak[1]+psf_half_r+1]
-            print("Fitting "+folder)
             exptime =singel_exp * 8
             #stdd =  0.0088  #Measurement from empty retion: can also be estimated by: stdd/np.sqrt(8.)*0.04**2/0.063**2
             stdd = [1.6, 1.06, 0.77, 0.75][filt_i] /np.sqrt(singel_exp)   #An empirical formula from ETC
@@ -73,9 +82,9 @@ for ID in [5]:
             #==============================================================================
             # input the objects components and parameteres
             #==============================================================================
-            objs, Q_index = detect_obj(QSO_img,pltshow = pltshow)
-            qso_info = objs[Q_index]
-            obj = [objs[i] for i in range(len(objs)) if i != Q_index]
+            #objs, Q_index = detect_obj(QSO_img,pltshow = pltshow)
+            #qso_info = objs[Q_index]
+            #obj = [objs[i] for i in range(len(objs)) if i != Q_index]
             fixed_source = []
             kwargs_source_init = []
             kwargs_source_sigma = []
