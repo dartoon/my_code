@@ -47,7 +47,6 @@ kwargs_numerics = {'supersampling_factor': 3, 'supersampling_convolution': False
 import sys
 sys.path.insert(0,'../share_tools/')
 from gene_para import gene_para
-#seed=221 #input("The seed for simulation:\n")
 for seed in range(601, 622):
     print(seed)
     para=gene_para(seed=seed,fixh0=102)

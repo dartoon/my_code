@@ -18,7 +18,7 @@ import glob
 filt='f160w'
 import pickle
 import sys
-sys.path.insert(0,'../../../py_tools/')
+sys.path.insert(0,'../../../../../py_tools/')
 from flux_profile import cr_mask
 from mask_objects import find_loc_max
 

@@ -21,6 +21,7 @@ import sys
 sys.path.insert(0,'../../../py_tools/')
 from flux_profile import cr_mask
 from mask_objects import find_loc_max
+from astropy.cosmology import FlatLambdaCDM
 
 from lenstronomy.Cosmo.lens_cosmo import LensCosmo
 def cal_Ddt(zl, zs, H0_ini=100, om=0.27):
@@ -37,10 +38,9 @@ def cal_h0(zl, zs, Ddt, om=0.27):
     ratio = Ddt_corr/Ddt
     return 100 * ratio
 
-#folder = 'sim_lens_ID_221/'
-#folder = 'sim_lens_noqso_ID_221/'
 for ID in range(501, 502):  
     folder = 'sim_lens_noqso_ID_{0}/'.format(ID)
+    qso_folder = 'sim_lens_ID_{0}/'.format(ID)
     print(folder)
     model_lists, para_s, lens_info= pickle.load(open(folder+'sim_kwargs.pkl','rb'))
     lens_model_list, lens_light_model_list, source_model_list, point_source_list = model_lists
@@ -49,6 +49,8 @@ for ID in range(501, 502):
     solver_type = 'PROFILE_SHEAR'
     
     if len(kwargs_ps['ra_image']) <4:
+        if abs(kwargs_ps['ra_image']).min() != abs(kwargs_ps['ra_image'][-1]) and abs(kwargs_ps['dec_image']).min() != abs(kwargs_ps['dec_image'][-1]):
+            raise ValueError("The double image is not taken the points position correctly")
         kwargs_ps['ra_image'] = kwargs_ps['ra_image'][:2] 
         kwargs_ps['dec_image'] = kwargs_ps['dec_image'][:2]
         kwargs_ps['point_amp'] = kwargs_ps['point_amp'][:2]
@@ -60,9 +62,13 @@ for ID in range(501, 502):
                           'solver_type': solver_type,  # 'PROFILE', 'PROFILE_SHEAR', 'ELLIPSE', 'CENTER'
                           'Ddt_sampling': True,
                                   }
-    if glob.glob(folder+'model_result.pkl') == []:
-        _, _, kwargs_result, _, _ = pickle.load(open('sim_lens_ID_{0}/'.format(ID)+'model_result.pkl','rb'))
-        
+    
+    if glob.glob(qso_folder+'model_result.pkl') == []:
+        raise ValueError("The first time run of with QSO case is not finished")
+    else:        
+        #Load the result from the first run:
+        _, _, kwargs_result, _, _ = pickle.load(open(qso_folder+'model_result.pkl','rb'))
+#        fixed_lens, fixed_source, fixed_lens_light, fixed_ps, fixed_cosmo = fix_setting
         #Setting up the fitting:
         lens_data = pyfits.getdata(folder+'Drz_QSO_image.fits')
         lens_mask = cr_mask(lens_data, 'normal_mask.reg')
@@ -107,8 +113,8 @@ for ID in range(501, 502):
         fixed_lens.append({'ra_0': 0, 'dec_0': 0})
         kwargs_lens_init = kwargs_lens_list
         kwargs_lens_sigma.append({'theta_E': .2, 'e1': 0.1, 'e2': 0.1, 'gamma': 0.1, 'center_x': 0.01, 'center_y': 0.01})
-        kwargs_lower_lens.append({'theta_E': 0.01, 'e1': -0.5, 'e2': -0.5, 'gamma': 1.5, 'center_x': -10, 'center_y': -10})
-        kwargs_upper_lens.append({'theta_E': 10, 'e1': 0.5, 'e2': 0.5, 'gamma': 2.5, 'center_x': 10, 'center_y': 10})
+        kwargs_lower_lens.append({'theta_E': 0.01, 'e1': -0.5, 'e2': -0.5, 'gamma': kwargs_lens_init[0]['gamma']-0.2, 'center_x': -10, 'center_y': -10})
+        kwargs_upper_lens.append({'theta_E': 10, 'e1': 0.5, 'e2': 0.5, 'gamma': kwargs_lens_init[0]['gamma']+0.2, 'center_x': 10, 'center_y': 10})
         kwargs_lens_sigma.append({'gamma1': 0.1, 'gamma2': 0.1})
         kwargs_lower_lens.append({'gamma1': -0.2, 'gamma2': -0.1})
         kwargs_upper_lens.append({'gamma1': 0.2, 'gamma2': 0.2})
@@ -142,15 +148,12 @@ for ID in range(501, 502):
         
         # point source choices
         fixed_ps = [{}]
-#        kwargs_ps_init = [kwargs_ps]
         kwargs_ps_init = kwargs_result['kwargs_ps']
-    #    kwargs_ps_init = [{'ra_image': np.array([ 0.44375479, -0.19650614, -0.86265324,  1.10804188]),
-    #                       'dec_image': np.array([ 1.22573014, -0.88867742,  0.33737805, -0.19803038])}]
-        kwargs_ps_sigma = [{'ra_image': 0.01 * np.ones(len(kwargs_ps['ra_image'])), 'dec_image': 0.01 * np.ones(len(kwargs_ps['ra_image']))}]
-        kwargs_lower_ps = [{'ra_image': -10 * np.ones(len(kwargs_ps['ra_image'])), 'dec_image': -10 * np.ones(len(kwargs_ps['ra_image']))}]
-        kwargs_upper_ps = [{'ra_image': 10* np.ones(len(kwargs_ps['ra_image'])), 'dec_image': 10 * np.ones(len(kwargs_ps['ra_image']))}]
-        
-        
+        kwargs_ps_sigma = [{'ra_image': 0.01 * np.ones(len(kwargs_ps_init[0]['ra_image'])), 'dec_image': 0.01 * np.ones(len(kwargs_ps_init[0]['ra_image']))}]
+        kwargs_lower_ps = [{'ra_image': kwargs_ps_init[0]['ra_image']-0.004, 'dec_image': kwargs_ps_init[0]['dec_image']-0.004 }]
+        kwargs_upper_ps = [{'ra_image': kwargs_ps_init[0]['ra_image']+0.004, 'dec_image': kwargs_ps_init[0]['dec_image']+0.004 }]
+        ps_params = [kwargs_ps_init, kwargs_ps_sigma, fixed_ps, kwargs_lower_ps, kwargs_upper_ps]
+         
         # Set cosmo
         fixed_cosmo = {}
         kwargs_cosmo_init = {'D_dt': TD_distance}
@@ -158,7 +161,6 @@ for ID in range(501, 502):
         kwargs_lower_cosmo = {'D_dt': 0}
         kwargs_upper_cosmo = {'D_dt': 10000}
         cosmo_params = [kwargs_cosmo_init, kwargs_cosmo_sigma, fixed_cosmo, kwargs_lower_cosmo, kwargs_upper_cosmo]
-        ps_params = [kwargs_ps_init, kwargs_ps_sigma, fixed_ps, kwargs_lower_ps, kwargs_upper_ps]
         
         kwargs_params = {'lens_model': lens_params,
                         'source_model': source_params,
@@ -183,7 +185,8 @@ for ID in range(501, 502):
         multi_band_list = [image_band]
         kwargs_data_joint = {'multi_band_list': multi_band_list, 'multi_band_type': 'multi-linear',
                             'time_delays_measured': TD_obs[1:],
-                            'time_delays_uncertainties': TD_err_l[1:]}
+                            'time_delays_uncertainties': TD_err_l[1:],
+                            'ra_image_list': [kwargs_result['kwargs_ps'][0]['ra_image']], 'dec_image_list': [kwargs_result['kwargs_ps'][0]['dec_image']]}
         
         kwargs_model = {'lens_model_list': lens_model_list, 
                          'lens_light_model_list': lens_light_model_list,
@@ -195,41 +198,48 @@ for ID in range(501, 502):
                                       kwargs_likelihood, kwargs_params)
         
         fitting_kwargs_list_0 = [
-                                ['PSO', {'sigma_scale': 1., 'n_particles': 300, 'n_iterations': 300}],
-                                ['MCMC', {'n_burn': 20, 'n_run': 20, 'walkerRatio': 4, 'sigma_scale': .1}]
+                                ['PSO', {'sigma_scale': 1., 'n_particles': 200, 'n_iterations': 200}],
+                                ['MCMC', {'n_burn': 200, 'n_run': 200, 'walkerRatio': 4, 'sigma_scale': .1}],
+                                ['MCMC', {'n_burn': 300, 'n_run': 300, 'walkerRatio': 4, 'sigma_scale': .1}]                           
                                 ]
         
         start_time = time.time()
         chain_list = fitting_seq.fit_sequence(fitting_kwargs_list_0)
         
-#        kwargs_psf_iter = {'num_iter': 100, 'psf_iter_factor': 0.2,
-#                            'stacking_method': 'median', 
-#                           'keep_psf_error_map': False, 
-#                           'psf_symmetry': 1, 
-#                           'block_center_neighbour': 0.05}
-#        
-#        fitting_kwargs_list_1 = [
-#                                ['psf_iteration', kwargs_psf_iter],
-#                                ['PSO', {'sigma_scale': 1., 'n_particles': 100, 'n_iterations': 100}],
-#                                ['psf_iteration', kwargs_psf_iter],
-#                                ['PSO', {'sigma_scale': 1., 'n_particles': 100, 'n_iterations': 100}],
-#                                ['MCMC', {'n_burn': 20, 'n_run': 20, 'walkerRatio': 4, 'sigma_scale': .1}]
-#                                ]
 #        chain_list = fitting_seq.fit_sequence(fitting_kwargs_list_1)
         kwargs_result = fitting_seq.best_fit()
         end_time = time.time()
         print(end_time - start_time, 'total time needed for computation')
         print('============ CONGRATULATION, YOUR JOB WAS SUCCESSFUL ================ ')
-        
         #Save in pickle
         fix_setting =  [fixed_lens, fixed_source, fixed_lens_light, fixed_ps, fixed_cosmo]
-        pickle.dump([multi_band_list, kwargs_model, kwargs_result, chain_list, fix_setting], open(folder+'model_result.pkl', 'wb'))
+
+        cosmo = FlatLambdaCDM(H0=70, Om0=0.3, Ob0=0.)
+        from lenstronomy.Analysis.td_cosmography import TDCosmography
+        td_cosmo = TDCosmography(z_l, z_s, kwargs_model, cosmo_fiducial=cosmo)
+        from lenstronomy.Sampling.parameters import Param
+        # make instance of parameter class with given model options, constraints and fixed parameters #
+        param = Param(kwargs_model, fixed_lens, fixed_source, fixed_lens_light, fixed_ps, fixed_cosmo, 
+                      kwargs_lens_init=kwargs_result['kwargs_lens'], **kwargs_constraints)
+        sampler_type, samples_mcmc, param_mcmc, dist_mcmc  = chain_list[-1]
+        mcmc_new_list = []
+        labels_new = [r"$\gamma$", r"$D_{\Delta t}$","H$_0$" ]
+        for i in range(len(samples_mcmc)):
+            # transform the parameter position of the MCMC chain in a lenstronomy convention with keyword arguments #
+            kwargs_result = param.args2kwargs(samples_mcmc[i])
+            D_dt = kwargs_result['kwargs_special']['D_dt']
+            fermat_pot = td_cosmo.fermat_potential(kwargs_result['kwargs_lens'], kwargs_result['kwargs_ps'])
+        #    delta_fermat_12 = fermat_pot[0] - fermat_pot[2]
+            gamma = kwargs_result['kwargs_lens'][0]['gamma']
+        #    phi_ext, gamma_ext = kwargs_result['kwargs_lens'][1]['gamma1'], kwargs_result['kwargs_lens'][1]['gamma2']
+            mcmc_new_list.append([gamma, D_dt, cal_h0(z_l ,z_s, D_dt)])        
+        pickle.dump([multi_band_list, kwargs_model, kwargs_result, chain_list, fix_setting, mcmc_new_list], open(folder+'2nd_model_result_improve.pkl', 'wb'))
     #%%Print fitting result:
-    multi_band_list, kwargs_model, kwargs_result, chain_list, fix_setting = pickle.load(open(folder+'model_result.pkl','rb'))
+    multi_band_list, kwargs_model, kwargs_result, chain_list, fix_setting, mcmc_new_list = pickle.load(open(folder+'2nd_model_result_improve.pkl','rb'))
     fixed_lens, fixed_source, fixed_lens_light, fixed_ps, fixed_cosmo = fix_setting
     from lenstronomy.Plots import chain_plot
     from lenstronomy.Plots.model_plot import ModelPlot
-    
+    labels_new = [r"$\gamma$", r"$D_{\Delta t}$","H$_0$" ]    
     modelPlot = ModelPlot(multi_band_list, kwargs_model, kwargs_result, arrow_size=0.02, cmap_string="gist_heat")
     f, axes = modelPlot.plot_main()
     f.show()
@@ -238,38 +248,17 @@ for ID in range(501, 502):
     f, axes = modelPlot.plot_subtract_from_data_all()
     f.show()
     
-    from lenstronomy.Analysis.td_cosmography import TDCosmography
-    from astropy.cosmology import FlatLambdaCDM
-    cosmo = FlatLambdaCDM(H0=70, Om0=0.3, Ob0=0.)
-    td_cosmo = TDCosmography(z_l, z_s, kwargs_model, cosmo_fiducial=cosmo)
-    
     for i in range(len(chain_list)):
         chain_plot.plot_chain_list(chain_list, i)
-    sampler_type, samples_mcmc, param_mcmc, dist_mcmc  = chain_list[1]
     plt.show()
     
-    print("number of non-linear parameters in the MCMC process: ", len(param_mcmc))
-    print("parameters in order: ", param_mcmc)
-    print("number of evaluations in the MCMC process: ", np.shape(samples_mcmc)[0])
+#    print("number of non-linear parameters in the MCMC process: ", len(param_mcmc))
+#    print("parameters in order: ", param_mcmc)
+#    print("number of evaluations in the MCMC process: ", np.shape(samples_mcmc)[0])
     import corner
     # import the parameter handling class #
-    from lenstronomy.Sampling.parameters import Param
-    # make instance of parameter class with given model options, constraints and fixed parameters #
-    param = Param(kwargs_model, fixed_lens, fixed_source, fixed_lens_light, fixed_ps, fixed_cosmo, 
-                  kwargs_lens_init=kwargs_result['kwargs_lens'], **kwargs_constraints)
     # the number of non-linear parameters and their names #
-    num_param, param_list = param.num_param()
-    mcmc_new_list = []
-    labels_new = [r"$\gamma$", r"$D_{\Delta t}$","H$_0$" ]
-    for i in range(len(samples_mcmc)):
-        # transform the parameter position of the MCMC chain in a lenstronomy convention with keyword arguments #
-        kwargs_result = param.args2kwargs(samples_mcmc[i])
-        D_dt = kwargs_result['kwargs_special']['D_dt']
-        fermat_pot = td_cosmo.fermat_potential(kwargs_result['kwargs_lens'], kwargs_result['kwargs_ps'])
-    #    delta_fermat_12 = fermat_pot[0] - fermat_pot[2]
-        gamma = kwargs_result['kwargs_lens'][0]['gamma']
-    #    phi_ext, gamma_ext = kwargs_result['kwargs_lens'][1]['gamma1'], kwargs_result['kwargs_lens'][1]['gamma2']
-        mcmc_new_list.append([gamma, D_dt, cal_h0(z_l ,z_s, D_dt)])
+#    num_param, param_list = param.num_param()
     truths=[para_s[0][0]['gamma'],TD_distance, 70.656]	
     #plot = corner.corner(mcmc_new_list, labels=labels_new, show_titles=True,truths =truths, levels=1.0 - np.exp(-0.5 * np.array([1.,2.]) ** 2))
     plot = corner.corner(mcmc_new_list, labels=labels_new, show_titles=True, #range= [[0.8,1.5],[1,3],[0,1],[0, 1],[2000,5000],[20,100]], 
