@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 from scipy import integrate
 from scipy import interpolate
 ###load data first
-DCO_type = 2
+DCO_type = 0
 s_type = ['NSNS', 'BHNS', 'BHBH'][DCO_type]
 file = open('../data/' + s_type + 'rates.dat')
 gwdata = np.loadtxt(file)
@@ -13,15 +13,17 @@ gwdata=gwdata[gwdata[:,0].argsort(),]
 scenario = 5 #0:z 1:snh snl onl onh dnl dnh knl knh
 sce_list = [None, 'standard high', 'standard low', 'optimistic low', 'optimistic high', 'delayed SN low', 'delayed SN high', 'high BH kicks low', 'high BH kicks high']
 
-z=gwdata[:,0]
+z = gwdata[:,0]
 c=299790. # speed of light [km/s]
 H = 70.
 om = 0.3
 w = -1.
 dH=c/H
 rho0 = 8.
+
 ### detector horizon 
-r0 = 1527.	# in [Mpc] value for ET - polynomial Noise curve
+#r0 = 1527.	# in [Mpc] value for ET - polynomial Noise curve
+r0 = 1918.	# in [Mpc] value for ET “xylophone”
 #r0 = 6709 	# in [Mpc] value for DECIGO - polynomial Noise curve
 
 Mchirp0 =[1.2, 3.2, 6.7][DCO_type] #type of the binaries 1.2 3.2 6.7
@@ -66,10 +68,10 @@ for j in range(pho_grid):
             Ptheta[i]=0
     sDrhoDz[:,j]=4*np.pi*(dH)**3*(n0/(1+z))*Dist**2*rev_E*Ptheta*x/rho
     
-#Calcualte the non lensed events:
-plt.plot(z, np.sum(sDrhoDz[:,100:]*pho_upper/pho_grid, axis=1) )
-plt.close()
-print(s_type, ": total:", sce_list[scenario], np.sum(np.sum(sDrhoDz[:-1,100:], axis=1) *(z[1:]-z[:-1]))*pho_upper/pho_grid  )  
+##Calcualte the non lensed events:
+#plt.plot(z, np.sum(sDrhoDz[:,100:]*pho_upper/pho_grid, axis=1) )
+#plt.close()
+#print(s_type, ": total:", sce_list[scenario], np.sum(np.sum(sDrhoDz[:-1,100:], axis=1) *(z[1:]-z[:-1]))*pho_upper/pho_grid  )  
 
 #%%Calculate lening statistics:
 phi0=8.0e-3*(H/100)**3
@@ -81,26 +83,29 @@ TFactor = (sig0/c)**4*phi0*gamma((4.+alpha)/bet)/gamma(alpha/bet)
 tau = np.zeros([len(z), pho_grid])
 for i in range(pho_grid): 
     rho0 =pho_upper*(i+1)/pho_grid
-    ymax = 1./((SNR/rho0)**2 - 1)   #two images to decide
+    ymax = 1./((SNR/rho0)**2 + 1)   #two images to decide
     if ymax>1:  #for the u_+ case ymax can be large than 1 
         ymax=1
     tau[:,i]=(16/30)*np.pi**3*dH**3*TFactor*ymax**2.*Dist**3
+    
 #%%    
 #############################int z then rho######################
 Nd_rh=np.zeros_like(tau)
 for i in range(len(z)-1):
     Nd_rh[i+1,:] = Nd_rh[i,:]+sDrhoDz[i+1]*tau[i+1,:]*(z[i+1]-z[i])   #for continuous, calculated form the right end.
-    
-print(s_type, ": total:", sce_list[scenario],np.sum(Nd_rh[-1,:pho_break_idx])*pho_upper/pho_grid)
-#plt.plot(np.linspace(0,80,pho_grid), Nd_rh[-1,:]/(np.sum(Nd_rh[-1,:])), 'k--')
-#plt.close()
+total = np.sum(Nd_rh[-1,:pho_break_idx])*pho_upper/pho_grid
+print(s_type, ": total:", sce_list[scenario], np.sum(Nd_rh[-1,:pho_break_idx])*pho_upper/pho_grid)
+plt.plot(np.linspace(0,80,pho_grid), Nd_rh[-1,:]/total, 'r--')
+plt.plot(np.linspace(0,80,pho_grid), N_init, 'r')
+plt.xlim(0, 30)
+plt.show()
 ##Tau shape
 #from matplotlib.colors import LogNorm
 #plt.figure(figsize=(11, 3))
 #plt.imshow(tau,origin='lower', norm = LogNorm())
 #plt.colorbar()
 #plt.show()
-##%%
+#%%
 #############################int rho then z #######################
 #sdzt=sDrhoDz*tau
 #print(s_type, ": total:", sce_list[scenario], np.sum(np.sum(sdzt[:-1,:], axis=1) *(z[1:]-z[:-1]))*pho_upper/pho_grid  )  
