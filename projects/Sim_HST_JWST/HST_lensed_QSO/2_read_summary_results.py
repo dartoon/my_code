@@ -38,12 +38,12 @@ def cal_h0(zl, zs, Ddt, om=0.27):
     return 100 * ratio
 
 result_dic = {}
-#folder_type = 'sim_lens_ID_'
-#file_type = '2nd_model_result_newlist.pkl'
+folder_type = 'sim_lens_ID_'
+file_type = 'model_result.pkl'
 
 #folder_type = 'sim_lens_noqso_ID_'
-#file_type = '2nd_model_result_improve.pkl'
-id_range= [501, 522]
+#file_type = 'model_result.pkl'
+id_range= [601, 622]
 for ID in range(id_range[0], id_range[1]):  
     folder = folder_type + '{0}/'.format(ID)
 #    print(folder)
@@ -64,9 +64,9 @@ for ID in range(id_range[0], id_range[1]):
                           'solver_type': solver_type,  # 'PROFILE', 'PROFILE_SHEAR', 'ELLIPSE', 'CENTER'
                           'Ddt_sampling': True,
                                   }
-    if glob.glob(folder+'2nd_model_result_newlist.pkl') == []:
-        result_dic[folder] = [None, None]
-        continue
+#    if glob.glob(folder+'model_result.pkl') == []:
+#        result_dic[folder] = [None, None]
+#        continue
     multi_band_list, kwargs_model, kwargs_result, chain_list, fix_setting, mcmc_new_list = pickle.load(open(folder+file_type,'rb'))
     fixed_lens, fixed_source, fixed_lens_light, fixed_ps, fixed_cosmo = fix_setting
     mcmc_new_list = np.array(mcmc_new_list)
@@ -80,7 +80,7 @@ for ID in range(id_range[0], id_range[1]):
     result_dic[folder[:-1]] = [truth_dic, kwargs_result, [np.percentile(H0_list,16), np.percentile(H0_list,50), np.percentile(H0_list,84)]]
 
 #%%
-H0_true = 70.656 
+H0_true = 73.907
 fig, ax = plt.subplots(figsize=(11,8))
 for ID in range(id_range[0], id_range[1]):
     key = folder_type + '{0}'.format(ID)

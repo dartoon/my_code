@@ -12,13 +12,13 @@ import pickle
 potential_mismatch_list = []
 geometry_mismatch_list = []
 
-#folder_type = 'sim_lens_ID_'
-#file_type = '2nd_model_result_newlist.pkl'
+folder_type = 'sim_lens_ID_'
+file_type = 'model_result.pkl'
 
-folder_type = 'sim_lens_noqso_ID_'
-file_type = '2nd_model_result_improve.pkl'
+#folder_type = 'sim_lens_noqso_ID_'
+#file_type = 'model_result.pkl'
 
-for seed in range(501, 522):
+for seed in range(601, 622):
     #==============================================================================
     # ##### lens mass model 
     #==============================================================================
@@ -46,7 +46,7 @@ for seed in range(501, 522):
     source_pos_infe = [kwargs_result['kwargs_source'][0]['center_x'], kwargs_result['kwargs_source'][0]['center_y']]
     potential_infe = lens_model_class.potential(x_image_infe, y_image_infe, kwargs=kwargs_lens_list_infe)
     geometry_infe = ((x_image_infe - source_pos_infe[0])**2 + (y_image_infe - source_pos_infe[1])**2) / 2.
-    print(round(source_pos_infe[0],4), round(source_pos_infe[1],4))
+#    print(round(source_pos_infe[0],4), round(source_pos_infe[1],4))
 #    print("potential:", potential_infe, "geometry:", geometry_inf)
     true_potential_diff = potential[0]- potential[1:]
     true_geometry_diff = geometry[0]- geometry[1:]
