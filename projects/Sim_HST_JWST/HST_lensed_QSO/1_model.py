@@ -82,7 +82,7 @@ for ID in range(620, 622):
         plt.colorbar()
 
         exp_time = 599.* 2 * 8
-        stdd =  0.0024  #Measurement from empty retion.
+        stdd =  0.0024  #Measurement from empty retion, 0.016*0.08**2/0.13**2/np.sqrt(8)
         len_std = (abs(lens_data/exp_time)+stdd**2)**0.5
         deltaPix = 0.08
         

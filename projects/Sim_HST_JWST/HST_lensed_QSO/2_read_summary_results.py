@@ -40,6 +40,7 @@ def cal_h0(zl, zs, Ddt, om=0.27):
 result_dic = {}
 folder_type = 'sim_lens_ID_'
 file_type = 'model_result.pkl'
+#file_type = 'model_result_fixgamma.pkl'
 
 #folder_type = 'sim_lens_noqso_ID_'
 #file_type = 'model_result.pkl'
@@ -70,7 +71,7 @@ for ID in range(id_range[0], id_range[1]):
     multi_band_list, kwargs_model, kwargs_result, chain_list, fix_setting, mcmc_new_list = pickle.load(open(folder+file_type,'rb'))
     fixed_lens, fixed_source, fixed_lens_light, fixed_ps, fixed_cosmo = fix_setting
     mcmc_new_list = np.array(mcmc_new_list)
-    H0_list = mcmc_new_list[:,2]
+    H0_list = mcmc_new_list[:,-1]
     truth_dic = {}
     truth_dic['kwargs_lens'] =kwargs_lens_list
     truth_dic['kwargs_source'] =kwargs_source_list
@@ -95,17 +96,20 @@ for ID in range(id_range[0], id_range[1]):
     plt.tick_params(labelsize=20)
 plt.show()
 
-#%%
+#%%test parameter bias:
+para = 'theta_E'  #'gamma'
 fig, ax = plt.subplots(figsize=(11,8))
 for ID in range(id_range[0], id_range[1]):
     key = folder_type + '{0}'.format(ID)
-    gamma_bias = result_dic[key][1]['kwargs_lens'][0]['gamma'] - result_dic[key][0]['kwargs_lens'][0]['gamma']
+    gamma_bias = result_dic[key][1]['kwargs_lens'][0][para]/0.6153846*0.63492063 - result_dic[key][0]['kwargs_lens'][0][para]
     plt.scatter(ID, gamma_bias,
                 c='darkred',s=280,marker=".",zorder=0, vmin=1.2, vmax=1.8, edgecolors='white',alpha=0.7)
     ax.set_xticks(range(id_range[0]-1, id_range[1]+1,3)) 
     plt.plot(np.linspace(id_range[0]-1, id_range[1]+1), np.linspace(id_range[0]-1, id_range[1]+1)*0)
     plt.xlabel("ID",fontsize=27)
-    plt.ylabel("$\gamma$ bias (inferred - truth)",fontsize=27)
+    plt.ylabel(para+" bias (inferred - truth)",fontsize=27)
     plt.ylim(-0.23,0.23)
     plt.tick_params(labelsize=20)
 plt.show()
+
+

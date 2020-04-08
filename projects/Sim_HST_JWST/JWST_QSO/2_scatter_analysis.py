@@ -38,7 +38,7 @@ if use_true_PSF == True:
     save_name = 'fit_result_truePSF'
 else:
     save_name = 'fit_result'
-for ID in [1]:
+for ID in range(1, 6):
     fig, ax = plt.subplots(figsize=(11,8))
     for filt_i in range(4):    
         filt  = ['F444W', 'F356W', 'F200W', 'F150W'][filt_i]
@@ -82,5 +82,5 @@ for ID in [1]:
     plt.xlim(-0.5, 3.2)
     plt.ylim(-1.5, 1.)    
     plt.tick_params(labelsize=20)
-#    plt.savefig("host_mag_bias_ID{0}_seed{1}.pdf".format(ID, seed))
+    plt.savefig("host_mag_bias_ID{0}.pdf".format(ID))
     plt.show()
