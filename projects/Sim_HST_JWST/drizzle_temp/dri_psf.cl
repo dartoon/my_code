@@ -1,7 +1,7 @@
 drizzle.outnx=81
 drizzle.outny=81
 drizzle.pixfrac=0.7
-drizzle.scale=0.63492063
+drizzle.scale=0.61538462
 drizzle.kernel="gaussian"
 drizzle non_drizzled_psf-1.fits dripsf.fits outweig = "dripsfw.fits" xsh=-0.375 ysh=-0.375
 drizzle non_drizzled_psf-2.fits dripsf.fits outweig = "dripsfw.fits" xsh=-0.375 ysh=0.125
