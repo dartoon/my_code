@@ -32,7 +32,7 @@ from flux_profile import cr_mask
 from mask_objects import find_loc_max
 #file name:
 filt='f160w'
-
+            
 def cal_Ddt(zl, zs, H0_ini=100, om=0.27):
     cosmo = FlatLambdaCDM(H0=H0_ini, Om0=0.27) 
     lensunits=LensCosmo(z_lens=zl, z_source=zs,cosmo= cosmo)
@@ -46,22 +46,21 @@ def cal_h0(zl, zs, Ddt, om=0.27):
     Ddt_corr = cal_Ddt(zl, zs, H0_ini=100)
     ratio = Ddt_corr/Ddt
     return 100 * ratio
+##601, 608, 615
+#low_, up_ = [[601, 608], [608, 615], [615, 622]][2]
 
 #low_, up_ = [[602, 605], [605, 608], [609, 612], [612, 615], [616, 619], [619, 622]][5]
-low_, up_ = [[601, 608], [608, 615], [615, 622]][2]
-for ID in range(low_, up_):  
-    folder = 'sim_lens_noqso_ID_{0}/'.format(ID)
-    qso_folder = 'sim_lens_ID_{0}/'.format(ID)
+
+#for ID in [612, 614, 617, 619]:  
+for ID in range(612, 622):    
+    folder = 'sim_lens_ID_{0}/'.format(ID)
     print(folder)
     model_lists, para_s, lens_info= pickle.load(open(folder+'sim_kwargs.pkl','rb'))
     lens_model_list, lens_light_model_list, source_model_list, point_source_list = model_lists
     z_l, z_s, TD_distance, TD_true, TD_obs, TD_err_l = lens_info
     kwargs_lens_list, kwargs_lens_light_list, kwargs_source_list, kwargs_ps = para_s
     solver_type = 'PROFILE_SHEAR'
-    
     if len(kwargs_ps['ra_image']) <4:
-        if abs(kwargs_ps['ra_image']).min() != abs(kwargs_ps['ra_image'][-1]) and abs(kwargs_ps['dec_image']).min() != abs(kwargs_ps['dec_image'][-1]):
-            raise ValueError("The double image is not taken the points position correctly")
         kwargs_ps['ra_image'] = kwargs_ps['ra_image'][:2] 
         kwargs_ps['dec_image'] = kwargs_ps['dec_image'][:2]
         kwargs_ps['point_amp'] = kwargs_ps['point_amp'][:2]
@@ -73,12 +72,26 @@ for ID in range(low_, up_):
                           'solver_type': solver_type,  # 'PROFILE', 'PROFILE_SHEAR', 'ELLIPSE', 'CENTER'
                           'Ddt_sampling': True,
                                   }
-    
-    if glob.glob(qso_folder+'model_result.pkl') == []:
-        raise ValueError("The first time run of with QSO case is not finished")
-    else:        
+    refit = False
+    files = glob.glob(folder+'model_result*.pkl')
+    files.sort()
+    read_file = files[-1]
+    multi_band_list, kwargs_model, kwargs_result, chain_list, fix_setting, mcmc_new_list = pickle.load(open(read_file,'rb'))
+    fixed_lens, fixed_source, fixed_lens_light, fixed_ps, fixed_cosmo = fix_setting
+    modelPlot = ModelPlot(multi_band_list, kwargs_model, kwargs_result, arrow_size=0.02, cmap_string="gist_heat")
+    logL = modelPlot._imageModel.likelihood_data_given_model(source_marg=False, linear_prior=None, **kwargs_result)
+    n_data = modelPlot._imageModel.num_data_evaluate
+    chisq = -logL * 2 / n_data    
+    if abs(chisq)>10:
+        refit = True
+    if abs(chisq)<20:
+        kwargs_lens_list = kwargs_result['kwargs_lens']
+        kwargs_lens_light_list = kwargs_result['kwargs_lens_light']
+        kwargs_source_list = kwargs_result['kwargs_source']
+    if refit == True:
+        savename = 'model_result_{0}.pkl'.format(len(files)+1)
         #Load the result from the first run:
-        _, _, kwargs_result, _, _, _ = pickle.load(open(qso_folder+'model_result.pkl','rb'))
+#        multi_band_list, kwargs_model, kwargs_result, chain_list, fix_setting = pickle.load(open(folder+'model_result.pkl','rb'))
 #        fixed_lens, fixed_source, fixed_lens_light, fixed_ps, fixed_cosmo = fix_setting
         #Setting up the fitting:
         lens_data = pyfits.getdata(folder+'Drz_QSO_image.fits')
@@ -89,7 +102,7 @@ for ID in range(low_, up_):
         lens_mask = (1-lens_mask)[ct:-ct,ct:-ct]
         plt.imshow(lens_data, origin='lower',cmap='gist_heat', norm=LogNorm())
         plt.colorbar()
-        plt.show()
+
         exp_time = 599.* 2 * 8
         stdd =  0.0024  #Measurement from empty retion, 0.016*0.08**2/0.13**2/np.sqrt(8)
         len_std = (abs(lens_data/exp_time)+stdd**2)**0.5
@@ -157,11 +170,11 @@ for ID in range(low_, up_):
         # point source choices
         fixed_ps = [{}]
         kwargs_ps_init = kwargs_result['kwargs_ps']
+#        kwargs_ps_init = kwargs_result['kwargs_ps']
         kwargs_ps_sigma = [{'ra_image': 0.01 * np.ones(len(kwargs_ps_init[0]['ra_image'])), 'dec_image': 0.01 * np.ones(len(kwargs_ps_init[0]['ra_image']))}]
-        kwargs_lower_ps = [{'ra_image': kwargs_ps_init[0]['ra_image']-0.004, 'dec_image': kwargs_ps_init[0]['dec_image']-0.004 }]
-        kwargs_upper_ps = [{'ra_image': kwargs_ps_init[0]['ra_image']+0.004, 'dec_image': kwargs_ps_init[0]['dec_image']+0.004 }]
-        ps_params = [kwargs_ps_init, kwargs_ps_sigma, fixed_ps, kwargs_lower_ps, kwargs_upper_ps]
-         
+        kwargs_lower_ps = [{'ra_image': -10 * np.ones(len(kwargs_ps_init[0]['ra_image'])), 'dec_image': -10 * np.ones(len(kwargs_ps_init[0]['ra_image']))}]
+        kwargs_upper_ps = [{'ra_image': 10* np.ones(len(kwargs_ps_init[0]['ra_image'])), 'dec_image': 10 * np.ones(len(kwargs_ps_init[0]['ra_image']))}]
+        
         # Set cosmo
         fixed_cosmo = {}
         kwargs_cosmo_init = {'D_dt': TD_distance}
@@ -169,6 +182,7 @@ for ID in range(low_, up_):
         kwargs_lower_cosmo = {'D_dt': TD_distance/2}
         kwargs_upper_cosmo = {'D_dt': TD_distance*1.5}
         cosmo_params = [kwargs_cosmo_init, kwargs_cosmo_sigma, fixed_cosmo, kwargs_lower_cosmo, kwargs_upper_cosmo]
+        ps_params = [kwargs_ps_init, kwargs_ps_sigma, fixed_ps, kwargs_lower_ps, kwargs_upper_ps]
         
         kwargs_params = {'lens_model': lens_params,
                         'source_model': source_params,
@@ -193,8 +207,7 @@ for ID in range(low_, up_):
         multi_band_list = [image_band]
         kwargs_data_joint = {'multi_band_list': multi_band_list, 'multi_band_type': 'multi-linear',
                             'time_delays_measured': TD_obs[1:],
-                            'time_delays_uncertainties': TD_err_l[1:],
-                            'ra_image_list': [kwargs_result['kwargs_ps'][0]['ra_image']], 'dec_image_list': [kwargs_result['kwargs_ps'][0]['dec_image']]}
+                            'time_delays_uncertainties': TD_err_l[1:]}
         
         kwargs_model = {'lens_model_list': lens_model_list, 
                          'lens_light_model_list': lens_light_model_list,
@@ -204,15 +217,28 @@ for ID in range(low_, up_):
         fitting_seq = FittingSequence(kwargs_data_joint, kwargs_model, kwargs_constraints,
                                       kwargs_likelihood, kwargs_params)
         
+        start_time = time.time()
         fitting_kwargs_list_0 = [
                                 ['PSO', {'sigma_scale': 1., 'n_particles': 150, 'n_iterations': 200}],
-                                ['PSO', {'sigma_scale': 1., 'n_particles': 200, 'n_iterations': 400}],
-                                ['PSO', {'sigma_scale': 1., 'n_particles': 200, 'n_iterations': 400}],
-                                ['MCMC', {'n_burn': 300, 'n_run': 300, 'walkerRatio': 6, 'sigma_scale': 0.1}]                           
+                                ['PSO', {'sigma_scale': 1., 'n_particles': 200, 'n_iterations': 400}]
                                 ]
         
-        start_time = time.time()
-        chain_list = fitting_seq.fit_sequence(fitting_kwargs_list_0)
+        fitting_seq.fit_sequence(fitting_kwargs_list_0)
+        
+        kwargs_psf_iter = {'num_iter': 150, 'psf_iter_factor': 0.5,
+                            'stacking_method': 'median', 
+                           'keep_psf_error_map': True, 
+                           'psf_symmetry': 1, 
+                           'block_center_neighbour': 0.05}
+        
+        fitting_kwargs_list_1 = [
+                                ['psf_iteration', kwargs_psf_iter],
+                                ['PSO', {'sigma_scale': 1., 'n_particles': 150, 'n_iterations': 300}],
+                                ['psf_iteration', kwargs_psf_iter],
+                                ['PSO', {'sigma_scale': .1, 'n_particles': 150, 'n_iterations': 300}],
+                                ['MCMC', {'n_burn': 300, 'n_run': 400, 'walkerRatio': 6, 'sigma_scale': 0.1}],
+                                ]
+        chain_list = fitting_seq.fit_sequence(fitting_kwargs_list_1)
         kwargs_result = fitting_seq.best_fit()
         end_time = time.time()
         print(end_time - start_time, 'total time needed for computation')
@@ -236,26 +262,28 @@ for ID in range(low_, up_):
             gamma = kwargs_result['kwargs_lens'][0]['gamma']
         #    phi_ext, gamma_ext = kwargs_result['kwargs_lens'][1]['gamma1'], kwargs_result['kwargs_lens'][1]['gamma2']
             mcmc_new_list.append([gamma, D_dt, cal_h0(z_l ,z_s, D_dt)])        
-        pickle.dump([multi_band_list, kwargs_model, kwargs_result, chain_list, fix_setting, mcmc_new_list], open(folder+'model_result.pkl', 'wb'))
-    #%%Print fitting result:
-    multi_band_list, kwargs_model, kwargs_result, chain_list, fix_setting, mcmc_new_list = pickle.load(open(folder+'model_result.pkl','rb'))
-    fixed_lens, fixed_source, fixed_lens_light, fixed_ps, fixed_cosmo = fix_setting
-    labels_new = [r"$\gamma$", r"$D_{\Delta t}$","H$_0$" ]    
-    modelPlot = ModelPlot(multi_band_list, kwargs_model, kwargs_result, arrow_size=0.02, cmap_string="gist_heat")
-    f, axes = modelPlot.plot_main()
-    f.show()
-    f, axes = modelPlot.plot_separate()
-    f.show()
-    f, axes = modelPlot.plot_subtract_from_data_all()
-    f.show()
+        
+        pickle.dump([multi_band_list, kwargs_model, kwargs_result, chain_list, fix_setting, mcmc_new_list], open(folder+savename, 'wb'))
+        
+        #%%Print fitting result:
+        multi_band_list, kwargs_model, kwargs_result, chain_list, fix_setting, mcmc_new_list = pickle.load(open(folder+savename,'rb'))
+        fixed_lens, fixed_source, fixed_lens_light, fixed_ps, fixed_cosmo = fix_setting
+    #    labels_new = [r"$\gamma$", r"$D_{\Delta t}$","H$_0$" ]
+        modelPlot = ModelPlot(multi_band_list, kwargs_model, kwargs_result, arrow_size=0.02, cmap_string="gist_heat")
+        f, axes = modelPlot.plot_main()
+        f.show()
+    #    f, axes = modelPlot.plot_separate()
+    #    f.show()
+    #    f, axes = modelPlot.plot_subtract_from_data_all()
+    #    f.show()
+        plt.show()
     
-    for i in range(len(chain_list)):
-        chain_plot.plot_chain_list(chain_list, i)
-    plt.show()
-    
-    truths=[para_s[0][0]['gamma'],TD_distance, 70.656]	
-    plot = corner.corner(mcmc_new_list, labels=labels_new, show_titles=True, #range= [[0.8,1.5],[1,3],[0,1],[0, 1],[2000,5000],[20,100]], 
-                         quantiles=[0.16, 0.5, 0.84], truths =truths,
-                         title_kwargs={"fontsize": 15}, label_kwargs = {"fontsize": 25},
-                         levels=1.0 - np.exp(-0.5 * np.array([1.,2.]) ** 2))
-    plt.show()
+    #    for i in range(len(chain_list)):
+    #        chain_plot.plot_chain_list(chain_list, i)
+    #    plt.close()
+    #    truths=[para_s[0][0]['gamma'],TD_distance, 70.656]	
+    #    plot = corner.corner(mcmc_new_list, labels=labels_new, show_titles=True, #range= [[0.8,1.5],[1,3],[0,1],[0, 1],[2000,5000],[20,100]], 
+    #                         quantiles=[0.16, 0.5, 0.84], truths =truths,
+    #                         title_kwargs={"fontsize": 15}, label_kwargs = {"fontsize": 25},
+    #                         levels=1.0 - np.exp(-0.5 * np.array([1.,2.]) ** 2))
+    #    plt.close()

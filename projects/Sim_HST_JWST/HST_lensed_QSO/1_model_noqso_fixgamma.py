@@ -48,7 +48,7 @@ def cal_h0(zl, zs, Ddt, om=0.27):
     return 100 * ratio
 
 #low_, up_ = [[602, 605], [605, 608], [609, 612], [612, 615], [616, 619], [619, 622]][5]
-low_, up_ = [[601, 608], [608, 615], [615, 622]][2]
+low_, up_ = [[602, 607], [607, 612], [612, 617], [617, 622]][3]
 for ID in range(low_, up_):  
     folder = 'sim_lens_noqso_ID_{0}/'.format(ID)
     qso_folder = 'sim_lens_ID_{0}/'.format(ID)
@@ -76,17 +76,27 @@ for ID in range(low_, up_):
     
     if glob.glob(qso_folder+'model_result.pkl') == []:
         raise ValueError("The first time run of with QSO case is not finished")
-    else:        
+    else:   
+        files = glob.glob(folder+'model_result*.pkl')        
+        savename = 'model_result_fixgamma.pkl'
+        qso_files = glob.glob(folder+'model_result*.pkl')       
+        qso_files.sort()
+        read_file = files[-1]
+        print('read_file', read_file)
         #Load the result from the first run:
-        _, _, kwargs_result, _, _, _ = pickle.load(open(qso_folder+'model_result.pkl','rb'))
-#        fixed_lens, fixed_source, fixed_lens_light, fixed_ps, fixed_cosmo = fix_setting
+        _, _, kwargs_result, _, _, _ = pickle.load(open(read_file,'rb'))
+        
         #Setting up the fitting:
         lens_data = pyfits.getdata(folder+'Drz_QSO_image.fits')
         lens_mask = cr_mask(lens_data, 'normal_mask.reg')
         framesize = 81
+        center = int(framesize/2)
+
         ct = int((len(lens_data) - framesize)/2)
         lens_data = lens_data[ct:-ct,ct:-ct]
         lens_mask = (1-lens_mask)[ct:-ct,ct:-ct]
+        lens_mask[center, center] = 0
+        
         plt.imshow(lens_data, origin='lower',cmap='gist_heat', norm=LogNorm())
         plt.colorbar()
         plt.show()
@@ -117,12 +127,12 @@ for ID in range(low_, up_):
         kwargs_lens_sigma = []
         kwargs_lower_lens = []
         kwargs_upper_lens = []
-        fixed_lens.append({}) 
+        fixed_lens.append({'gamma': kwargs_lens_list[0]['gamma']}) 
         fixed_lens.append({'ra_0': 0, 'dec_0': 0})
         kwargs_lens_init = kwargs_lens_list
-        kwargs_lens_sigma.append({'theta_E': .2, 'e1': 0.1, 'e2': 0.1, 'gamma': 0.1, 'center_x': 0.01, 'center_y': 0.01})
-        kwargs_lower_lens.append({'theta_E': 0.01, 'e1': -0.5, 'e2': -0.5, 'gamma': kwargs_lens_init[0]['gamma']-0.2, 'center_x': -10, 'center_y': -10})
-        kwargs_upper_lens.append({'theta_E': 10, 'e1': 0.5, 'e2': 0.5, 'gamma': kwargs_lens_init[0]['gamma']+0.2, 'center_x': 10, 'center_y': 10})
+        kwargs_lens_sigma.append({'theta_E': .2, 'e1': 0.1, 'e2': 0.1, 'center_x': 0.01, 'center_y': 0.01})
+        kwargs_lower_lens.append({'theta_E': 0.01, 'e1': -0.5, 'e2': -0.5, 'center_x': -10, 'center_y': -10})
+        kwargs_upper_lens.append({'theta_E': 10, 'e1': 0.5, 'e2': 0.5, 'center_x': 10, 'center_y': 10})
         kwargs_lens_sigma.append({'gamma1': 0.1, 'gamma2': 0.1})
         kwargs_lower_lens.append({'gamma1': -0.2, 'gamma2': -0.1})
         kwargs_upper_lens.append({'gamma1': 0.2, 'gamma2': 0.2})
@@ -226,22 +236,22 @@ for ID in range(low_, up_):
                       kwargs_lens_init=kwargs_result['kwargs_lens'], **kwargs_constraints)
         sampler_type, samples_mcmc, param_mcmc, dist_mcmc  = chain_list[-1]
         mcmc_new_list = []
-        labels_new = [r"$\gamma$", r"$D_{\Delta t}$","H$_0$" ]
+        labels_new = [r"$D_{\Delta t}$","H$_0$" ]
         for i in range(len(samples_mcmc)):
             # transform the parameter position of the MCMC chain in a lenstronomy convention with keyword arguments #
             kwargs_result = param.args2kwargs(samples_mcmc[i])
             D_dt = kwargs_result['kwargs_special']['D_dt']
 #            fermat_pot = td_cosmo.fermat_potential(kwargs_result['kwargs_lens'], kwargs_result['kwargs_ps'])
         #    delta_fermat_12 = fermat_pot[0] - fermat_pot[2]
-            gamma = kwargs_result['kwargs_lens'][0]['gamma']
         #    phi_ext, gamma_ext = kwargs_result['kwargs_lens'][1]['gamma1'], kwargs_result['kwargs_lens'][1]['gamma2']
-            mcmc_new_list.append([gamma, D_dt, cal_h0(z_l ,z_s, D_dt)])        
-        pickle.dump([multi_band_list, kwargs_model, kwargs_result, chain_list, fix_setting, mcmc_new_list], open(folder+'model_result.pkl', 'wb'))
+            mcmc_new_list.append([D_dt, cal_h0(z_l ,z_s, D_dt)])        
+        pickle.dump([multi_band_list, kwargs_model, kwargs_result, chain_list, fix_setting, mcmc_new_list], open(folder+savename, 'wb'))
     #%%Print fitting result:
-    multi_band_list, kwargs_model, kwargs_result, chain_list, fix_setting, mcmc_new_list = pickle.load(open(folder+'model_result.pkl','rb'))
+    multi_band_list, kwargs_model, kwargs_result, chain_list, fix_setting, mcmc_new_list = pickle.load(open(folder+savename,'rb'))
     fixed_lens, fixed_source, fixed_lens_light, fixed_ps, fixed_cosmo = fix_setting
-    labels_new = [r"$\gamma$", r"$D_{\Delta t}$","H$_0$" ]    
-    modelPlot = ModelPlot(multi_band_list, kwargs_model, kwargs_result, arrow_size=0.02, cmap_string="gist_heat")
+    labels_new = [r"$D_{\Delta t}$","H$_0$" ]    
+    lens_mask = pyfits.getdata('noqso_mask.fits')
+    modelPlot = ModelPlot(multi_band_list, kwargs_model, kwargs_result, arrow_size=0.02, cmap_string="gist_heat",likelihood_mask_list=[lens_mask])
     f, axes = modelPlot.plot_main()
     f.show()
     f, axes = modelPlot.plot_separate()

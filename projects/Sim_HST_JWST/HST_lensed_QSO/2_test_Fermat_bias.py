@@ -12,11 +12,11 @@ import pickle
 potential_mismatch_list = []
 geometry_mismatch_list = []
 
-folder_type = 'sim_lens_ID_'
-file_type = 'model_result.pkl'
+    #folder_type = 'sim_lens_ID_'
+    #file_type = 'model_result.pkl'
 
-#folder_type = 'sim_lens_noqso_ID_'
-#file_type = 'model_result.pkl'
+folder_type = 'sim_lens_noqso_ID_'
+file_type = 'model_result.pkl'
 
 for seed in range(601, 622):
     #==============================================================================

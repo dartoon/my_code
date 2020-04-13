@@ -48,7 +48,7 @@ def cal_h0(zl, zs, Ddt, om=0.27):
     return 100 * ratio
 
 #low_, up_ = [[602, 605], [605, 608], [609, 612], [612, 615], [616, 619], [619, 622]][5]
-low_, up_ = [[601, 608], [608, 615], [615, 622]][2]
+low_, up_ = [[601, 607], [607, 612], [612, 617], [617, 622]][0]
 for ID in range(low_, up_):  
     folder = 'sim_lens_noqso_ID_{0}/'.format(ID)
     qso_folder = 'sim_lens_ID_{0}/'.format(ID)
@@ -76,17 +76,28 @@ for ID in range(low_, up_):
     
     if glob.glob(qso_folder+'model_result.pkl') == []:
         raise ValueError("The first time run of with QSO case is not finished")
-    else:        
+    else:   
+        files = glob.glob(folder+'model_result*.pkl')        
+        savename = 'model_result_{0}_subg3.pkl'.format(len(files)+1)
+        
+        qso_files = glob.glob(folder+'model_result*.pkl')       
+        qso_files.sort()
+        read_file = files[-1]
+        print('read_file', read_file)
         #Load the result from the first run:
-        _, _, kwargs_result, _, _, _ = pickle.load(open(qso_folder+'model_result.pkl','rb'))
-#        fixed_lens, fixed_source, fixed_lens_light, fixed_ps, fixed_cosmo = fix_setting
+        _, _, kwargs_result, _, _, _ = pickle.load(open(read_file,'rb'))
+        
         #Setting up the fitting:
         lens_data = pyfits.getdata(folder+'Drz_QSO_image.fits')
         lens_mask = cr_mask(lens_data, 'normal_mask.reg')
         framesize = 81
+        center = int(framesize/2)
+
         ct = int((len(lens_data) - framesize)/2)
         lens_data = lens_data[ct:-ct,ct:-ct]
         lens_mask = (1-lens_mask)[ct:-ct,ct:-ct]
+        lens_mask[center, center] = 0
+        
         plt.imshow(lens_data, origin='lower',cmap='gist_heat', norm=LogNorm())
         plt.colorbar()
         plt.show()
@@ -188,7 +199,7 @@ for ID in range(low_, up_):
                              'time_delay_likelihood': True,
                              'image_likelihood_mask_list': [lens_mask]
                                      }
-        kwargs_numerics = {'supersampling_factor': 2}
+        kwargs_numerics = {'supersampling_factor': 3}
         image_band = [kwargs_data, kwargs_psf, kwargs_numerics]
         multi_band_list = [image_band]
         kwargs_data_joint = {'multi_band_list': multi_band_list, 'multi_band_type': 'multi-linear',
@@ -236,12 +247,13 @@ for ID in range(low_, up_):
             gamma = kwargs_result['kwargs_lens'][0]['gamma']
         #    phi_ext, gamma_ext = kwargs_result['kwargs_lens'][1]['gamma1'], kwargs_result['kwargs_lens'][1]['gamma2']
             mcmc_new_list.append([gamma, D_dt, cal_h0(z_l ,z_s, D_dt)])        
-        pickle.dump([multi_band_list, kwargs_model, kwargs_result, chain_list, fix_setting, mcmc_new_list], open(folder+'model_result.pkl', 'wb'))
+        pickle.dump([multi_band_list, kwargs_model, kwargs_result, chain_list, fix_setting, mcmc_new_list], open(folder+savename, 'wb'))
     #%%Print fitting result:
-    multi_band_list, kwargs_model, kwargs_result, chain_list, fix_setting, mcmc_new_list = pickle.load(open(folder+'model_result.pkl','rb'))
+    multi_band_list, kwargs_model, kwargs_result, chain_list, fix_setting, mcmc_new_list = pickle.load(open(folder+savename,'rb'))
     fixed_lens, fixed_source, fixed_lens_light, fixed_ps, fixed_cosmo = fix_setting
     labels_new = [r"$\gamma$", r"$D_{\Delta t}$","H$_0$" ]    
-    modelPlot = ModelPlot(multi_band_list, kwargs_model, kwargs_result, arrow_size=0.02, cmap_string="gist_heat")
+    lens_mask = pyfits.getdata('noqso_mask.fits')
+    modelPlot = ModelPlot(multi_band_list, kwargs_model, kwargs_result, arrow_size=0.02, cmap_string="gist_heat",likelihood_mask_list=[lens_mask])
     f, axes = modelPlot.plot_main()
     f.show()
     f, axes = modelPlot.plot_separate()

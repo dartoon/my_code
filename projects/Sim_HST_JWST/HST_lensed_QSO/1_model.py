@@ -46,8 +46,13 @@ def cal_h0(zl, zs, Ddt, om=0.27):
     Ddt_corr = cal_Ddt(zl, zs, H0_ini=100)
     ratio = Ddt_corr/Ddt
     return 100 * ratio
+##601, 608, 615
+#low_, up_ = [[601, 608], [608, 615], [615, 622]][2]
 
-for ID in range(620, 622):  
+#low_, up_ = [[602, 605], [605, 608], [609, 612], [612, 615], [616, 619], [619, 622]][5]
+
+#for ID in [612, 614, 617, 619]:  
+for ID in range(611, 612):    
     folder = 'sim_lens_ID_{0}/'.format(ID)
     print(folder)
     model_lists, para_s, lens_info= pickle.load(open(folder+'sim_kwargs.pkl','rb'))
@@ -67,7 +72,7 @@ for ID in range(620, 622):
                           'solver_type': solver_type,  # 'PROFILE', 'PROFILE_SHEAR', 'ELLIPSE', 'CENTER'
                           'Ddt_sampling': True,
                                   }
-    if glob.glob(folder+'model_result_subg3.pkl') == []:    
+    if glob.glob(folder+'model_result.pkl') == []:    
         #Load the result from the first run:
 #        multi_band_list, kwargs_model, kwargs_result, chain_list, fix_setting = pickle.load(open(folder+'model_result.pkl','rb'))
 #        fixed_lens, fixed_source, fixed_lens_light, fixed_ps, fixed_cosmo = fix_setting
@@ -203,7 +208,7 @@ for ID in range(620, 622):
                              'time_delay_likelihood': True,
                              'image_likelihood_mask_list': [lens_mask]
                                      }
-        kwargs_numerics = {'supersampling_factor': 3}
+        kwargs_numerics = {'supersampling_factor': 2}
         image_band = [kwargs_data, kwargs_psf, kwargs_numerics]
         multi_band_list = [image_band]
         kwargs_data_joint = {'multi_band_list': multi_band_list, 'multi_band_type': 'multi-linear',
@@ -264,25 +269,26 @@ for ID in range(620, 622):
         #    phi_ext, gamma_ext = kwargs_result['kwargs_lens'][1]['gamma1'], kwargs_result['kwargs_lens'][1]['gamma2']
             mcmc_new_list.append([gamma, D_dt, cal_h0(z_l ,z_s, D_dt)])        
         
-        pickle.dump([multi_band_list, kwargs_model, kwargs_result, chain_list, fix_setting, mcmc_new_list], open(folder+'model_result_subg3.pkl', 'wb'))
+        pickle.dump([multi_band_list, kwargs_model, kwargs_result, chain_list, fix_setting, mcmc_new_list], open(folder+'model_result.pkl', 'wb'))
     #%%Print fitting result:
-    multi_band_list, kwargs_model, kwargs_result, chain_list, fix_setting, mcmc_new_list = pickle.load(open(folder+'model_result_subg3.pkl','rb'))
+    multi_band_list, kwargs_model, kwargs_result, chain_list, fix_setting, mcmc_new_list = pickle.load(open(folder+'model_result.pkl','rb'))
     fixed_lens, fixed_source, fixed_lens_light, fixed_ps, fixed_cosmo = fix_setting
-    labels_new = [r"$\gamma$", r"$D_{\Delta t}$","H$_0$" ]
+#    labels_new = [r"$\gamma$", r"$D_{\Delta t}$","H$_0$" ]
     modelPlot = ModelPlot(multi_band_list, kwargs_model, kwargs_result, arrow_size=0.02, cmap_string="gist_heat")
     f, axes = modelPlot.plot_main()
     f.show()
-    f, axes = modelPlot.plot_separate()
-    f.show()
-    f, axes = modelPlot.plot_subtract_from_data_all()
-    f.show()
-    
-    for i in range(len(chain_list)):
-        chain_plot.plot_chain_list(chain_list, i)
+#    f, axes = modelPlot.plot_separate()
+#    f.show()
+#    f, axes = modelPlot.plot_subtract_from_data_all()
+#    f.show()
     plt.show()
-    truths=[para_s[0][0]['gamma'],TD_distance, 70.656]	
-    plot = corner.corner(mcmc_new_list, labels=labels_new, show_titles=True, #range= [[0.8,1.5],[1,3],[0,1],[0, 1],[2000,5000],[20,100]], 
-                         quantiles=[0.16, 0.5, 0.84], truths =truths,
-                         title_kwargs={"fontsize": 15}, label_kwargs = {"fontsize": 25},
-                         levels=1.0 - np.exp(-0.5 * np.array([1.,2.]) ** 2))
-    plt.show()
+
+#    for i in range(len(chain_list)):
+#        chain_plot.plot_chain_list(chain_list, i)
+#    plt.close()
+#    truths=[para_s[0][0]['gamma'],TD_distance, 70.656]	
+#    plot = corner.corner(mcmc_new_list, labels=labels_new, show_titles=True, #range= [[0.8,1.5],[1,3],[0,1],[0, 1],[2000,5000],[20,100]], 
+#                         quantiles=[0.16, 0.5, 0.84], truths =truths,
+#                         title_kwargs={"fontsize": 15}, label_kwargs = {"fontsize": 25},
+#                         levels=1.0 - np.exp(-0.5 * np.array([1.,2.]) ** 2))
+#    plt.close()
