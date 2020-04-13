@@ -104,7 +104,8 @@ def mask_obj(img, snr=3.0, exp_sz= 1.2, pltshow = 0, npixels=20, return_deblend 
     segm_deblend_size = segm_deblend.areas
     apertures = []
     for obj in cat:
-        size = segm_deblend_size[obj.id]
+        print(len(segm_deblend_size), obj.id)
+        size = segm_deblend_size[obj.id-1]
         position = (obj.xcentroid.value, obj.ycentroid.value)
         a_o = obj.semimajor_axis_sigma.value
         b_o = obj.semiminor_axis_sigma.value

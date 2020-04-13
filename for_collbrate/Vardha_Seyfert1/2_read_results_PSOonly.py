@@ -14,6 +14,8 @@ from matplotlib.colors import LogNorm
 import copy
 
 picklename = 'result_vardha/PSO_only/l24_sersicdisk.pkl'
+picklename = 'result_vardha/l5548_sersicdisk.pkl'
+
 
 result = pickle.load(open(picklename,'rb'))
 [best_fit,pso_fit,mcmc_fit, trans_paras] = result
