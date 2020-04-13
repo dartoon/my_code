@@ -48,20 +48,20 @@ for i in range(len(position_list)):
 #plt.colorbar()
 #plt.show()    
 #%%Create the saving file folder
-import os
-PSF_folder_name = 'highres_PSF_' + filt
-if os.path.exists(PSF_folder_name)==True:
-    ifdel = input("Simulation of "+ PSF_folder_name + " exist, delete the old folder?(Y/N):\n")
-    if ifdel == 'Y':
-        import shutil 
-        shutil.rmtree(PSF_folder_name)
-    elif ifdel == 'N':
-        print("Simulation stop!")
-        from sys import exit
-        exit
-    else:
-        raise ValueError("Input is not right, stop simulation.")        
-os.mkdir(PSF_folder_name)
-for i in range(len(psf_list)):
-    pyfits.PrimaryHDU(psf_list[i][0].data,header=psf_list[i][0].header).writeto(PSF_folder_name+'/'+'PSF_id{0}.fits'.format(i))
-#    
+#import os
+#PSF_folder_name = 'highres_PSF_' + filt
+#if os.path.exists(PSF_folder_name)==True:
+#    ifdel = input("Simulation of "+ PSF_folder_name + " exist, delete the old folder?(Y/N):\n")
+#    if ifdel == 'Y':
+#        import shutil 
+#        shutil.rmtree(PSF_folder_name)
+#    elif ifdel == 'N':
+#        print("Simulation stop!")
+#        from sys import exit
+#        exit
+#    else:
+#        raise ValueError("Input is not right, stop simulation.")        
+#os.mkdir(PSF_folder_name)
+#for i in range(len(psf_list)):
+#    pyfits.PrimaryHDU(psf_list[i][0].data,header=psf_list[i][0].header).writeto(PSF_folder_name+'/'+'PSF_id{0}.fits'.format(i))
+##    

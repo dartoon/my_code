@@ -11,7 +11,7 @@ import astropy.io.fits as pyfits
 import matplotlib.pyplot as plt
 import glob
 
-ID = 5 #1, 2, 3, 4, 5
+ID = 6 #1, 2, 3, 4, 5
 #The data information of the five system
 if ID ==1:
     M1450, m_zAB, m_yAB, z, M_dyn = -23.82, 22.775, 22.942, 6.10, 82.
@@ -23,6 +23,9 @@ elif ID ==4:
     M1450, m_zAB, m_yAB, z, M_dyn = -24.73, 22.121, 22.045, 6.2, 13.
 elif ID ==5:
     M1450, m_zAB, m_yAB, z, M_dyn = -24.69, 22.402, 22.326, 6.26, 290.
+elif ID ==6:
+    M1450, m_zAB, m_yAB, z, M_dyn = -26.5, 22.402, 22.326, 6.26, 200.  #(M_dyn as 2*10^11, i.e. 200*10^9 )
+
 
 def esti_abmag(stellar , fnu_ini, stellar_ini):
     '''
@@ -42,6 +45,8 @@ filt_l = ['444','356', '200', '150']
 print('================')
 for i in range(len(filt_l)):
     filt = filt_l[i]
+    if ID >5:
+        ID = 5
     filename  = 'f{0}w/summary_{0}{1}_PA00.fits'.format(filt,ID)
     filename = glob.glob(filename)[0]
     hdul_sum = pyfits.open(filename)

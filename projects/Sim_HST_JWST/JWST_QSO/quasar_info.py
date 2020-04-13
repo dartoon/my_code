@@ -65,6 +65,17 @@ qso_info['ID5']['galaxy_F356W_mag'] = 21.056
 qso_info['ID5']['galaxy_F200W_mag'] = 22.222
 qso_info['ID5']['galaxy_F150W_mag'] = 22.312
 
+qso_info['ID6']['z'] = 6.1
+qso_info['ID6']['M_1450'] = -26.5
+qso_info['ID6']['s_mass'] = 11.301 
+qso_info['ID6']['AGN_F444W_mag'] = 19.217
+qso_info['ID6']['AGN_F356W_mag'] = 19.584
+qso_info['ID6']['AGN_F200W_mag'] = 19.734
+qso_info['ID6']['AGN_F150W_mag'] = 19.914
+qso_info['ID6']['galaxy_F444W_mag'] = 21.326
+qso_info['ID6']['galaxy_F356W_mag'] = 21.404
+qso_info['ID6']['galaxy_F200W_mag'] = 22.562
+qso_info['ID6']['galaxy_F150W_mag'] = 22.673
 
 #ID 1 Input:
 #m_zAB 22.775
@@ -171,3 +182,25 @@ qso_info['ID5']['galaxy_F150W_mag'] = 22.312
 #galaxy F356W mag: 21.056
 #galaxy F200W mag: 22.222
 #galaxy F150W mag: 22.312
+
+
+#ID 6 Input:
+#m_zAB 22.402
+#m_yAB 22.326
+#M_1450 -26.5
+#================
+#Estimate AGN total mag
+#z_mag 19.389
+#y_mag 20.124
+#AGN F444W mag 19.217
+#AGN F356W mag 19.584
+#AGN F200W mag 19.734
+#AGN F150W mag 19.914
+#================
+#age: 0.23 mel -0.687 sample redshift 6.1 
+#intput stellar mass: 11.301 
+#Estimates:
+#galaxy F444W mag: 21.326
+#galaxy F356W mag: 21.404
+#galaxy F200W mag: 22.562
+#galaxy F150W mag: 22.673
