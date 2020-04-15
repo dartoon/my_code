@@ -1,7 +1,7 @@
 drizzle.outnx=175
 drizzle.outny=175
-drizzle.pixfrac=1.05
-drizzle.scale=0.96463022508
+drizzle.pixfrac=1.0
+drizzle.scale=0.932475884
 drizzle.kernel="gaussian"
 drizzle rmsSQ-1.fits drzrmsSQ.fits outweig = "drzrmsSQw.fits" xsh=-0.625 ysh=-0.625
 drizzle rmsSQ-2.fits drzrmsSQ.fits outweig = "drzrmsSQw.fits" xsh=-0.625 ysh=-0.125

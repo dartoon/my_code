@@ -28,12 +28,14 @@ import pickle
 singel_exp = 625.0
 deep_seed = True  #Set as True to put more seed and steps to fit.
 pltshow = 1 #Note that setting plt.ion() in line27, the plot won't show anymore if running in terminal.
-fixcenter = False
+fixcenter = True
 run_MCMC = False
-use_true_PSF = 'same_drizzle' #False
+use_true_PSF = True #'same_drizzle' #False
 save_SNR = False
-ID = 5 
-for seed in range(0, 30):
+ID = 3
+zp_dic = {'F444W':27.3012, 'F356W':27.1841, 'F200W':27.0383, 'F150W':26.8627} #Using mirage
+
+for seed in range(101, 102):
     for filt_i in [0, 1, 2, 3]:
         filt  = ['F444W', 'F356W', 'F200W', 'F150W'][filt_i]
         folder = 'sim'+'_ID'+repr(ID)+'_'+filt+'_seed'+repr(seed)
@@ -46,7 +48,7 @@ for seed in range(0, 30):
             psf = pyfits.getdata('webPSF/drizzle_PSF_{0}/Drz_PSF_id{1}.fits'.format(filt, psf_id))
         elif use_true_PSF == False:
             psf_id = 0
-            save_name = 'fit_result'
+            save_name = 'fit_result_diffPSF'
             psf = pyfits.getdata('webPSF/drizzle_PSF_{0}/Drz_PSF_id{1}.fits'.format(filt, psf_id))
         elif use_true_PSF == 'same_drizzle':
             psf = pyfits.getdata(folder+'/Drz_POINTclean_image.fits')
@@ -58,14 +60,16 @@ for seed in range(0, 30):
             #Setting the fitting condition:
             print("Fitting "+folder)
             pix_org_scale = [0.063, 0.063, 0.0311, 0.0311][filt_i] #After dirzzled
-            pix_scale = [0.04, 0.04, 0.02, 0.02][filt_i] #After dirzzled
-            zp= [28.0, 27.9, 26.7, 27.75][filt_i]
+            pix_scale = [0.04, 0.04, 0.029, 0.029][filt_i] #After dirzzled
+            zp= zp_dic[filt]
             QSO_img_org = pyfits.getdata(folder+'/Drz_QSO_image.fits')
+            rms_org = pyfits.getdata(folder+'/noise_map.fits')
             for framesize in range(61, 111, 10):
                 half_r = int(framesize/2)
                 peak = np.where(QSO_img_org==QSO_img_org.max())
                 peak = [peak[0][0], peak[1][0]]
                 QSO_img = QSO_img_org[peak[0]-half_r:peak[0]+half_r+1,peak[1]-half_r:peak[1]+half_r+1]
+                QSO_std = rms_org[peak[0]-half_r:peak[0]+half_r+1,peak[1]-half_r:peak[1]+half_r+1]
                 edges_value = np.concatenate((QSO_img[0,:], QSO_img[-1,:], QSO_img[0,:], QSO_img[-1,:]))
 #                print(np.median(edges_value), np.std(edges_value))
                 if np.median(edges_value)*1.5-np.std(edges_value)<0:
@@ -80,11 +84,10 @@ for seed in range(0, 30):
             psf_peak = np.where(psf==psf.max())
             psf_peak = [psf_peak[0][0], psf_peak[1][0]]
             psf = psf[psf_peak[0]-psf_half_r:psf_peak[0]+psf_half_r+1,psf_peak[1]-psf_half_r:psf_peak[1]+psf_half_r+1]
-            exptime =singel_exp * 8
-            #stdd =  0.0088  #Measurement from empty retion: can also be estimated by: stdd/np.sqrt(8.)*0.04**2/0.063**2
-            stdd = [1.6, 1.06, 0.77, 0.75][filt_i] /np.sqrt(singel_exp)   #An empirical formula from ETC
-            stdd =  stdd/np.sqrt(8.)*pix_scale**2/pix_org_scale**2  #Measurement from empty retion: can also be estimated by: stdd/np.sqrt(8.)*0.04**2/0.063**2
-            QSO_std = (abs(QSO_img/exptime)+stdd**2)**0.5
+#            exptime =singel_exp * 8
+#            stdd = [1.6, 1.06, 0.77, 0.75][filt_i] /np.sqrt(singel_exp)   #An empirical formula from ETC
+#            stdd =  stdd/np.sqrt(8.)*pix_scale**2/pix_org_scale**2  #Measurement from empty retion: can also be estimated by: stdd/np.sqrt(8.)*0.04**2/0.063**2
+#            QSO_std = (abs(QSO_img/exptime)+stdd**2)**0.5
             #==============================================================================
             # input the objects components and parameteres
             #==============================================================================
