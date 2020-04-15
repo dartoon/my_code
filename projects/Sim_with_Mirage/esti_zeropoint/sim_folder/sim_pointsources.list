@@ -1,0 +1,4 @@
+# Field center (degrees):   53.10000000   -27.80000000 y axis rotation angle (degrees): 12.500000  image size: 2048 2048
+#
+#    Index   RA_(hh:mm:ss)   DEC_(dd:mm:ss)   RA_degrees      DEC_degrees     pixel_x   pixel_y    magnitude   counts/sec    counts/frame    TSO_lightcurve_catalog
+1 03:32:24.0000 -27:48:00.0000    53.10000000   -27.80000000  1023.542  1023.511     20.000   6.434635e+02    6.908719e+03  None

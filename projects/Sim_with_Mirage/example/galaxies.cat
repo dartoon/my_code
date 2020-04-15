@@ -1,0 +1,9 @@
+#
+#
+#
+# abmag
+#
+# Magnitudes are converted from input flux densities.
+x_or_RA         y_or_Dec     radius    ellipticity    pos_angle       sersic_index      niriss_f200w_magnitude
+53.05           -27.83        0.17        0.46         104.35              3.3                 18.06
+53.10           -27.83        0.73        0.01         195.50              2.7                 16.86     
