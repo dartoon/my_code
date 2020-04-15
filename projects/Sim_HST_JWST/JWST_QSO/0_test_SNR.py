@@ -31,7 +31,8 @@ ID = 1
 for filt_i in range(4): #int(input("which filter 0: 'F444W', 1: 'F356W', 2: 'F200W', 3: 'F150W':\n"))
     filt  = ['F444W', 'F356W', 'F200W', 'F150W'][filt_i]
     numPix = [341, 341, 645, 645][filt_i]  # total frame pixel size #!!!Need to be changed for different filter
-    zp = [28., 27.9, 26.7, 27.75][filt_i]   #Using ETC, (616-556) total flux for 23.5 ab mag objects.  #Need to check
+#    zp = [28., 27.9, 26.7, 27.75][filt_i]   #Using ETC, (616-556) total flux for 23.5 ab mag objects.  #Need to check
+    zp = [27.3012, 27.1841, 27.0383, 26.8627][filt_i]   #Using mirage
     pix_scale = [0.063, 0.063, 0.031, 0.031][filt_i] #After dirzzled
     #properties:
     z_s = qso_info['ID'+repr(ID)]['z']       #AGN redshift
@@ -146,7 +147,10 @@ for filt_i in range(4): #int(input("which filter 0: 'F444W', 1: 'F356W', 2: 'F20
     peak = np.where(Total_SNR==Total_SNR.max())
     peak = [peak[0][0], peak[1][0]]
     Total_SNR = Total_SNR[peak[0]-half_r:peak[0]+half_r+1,peak[1]-half_r:peak[1]+half_r+1]
-    print("Pring {0} SNR map:".format(filt), "Total SNR:", Total_SNR.sum())
+    point_image = point_image_bin[0][peak[0]-half_r:peak[0]+half_r+1,peak[1]-half_r:peak[1]+half_r+1]
+    noise = noise[peak[0]-half_r:peak[0]+half_r+1,peak[1]-half_r:peak[1]+half_r+1]
+    print("Pring {0} SNR map:".format(filt))#, "Total SNR:", Total_SNR.sum())
+    print("Total SNR:", np.sum(point_image) / np.mean(noise))
     plt.imshow(Total_SNR, origin='lower')#,cmap='gist_heat', norm=LogNorm())
     plt.colorbar()
     plt.show()

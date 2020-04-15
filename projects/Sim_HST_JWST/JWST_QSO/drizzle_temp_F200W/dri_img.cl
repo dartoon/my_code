@@ -1,7 +1,7 @@
-drizzle.outnx=249
-drizzle.outny=249
-drizzle.pixfrac=0.7
-drizzle.scale=0.6430868167
+drizzle.outnx=175
+drizzle.outny=175
+drizzle.pixfrac=1.05
+drizzle.scale=0.96463022508
 drizzle.kernel="gaussian"
 drizzle non_drizzled-image-1.fits drimage.fits outweig = "drimagew.fits" xsh=-0.625 ysh=-0.625
 drizzle non_drizzled-image-2.fits drimage.fits outweig = "drimagew.fits" xsh=-0.625 ysh=-0.125

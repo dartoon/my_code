@@ -28,12 +28,16 @@ import os
 import rebin #From my share_tools    
 oversample = 4
 #seed = 0
-for seed in range(1,30):
+zp_dic = {'F444W':27.3012, 'F356W':27.1841, 'F200W':27.0383, 'F150W':26.8627} #Using mirage
+for seed in range(101,102):
     for ID in range(1,6): #int(input("input simulation ID:\n"))  #The ID for this simulation
-        for filt_i in range(4): #int(input("which filter 0: 'F444W', 1: 'F356W', 2: 'F200W', 3: 'F150W':\n"))
+        host_flux_rescale = False
+        count = 0 
+        for filt_i in [3,2,1,0]: #int(input("which filter 0: 'F444W', 1: 'F356W', 2: 'F200W', 3: 'F150W':\n"))
             filt  = ['F444W', 'F356W', 'F200W', 'F150W'][filt_i]
             numPix = [341, 341, 645, 645][filt_i]  # total frame pixel size #!!!Need to be changed for different filter
-            zp = [28., 27.9, 26.7, 27.75][filt_i]   #Using ETC, (616-556) total flux for 23.5 ab mag objects.  #Need to check
+#            zp = [28., 27.9, 26.7, 27.75][filt_i]   #Using ETC, (616-556) total flux for 23.5 ab mag objects.  #Need to check
+            zp = zp_dic[filt]   #Using mirage
             #properties:
             z_s = qso_info['ID'+repr(ID)]['z']       #AGN redshift
             point_mag = qso_info['ID'+repr(ID)]['AGN_{0}_mag'.format(filt)]
@@ -46,14 +50,27 @@ for seed in range(1,30):
             point_flux = 10**(0.4*(zp - point_mag))
             total_flux =  point_flux + host_flux
             host_ratio = host_flux/total_flux
-            if host_ratio< 0.1:
-                host_ratio =np.random.uniform(0.1,0.2)
-                total_flux = point_flux/(1-host_ratio)
-                host_flux = total_flux - point_flux
-            elif host_ratio > 0.95:
-                host_ratio =np.random.uniform(0.8,0.95)
-                total_flux = point_flux/(1-host_ratio)
-                host_flux = total_flux - point_flux
+            if count == 0:
+                if host_ratio< 0.1:
+                    host_ratio =np.random.uniform(0.1,0.2)
+                    total_flux = point_flux/(1-host_ratio)
+                    host_flux = total_flux - point_flux
+                    host_flux_rescale = True
+                elif host_ratio > 0.95:
+                    host_ratio =np.random.uniform(0.8,0.95)
+                    total_flux = point_flux/(1-host_ratio)
+                    host_flux = total_flux - point_flux
+                    host_flux_rescale = True
+                host_flux_F150W = host_flux   
+                ref_filt = filt
+            if host_flux_rescale == True:
+                temp_flux_F150w = 10**(0.4*(zp_dic[ref_filt] - qso_info['ID'+repr(ID)]['galaxy_{0}_mag'.format(ref_filt)]))
+                temp_flux = 10**(0.4*(zp - qso_info['ID'+repr(ID)]['galaxy_{0}_mag'.format(filt)]))
+                ratio = temp_flux/temp_flux_F150w
+                host_flux = host_flux_F150W * ratio
+                total_flux =  point_flux + host_flux
+                host_ratio = host_flux/total_flux                
+            count = count+1    
             cosmo = FlatLambdaCDM(H0=70, Om0=0.3)
             scale_relation = cosmo.angular_diameter_distance(z_s).value * 10**3 * (1/3600./180.*np.pi)  #Kpc/arc
             #Take the PSF: Use PSF 1 - 8 to simulate, but use PSF0 to model the data
@@ -62,6 +79,7 @@ for seed in range(1,30):
             psf = pyfits.open(psf_take_name)
             #Build up the simulation:
             pix_s = psf[0].header['PIXELSCL'] #* oversample
+            print("Pixel scale for", filt, pix_s)
             host_Reff = host_Reff_kpc/scale_relation   #In arcsec
             sim_folder_name = 'sim'+'_ID'+repr(ID)+'_'+filt+'_seed'+repr(seed)
             print("Simulate: "+sim_folder_name+" host ratio:", host_ratio)
@@ -84,7 +102,7 @@ for seed in range(1,30):
             kwargs_data_high_res = sim_util.data_configure_simple(numPix, pix_s)
             data_class = ImageData(**kwargs_data_high_res)
             psf_class = PSF(**kwargs_psf_high_res)
-            center_x, center_y = np.random.uniform(-5,5) * pix_s*oversample, np.random.uniform(-5,5)* pix_s*oversample
+            center_x, center_y = np.random.uniform(-1.5, 1.5) * pix_s*oversample, np.random.uniform(-1.5,1.5)* pix_s*oversample
             point_amp = point_flux
             point_source_list = ['UNLENSED']
             pointSource = PointSource(point_source_type_list=point_source_list)
@@ -175,7 +193,8 @@ for seed in range(1,30):
                 noiz[i]=np.random.normal(0, bkg_noise, size=rms[i].shape)
                 image_data_noise[i]=noiz[i]+np.random.poisson(lam=bf_noz[i]*exptim)/(exptim)  #Non-drizzled imaged
                 pyfits.PrimaryHDU(image_data_noise[i]).writeto(sim_folder_name+'/non_drizzled-image-{0}.fits'.format(i+1),overwrite=False)
-            
+                pyfits.PrimaryHDU(rms[i]).writeto(sim_folder_name + '/non_drizzled-noise_map-{0}.fits'.format(i+1),overwrite=False)
+                pyfits.PrimaryHDU(rms[i]**2).writeto(sim_folder_name+'/rmsSQ-{0}.fits'.format(i+1),overwrite=False)
             filename_ascii = sim_folder_name+'/sim_info.txt'
             data_info =  open(filename_ascii,'w') 
             data_info.write("Filter:\t{0}\n".format(filt))

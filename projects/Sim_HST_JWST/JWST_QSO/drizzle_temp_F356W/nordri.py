@@ -29,3 +29,9 @@ filename='drPOINTclean.fits'
 POINT = pyfits.open(filename)[0].data.copy()
 POINT /=nimage
 pyfits.PrimaryHDU(POINT).writeto('Drz_POINTclean_image.fits')#,overwrite=True)
+
+filename='drzrmsSQ.fits'
+var = pyfits.open(filename)[0].data.copy()
+rms = var **0.5
+rms /=nimage
+pyfits.PrimaryHDU(rms).writeto('noise_map.fits')#,overwrite=True)

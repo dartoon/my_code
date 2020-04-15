@@ -4,6 +4,7 @@ qso_info['ID2']= {}
 qso_info['ID3']= {}
 qso_info['ID4']= {}
 qso_info['ID5']= {}
+qso_info['ID6']= {}
 
 qso_info['ID1']['z'] = 6.1 
 qso_info['ID1']['M_1450'] = -23.82

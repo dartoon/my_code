@@ -19,3 +19,6 @@ for i in range(num):
 	hdu=pyfits.open('non_drizzled-POINTclean-{0}.fits'.format(i+1),mode = 'update')
 	hdu[0].header["EXPTIME"]=1
 	hdu.flush()	
+	hdu=pyfits.open('rmsSQ-{0}.fits'.format(i+1),mode = 'update')
+	hdu[0].header["EXPTIME"]=1
+	hdu.flush()	

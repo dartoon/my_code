@@ -16,6 +16,7 @@ echo "cl<dri_img.cl; logout" | cl
 echo "cl<dri_AGNclean.cl; logout" | cl
 echo "cl<dri_HOSTclean.cl; logout" | cl
 echo "cl<dri_POINTclean.cl; logout" | cl
+echo "cl<dri_rmsSQ.cl; logout" | cl
 python nordri.py
 rm -r uparm
 rm *.cl *.py
