@@ -30,9 +30,9 @@ deep_seed = True  #Set as True to put more seed and steps to fit.
 pltshow = 1 #Note that setting plt.ion() in line27, the plot won't show anymore if running in terminal.
 fixcenter = True
 run_MCMC = False
-use_true_PSF = True #'same_drizzle' #False
+use_true_PSF = False #'same_drizzle' #False
 save_SNR = False
-ID = 3
+ID = 6
 zp_dic = {'F444W':27.3012, 'F356W':27.1841, 'F200W':27.0383, 'F150W':26.8627} #Using mirage
 
 for seed in range(101, 102):
@@ -79,7 +79,7 @@ for seed in range(101, 102):
             plt.imshow(QSO_img, origin='lower', cmap='gist_heat', norm=LogNorm())
             plt.colorbar()
             plt.show()                
-            psf_framesize = [111, 111,75, 75][filt_i]
+            psf_framesize = len(QSO_img) #[111, 111, 75, 75][filt_i]
             psf_half_r = int(psf_framesize/2)
             psf_peak = np.where(psf==psf.max())
             psf_peak = [psf_peak[0][0], psf_peak[1][0]]

@@ -29,7 +29,7 @@ import rebin #From my share_tools
 oversample = 4
 #seed = 0
 zp_dic = {'F444W':27.3012, 'F356W':27.1841, 'F200W':27.0383, 'F150W':26.8627} #Using mirage
-for seed in range(101,102):
+for seed in range(101,121):
     for ID in range(1,7): #int(input("input simulation ID:\n"))  #The ID for this simulation
         host_flux_rescale = False
         count = 0 
@@ -102,7 +102,7 @@ for seed in range(101,102):
             kwargs_data_high_res = sim_util.data_configure_simple(numPix, pix_s)
             data_class = ImageData(**kwargs_data_high_res)
             psf_class = PSF(**kwargs_psf_high_res)
-            center_x, center_y = np.random.uniform(-1.5, 1.5) * pix_s*oversample, np.random.uniform(-1.5,1.5)* pix_s*oversample
+            center_x, center_y = np.random.uniform(-0.2, 0.2) * pix_s*oversample, np.random.uniform(-0.2,0.2)* pix_s*oversample
             point_amp = point_flux
             point_source_list = ['UNLENSED']
             pointSource = PointSource(point_source_type_list=point_source_list)

@@ -39,12 +39,12 @@ zp_dic = {'F444W':27.3012, 'F356W':27.1841, 'F200W':27.0383, 'F150W':26.8627} #U
 if use_true_PSF == True:
     save_name = 'fit_result_truePSF'
 elif use_true_PSF == False:
-    save_name = 'fit_result'
+    save_name = 'fit_result_diffPSF'
 elif use_true_PSF == 'same_drizzle':
     save_name = 'fit_result_samedrizzle'
    
 #%%Mag bias
-for ID in range(1, 3):
+for ID in range(1,7):
     fig, ax = plt.subplots(figsize=(11,8))
     for filt_i in range(4):    
         filt  = ['F150W', 'F200W', 'F356W','F444W'][filt_i]
