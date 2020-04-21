@@ -235,7 +235,7 @@ class gene_BHBH:
         self.m_type = m_type
         self.rho0 = rho0
         self.scenario = scenario
-        filename = '../data/{0}rates.dat'.format(self.m_type)
+        filename = '../../data/{0}rates.dat'.format(self.m_type)
         f=open(filename)
         bhbh = np.loadtxt(f)
         self.bhbh=bhbh[bhbh[:,0].argsort()]
