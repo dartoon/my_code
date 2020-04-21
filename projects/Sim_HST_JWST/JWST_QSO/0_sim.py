@@ -36,6 +36,7 @@ for seed in range(101,121):
         for filt_i in [3,2,1,0]: #int(input("which filter 0: 'F444W', 1: 'F356W', 2: 'F200W', 3: 'F150W':\n"))
             filt  = ['F444W', 'F356W', 'F200W', 'F150W'][filt_i]
             numPix = [341, 341, 645, 645][filt_i]  # total frame pixel size #!!!Need to be changed for different filter
+            np.random.seed(seed = seed)
 #            zp = [28., 27.9, 26.7, 27.75][filt_i]   #Using ETC, (616-556) total flux for 23.5 ab mag objects.  #Need to check
             zp = zp_dic[filt]   #Using mirage
             #properties:
@@ -44,7 +45,6 @@ for seed in range(101,121):
             host_mag = qso_info['ID'+repr(ID)]['galaxy_{0}_mag'.format(filt)]
             host_n = np.random.uniform(2,4)   #Host effective radius, unit: Kpc
             host_Reff_kpc = np.random.uniform(2,3)   #Host effective radius, unit: Kpc
-            np.random.seed(seed = seed)
             #host_ratio = np.random.uniform(0.4, 0.7) #Set the random host flux ratio [40% - 70%].
             host_flux = 10**(0.4*(zp - host_mag))
             point_flux = 10**(0.4*(zp - point_mag))
