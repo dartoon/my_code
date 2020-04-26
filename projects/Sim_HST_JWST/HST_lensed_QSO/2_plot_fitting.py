@@ -40,9 +40,9 @@ folder_type = 'sim_lens_noqso_ID_'
 idx = -2
      
 #ID = 604
-#ID = 605
+ID = 605
 #ID = 607
-ID = 612
+#ID = 612
 
 for ID in range(ID, ID+1):    
     folder = folder_type + '{0}/'.format(ID)

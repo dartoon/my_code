@@ -47,7 +47,7 @@ kwargs_numerics = {'supersampling_factor': 3, 'supersampling_convolution': False
 import sys
 sys.path.insert(0,'../share_tools/')
 from gene_para import gene_para
-for seed in range(622, 623):
+for seed in range(701, 721):
     print(seed)
     para=gene_para(seed=seed,fixh0=102)
     
@@ -252,6 +252,8 @@ for seed in range(622, 623):
         noiz[i]=np.random.normal(0, bkg_noise, size=rms[i].shape)
         image_data_noz[i]=noiz[i]+np.random.poisson(lam=bf_noz[i]*2*explong)/(2*explong)
         pyfits.PrimaryHDU(image_data_noz[i]).writeto(sim_folder_name+'/non_drizzled-image-{0}.fits'.format(i+1),overwrite=False)
+#        pyfits.PrimaryHDU(rms[i]).writeto(sim_folder_name + '/non_drizzled-noise_map-{0}.fits'.format(i+1),overwrite=False)
+        pyfits.PrimaryHDU(rms[i]**2).writeto(sim_folder_name+'/rmsSQ-{0}.fits'.format(i+1),overwrite=False)        
     plt.matshow(np.log10(image_data_noz[0]),origin='lower')
     plt.colorbar()
     plt.show()

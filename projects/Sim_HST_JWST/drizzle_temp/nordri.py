@@ -12,3 +12,9 @@ filename='dripsf.fits'
 psf = pyfits.open(filename)[0].data.copy()
 psf /= np.sum(psf)  
 pyfits.PrimaryHDU(psf).writeto('Drz_PSF.fits')#,overwrite=True)
+
+filename='drzrmsSQ.fits'
+var = pyfits.open(filename)[0].data.copy()
+rms = var **0.5
+rms /=nimage
+pyfits.PrimaryHDU(rms).writeto('noise_map.fits')#,overwrite=True)

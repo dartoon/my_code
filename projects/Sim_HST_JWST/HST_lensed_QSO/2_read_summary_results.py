@@ -101,28 +101,27 @@ for ID in range(id_range[0], id_range[1]):
         plt.tick_params(labelsize=20)
 plt.show()
 
-##%%test H0 Bias as function of other parameter's bias
-##para = 'theta_E'  #'gamma'
-##para = 'gamma'
-#which = ['kwargs_lens', 'gamma']
-##which = ['kwargs_source', 'center_y']
-#fig, ax = plt.subplots(figsize=(11,8))
-#for ID in range(id_range[0], id_range[1]):
-#    key = folder_type + '{0}'.format(ID)
-#    H0 = result_dic[key][-2]
-#    gamma_bias = result_dic[key][1][which[0]][0][which[1]] - result_dic[key][0][which[0]][0][which[1]]
-#    plt.scatter(gamma_bias, H0[1] - H0_true,
-#                c='darkred',s=280,marker=".",zorder=0, vmin=1.2, vmax=1.8, edgecolors='white',alpha=0.7)
-#    plt.errorbar(gamma_bias, H0[1] - H0_true,
-#                 yerr = [[H0[2]-H0[1]], [H0[1]-H0[0]]],
-#                ecolor='black', fmt='o', zorder=-500,markersize=1)      
-##    ax.set_xticks(range(id_range[0]-1, id_range[1]+1,3)) 
-#    plt.xlabel(which[1]+" bias (inferred - truth)", fontsize=27)
-#    plt.ylabel("$H_0$ bias (inferred - truth)", fontsize=27)
-#    plt.ylim(-20,20)
-#    plt.tick_params(labelsize=20)
-#plt.show()
-
+#%%test H0 Bias as function of other parameter's bias
+#para = 'theta_E'  #'gamma'
+#para = 'gamma'
+which = ['kwargs_lens', 'gamma']
+#which = ['kwargs_source', 'center_y']
+fig, ax = plt.subplots(figsize=(11,8))
+for ID in range(id_range[0], id_range[1]):
+    key = folder_type + '{0}'.format(ID)
+    H0 = result_dic[key][-2]
+    gamma_bias = result_dic[key][1][which[0]][0][which[1]] - result_dic[key][0][which[0]][0][which[1]]
+    plt.scatter(gamma_bias, H0[1] - H0_true,
+                c='darkred',s=280,marker=".",zorder=0, vmin=1.2, vmax=1.8, edgecolors='white',alpha=0.7)
+    plt.errorbar(gamma_bias, H0[1] - H0_true,
+                 yerr = [[H0[2]-H0[1]], [H0[1]-H0[0]]],
+                ecolor='black', fmt='o', zorder=-500,markersize=1)      
+#    ax.set_xticks(range(id_range[0]-1, id_range[1]+1,3)) 
+    plt.xlabel(which[1]+" bias (inferred - truth)", fontsize=27)
+    plt.ylabel("$H_0$ bias (inferred - truth)", fontsize=27)
+    plt.ylim(-20,20)
+    plt.tick_params(labelsize=20)
+plt.show()
 
 
 #%%test parameter bias:

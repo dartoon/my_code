@@ -8,3 +8,7 @@ for i in range(8):
 	psf=pyfits.open('non_drizzled_psf-{0}.fits'.format(i+1),mode = 'update')
 	psf[0].header["EXPTIME"]=1
 	psf.flush()
+	hdu=pyfits.open('rmsSQ-{0}.fits'.format(i+1),mode = 'update')
+	hdu[0].header["EXPTIME"]=1
+	hdu.flush()	
+	
