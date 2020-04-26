@@ -9,6 +9,7 @@ cd sim_lens_noqso_ID_${id}
 python header.py
 echo "cl<dri_img.cl; logout" | cl
 echo "cl<dri_psf.cl; logout" | cl
+echo "cl<dri_rmsSQ.cl; logout" | cl
 python nordri.py
 rm -r uparm
 rm *.cl *.py
