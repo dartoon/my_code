@@ -25,21 +25,25 @@ import pickle
 #import copy
 #import time
 
-singel_exp = 625.0
+#singel_exp = 625.0
 deep_seed = True  #Set as True to put more seed and steps to fit.
 pltshow = 1 #Note that setting plt.ion() in line27, the plot won't show anymore if running in terminal.
 fixcenter = True
 run_MCMC = False
 use_true_PSF = False #'same_drizzle' #False
-save_SNR = False
+save_SNR = True
 zp_dic = {'F444W':27.3012, 'F356W':27.1841, 'F200W':27.0383, 'F150W':26.8627} #Using mirage
 
-seed_l, seed_h = [[101, 105], [105,109], [109,113], [113,117], [117,121]][4]
+#folder_suf = 'sim_seed201_2500s/'
+folder_suf = 'sim_seed201_5000s/'
+
+seed_l, seed_h = [[201, 208], [208,215], [215, 221]][0]
+
 for seed in range(seed_l, seed_h):
     for ID in range(1, 7):
         for filt_i in [0, 1, 2, 3]:
             filt  = ['F444W', 'F356W', 'F200W', 'F150W'][filt_i]
-            folder = 'sim'+'_ID'+repr(ID)+'_'+filt+'_seed'+repr(seed)
+            folder = folder_suf + 'sim'+'_ID'+repr(ID)+'_'+filt+'_seed'+repr(seed)
             if use_true_PSF == True:
                 f = open(folder+"/sim_info.txt","r")
                 string = f.read()
@@ -49,12 +53,12 @@ for seed in range(seed_l, seed_h):
                 psf = pyfits.getdata('webPSF/drizzle_PSF_{0}/Drz_PSF_id{1}.fits'.format(filt, psf_id))
             elif use_true_PSF == False:
                 psf_id = 0
-                save_name = 'fit_result_diffPSF_biggerframecalrms'
+                save_name = 'fit_result_diffPSF'
                 psf = pyfits.getdata('webPSF/drizzle_PSF_{0}/Drz_PSF_id{1}.fits'.format(filt, psf_id))
             elif use_true_PSF == 'same_drizzle':
                 psf = pyfits.getdata(folder+'/Drz_POINTclean_image.fits')
                 psf = psf/psf.sum()
-                save_name = 'fit_result_samedrizzle_biggerframecalrms'
+                save_name = 'fit_result_samedrz'
             print("Fitting "+folder)                
             if glob.glob(folder+'/{0}.pkl'.format(save_name)) !=[]:
                 continue
@@ -64,7 +68,7 @@ for seed in range(seed_l, seed_h):
                 pix_scale = [0.04, 0.04, 0.029, 0.029][filt_i] #After dirzzled
                 zp= zp_dic[filt]
                 framesize_list = []
-                for check_seed in range(101, 121):
+                for check_seed in range(201, 221):
                     QSO_img_org_i = pyfits.getdata(folder[:-3]+repr(check_seed)+'/Drz_QSO_image.fits')
                     for framesize in range(61, len(QSO_img_org_i), 10):
                         half_r = int(framesize/2)
@@ -83,7 +87,7 @@ for seed in range(seed_l, seed_h):
                 peak = np.where(QSO_img_org==QSO_img_org.max())
                 peak = [peak[0][0], peak[1][0]]                
                 QSO_img = QSO_img_org[peak[0]-half_r:peak[0]+half_r+1,peak[1]-half_r:peak[1]+half_r+1]                
-#                QSO_std = rms_org[peak[0]-half_r:peak[0]+half_r+1,peak[1]-half_r:peak[1]+half_r+1]
+                QSO_std = rms_org[peak[0]-half_r:peak[0]+half_r+1,peak[1]-half_r:peak[1]+half_r+1]
                 plt.imshow(QSO_img, origin='lower', cmap='gist_heat', norm=LogNorm())
                 plt.colorbar()
                 plt.show()   
@@ -93,10 +97,10 @@ for seed in range(seed_l, seed_h):
                     psf_peak = np.where(psf==psf.max())
                     psf_peak = [psf_peak[0][0], psf_peak[1][0]]
                     psf = psf[psf_peak[0]-psf_half_r:psf_peak[0]+psf_half_r+1,psf_peak[1]-psf_half_r:psf_peak[1]+psf_half_r+1]
-                exptime =singel_exp * 8
-                stdd = [1.6, 1.06, 0.77, 0.75][filt_i] /np.sqrt(singel_exp)   #An empirical formula from ETC
-                stdd =  stdd/np.sqrt(8.)*pix_scale**2/pix_org_scale**2  #Measurement from empty retion: can also be estimated by: stdd/np.sqrt(8.)*0.04**2/0.063**2
-                QSO_std = (abs(QSO_img/exptime)+stdd**2)**0.5
+#                exptime =singel_exp * 8
+#                stdd = [1.6, 1.06, 0.77, 0.75][filt_i] /np.sqrt(singel_exp)   #An empirical formula from ETC
+#                stdd =  stdd/np.sqrt(8.)*pix_scale**2/pix_org_scale**2  #Measurement from empty retion: can also be estimated by: stdd/np.sqrt(8.)*0.04**2/0.063**2
+#                QSO_std = (abs(QSO_img/exptime)+stdd**2)**0.5
                 #==============================================================================
                 # input the objects components and parameteres
                 #==============================================================================
@@ -153,27 +157,27 @@ for seed in range(seed_l, seed_h):
             #    print("AGN flux :",  result['QSO_amp'])
     #            #%%Print SNR map:
     #        #    print("Host galaxy SNR map:")
-    #            if save_SNR == True:
-    #                host_clean = pyfits.getdata(folder+'/Drz_HOSTclean_image.fits')
-    #                host_clean = host_clean[peak[0]-half_r:peak[0]+half_r+1,peak[1]-half_r:peak[1]+half_r+1]
-    #                host_SNR = host_clean/QSO_std
-    #                plt.imshow(host_SNR, origin='lower')#,cmap='gist_heat', norm=LogNorm())
-    #                plt.colorbar()
-    #                plt.savefig(folder+'/SNR_host.pdf')
-    #                plt.close()
-    #            #    print("Point source SNR map:")
-    #                point_clean = pyfits.getdata(folder+'/Drz_POINTclean_image.fits')
-    #                point_clean = point_clean[peak[0]-half_r:peak[0]+half_r+1,peak[1]-half_r:peak[1]+half_r+1]
-    #                point_SNR = point_clean/QSO_std
-    #                plt.imshow(point_SNR, origin='lower')#,cmap='gist_heat', norm=LogNorm())
-    #                plt.colorbar()
-    #                plt.savefig(folder+'/SNR_point.pdf')
-    #                plt.close()
-    #            #    print("AGN (total) SNR map:")
-    #                AGN_clean = pyfits.getdata(folder+'/Drz_AGNclean_image.fits')
-    #                AGN_clean = AGN_clean[peak[0]-half_r:peak[0]+half_r+1,peak[1]-half_r:peak[1]+half_r+1]
-    #                Total_SNR = AGN_clean/QSO_std
-    #                plt.imshow(Total_SNR, origin='lower')#,cmap='gist_heat', norm=LogNorm())
-    #                plt.colorbar()
-    #                plt.savefig(folder+'/SNR_Total.pdf')
-    #                plt.close()
+                if save_SNR == True:
+                    host_clean = pyfits.getdata(folder+'/Drz_HOSTclean_image.fits')
+                    host_clean = host_clean[peak[0]-half_r:peak[0]+half_r+1,peak[1]-half_r:peak[1]+half_r+1]
+                    host_SNR = host_clean/QSO_std
+                    plt.imshow(host_SNR, origin='lower')#,cmap='gist_heat', norm=LogNorm())
+                    plt.colorbar()
+                    plt.savefig(folder+'/SNR_host.pdf')
+                    plt.close()
+                #    print("Point source SNR map:")
+                    point_clean = pyfits.getdata(folder+'/Drz_POINTclean_image.fits')
+                    point_clean = point_clean[peak[0]-half_r:peak[0]+half_r+1,peak[1]-half_r:peak[1]+half_r+1]
+                    point_SNR = point_clean/QSO_std
+                    plt.imshow(point_SNR, origin='lower')#,cmap='gist_heat', norm=LogNorm())
+                    plt.colorbar()
+                    plt.savefig(folder+'/SNR_point.pdf')
+                    plt.close()
+                #    print("AGN (total) SNR map:")
+                    AGN_clean = pyfits.getdata(folder+'/Drz_AGNclean_image.fits')
+                    AGN_clean = AGN_clean[peak[0]-half_r:peak[0]+half_r+1,peak[1]-half_r:peak[1]+half_r+1]
+                    Total_SNR = AGN_clean/QSO_std
+                    plt.imshow(Total_SNR, origin='lower')#,cmap='gist_heat', norm=LogNorm())
+                    plt.colorbar()
+                    plt.savefig(folder+'/SNR_Total.pdf')
+                    plt.close()

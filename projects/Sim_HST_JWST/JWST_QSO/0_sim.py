@@ -29,7 +29,7 @@ import rebin #From my share_tools
 oversample = 4
 #seed = 0
 zp_dic = {'F444W':27.3012, 'F356W':27.1841, 'F200W':27.0383, 'F150W':26.8627} #Using mirage
-for seed in range(101,121):
+for seed in range(201,221):
     for ID in range(1,7): #int(input("input simulation ID:\n"))  #The ID for this simulation
         host_flux_rescale = False
         count = 0 
@@ -45,11 +45,14 @@ for seed in range(101,121):
             host_mag = qso_info['ID'+repr(ID)]['galaxy_{0}_mag'.format(filt)]
             host_n = np.random.uniform(2,4)   #Host effective radius, unit: Kpc
             host_Reff_kpc = np.random.uniform(2,3)   #Host effective radius, unit: Kpc
+            q = np.random.uniform(0.5,0.9)
+            phi = np.random.uniform(0.,2*np.pi)            
             #host_ratio = np.random.uniform(0.4, 0.7) #Set the random host flux ratio [40% - 70%].
             host_flux = 10**(0.4*(zp - host_mag))
             point_flux = 10**(0.4*(zp - point_mag))
             total_flux =  point_flux + host_flux
             host_ratio = host_flux/total_flux
+            
             if count == 0:
                 if host_ratio< 0.1:
                     host_ratio =np.random.uniform(0.1,0.2)
@@ -109,8 +112,6 @@ for seed in range(101,121):
             kwargs_ps = [{'ra_image': [center_x], 'dec_image': [center_y], 'point_amp': [point_amp]}]
             light_model_list = ['SERSIC_ELLIPSE']
             lightModel = LightModel(light_model_list=light_model_list)
-            q = np.random.uniform(0.5,0.9)
-            phi = np.random.uniform(0.,2*np.pi)
             e1, e2 = param_util.phi_q2_ellipticity(phi=phi, q=q)
             kwargs_numerics = {'supersampling_factor': 2, 'supersampling_convolution': False}
             kwargs_sersic_medi = {'amp': 1. , 'n_sersic': host_n, 'R_sersic': host_Reff/np.sqrt(q), 'e1': e1, 'e2': e2,
@@ -185,7 +186,7 @@ for seed in range(101,121):
             rms = np.zeros_like(total_image_bin) #input rms
             noiz = np.zeros_like(total_image_bin) #input noiz
             image_data_noise=np.zeros_like(total_image_bin) #image after noiz
-            exptim= 625.   #units of seconds. 
+            exptim= 312.5   #units of seconds. 
             stdd = [1.6, 1.06, 0.77, 0.75][filt_i] /np.sqrt(exptim)   #An empirical formula from ETC
             for i in range(len(pattern_x)):
                 rms[i]=(bf_noz[i]/(exptim)+stdd**2)**0.5 #RMS not saved, thus its value not used here
@@ -193,7 +194,7 @@ for seed in range(101,121):
                 noiz[i]=np.random.normal(0, bkg_noise, size=rms[i].shape)
                 image_data_noise[i]=noiz[i]+np.random.poisson(lam=bf_noz[i]*exptim)/(exptim)  #Non-drizzled imaged
                 pyfits.PrimaryHDU(image_data_noise[i]).writeto(sim_folder_name+'/non_drizzled-image-{0}.fits'.format(i+1),overwrite=False)
-                pyfits.PrimaryHDU(rms[i]).writeto(sim_folder_name + '/non_drizzled-noise_map-{0}.fits'.format(i+1),overwrite=False)
+#                pyfits.PrimaryHDU(rms[i]).writeto(sim_folder_name + '/non_drizzled-noise_map-{0}.fits'.format(i+1),overwrite=False)
                 pyfits.PrimaryHDU(rms[i]**2).writeto(sim_folder_name+'/rmsSQ-{0}.fits'.format(i+1),overwrite=False)
             filename_ascii = sim_folder_name+'/sim_info.txt'
             data_info =  open(filename_ascii,'w') 
@@ -205,7 +206,7 @@ for seed in range(101,121):
             data_info.write("host position (x, y):\t({0}, {1}) arcsec\n".format(round(center_x,5),round(center_y,5))) 
             data_info.write("host_flux (within frame):\t{0}\n".format(round(host_flux,3)))   
             data_info.write("host_flux_ratio:\t{0}%\n".format(round(host_ratio*100,3)))  
-            data_info.write("host (phi, q):\t({0}, {1}) arcsec\n".format(round(phi,3),round(q,3))) 
+            data_info.write("host (phi, q):\t({0}, {1})\n".format(round(phi,3),round(q,3))) 
             data_info.write("host_n:\t{0}\n".format(host_n))
             data_info.write("host_Reff_kpc:\t{0}\n".format(host_Reff_kpc)) 
             data_info.write("host_Reff:\t{0} arcsec\n".format(round(host_Reff,5))) 

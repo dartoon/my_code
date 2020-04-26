@@ -36,11 +36,13 @@ color = {'F150W': 'cyan', 'F200W':'lime', 'F356W':'tomato', 'F444W':'firebrick'}
 use_true_PSF ='same_drizzle'
 zp_dic = {'F444W':27.3012, 'F356W':27.1841, 'F200W':27.0383, 'F150W':26.8627} #Using mirage
 
-save_name = 'fit_result_samedrizzle_biggerframe'
+#save_name = 'fit_result_samedrizzle_biggerframe'
 #save_name = 'fit_result_samedrizzle'
 #save_name = 'fit_result_diffPSF_biggerframe'
 #save_name = 'fit_result_samedrizzle_biggerframecalrms'
-save_name = 'fit_result_diffPSF_biggerframecalrms'
+#folder_suf = 'sim_seed201_5000s/'
+folder_suf = 'sim_seed201_2500s/'
+save_name = 'fit_result_diffPSF'
 #if use_true_PSF == True:
 #    save_name = 'fit_result_truePSF'
 #elif use_true_PSF == False:
@@ -48,7 +50,7 @@ save_name = 'fit_result_diffPSF_biggerframecalrms'
 #elif use_true_PSF == 'same_drizzle':
 #    save_name = 'fit_result_samedrizzle'
 
-ID_range = [1, 2]   
+ID_range = [1,7]   
 #%%Mag bias
 
 for ID in range(ID_range[0],ID_range[1]):
@@ -57,8 +59,8 @@ for ID in range(ID_range[0],ID_range[1]):
         filt  = ['F150W', 'F200W', 'F356W','F444W'][filt_i]
         zp = zp_dic[filt]
         bias_list = []
-        for seed in range(101,121):
-            folder = 'sim'+'_ID'+repr(ID)+'_'+filt+'_seed'+repr(seed)    
+        for seed in range(201,221):
+            folder = folder_suf + 'sim'+'_ID'+repr(ID)+'_'+filt+'_seed'+repr(seed)    
             f = open(folder+"/sim_info.txt","r")
             string = f.read()
             lines = string.split('\n')   # Split in to \n
@@ -114,8 +116,8 @@ for ID in range(ID_range[0],ID_range[1]):
         zp = zp_dic[filt]
         true_mag_list = []
         infe_mag_list = []
-        for seed in range(101,121):
-            folder = 'sim'+'_ID'+repr(ID)+'_'+filt+'_seed'+repr(seed)    
+        for seed in range(201,221):
+            folder = folder = folder_suf + 'sim'+'_ID'+repr(ID)+'_'+filt+'_seed'+repr(seed)
             f = open(folder+"/sim_info.txt","r")
             string = f.read()
             lines = string.split('\n')   # Split in to \n
@@ -134,14 +136,24 @@ for ID in range(ID_range[0],ID_range[1]):
         infe_filt_mag_list.append(np.array(infe_mag_list))
     plt.scatter(true_filt_mag_list[compare[0]]-true_filt_mag_list[compare[1]], 
                 infe_filt_mag_list[compare[0]]-infe_filt_mag_list[compare[1]],
-                s=200, marker=".",zorder=0, edgecolors='w',alpha=0.5)                
-    plt.plot(np.linspace(-2, -1), np.linspace(-2,-1)*1,'k')   
+                s=200, marker=".",zorder=0, edgecolors='w',alpha=0.5)    
+    plt.errorbar(np.mean(true_filt_mag_list[compare[0]]-true_filt_mag_list[compare[1]])-0.05, 
+                 np.mean(infe_filt_mag_list[compare[0]]-infe_filt_mag_list[compare[1]]), 
+                 yerr=np.std(infe_filt_mag_list[compare[0]]-infe_filt_mag_list[compare[1]]), 
+                 color=color[filt],ecolor='black', fmt='o',zorder=-500,markersize=10)    
+    plt.text(np.mean(true_filt_mag_list[compare[0]]-true_filt_mag_list[compare[1]])-0.1, 
+             np.mean(infe_filt_mag_list[compare[0]]-infe_filt_mag_list[compare[1]]), 
+             '{0}\n$\pm${1}'.format(round(np.mean(infe_filt_mag_list[compare[0]]-infe_filt_mag_list[compare[1]]),2),round(np.std(infe_filt_mag_list[compare[0]]-infe_filt_mag_list[compare[1]]),2)), color='black',fontsize=14)
+     
+    plt.plot(np.linspace(-2, 0), np.linspace(-2,0)*1,'k')   
     plt.title('Inferred color bias for ID '+repr(ID), fontsize=27)
     #legend:
     plt.xlabel("True $\Delta$mag ({0} - {1})".format(filt_list[compare[0]], filt_list[compare[1]]),fontsize=20)
     plt.ylabel("Inferred $\Delta$mag ({0} - {1})".format(filt_list[compare[0]], filt_list[compare[1]]),fontsize=20)
     plt.tick_params(labelsize=20)
-#    plt.savefig("host_mag_bias_ID{0}.pdf".format(ID))
+    plt.xlim(-2.0, -0.5)
+    plt.ylim(-2.0, -0.5)
+#    plt.savefig("host_color_bias_ID{0}.pdf".format(ID))
     plt.show()    
     
 #%%Other parameter bias
@@ -152,13 +164,15 @@ for ID in range(ID_range[0],ID_range[1]):
     for filt_i in range(4):    
         filt  = ['F150W', 'F200W', 'F356W','F444W'][filt_i]
         bias_list = []
-        for seed in range(101,121):
-            folder = 'sim'+'_ID'+repr(ID)+'_'+filt+'_seed'+repr(seed)    
+        for seed in range(201,221):
+            folder = folder_suf + 'sim'+'_ID'+repr(ID)+'_'+filt+'_seed'+repr(seed) 
             f = open(folder+"/sim_info.txt","r")
             string = f.read()
             lines = string.split('\n')   # Split in to \n
             true_para = [lines[i] for i in range(len(lines)) if 'host_'+para+':' in lines[i]][0].split('\t')[1]
-            true_para = float(true_para[:5])
+            true_q = [lines[i] for i in range(len(lines)) if '(phi, q):' in lines[i]][0].split('\t')[1]
+            true_q = float(true_q.split(', ')[1].split(')')[0])
+            true_para = float(true_para[:5]) / np.sqrt(true_q)
             result, framesize = pickle.load(open(folder+'/{0}.pkl'.format(save_name),'rb'))
             result_key_dic = {'Reff': 'R_sersic', 'n': 'n_sersic'}
             fit_para = result[result_key_dic[para]] 
@@ -176,13 +190,13 @@ for ID in range(ID_range[0],ID_range[1]):
         plt.text(filt_i-0.35, np.mean(bias_list)-0.05, '{0}\n$\pm${1}'.format(round(np.mean(bias_list),2),round(np.std(bias_list),2)), color='black',fontsize=14)
     if para == 'n':
         plt.ylim(-2, 2)       
-#    elif para == 'Reff':
-#        plt.ylim(-0.5, 0.5)    
+    elif para == 'Reff':
+        plt.ylim(0.7, 1.3)    
 #    for filt_i in range(4):                   
 #        y_min, y_max=ax.get_ylim()
 #        plt.text(filt_i, y_min+(y_max-y_min)*0.1, '{0}'.format(round(true_total_mag,2)), color='g',fontsize=14)
 #        plt.text(filt_i, y_min+(y_max-y_min)*0.05, '{0}%'.format(round(float(true_host_ratio[:-1]),1)), color='crimson',fontsize=14)
-    plt.plot(np.linspace(-1, 5), np.linspace(-1, 5)*0,'k')   
+    plt.plot(np.linspace(-1, 5), np.linspace(-1, 5)*0+1,'k')   
     plt.title('Inferred {0} bias for ID '.format(para)+repr(ID), fontsize=27)
     #legend:
 #    plt.text(-0.5,y_min+(y_max-y_min)*0.25, 'Total magnitude', color='g',fontsize=14)
@@ -190,9 +204,9 @@ for ID in range(ID_range[0],ID_range[1]):
     labels = ['F150W', 'F200W', 'F356W', 'F444W']
     ax.set_xticks(range(4))
     ax.set_xticklabels(labels)
-    plt.ylabel("$\Delta${0} (inferred - truth)".format(para),fontsize=27)
+    plt.ylabel("{0} ratio (inferred/truth)".format(para),fontsize=27)
     plt.xlim(-0.5, 3.2)
     plt.tick_params(labelsize=20)
-#    plt.savefig("host_mag_bias_ID{0}.pdf".format(ID))
+    plt.savefig("host_Reff_bias_ID{0}.pdf".format(ID))
     plt.show()
     
