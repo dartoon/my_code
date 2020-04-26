@@ -47,7 +47,7 @@ kwargs_numerics = {'supersampling_factor': 3, 'supersampling_convolution': False
 import sys
 sys.path.insert(0,'../share_tools/')
 from gene_para import gene_para
-for seed in range(701, 721):
+for seed in range(701, 751):
     print(seed)
     para=gene_para(seed=seed,fixh0=102)
     
@@ -150,8 +150,8 @@ for seed in range(701, 721):
     qso_amp= 10.**(-0.4*(source_para['mag_sersic']-zp))*amp_qRh_s_plane
     
 #    add_qso = int(input("add QSO?:\n input 0 no qso, others add qso:\t"))
-#    add_qso= 1
-    add_qso= 0
+    add_qso= 1
+#    add_qso= 0
     
     if add_qso == 0:
     	qso_amp = 0
