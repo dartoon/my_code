@@ -440,8 +440,8 @@ def profiles_compare(prf_list, scal_list, prf_name_list = None, gridspace = None
     fig, ax = plt.subplots(figsize=(10,7))
     prf_NO = len(prf_list)
     for i in range(prf_NO):
-        b_c = len(prf_list[i])/2
-        b_r = len(prf_list[i])/6
+        b_c = int(len(prf_list[i])/2)
+        b_r = int(len(prf_list[i])/6)
         center = np.reshape(np.asarray(np.where(prf_list[i]== prf_list[i][b_c-b_r:b_c+b_r,b_c-b_r:b_c+b_r].max())),(2))[::-1]
         scale = scal_list[i]
         r_SB, r_grids = SB_profile(prf_list[i], center, radius=radius*scale,

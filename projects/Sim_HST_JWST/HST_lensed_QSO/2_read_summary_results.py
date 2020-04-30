@@ -24,23 +24,24 @@ from lenstronomy.Plots.model_plot import ModelPlot
 from mask_objects import find_loc_max
 
 result_dic = {}
-#folder_type = 'sim_lens_ID_'
-###file_type = 'model_result.pkl'
-#idx = -1
 
-#
-folder_type = 'sim_lens_noqso_ID_'
+#folder_type = 'sim_lens_ID_'
 #file_type = 'model_result.pkl'
-idx = -2
- 
+
+folder_type = 'sim_lens_noqso_ID_'
+file_type = 'model_result.pkl'
 
 chisq_list = []
-id_range= [601, 622]
-for ID in range(id_range[0], id_range[1]):  
-    folder = folder_type + '{0}/'.format(ID)
-    files = glob.glob(folder+'model_result*.pkl')
-    files.sort()
-    read_file = files[idx]    
+folder_list = glob.glob(folder_type+'*')
+folder_list.sort()
+test_numer = 29
+folder_list = folder_list[:test_numer]
+
+id_range = int(folder_list[0][-3:]), int(folder_list[-1][-3:])
+
+for folder in folder_list:
+    folder = folder+'/'
+    read_file = folder+ file_type
     print(read_file)
     model_lists, para_s, lens_info= pickle.load(open(folder+'sim_kwargs.pkl','rb'))
     lens_model_list, lens_light_model_list, source_model_list, point_source_list = model_lists
@@ -84,21 +85,24 @@ for ID in range(id_range[0], id_range[1]):
 #%%
 H0_true = 73.907
 fig, ax = plt.subplots(figsize=(11,8))
-for ID in range(id_range[0], id_range[1]):
+for folder in folder_list:
+    ID = folder[-3:]
     key = folder_type + '{0}'.format(ID)
-    if abs(result_dic[key][-1]) < 100:        
+#    if abs(result_dic[key][-1]) < 100:     
+    if result_dic[key][-1] < 0.8:
+        ID = int(ID)
         H0 = result_dic[key][-2]
         plt.scatter(ID, H0[1],
                     c='darkred',s=280,marker=".",zorder=0, vmin=1.2, vmax=1.8, edgecolors='white',alpha=0.7)
         plt.errorbar(ID, H0[1], yerr = [[H0[2]-H0[1]], [H0[1]-H0[0]]],
                     ecolor='black', fmt='o', zorder=-500,markersize=1)  
         plt.text(ID, H0[1], repr(round(result_dic[key][-1], 1)),fontsize=15)
-        ax.set_xticks(range(id_range[0]-1, id_range[1]+1,3)) 
-        plt.plot(np.linspace(id_range[0]-1, id_range[1]+1), np.linspace(id_range[0]-1, id_range[1]+1)*0 + H0_true)
-        plt.xlabel("ID",fontsize=27)
-        plt.ylabel("$H_0$",fontsize=27)
-        plt.ylim(25,90)
-        plt.tick_params(labelsize=20)
+#        ax.set_xticks(range(id_range[0]-1, id_range[1]+1,3)) 
+plt.plot(np.linspace(id_range[0]-1, id_range[1]+1), np.linspace(id_range[0]-1, id_range[1]+1)*0 + H0_true)
+plt.xlabel("ID",fontsize=27)
+plt.ylabel("$H_0$",fontsize=27)
+plt.ylim(25,120)
+plt.tick_params(labelsize=20)
 plt.show()
 
 #%%test H0 Bias as function of other parameter's bias
@@ -107,7 +111,8 @@ plt.show()
 which = ['kwargs_lens', 'gamma']
 #which = ['kwargs_source', 'center_y']
 fig, ax = plt.subplots(figsize=(11,8))
-for ID in range(id_range[0], id_range[1]):
+for folder in folder_list:
+    ID = folder[-3:]
     key = folder_type + '{0}'.format(ID)
     H0 = result_dic[key][-2]
     gamma_bias = result_dic[key][1][which[0]][0][which[1]] - result_dic[key][0][which[0]][0][which[1]]
@@ -117,10 +122,10 @@ for ID in range(id_range[0], id_range[1]):
                  yerr = [[H0[2]-H0[1]], [H0[1]-H0[0]]],
                 ecolor='black', fmt='o', zorder=-500,markersize=1)      
 #    ax.set_xticks(range(id_range[0]-1, id_range[1]+1,3)) 
-    plt.xlabel(which[1]+" bias (inferred - truth)", fontsize=27)
-    plt.ylabel("$H_0$ bias (inferred - truth)", fontsize=27)
-    plt.ylim(-20,20)
-    plt.tick_params(labelsize=20)
+plt.xlabel(which[1]+" bias (inferred - truth)", fontsize=27)
+plt.ylabel("$H_0$ bias (inferred - truth)", fontsize=27)
+plt.ylim(-20,20)
+plt.tick_params(labelsize=20)
 plt.show()
 
 
@@ -130,13 +135,14 @@ plt.show()
 which = ['kwargs_lens', 'gamma']
 #which = ['kwargs_source', 'center_y']
 fig, ax = plt.subplots(figsize=(11,8))
-for ID in range(id_range[0], id_range[1]):
+for folder in folder_list:
+    ID = folder[-3:]
     key = folder_type + '{0}'.format(ID)
     gamma_bias = result_dic[key][1][which[0]][0][which[1]] - result_dic[key][0][which[0]][0][which[1]]
     plt.scatter(ID, gamma_bias,
                 c='darkred',s=280,marker=".",zorder=0, vmin=1.2, vmax=1.8, edgecolors='white',alpha=0.7)
-    ax.set_xticks(range(id_range[0]-1, id_range[1]+1,3)) 
-    plt.plot(np.linspace(id_range[0]-1, id_range[1]+1), np.linspace(id_range[0]-1, id_range[1]+1)*0)
+#    ax.set_xticks(range(id_range[0]-1, id_range[1]+1,3)) 
+#    plt.plot(np.linspace(id_range[0]-1, id_range[1]+1), np.linspace(id_range[0]-1, id_range[1]+1)*0)
     plt.xlabel("ID",fontsize=27)
     plt.ylabel(which[1]+" bias (inferred - truth)",fontsize=27)
     plt.ylim(-0.4,0.4)

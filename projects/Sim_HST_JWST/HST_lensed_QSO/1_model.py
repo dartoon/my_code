@@ -46,27 +46,36 @@ def cal_h0(zl, zs, Ddt, om=0.27):
     Ddt_corr = cal_Ddt(zl, zs, H0_ini=100)
     ratio = Ddt_corr/Ddt
     return 100 * ratio
-##601, 608, 615
-#low_, up_ = [[601, 608], [608, 615], [615, 622]][2]
 
-#low_, up_ = [[602, 605], [605, 608], [609, 612], [612, 615], [616, 619], [619, 622]][5]
+folder_list = glob.glob('sim_lens_ID_7??')
+folder_list.sort()
+test_numer = 10
+kernel = 5
+run_n = int(test_numer/kernel)
 
-#for ID in [612, 614, 617, 619]:  
-for ID in range(611, 612):    
-    folder = 'sim_lens_ID_{0}/'.format(ID)
+kernel_i = 4 # 0, 1 ,2, 3 .. max = kernel-1
+folder_list = folder_list[20:20+test_numer]
+
+for folder in folder_list[kernel_i*run_n:kernel_i*run_n+run_n]:
+    ID = folder[-3:]
+    folder = folder + '/'
     print(folder)
     model_lists, para_s, lens_info= pickle.load(open(folder+'sim_kwargs.pkl','rb'))
     lens_model_list, lens_light_model_list, source_model_list, point_source_list = model_lists
     z_l, z_s, TD_distance, TD_true, TD_obs, TD_err_l = lens_info
     kwargs_lens_list, kwargs_lens_light_list, kwargs_source_list, kwargs_ps = para_s
     solver_type = 'PROFILE_SHEAR'
-    if len(kwargs_ps['ra_image']) <4:
-        kwargs_ps['ra_image'] = kwargs_ps['ra_image'][:2] 
-        kwargs_ps['dec_image'] = kwargs_ps['dec_image'][:2]
-        kwargs_ps['point_amp'] = kwargs_ps['point_amp'][:2]
-        TD_obs = TD_obs[:2]
-        TD_err_l = TD_err_l[:2]
-        solver_type = 'THETA_E_PHI'
+#    if len(kwargs_ps['ra_image']) <4:
+#        print(folder)
+#        import shutil
+#        shutil.rmtree(folder)        
+##        kwargs_ps['ra_image'] = kwargs_ps['ra_image'][:2] 
+##        kwargs_ps['dec_image'] = kwargs_ps['dec_image'][:2]
+##        kwargs_ps['point_amp'] = kwargs_ps['point_amp'][:2]
+##        TD_obs = TD_obs[:2]
+##        TD_err_l = TD_err_l[:2]
+##        solver_type = 'THETA_E_PHI'
+    
     kwargs_constraints = {'joint_source_with_point_source': [[0, 0]],
                           'num_point_source_list': [len(kwargs_ps['ra_image'])],
                           'solver_type': solver_type,  # 'PROFILE', 'PROFILE_SHEAR', 'ELLIPSE', 'CENTER'
@@ -78,17 +87,18 @@ for ID in range(611, 612):
 #        fixed_lens, fixed_source, fixed_lens_light, fixed_ps, fixed_cosmo = fix_setting
         #Setting up the fitting:
         lens_data = pyfits.getdata(folder+'Drz_QSO_image.fits')
+        len_std = pyfits.getdata(folder+'noise_map.fits')
         lens_mask = cr_mask(lens_data, 'normal_mask.reg')
         framesize = 81
         ct = int((len(lens_data) - framesize)/2)
         lens_data = lens_data[ct:-ct,ct:-ct]
+        len_std = len_std[ct:-ct,ct:-ct]
         lens_mask = (1-lens_mask)[ct:-ct,ct:-ct]
         plt.imshow(lens_data, origin='lower',cmap='gist_heat', norm=LogNorm())
         plt.colorbar()
-
-        exp_time = 599.* 2 * 8
-        stdd =  0.0024  #Measurement from empty retion, 0.016*0.08**2/0.13**2/np.sqrt(8)
-        len_std = (abs(lens_data/exp_time)+stdd**2)**0.5
+#        exp_time = 599.* 2 * 8
+#        stdd =  0.0024  #Measurement from empty retion, 0.016*0.08**2/0.13**2/np.sqrt(8)
+#        len_std = (abs(lens_data/exp_time)+stdd**2)**0.5
         deltaPix = 0.08
         
         x, y =find_loc_max(lens_data)
@@ -115,7 +125,7 @@ for ID in range(611, 612):
         plt.show()         
         
         psf = pyfits.getdata(folder+'Drz_PSF.fits')
-        psf_fsize = 75
+        psf_fsize = 77
         psf_half_r = int(psf_fsize/2)
         psf_peak = np.where(psf==psf.max())
         psf_peak = [psf_peak[0][0], psf_peak[1][0]]
@@ -140,8 +150,8 @@ for ID in range(611, 612):
         fixed_lens.append({'ra_0': 0, 'dec_0': 0})
         kwargs_lens_init = kwargs_lens_list
         kwargs_lens_sigma.append({'theta_E': .2, 'e1': 0.1, 'e2': 0.1, 'gamma': 0.1, 'center_x': 0.01, 'center_y': 0.01})
-        kwargs_lower_lens.append({'theta_E': 0.01, 'e1': -0.5, 'e2': -0.5, 'gamma': kwargs_lens_init[0]['gamma']-0.2, 'center_x': -10, 'center_y': -10})
-        kwargs_upper_lens.append({'theta_E': 10, 'e1': 0.5, 'e2': 0.5, 'gamma': kwargs_lens_init[0]['gamma']+0.2, 'center_x': 10, 'center_y': 10})
+        kwargs_lower_lens.append({'theta_E': 0.01, 'e1': -0.5, 'e2': -0.5, 'gamma': kwargs_lens_init[0]['gamma']-0.5, 'center_x': -10, 'center_y': -10})
+        kwargs_upper_lens.append({'theta_E': 10, 'e1': 0.5, 'e2': 0.5, 'gamma': kwargs_lens_init[0]['gamma']+0.5, 'center_x': 10, 'center_y': 10})
         kwargs_lens_sigma.append({'gamma1': 0.1, 'gamma2': 0.1})
         kwargs_lower_lens.append({'gamma1': -0.2, 'gamma2': -0.1})
         kwargs_upper_lens.append({'gamma1': 0.2, 'gamma2': 0.2})
@@ -273,7 +283,7 @@ for ID in range(611, 612):
     #%%Print fitting result:
     multi_band_list, kwargs_model, kwargs_result, chain_list, fix_setting, mcmc_new_list = pickle.load(open(folder+'model_result.pkl','rb'))
     fixed_lens, fixed_source, fixed_lens_light, fixed_ps, fixed_cosmo = fix_setting
-#    labels_new = [r"$\gamma$", r"$D_{\Delta t}$","H$_0$" ]
+    labels_new = [r"$\gamma$", r"$D_{\Delta t}$","H$_0$" ]
     modelPlot = ModelPlot(multi_band_list, kwargs_model, kwargs_result, arrow_size=0.02, cmap_string="gist_heat")
     f, axes = modelPlot.plot_main()
     f.show()
@@ -286,9 +296,9 @@ for ID in range(611, 612):
 #    for i in range(len(chain_list)):
 #        chain_plot.plot_chain_list(chain_list, i)
 #    plt.close()
-#    truths=[para_s[0][0]['gamma'],TD_distance, 70.656]	
-#    plot = corner.corner(mcmc_new_list, labels=labels_new, show_titles=True, #range= [[0.8,1.5],[1,3],[0,1],[0, 1],[2000,5000],[20,100]], 
-#                         quantiles=[0.16, 0.5, 0.84], truths =truths,
-#                         title_kwargs={"fontsize": 15}, label_kwargs = {"fontsize": 25},
-#                         levels=1.0 - np.exp(-0.5 * np.array([1.,2.]) ** 2))
-#    plt.close()
+    truths=[para_s[0][0]['gamma'],TD_distance, 73.907]	
+    plot = corner.corner(mcmc_new_list, labels=labels_new, show_titles=True, #range= [[0.8,1.5],[1,3],[0,1],[0, 1],[2000,5000],[20,100]], 
+                         quantiles=[0.16, 0.5, 0.84], truths =truths,
+                         title_kwargs={"fontsize": 15}, label_kwargs = {"fontsize": 25},
+                         levels=1.0 - np.exp(-0.5 * np.array([1.,2.]) ** 2))
+    plt.show()

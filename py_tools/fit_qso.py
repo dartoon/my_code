@@ -49,7 +49,7 @@ from lenstronomy.Plots import chain_plot
 from lenstronomy.Sampling.parameters import Param
 
 def fit_qso(QSO_im, psf_ave, psf_std=None, source_params=None,ps_param=None, background_rms=0.04, pix_sz = 0.168,
-            exp_time = 300., fix_n=None, image_plot = True, corner_plot=True,
+            exp_time = 300., fix_n=None, image_plot = True, corner_plot=True, supersampling_factor = 1, 
             flux_ratio_plot=False, deep_seed = False, fixcenter = False, QSO_msk=None, QSO_std=None,
             tag = None, no_MCMC= False, pltshow = 1, return_Chisq = False, dump_result = False, pso_diag=False):
     '''
@@ -83,7 +83,7 @@ def fit_qso(QSO_im, psf_ave, psf_std=None, source_params=None,ps_param=None, bac
     psf_type = 'PIXEL'  # 'gaussian', 'pixel', 'NONE'
     kernel = psf_ave
 
-    kwargs_numerics = {'supersampling_factor': 1, 'supersampling_convolution': False} 
+    kwargs_numerics = {'supersampling_factor': supersampling_factor, 'supersampling_convolution': False} 
     
     if source_params is None:
         # here are the options for the host galaxy fitting
@@ -219,7 +219,10 @@ def fit_qso(QSO_im, psf_ave, psf_std=None, source_params=None,ps_param=None, bac
     image_host = []  #!!! The linear_solver before and after LensModelPlot could have different result for very faint sources.
     for i in range(len(source_result)):
         image_host.append(imageModel.source_surface_brightness(source_result, de_lensed=True,unconvolved=False,k=i))
-    image_ps = imageModel.point_source(ps_result)
+    
+    image_ps = []
+    for i in range(len(ps_result)):
+        image_ps.append(imageModel.point_source(ps_result, k = i))
     
     if pso_diag == True:
         f, axes = chain_plot.plot_chain_list(chain_list,0)
@@ -260,29 +263,39 @@ def fit_qso(QSO_im, psf_ave, psf_std=None, source_params=None,ps_param=None, bac
            plot = corner.corner(samples_mcmc, labels=param_mcmc, show_titles=True)
            if tag is not None:
                plot.savefig('{0}_para_corner.pdf'.format(tag))
-           if pltshow == 0:
-               plt.close()
-           else:
-               plt.show()
+           plt.close()               
+           # if pltshow == 0:
+           #     plt.close()
+           # else:
+           #     plt.show()
         
     if flux_ratio_plot==True and no_MCMC==False:
         param = Param(kwargs_model, kwargs_fixed_source=source_params[2], kwargs_fixed_ps=ps_param[2], **kwargs_constraints)
         mcmc_new_list = []
-        labels_new = ["Quasar flux"] +  ["host{0} flux".format(i) for i in range(len(source_params[0]))]
+        if len(ps_param[2]) == 1:
+            labels_new = ["Quasar flux"] +  ["host{0} flux".format(i) for i in range(len(source_params[0]))]
+        else:
+            labels_new = ["Quasar{0} flux".format(i) for i in range(len(ps_param[2]))] +  ["host{0} flux".format(i) for i in range(len(source_params[0]))]
         for i in range(len(samples_mcmc)):
             kwargs_out = param.args2kwargs(samples_mcmc[i])
             kwargs_light_source_out = kwargs_out['kwargs_source']
             kwargs_ps_out =  kwargs_out['kwargs_ps']
             image_reconstructed, _, _, _ = imageLinearFit.image_linear_solve(kwargs_source=kwargs_light_source_out, kwargs_ps=kwargs_ps_out)
-            image_ps = imageModel.point_source(kwargs_ps_out)
-            flux_quasar = np.sum(image_ps)
+            flux_quasar = []
+            if len(ps_param[0]) == 1:
+                image_ps_j = imageModel.point_source(kwargs_ps_out)
+                flux_quasar.append(np.sum(image_ps_j))  
+            else:    
+                for j in range(len(ps_param[0])):
+                    image_ps_j = imageModel.point_source(kwargs_ps_out, k=j)
+                    flux_quasar.append(np.sum(image_ps_j))
             fluxs = []
             for j in range(len(source_params[0])):
                 image_j = imageModel.source_surface_brightness(kwargs_light_source_out,unconvolved= False, k=j)
                 fluxs.append(np.sum(image_j))
-            mcmc_new_list.append([flux_quasar] + fluxs )
-            if i/1000 > (i-1)/1000 :
-                print(len(samples_mcmc), "MCMC samplers in total, finished translate:", i    )
+            mcmc_new_list.append(flux_quasar + fluxs )
+            if int(i/1000) > int((i-1)/1000) :
+                print(len(samples_mcmc), "MCMC samplers in total, finished translate:", i )
         plot = corner.corner(mcmc_new_list, labels=labels_new, show_titles=True)
         if tag is not None:
             plot.savefig('{0}_HOSTvsQSO_corner.pdf'.format(tag))
@@ -296,14 +309,16 @@ def fit_qso(QSO_im, psf_ave, psf_std=None, source_params=None,ps_param=None, bac
         noise_map = np.sqrt(QSO_std**2+np.abs(error_map))
     if dump_result == True:
         if flux_ratio_plot==True and no_MCMC==False:
-            trans_paras = [source_params[2], ps_param[2], mcmc_new_list, labels_new, 'source_params[2], ps_param[2], mcmc_new_list, labels_new']
+            trans_paras = [mcmc_new_list, labels_new, 'mcmc_new_list, labels_new']
         else:
             trans_paras = []
-            chain_list = None
         picklename= tag + '.pkl'
         best_fit = [source_result, image_host, ps_result, image_ps,'source_result, image_host, ps_result, image_ps']
         chain_list_result = [chain_list, 'chain_list']
-        pickle.dump([best_fit, chain_list_result, trans_paras], open(picklename, 'wb'))
+        kwargs_fixed_source=source_params[2]
+        kwargs_fixed_ps=ps_param[2]
+        material = multi_band_list, kwargs_model, kwargs_result, QSO_msk, kwargs_fixed_source, kwargs_fixed_ps, kwargs_constraints, kwargs_numerics
+        pickle.dump([best_fit, chain_list_result, trans_paras, material], open(picklename, 'wb'))
     if return_Chisq == False:
         return source_result, ps_result, image_ps, image_host, noise_map
     elif return_Chisq == True:
@@ -515,7 +530,7 @@ def fit_galaxy(galaxy_im, psf_ave, psf_std=None, source_params=None, background_
                 image_j = imageModel.source_surface_brightness(kwargs_light_source_out,unconvolved= False, k=j)
                 fluxs.append(np.sum(image_j))
             mcmc_new_list.append( fluxs )
-            if i/1000 > (i-1)/1000 :
+            if int(i/1000) > int((i-1)/1000) :
                 print(len(samples_mcmc), "MCMC samplers in total, finished translate:", i    )
         plot = corner.corner(mcmc_new_list, labels=labels_new, show_titles=True)
         if tag is not None:

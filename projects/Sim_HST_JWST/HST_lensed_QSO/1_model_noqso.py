@@ -47,33 +47,44 @@ def cal_h0(zl, zs, Ddt, om=0.27):
     ratio = Ddt_corr/Ddt
     return 100 * ratio
 
-#low_, up_ = [[602, 605], [605, 608], [609, 612], [612, 615], [616, 619], [619, 622]][5]
-low_, up_ = [[601, 608], [608, 615], [615, 622]][2]
-for ID in range(low_, up_):  
-    folder = 'sim_lens_noqso_ID_{0}/'.format(ID)
-    qso_folder = 'sim_lens_ID_{0}/'.format(ID)
+folder_list = glob.glob('sim_lens_noqso_ID_7??')
+folder_list.sort()
+test_numer = 10
+kernel = 5
+run_n = int(test_numer/kernel)
+
+kernel_i = 4 # 0, 1 ,2, 3 .. max = kernel-1
+folder_list = folder_list[20:20+test_numer]
+
+for folder in folder_list[kernel_i*run_n:kernel_i*run_n+run_n]:
+    ID = folder[-3:]
+    folder = folder + '/'
     print(folder)
+    qso_folder = 'sim_lens_ID_{0}/'.format(ID)
     model_lists, para_s, lens_info= pickle.load(open(folder+'sim_kwargs.pkl','rb'))
     lens_model_list, lens_light_model_list, source_model_list, point_source_list = model_lists
     z_l, z_s, TD_distance, TD_true, TD_obs, TD_err_l = lens_info
     kwargs_lens_list, kwargs_lens_light_list, kwargs_source_list, kwargs_ps = para_s
     solver_type = 'PROFILE_SHEAR'
     
-    if len(kwargs_ps['ra_image']) <4:
-        if abs(kwargs_ps['ra_image']).min() != abs(kwargs_ps['ra_image'][-1]) and abs(kwargs_ps['dec_image']).min() != abs(kwargs_ps['dec_image'][-1]):
-            raise ValueError("The double image is not taken the points position correctly")
-        kwargs_ps['ra_image'] = kwargs_ps['ra_image'][:2] 
-        kwargs_ps['dec_image'] = kwargs_ps['dec_image'][:2]
-        kwargs_ps['point_amp'] = kwargs_ps['point_amp'][:2]
-        TD_obs = TD_obs[:2]
-        TD_err_l = TD_err_l[:2]
-        solver_type = 'THETA_E_PHI'
+#    if len(kwargs_ps['ra_image']) <4:  #Would delete all the double
+#        print(folder)
+#        import shutil
+#        shutil.rmtree(folder)
+##        continue
+##        if abs(kwargs_ps['ra_image']).min() != abs(kwargs_ps['ra_image'][-1]) and abs(kwargs_ps['dec_image']).min() != abs(kwargs_ps['dec_image'][-1]):
+##            raise ValueError("The double image is not taken the points position correctly")
+##        kwargs_ps['ra_image'] = kwargs_ps['ra_image'][:2] 
+##        kwargs_ps['dec_image'] = kwargs_ps['dec_image'][:2]
+##        kwargs_ps['point_amp'] = kwargs_ps['point_amp'][:2]
+##        TD_obs = TD_obs[:2]
+##        TD_err_l = TD_err_l[:2]
+##        solver_type = 'THETA_E_PHI'
     kwargs_constraints = {'joint_source_with_point_source': [[0, 0]],
                           'num_point_source_list': [len(kwargs_ps['ra_image'])],
                           'solver_type': solver_type,  # 'PROFILE', 'PROFILE_SHEAR', 'ELLIPSE', 'CENTER'
                           'Ddt_sampling': True,
                                   }
-    
     if glob.glob(qso_folder+'model_result.pkl') == []:
         raise ValueError("The first time run of with QSO case is not finished")
     else:        
@@ -82,21 +93,23 @@ for ID in range(low_, up_):
 #        fixed_lens, fixed_source, fixed_lens_light, fixed_ps, fixed_cosmo = fix_setting
         #Setting up the fitting:
         lens_data = pyfits.getdata(folder+'Drz_QSO_image.fits')
+        len_std = pyfits.getdata(folder+'noise_map.fits')        
         lens_mask = cr_mask(lens_data, 'normal_mask.reg')
         framesize = 81
         ct = int((len(lens_data) - framesize)/2)
         lens_data = lens_data[ct:-ct,ct:-ct]
+        len_std = len_std[ct:-ct,ct:-ct]
         lens_mask = (1-lens_mask)[ct:-ct,ct:-ct]
         plt.imshow(lens_data, origin='lower',cmap='gist_heat', norm=LogNorm())
         plt.colorbar()
         plt.show()
-        exp_time = 599.* 2 * 8
-        stdd =  0.0024  #Measurement from empty retion, 0.016*0.08**2/0.13**2/np.sqrt(8)
-        len_std = (abs(lens_data/exp_time)+stdd**2)**0.5
+#        exp_time = 599.* 2 * 8
+#        stdd =  0.0024  #Measurement from empty retion, 0.016*0.08**2/0.13**2/np.sqrt(8)
+#        len_std = (abs(lens_data/exp_time)+stdd**2)**0.5
         deltaPix = 0.08
         
         psf = pyfits.getdata(folder+'Drz_PSF.fits')
-        psf_fsize = 75
+        psf_fsize = 77
         psf_half_r = int(psf_fsize/2)
         psf_peak = np.where(psf==psf.max())
         psf_peak = [psf_peak[0][0], psf_peak[1][0]]
@@ -121,8 +134,8 @@ for ID in range(low_, up_):
         fixed_lens.append({'ra_0': 0, 'dec_0': 0})
         kwargs_lens_init = kwargs_lens_list
         kwargs_lens_sigma.append({'theta_E': .2, 'e1': 0.1, 'e2': 0.1, 'gamma': 0.1, 'center_x': 0.01, 'center_y': 0.01})
-        kwargs_lower_lens.append({'theta_E': 0.01, 'e1': -0.5, 'e2': -0.5, 'gamma': kwargs_lens_init[0]['gamma']-0.2, 'center_x': -10, 'center_y': -10})
-        kwargs_upper_lens.append({'theta_E': 10, 'e1': 0.5, 'e2': 0.5, 'gamma': kwargs_lens_init[0]['gamma']+0.2, 'center_x': 10, 'center_y': 10})
+        kwargs_lower_lens.append({'theta_E': 0.01, 'e1': -0.5, 'e2': -0.5, 'gamma': kwargs_lens_init[0]['gamma']-0.5, 'center_x': -10, 'center_y': -10})
+        kwargs_upper_lens.append({'theta_E': 10, 'e1': 0.5, 'e2': 0.5, 'gamma': kwargs_lens_init[0]['gamma']+0.5, 'center_x': 10, 'center_y': 10})
         kwargs_lens_sigma.append({'gamma1': 0.1, 'gamma2': 0.1})
         kwargs_lower_lens.append({'gamma1': -0.2, 'gamma2': -0.1})
         kwargs_upper_lens.append({'gamma1': 0.2, 'gamma2': 0.2})

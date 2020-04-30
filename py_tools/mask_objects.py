@@ -19,7 +19,7 @@ import scipy.ndimage as ndimage
 import scipy.ndimage.filters as filters
 
 def detect_obj(img, snr=2.8, exp_sz= 1.2, pltshow=1):
-    threshold = detect_threshold(img, snr=snr)
+    threshold = detect_threshold(img, nsigma=snr)
     center_img = len(img)/2
     sigma = 3.0 * gaussian_fwhm_to_sigma# FWHM = 3.
     kernel = Gaussian2DKernel(sigma, x_size=3, y_size=3)
@@ -67,7 +67,7 @@ def detect_obj(img, snr=2.8, exp_sz= 1.2, pltshow=1):
     
 
 def mask_obj(img, snr=3.0, exp_sz= 1.2, pltshow = 0, npixels=20, return_deblend = False):
-    threshold = detect_threshold(img, snr=snr)
+    threshold = detect_threshold(img, nsigma=snr)
     sigma = 3.0 * gaussian_fwhm_to_sigma# FWHM = 3.
     kernel = Gaussian2DKernel(sigma, x_size=npixels/4, y_size=npixels/4)
     kernel.normalize()
