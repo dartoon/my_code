@@ -219,8 +219,8 @@ for k in run_list:#len(band_seq)):
                 fixed_source.append({})  
                 kwargs_source_init.append({'R_sersic': obj[i][1] * pix_scale, 'n_sersic': 2., 'e1': 0., 'e2': 0., 'center_x': -obj[i][0][0]*pix_scale, 'center_y': obj[i][0][1]*pix_scale})
                 kwargs_source_sigma.append({'n_sersic': 0.5, 'R_sersic': 0.5, 'e1': 0.1, 'e2': 0.1, 'center_x': 0.1, 'center_y': 0.1})
-                kwargs_lower_source.append({'e1': -0.5, 'e2': -0.5, 'R_sersic': obj[i][1] * pix_scale/5, 'n_sersic': 0.3, 'center_x': -obj[i][0][0]*pix_scale-10, 'center_y': obj[i][0][1]*pix_scale-10})
-                kwargs_upper_source.append({'e1': 0.5, 'e2': 0.5, 'R_sersic': 3., 'n_sersic': 7., 'center_x': -obj[i][0][0]*pix_scale+10, 'center_y': obj[i][0][1]*pix_scale+10})
+                kwargs_lower_source.append({'e1': -0.5, 'e2': -0.5, 'R_sersic': obj[i][1] * pix_scale/5, 'n_sersic': 0.3, 'center_x': -obj[i][0][0]*pix_scale-1.5*pix_scale, 'center_y': obj[i][0][1]*pix_scale-1.5*pix_scale})
+                kwargs_upper_source.append({'e1': 0.5, 'e2': 0.5, 'R_sersic': 3., 'n_sersic': 7., 'center_x': -obj[i][0][0]*pix_scale+1.5*pix_scale, 'center_y': obj[i][0][1]*pix_scale+1.5*pix_scale})
 
     elif band_seq[k] != 'I' and fix_on_I_band == 1: 
         fixed_source.append({'R_sersic': Iband_inf[0]['R_sersic'],'n_sersic': Iband_inf[0]['n_sersic']})  
@@ -240,8 +240,8 @@ for k in run_list:#len(band_seq)):
                 fixed_source.append({'R_sersic': Iband_inf[i+2]['R_sersic'],'n_sersic': Iband_inf[i+2]['n_sersic']})  
                 kwargs_source_init.append({'R_sersic': Iband_inf[i+2]['R_sersic'], 'n_sersic': Iband_inf[i+2]['n_sersic'], 'e1': 0., 'e2': 0., 'center_x': -obj[i][0][0]*pix_scale, 'center_y': obj[i][0][1]*pix_scale})
                 kwargs_source_sigma.append({'e1': 0.1, 'e2': 0.1, 'center_x': 0.1, 'center_y': 0.1})
-                kwargs_lower_source.append({'e1': -0.5, 'e2': -0.5, 'center_x': -obj[i][0][0]*pix_scale-10, 'center_y': obj[i][0][1]*pix_scale-10})
-                kwargs_upper_source.append({'e1': 0.5, 'e2': 0.5, 'center_x': -obj[i][0][0]*pix_scale+10, 'center_y': obj[i][0][1]*pix_scale+10})
+                kwargs_lower_source.append({'e1': -0.5, 'e2': -0.5, 'center_x': -obj[i][0][0]*pix_scale-1.5*pix_scale, 'center_y': obj[i][0][1]*pix_scale-1.5*pix_scale})
+                kwargs_upper_source.append({'e1': 0.5, 'e2': 0.5, 'center_x': -obj[i][0][0]*pix_scale+1.5*pix_scale, 'center_y': obj[i][0][1]*pix_scale+1.5*pix_scale})
     source_params = [kwargs_source_init, kwargs_source_sigma, fixed_source, kwargs_lower_source, kwargs_upper_source]
 
     fixed_ps = []
@@ -261,7 +261,7 @@ for k in run_list:#len(band_seq)):
     #==============================================================================
     # to fit and save the inference
     #==============================================================================
-    fixcenter = False
+    fixcenter = True
     tag = folder + '/fit_image_{0}'.format(filename_list[k].split('.fits')[0])
     source_result, ps_result, image_ps, image_host, error_map, reduced_chisq=fit_qso(QSO_img, psf_ave=psf, psf_std = None, ps_param = ps_param,
                                                                       background_rms=background_rms_list[k],
@@ -327,7 +327,7 @@ for k in run_list:#len(band_seq)):
     fit_result.write(repr(result) + "\n")
     fit_result.write(repr(ps_result) + "\n")    
     if len(source_result)>1:
-        for i in range(1,len(source_result)):
+        for i in range(len(source_result)):
             result_i = transfer_obj_to_result(source_result[i],image_host[i], zp)
             fit_result.write("#obj {0}: \n".format(i))
             fit_result.write(repr(result_i) + "\n")
@@ -358,5 +358,5 @@ if len(data_host_list) == 5:
     pyfits.PrimaryHDU(host_i_y,header=file_header).writeto(tag_c+'_host_i-y.fits',overwrite=True)
 image_not_exit.close()
 
-os.system('say "your program has finished"')
-#os.system('say "I have an apple, I have a pen, ah! apple-pen. Pen-Pineapple-Apple-Pen"')
+# os.system('say "your program has finished"')
+# #os.system('say "I have an apple, I have a pen, ah! apple-pen. Pen-Pineapple-Apple-Pen"')

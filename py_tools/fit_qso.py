@@ -49,7 +49,7 @@ from lenstronomy.Plots import chain_plot
 from lenstronomy.Sampling.parameters import Param
 
 def fit_qso(QSO_im, psf_ave, psf_std=None, source_params=None,ps_param=None, background_rms=0.04, pix_sz = 0.168,
-            exp_time = 300., fix_n=None, image_plot = True, corner_plot=True, supersampling_factor = 1, 
+            exp_time = 300., fix_n=None, image_plot = True, corner_plot=True, supersampling_factor = 2, 
             flux_ratio_plot=False, deep_seed = False, fixcenter = False, QSO_msk=None, QSO_std=None,
             tag = None, no_MCMC= False, pltshow = 1, return_Chisq = False, dump_result = False, pso_diag=False):
     '''
@@ -140,8 +140,8 @@ def fit_qso(QSO_im, psf_ave, psf_std=None, source_params=None,ps_param=None, bac
         kwargs_constraints = {'num_point_source_list': [1] * len(ps_param[0])
                               }
     elif fixcenter == True:
-        kwargs_constraints = {'joint_source_with_point_source': [[0, 0]],
-                              'num_point_source_list': [1]
+        kwargs_constraints = {'joint_source_with_point_source': [[i, i] for i in range(len(ps_param[0]))],
+                              'num_point_source_list': [1] * len(ps_param[0])
                               }
     
     
@@ -190,8 +190,8 @@ def fit_qso(QSO_im, psf_ave, psf_std=None, source_params=None,ps_param=None, bac
             ]
     elif deep_seed == True:
          fitting_kwargs_list = [
-             ['PSO', {'sigma_scale': 0.8, 'n_particles': 150, 'n_iterations': 150}],
-             ['MCMC', {'n_burn': 10, 'n_run': 15, 'walkerRatio': 50, 'sigma_scale': .1}]
+             ['PSO', {'sigma_scale': 0.8, 'n_particles': 250, 'n_iterations': 250}],
+             ['MCMC', {'n_burn': 100, 'n_run': 200, 'walkerRatio': 10, 'sigma_scale': .1}]
             ]
     if no_MCMC == True:
         fitting_kwargs_list = [fitting_kwargs_list[0],
@@ -276,7 +276,11 @@ def fit_qso(QSO_im, psf_ave, psf_std=None, source_params=None,ps_param=None, bac
             labels_new = ["Quasar flux"] +  ["host{0} flux".format(i) for i in range(len(source_params[0]))]
         else:
             labels_new = ["Quasar{0} flux".format(i) for i in range(len(ps_param[2]))] +  ["host{0} flux".format(i) for i in range(len(source_params[0]))]
-        for i in range(len(samples_mcmc)):
+        if len(samples_mcmc) > 10000:
+            trans_steps = [len(samples_mcmc)-10000, len(samples_mcmc)]
+        else:
+            trans_steps = [0, len(samples_mcmc)]
+        for i in range(trans_steps[0], trans_steps[1]):
             kwargs_out = param.args2kwargs(samples_mcmc[i])
             kwargs_light_source_out = kwargs_out['kwargs_source']
             kwargs_ps_out =  kwargs_out['kwargs_ps']
