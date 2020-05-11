@@ -20,7 +20,7 @@ band_list = ['G', 'R', 'I', 'Z', 'Y']
 
 pix_scale = 0.167
 
-for ID in [ID_list[0]]:
+for ID in [ID_list[6]]:
     count = 0
     for band in band_list:
         picklename = '{0}/fit_image_{0}_HSC-{1}.pkl'.format(ID, band)
@@ -29,7 +29,12 @@ for ID in [ID_list[0]]:
         source_result, image_host, ps_result, image_ps, _ =best_fit
         chain_list, _ = chain_list_result
         sampler_type, samples_mcmc, param_mcmc, dist_mcmc  = chain_list[1]
-        multi_band_list, kwargs_model, kwargs_result, QSO_msk, kwargs_fixed_source, kwargs_fixed_ps, kwargs_constraints, kwargs_numerics = material
+        
+        if len(material) == 8:
+            multi_band_list, kwargs_model, kwargs_result, QSO_msk, kwargs_fixed_source, kwargs_fixed_ps, kwargs_constraints, kwargs_numerics = material
+        elif len(material) == 9:
+            multi_band_list, kwargs_model, kwargs_result, QSO_msk, kwargs_fixed_source, kwargs_fixed_ps, kwargs_constraints, kwargs_numerics, classes = material
+
         if count == 0:
             QSO_img = multi_band_list[0][0]['image_data']
             plt.imshow(QSO_img, origin='low', norm=LogNorm())

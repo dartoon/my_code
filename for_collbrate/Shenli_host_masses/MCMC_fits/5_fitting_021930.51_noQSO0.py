@@ -35,7 +35,7 @@ fix_on_I_band = 1 #input("Do you want, based on I band's inference, fix the othe
 pltshow = 1 #input("Do you want to plot while fitting?input 0 means no, input others means yes. \n")
 run_MCMC = True
 
-folder = image_ID
+folder = image_ID + '_noQSO0'
 if os.path.exists(folder)==False:
     os.mkdir(folder)
     
@@ -184,6 +184,9 @@ plt.imshow(QSO_img*QSO_msk, origin='low', norm=LogNorm())
     # plt.text(obj_x, obj_y, "obj{0}".format(i), fontsize=15, color='k')
 plt.show()
 obj = []
+
+arr_x = np.flipud(arr_x)
+arr_y = np.flipud(arr_y)     
         
 #%%
 for k in run_list:#len(band_seq)):
@@ -206,6 +209,7 @@ for k in run_list:#len(band_seq)):
     kwargs_lower_source = []
     kwargs_upper_source = []
 
+    
     ps_x = ((arr_x - fit_frame_size/2) * pix_scale) * -1
     ps_y = (arr_y - fit_frame_size/2) * pix_scale   
     
@@ -213,42 +217,42 @@ for k in run_list:#len(band_seq)):
         fixed_source.append({})  
         kwargs_source_init.append({'R_sersic': 1, 'n_sersic': 2., 'e1': 0., 'e2': 0., 'center_x': ps_x[0], 'center_y':  ps_y[0]})
         kwargs_source_sigma.append({'n_sersic': 0.5, 'R_sersic': 0.5, 'e1': 0.1, 'e2': 0.1, 'center_x': 0.1, 'center_y': 0.1})
-        kwargs_lower_source.append({'e1': -0.5, 'e2': -0.5, 'R_sersic': 0.5, 'n_sersic': 0.3, 'center_x': ps_x[0]-0.2, 'center_y': ps_y[0]-0.2})
-        kwargs_upper_source.append({'e1': 0.5, 'e2': 0.5, 'R_sersic': 10., 'n_sersic': 7., 'center_x': ps_x[0]+0.2, 'center_y': ps_y[0]+0.2})
+        kwargs_lower_source.append({'e1': -0.5, 'e2': -0.5, 'R_sersic': 0.5, 'n_sersic': 0.3, 'center_x': ps_x[0]-0.1, 'center_y': ps_y[0]-0.1})
+        kwargs_upper_source.append({'e1': 0.5, 'e2': 0.5, 'R_sersic': 10., 'n_sersic': 7., 'center_x': ps_x[0]+0.1, 'center_y': ps_y[0]+0.1})
         
         fixed_source.append({})  
         kwargs_source_init.append({'R_sersic': 1, 'n_sersic': 2., 'e1': 0., 'e2': 0., 'center_x': ps_x[1], 'center_y': ps_y[1]})
         kwargs_source_sigma.append({'n_sersic': 0.5, 'R_sersic': 0.5, 'e1': 0.1, 'e2': 0.1, 'center_x': 0.1, 'center_y': 0.1})
-        kwargs_lower_source.append({'e1': -0.5, 'e2': -0.5, 'R_sersic': 0.5, 'n_sersic': 0.3, 'center_x': ps_x[1]-0.2, 'center_y': ps_y[1]-0.2})
-        kwargs_upper_source.append({'e1': 0.5, 'e2': 0.5, 'R_sersic': 10., 'n_sersic': 7., 'center_x': ps_x[1]+0.2, 'center_y': ps_y[1]+0.2})
-        if len(obj) >= 1:
-            for i in range(len(obj)):
-                fixed_source.append({})  
-                kwargs_source_init.append({'R_sersic': obj[i][1] * pix_scale, 'n_sersic': 2., 'e1': 0., 'e2': 0., 'center_x': -obj[i][0][0]*pix_scale, 'center_y': obj[i][0][1]*pix_scale})
-                kwargs_source_sigma.append({'n_sersic': 0.5, 'R_sersic': 0.5, 'e1': 0.1, 'e2': 0.1, 'center_x': 0.1, 'center_y': 0.1})
-                kwargs_lower_source.append({'e1': -0.5, 'e2': -0.5, 'R_sersic': obj[i][1] * pix_scale/5, 'n_sersic': 0.3, 'center_x': -obj[i][0][0]*pix_scale-1.5*pix_scale, 'center_y': obj[i][0][1]*pix_scale-1.5*pix_scale})
-                kwargs_upper_source.append({'e1': 0.5, 'e2': 0.5, 'R_sersic': 3., 'n_sersic': 7., 'center_x': -obj[i][0][0]*pix_scale+1.5*pix_scale, 'center_y': obj[i][0][1]*pix_scale+1.5*pix_scale})
+        kwargs_lower_source.append({'e1': -0.5, 'e2': -0.5, 'R_sersic': 0.5, 'n_sersic': 0.3, 'center_x': ps_x[1]-0.1, 'center_y': ps_y[1]-0.1})
+        kwargs_upper_source.append({'e1': 0.5, 'e2': 0.5, 'R_sersic': 10., 'n_sersic': 7., 'center_x': ps_x[1]+0.1, 'center_y': ps_y[1]+0.1})
+        # if len(obj) >= 1:
+        #     for i in range(len(obj)):
+        #         fixed_source.append({})  
+        #         kwargs_source_init.append({'R_sersic': obj[i][1] * pix_scale, 'n_sersic': 2., 'e1': 0., 'e2': 0., 'center_x': -obj[i][0][0]*pix_scale, 'center_y': obj[i][0][1]*pix_scale})
+        #         kwargs_source_sigma.append({'n_sersic': 0.5, 'R_sersic': 0.5, 'e1': 0.1, 'e2': 0.1, 'center_x': 0.1, 'center_y': 0.1})
+        #         kwargs_lower_source.append({'e1': -0.5, 'e2': -0.5, 'R_sersic': obj[i][1] * pix_scale/5, 'n_sersic': 0.3, 'center_x': -obj[i][0][0]*pix_scale-1.5*pix_scale, 'center_y': obj[i][0][1]*pix_scale-1.5*pix_scale})
+        #         kwargs_upper_source.append({'e1': 0.5, 'e2': 0.5, 'R_sersic': 3., 'n_sersic': 7., 'center_x': -obj[i][0][0]*pix_scale+1.5*pix_scale, 'center_y': obj[i][0][1]*pix_scale+1.5*pix_scale})
 
     elif band_seq[k] != 'I' and fix_on_I_band == 1: 
         fixed_source.append({'R_sersic': Iband_inf[0]['R_sersic'],'n_sersic': Iband_inf[0]['n_sersic']})  
-        kwargs_source_init.append({'R_sersic': Iband_inf[0]['R_sersic'], 'n_sersic': Iband_inf[0]['n_sersic'], 'e1': 0., 'e2': 0., 'center_x': -qso_info[0][0]*pix_scale, 'center_y': qso_info[0][1]*pix_scale})
+        kwargs_source_init.append({'R_sersic': Iband_inf[0]['R_sersic'], 'n_sersic': Iband_inf[0]['n_sersic'], 'e1': 0., 'e2': 0., 'center_x': ps_x[0], 'center_y': ps_y[0]})
         kwargs_source_sigma.append({'e1': 0.1, 'e2': 0.1, 'center_x': 0.1, 'center_y': 0.1})
-        kwargs_lower_source.append({'e1': -0.5, 'e2': -0.5, 'center_x': -0.5, 'center_y': -0.5})
-        kwargs_upper_source.append({'e1': 0.5, 'e2': 0.5, 'center_x': 0.5, 'center_y': 0.5})
+        kwargs_lower_source.append({'e1': -0.5, 'e2': -0.5,  'center_x': ps_x[0]-0.1, 'center_y': ps_y[0]-0.1})
+        kwargs_upper_source.append({'e1': 0.5, 'e2': 0.5, 'center_x': ps_x[0]+0.1, 'center_y': ps_y[0]+0.1})
         
         fixed_source.append({'R_sersic': Iband_inf[1]['R_sersic'],'n_sersic': Iband_inf[1]['n_sersic']})  
-        kwargs_source_init.append({'R_sersic': Iband_inf[0]['R_sersic'], 'n_sersic': Iband_inf[0]['n_sersic'], 'e1': 0., 'e2': 0., 'center_x': -qso_info[0][0]*pix_scale, 'center_y': qso_info[0][1]*pix_scale})
+        kwargs_source_init.append({'R_sersic': Iband_inf[1]['R_sersic'], 'n_sersic': Iband_inf[1]['n_sersic'], 'e1': 0., 'e2': 0., 'center_x': ps_x[1], 'center_y': ps_y[1]})
         kwargs_source_sigma.append({'e1': 0.1, 'e2': 0.1, 'center_x': 0.1, 'center_y': 0.1})
-        kwargs_lower_source.append({'e1': -0.5, 'e2': -0.5, 'center_x': -0.5, 'center_y': ps_y[1]-0.2})
-        kwargs_upper_source.append({'e1': 0.5, 'e2': 0.5, 'center_x': 0.5, 'center_y': ps_y[1]+0.2})
+        kwargs_lower_source.append({'e1': -0.5, 'e2': -0.5, 'center_x': ps_x[1]-0.1, 'center_y': ps_y[1]-0.1})
+        kwargs_upper_source.append({'e1': 0.5, 'e2': 0.5, 'center_x': ps_x[1]+0.1, 'center_y': ps_y[1]+0.1})
         
-        if len(obj) >= 1:
-            for i in range(len(obj)):
-                fixed_source.append({'R_sersic': Iband_inf[i+2]['R_sersic'],'n_sersic': Iband_inf[i+2]['n_sersic']})  
-                kwargs_source_init.append({'R_sersic': Iband_inf[i+2]['R_sersic'], 'n_sersic': Iband_inf[i+2]['n_sersic'], 'e1': 0., 'e2': 0., 'center_x': -obj[i][0][0]*pix_scale, 'center_y': obj[i][0][1]*pix_scale})
-                kwargs_source_sigma.append({'e1': 0.1, 'e2': 0.1, 'center_x': 0.1, 'center_y': 0.1})
-                kwargs_lower_source.append({'e1': -0.5, 'e2': -0.5, 'center_x': -obj[i][0][0]*pix_scale-1.5*pix_scale, 'center_y': obj[i][0][1]*pix_scale-1.5*pix_scale})
-                kwargs_upper_source.append({'e1': 0.5, 'e2': 0.5, 'center_x': -obj[i][0][0]*pix_scale+1.5*pix_scale, 'center_y': obj[i][0][1]*pix_scale+1.5*pix_scale})
+        # if len(obj) >= 1:
+        #     for i in range(len(obj)):
+        #         fixed_source.append({'R_sersic': Iband_inf[i+2]['R_sersic'],'n_sersic': Iband_inf[i+2]['n_sersic']})  
+        #         kwargs_source_init.append({'R_sersic': Iband_inf[i+2]['R_sersic'], 'n_sersic': Iband_inf[i+2]['n_sersic'], 'e1': 0., 'e2': 0., 'center_x': -obj[i][0][0]*pix_scale, 'center_y': obj[i][0][1]*pix_scale})
+        #         kwargs_source_sigma.append({'e1': 0.1, 'e2': 0.1, 'center_x': 0.1, 'center_y': 0.1})
+        #         kwargs_lower_source.append({'e1': -0.5, 'e2': -0.5, 'center_x': -obj[i][0][0]*pix_scale-1.5*pix_scale, 'center_y': obj[i][0][1]*pix_scale-1.5*pix_scale})
+        #         kwargs_upper_source.append({'e1': 0.5, 'e2': 0.5, 'center_x': -obj[i][0][0]*pix_scale+1.5*pix_scale, 'center_y': obj[i][0][1]*pix_scale+1.5*pix_scale})
     source_params = [kwargs_source_init, kwargs_source_sigma, fixed_source, kwargs_lower_source, kwargs_upper_source]
 
     fixed_ps = []
@@ -257,7 +261,7 @@ for k in run_list:#len(band_seq)):
     kwargs_lower_ps = []
     kwargs_upper_ps = []
     point_amp = QSO_img.sum()/(len(x)+1.)
-    for i in range(len(arr_x)):
+    for i in range(1):
         fixed_ps.append({})
         kwargs_ps_init.append({'ra_image': [ps_x[i]], 'dec_image': [ps_y[i]], 'point_amp': [point_amp]})
         kwargs_ps_sigma.append({'ra_image': [0.05], 'dec_image': [0.05]})
