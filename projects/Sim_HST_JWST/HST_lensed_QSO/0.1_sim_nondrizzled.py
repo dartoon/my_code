@@ -42,7 +42,7 @@ psf_class = PSF(**kwargs_psf_high_res)
 zp= 25.9463
 kwargs_data_high_res = sim_util.data_configure_simple(numPix, deltaPix) #,inverse=True)
 data_class = Data(**kwargs_data_high_res)
-kwargs_numerics = {'supersampling_factor': 30, 'supersampling_convolution': False}
+kwargs_numerics = {'supersampling_factor': 3, 'supersampling_convolution': False}
 
 import sys
 sys.path.insert(0,'../share_tools/')
@@ -150,8 +150,8 @@ for seed in range(701, 751):
     qso_amp= 10.**(-0.4*(source_para['mag_sersic']-zp))*amp_qRh_s_plane
     
 #    add_qso = int(input("add QSO?:\n input 0 no qso, others add qso:\t"))
+    # add_qso= 1
     add_qso= 0
-#    add_qso= 0
     
     if add_qso == 0:
     	qso_amp = 0
@@ -190,9 +190,9 @@ for seed in range(701, 751):
     plt.show()
     
     if add_qso == 0:
-    	sim_folder_name = 'sim_lens_noqso_ID_subg30_'+repr(seed)
+    	sim_folder_name = 'sim_lens_noqso_nodrz_ID_'+repr(seed)
     else:
-    	sim_folder_name = 'sim_lens_ID_'+repr(seed)
+    	sim_folder_name = 'sim_lens_nodrz_ID_'+repr(seed)
     #==============================================================================
     # Creat a folder save the fits file
     #==============================================================================
@@ -208,8 +208,8 @@ for seed in range(701, 751):
     sys.path.insert(0, '../share_tools')
     import rebin
     factor=4
-    pattern_x=[0,2,0,2,1,3,1,3]
-    pattern_y=[0,0,2,2,3,3,1,1]      #from the info. given by observation
+    pattern_x=[0]
+    pattern_y=[0]      #from the info. given by observation
     ################Bin the lensed image################
     exp_grid=rebin.expend_grid(image_highres)
     cut_out=np.zeros([len(pattern_x),image_highres.shape[0]-5,image_highres.shape[1]-5])
@@ -241,9 +241,9 @@ for seed in range(701, 751):
     rms = np.zeros_like(image_bin) #input rms
     noiz = np.zeros_like(image_bin) #input noiz
     image_data_noz=np.zeros_like(image_bin) #image after noiz
-    stddlong=0.016
+    stddlong= 0.016/np.sqrt(8) #0.016 
     #stddshort=0.265
-    explong=599.
+    explong=599. * 8
     #expshort=43.98
     #exp_tot=2*explong+expshort
     for i in range(len(pattern_x)):
@@ -252,8 +252,8 @@ for seed in range(701, 751):
         noiz[i]=np.random.normal(0, bkg_noise, size=rms[i].shape)
         image_data_noz[i]=noiz[i]+np.random.poisson(lam=bf_noz[i]*2*explong)/(2*explong)
         pyfits.PrimaryHDU(image_data_noz[i]).writeto(sim_folder_name+'/non_drizzled-image-{0}.fits'.format(i+1),overwrite=False)
-#        pyfits.PrimaryHDU(rms[i]).writeto(sim_folder_name + '/non_drizzled-noise_map-{0}.fits'.format(i+1),overwrite=False)
-        pyfits.PrimaryHDU(rms[i]**2).writeto(sim_folder_name+'/rmsSQ-{0}.fits'.format(i+1),overwrite=False)        
+        pyfits.PrimaryHDU(rms[i]).writeto(sim_folder_name + '/non_drizzled-noise_map-{0}.fits'.format(i+1),overwrite=False)
+        # pyfits.PrimaryHDU(rms[i]**2).writeto(sim_folder_name+'/rmsSQ-{0}.fits'.format(i+1),overwrite=False)        
     plt.matshow(np.log10(image_data_noz[0]),origin='lower')
     plt.colorbar()
     plt.show()

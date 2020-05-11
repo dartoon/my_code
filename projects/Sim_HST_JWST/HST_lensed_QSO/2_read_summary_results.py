@@ -31,7 +31,6 @@ result_dic = {}
 folder_type = 'sim_lens_noqso_ID_'
 file_type = 'model_result.pkl'
 
-chisq_list = []
 folder_list = glob.glob(folder_type+'*')
 folder_list.sort()
 test_numer = 29
