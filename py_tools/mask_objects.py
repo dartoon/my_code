@@ -115,7 +115,7 @@ def mask_obj(img, snr=3.0, exp_sz= 1.2, pltshow = 0, npixels=20, return_deblend 
         theta = obj.orientation.value
         apertures.append(EllipticalAperture(position, a, b, theta=theta))
     center_img = len(img)/2
-    dis_sq = [np.sqrt((apertures[i].positions[0][0]-center_img)**2+(apertures[i].positions[0][1]-center_img)**2) for i in range(len(apertures))]
+    dis_sq = [np.sqrt((apertures[i].positions[0]-center_img)**2+(apertures[i].positions[1]-center_img)**2) for i in range(len(apertures))]
     dis_sq = np.asarray(dis_sq)
     c_index= np.where(dis_sq == dis_sq.min())[0][0]
     #from astropy.visualization.mpl_normalize import ImageNormalize
@@ -139,7 +139,7 @@ def mask_obj(img, snr=3.0, exp_sz= 1.2, pltshow = 0, npixels=20, return_deblend 
     obj_masks = []  # In the script, the objects are 1, emptys are 0.
     for i in range(len(apertures)):
         aperture = apertures[i]
-        x, y = aperture.positions[0]
+        x, y = aperture.positions
         center = PixCoord(x=x, y=y)
         theta = Angle(aperture.theta/np.pi*180.,'deg')
         reg = EllipsePixelRegion(center=center, width=aperture.a*2, height=aperture.b*2, angle=theta)

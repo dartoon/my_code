@@ -321,7 +321,8 @@ def fit_qso(QSO_im, psf_ave, psf_std=None, source_params=None,ps_param=None, bac
         chain_list_result = [chain_list, 'chain_list']
         kwargs_fixed_source=source_params[2]
         kwargs_fixed_ps=ps_param[2]
-        material = multi_band_list, kwargs_model, kwargs_result, QSO_msk, kwargs_fixed_source, kwargs_fixed_ps, kwargs_constraints, kwargs_numerics
+        classes = data_class, psf_class, lightModel, pointSource
+        material = multi_band_list, kwargs_model, kwargs_result, QSO_msk, kwargs_fixed_source, kwargs_fixed_ps, kwargs_constraints, kwargs_numerics, classes
         pickle.dump([best_fit, chain_list_result, trans_paras, material], open(picklename, 'wb'))
     if return_Chisq == False:
         return source_result, ps_result, image_ps, image_host, noise_map

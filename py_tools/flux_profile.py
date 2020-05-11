@@ -574,7 +574,7 @@ def total_compare(label_list, flux_list, zp=27.0, target_ID = 'target_ID',
     clim=im1.properties()['clim']
     frame_size = len(flux_list[0])
     ax1.set_ylabel(target_ID, fontsize=15, weight='bold')
-    ax1.text(frame_size*0.05, frame_size*0.9, label_list[0],fontsize=20,weight='bold', color='white')
+    # ax1.text(frame_size*0.05, frame_size*0.9, label_list[0],fontsize=20,weight='bold', color='white')
     ax1.get_xaxis().set_visible(False)
 #    ax1.get_yaxis().set_visible(False)
     scale_bar(ax1, frame_size, dist=1/delatPixel, text='1"', color = 'white')
@@ -588,8 +588,8 @@ def total_compare(label_list, flux_list, zp=27.0, target_ID = 'target_ID',
 #    pos2_o = ax2.get_position() # get the original position
 #    pos2 = [pos2_o.x0 -0.03, pos2_o.y0, pos2_o.width, pos2_o.height]
 #    ax2.set_position(pos2) # set a new position
-    ax2.text(frame_size*0.05, frame_size*0.9, label_list[-2],weight='bold',
-         fontsize=20, color='white')
+    # ax2.text(frame_size*0.05, frame_size*0.9, label_list[-2],weight='bold',
+         # fontsize=20, color='white')
     scale_bar(ax2, frame_size, dist=1/delatPixel, text='1"', color = 'white')
     if arrows == True:
         coordinate_arrows(ax2, frame_size, arrow_size=0.03, color = 'white')
@@ -602,8 +602,8 @@ def total_compare(label_list, flux_list, zp=27.0, target_ID = 'target_ID',
 #    posE = [posE_o.x0 -0.1, pos3_o.y0 +0.025, pos3_o.width, pos3_o.height]
 #    axE.set_position(posE) # set a new position
     imE = axE.imshow((flux_list[0] - flux_list[1])*msk_image, origin='lower',cmap=my_cmap, norm=norm, clim=clim)
-    axE.text(frame_size*0.05, frame_size*0.9, 'data - Point Source', weight='bold',
-         fontsize=17, color='white')
+    # axE.text(frame_size*0.05, frame_size*0.9, 'data - Point Source', weight='bold',
+         # fontsize=17, color='white')
     scale_bar(axE, frame_size, dist=1/delatPixel, text='1"', color = 'white')
     if arrows == True:
         coordinate_arrows(axE, frame_size, arrow_size=0.03, color = 'white')
@@ -617,8 +617,8 @@ def total_compare(label_list, flux_list, zp=27.0, target_ID = 'target_ID',
 #    pos3 = [pos3_o.x0 -0.1, pos3_o.y0 +0.025, pos3_o.width, pos3_o.height]
 #    ax3.set_position(pos3) # set a new position
     im3 = ax3.imshow(norm_residual, origin='lower',cmap='bwr', vmin=-6, vmax=6)
-    ax3.text(frame_size*0.02, frame_size*0.9, label_list[-1],weight='bold',
-         fontsize=17, color='black')
+    # ax3.text(frame_size*0.02, frame_size*0.9, label_list[-1],weight='bold',
+    #      fontsize=17, color='black')
     scale_bar(ax3, frame_size, dist=1/delatPixel, text='1"')
     if arrows == True:
         coordinate_arrows(ax3, frame_size, arrow_size=0.03)
@@ -757,6 +757,249 @@ def total_compare(label_list, flux_list, zp=27.0, target_ID = 'target_ID',
     pos5_o = ax5.get_position() # get the original position
     pos5 = [pos5_o.x0+0.067, pos5_o.y0+0.08, pos5_o.width*0.72, pos5_o.height*1.1]
     ax5.set_position(pos5) # set a new position
+    ax1.text(frame_size*0.05, frame_size*1.05, label_list[0],fontsize=20,weight='bold', color='black')
+    ax2.text(frame_size*0.05, frame_size*1.05, label_list[-2],weight='bold',
+      fontsize=20, color='black')
+    ax3.text(frame_size*0.05, frame_size*1.05, label_list[-1],weight='bold',
+          fontsize=17, color='black')    
+    axE.text(frame_size*0.05, frame_size*1.05, 'data - Point Source', weight='bold',
+         fontsize=17, color='black')
+    if plot_compare == True:
+        plt.show()
+    else:
+        plt.close()        
+    return f
+
+def total_compare_6(label_list, flux_list, zp=27.0, target_ID = 'target_ID',
+                  add_background=0.0, data_mask_list = None, data_cut = 0.,plot_compare=False,
+                  pix_sz = 'drz06', msk_image=None, if_annuli=False, arrows=False, host_comp_name=None, host_comp=None):
+    if pix_sz == 'swarp':
+        delatPixel = 0.127985
+    elif pix_sz == 'drz06':
+        delatPixel = 0.0642
+    elif pix_sz == 'acs':
+        delatPixel = 0.03
+    elif isinstance(pix_sz,float):
+        delatPixel = pix_sz
+    else:
+        delatPixel = 1.
+        print("Warning: The pix_sz is inappropriate and thus delatPixel=1.0")
+    
+    norm = LogNorm() #ImageNormalize(stretch=SqrtStretch())
+    f = plt.figure(0, figsize=(24.5,4))
+    ax1 = plt.subplot2grid((6,6), (0,0), rowspan=6)
+    ax2 = plt.subplot2grid((6,6), (0,1), rowspan=6)
+    axE = plt.subplot2grid((6,6), (0,2), rowspan=6)
+    axR = plt.subplot2grid((6,6), (0,3), rowspan=6)    
+    ax3 = plt.subplot2grid((6,6), (0,4), rowspan=6)
+    ax4 = plt.subplot2grid((6,6), (0,5), rowspan=5)
+    ax5 = plt.subplot2grid((6,6), (5,5), rowspan=1)
+
+    im1 = ax1.imshow(flux_list[0] + add_background,origin='lower',cmap=my_cmap, norm=norm, vmax = flux_list[0].max())
+    clim=im1.properties()['clim']
+    frame_size = len(flux_list[0])
+    ax1.set_ylabel(target_ID, fontsize=15, weight='bold')
+    # ax1.text(frame_size*0.05, frame_size*0.9, label_list[0],fontsize=20,weight='bold', color='white')
+    ax1.get_xaxis().set_visible(False)
+#    ax1.get_yaxis().set_visible(False)
+    scale_bar(ax1, frame_size, dist=1/delatPixel, text='1"', color = 'white')
+    if arrows == True:
+        coordinate_arrows(ax1, frame_size, arrow_size=0.03, color = 'white')
+    cb1 = f.colorbar(im1, ax=ax1, shrink=0.48, pad=0.01,  orientation="horizontal", aspect=15, ticks= [1.e-4, 1.e-3, 1.e-2,1.e-1,0, 10])
+    cb1.set_ticks([1.e-5, 1.e-4, 1.e-3, 1.e-2,1.e-1,0,1,10,100])   
+#    cb1.ax.()
+    
+    im2 = ax2.imshow(flux_list[1] + flux_list[2] + add_background,origin='lower',cmap="gist_heat", norm=norm, clim=clim)
+#    pos2_o = ax2.get_position() # get the original position
+#    pos2 = [pos2_o.x0 -0.03, pos2_o.y0, pos2_o.width, pos2_o.height]
+#    ax2.set_position(pos2) # set a new position
+    # ax2.text(frame_size*0.05, frame_size*0.9, label_list[-2],weight='bold',
+         # fontsize=20, color='white')
+    scale_bar(ax2, frame_size, dist=1/delatPixel, text='1"', color = 'white')
+    if arrows == True:
+        coordinate_arrows(ax2, frame_size, arrow_size=0.03, color = 'white')
+    ax2.get_xaxis().set_visible(False)
+    ax2.get_yaxis().set_visible(False)
+    cb2 = f.colorbar(im2, ax=ax2, shrink=0.48, pad=0.01,   orientation="horizontal", aspect=15) 
+    cb2.set_ticks([1.e-5, 1.e-4, 1.e-3, 1.e-2,1.e-1,0,1,10,100])  
+    
+#    posE_o = axE.get_position() # get the original position
+#    posE = [posE_o.x0 -0.1, pos3_o.y0 +0.025, pos3_o.width, pos3_o.height]
+#    axE.set_position(posE) # set a new position
+    imE = axE.imshow((flux_list[0] - flux_list[1])*msk_image, origin='lower',cmap=my_cmap, norm=norm, clim=clim)
+    # axE.text(frame_size*0.05, frame_size*0.9, 'data - Point Source', weight='bold',
+         # fontsize=17, color='white')
+    scale_bar(axE, frame_size, dist=1/delatPixel, text='1"', color = 'white')
+    if arrows == True:
+        coordinate_arrows(axE, frame_size, arrow_size=0.03, color = 'white')
+    axE.get_xaxis().set_visible(False)
+    axE.get_yaxis().set_visible(False)
+    cbE =f.colorbar(imE, ax=axE, shrink=0.48, pad=0.01,   orientation="horizontal", aspect=15) 
+    cbE.set_ticks([1.e-5, 1.e-4, 1.e-3, 1.e-2,1.e-1,0,1,10,100])  
+
+    imR = axR.imshow((flux_list[0] - flux_list[1]- flux_list[2])*msk_image, origin='lower',cmap=my_cmap, norm=norm, clim=clim)
+    scale_bar(axR, frame_size, dist=1/delatPixel, text='1"', color = 'white')
+    if arrows == True:
+        coordinate_arrows(axR, frame_size, arrow_size=0.03, color = 'white')
+    axR.get_xaxis().set_visible(False)
+    axR.get_yaxis().set_visible(False)
+    cbR =f.colorbar(imR, ax=axR, shrink=0.48, pad=0.01,   orientation="horizontal", aspect=15) 
+    cbR.set_ticks([1.e-5, 1.e-4, 1.e-3, 1.e-2,1.e-1,0,1,10,100])  
+    
+    norm_residual = (flux_list[0]-(flux_list[1]+flux_list[2]))/flux_list[3] * msk_image
+#    pos3_o = ax3.get_position() # get the original position
+#    pos3 = [pos3_o.x0 -0.1, pos3_o.y0 +0.025, pos3_o.width, pos3_o.height]
+#    ax3.set_position(pos3) # set a new position
+    im3 = ax3.imshow(norm_residual, origin='lower',cmap='bwr', vmin=-6, vmax=6)
+    # ax3.text(frame_size*0.02, frame_size*0.9, label_list[-1],weight='bold',
+    #      fontsize=17, color='black')
+    scale_bar(ax3, frame_size, dist=1/delatPixel, text='1"')
+    if arrows == True:
+        coordinate_arrows(ax3, frame_size, arrow_size=0.03)
+    ax3.get_xaxis().set_visible(False)
+    ax3.get_yaxis().set_visible(False)
+    f.colorbar(im3, ax=ax3, shrink=0.48, pad=0.01,   orientation="horizontal", aspect=15) 
+#    plt.tight_layout()
+    plt.subplots_adjust(wspace=-0.5, hspace=0)
+#    make_ticklabels_invisible(plt.gcf())
+    for i in range(len(flux_list)-1):
+        if i == 0:
+            model_flux = flux_list[i+1] +0  # Don't share a same space
+        else:
+            model_flux += flux_list[2]
+    model_flux = flux_list[1] + flux_list[2]
+
+    label_SB_list = [label_list[0], label_list[-2], label_list[1], label_list[2]] 
+    flux_SB_list = [flux_list[0], model_flux, flux_list[1], flux_list[2]]
+    radi = len(flux_list[0])/2
+    if if_annuli == False:
+        for i in range(len(label_SB_list)):
+            center = len(flux_SB_list[i])/2, len(flux_SB_list[i])/2
+            if label_SB_list[i] == 'data':
+#                print "data_mask_lists:\t", data_mask_list
+                r_SB, r_grids = SB_profile(flux_SB_list[i], center, gridspace = 'log',
+                                           radius= radi, grids = 50, mask_list=data_mask_list,
+                                           mask_cut = data_cut, msk_image=msk_image, fits_plot=False)
+            else:
+                r_SB, r_grids = SB_profile(flux_SB_list[i], center, gridspace = 'log', radius= radi,grids = 30, mask_list=None)
+            r_mag = - 2.5 * np.log10(r_SB) + zp 
+            if label_SB_list[i] == 'data':
+                ind = len(r_mag)-(r_mag == r_mag[-1]).sum()
+                ax4.plot(r_grids[:ind], r_mag[:ind], 'o', color = 'whitesmoke',markeredgecolor="black", label=label_SB_list[i])
+#                r_max =  r_grids[ind]
+            else:
+                ax4.plot(r_grids, r_mag, '-', label=label_SB_list[i])
+        if host_comp_name is not None and host_comp is not None:
+            for i in range(len(host_comp_name)):
+                center = len(host_comp[i])/2, len(host_comp[i])/2
+                r_SB, r_grids = SB_profile(host_comp[i], center, gridspace = 'log', radius= radi,grids = 30, mask_list=None)
+                r_mag = - 2.5 * np.log10(r_SB) + zp 
+                ax4.plot(r_grids, r_mag, '-', label=host_comp_name[i])
+        ax4.set_xlabel('pixel', fontsize=15)
+        ax4.xaxis.set_label_position('top')
+        ax4.xaxis.tick_top() 
+        ax4.set_xscale('log')
+        ax4.set_xticks([2,4,6,10,15,20,30,50,100,150])
+        from matplotlib.ticker import ScalarFormatter
+        ax4.xaxis.set_major_formatter(ScalarFormatter())
+        ax4.set_xlim([(r_grids).min()*0.85,r_grids.max()+6])
+    
+        ax4.invert_yaxis()
+        ax4.set_ylabel('$\mu$(mag, pixel$^{-2}$)', fontsize=12)
+        ax4.yaxis.set_label_position('right')
+        ax4.yaxis.tick_right()
+        ax4.yaxis.set_ticks_position('both') 
+        plt.gca().invert_yaxis()
+        ax4.legend()
+        x = np.linspace(1.e-4, 100, 2)
+        y = x * 0
+        r_mag_0 = 2.5 * np.log10(SB_profile(flux_SB_list[0], center, gridspace = 'log', radius= radi,
+                                            mask_list=data_mask_list, mask_cut = data_cut,grids = 30,
+                                            msk_image=msk_image)[0])
+        r_mag_1 = 2.5 * np.log10(SB_profile(flux_SB_list[1], center, gridspace = 'log', grids = 30,radius= radi)[0])
+        ind = len(r_mag_0)-(r_mag_0 == r_mag_0[-1]).sum()
+        ax5.plot(r_grids[:ind]*delatPixel, (r_mag_0-r_mag_1)[:ind], 'ro')   
+        ax5.set_ylabel('$\Delta\mu$', fontsize=15)
+        ax5.set_xlabel('arcsec', fontsize=15)
+        ax5.set_xscale('log')
+        ax5.set_xticks([0.1, 0.2, 0.5, 1, 2,5,10,20])
+        ax5.set_yticks([-0.5,-0.25, 0., 0.25])
+        import matplotlib
+        ax5.get_xaxis().set_major_formatter(matplotlib.ticker.ScalarFormatter())
+        ax5.plot(x, y, 'k--')  
+        ax5.yaxis.set_label_position('right')
+        ax5.yaxis.tick_right()
+        ax5.yaxis.set_ticks_position('both')
+        ax5.set_xlim([(r_grids*delatPixel).min()*0.85, (r_grids.max()+6)*delatPixel])
+        plt.ylim([-0.5,0.5])
+    elif if_annuli == True:
+        for i in range(len(label_SB_list)):
+            center = len(flux_SB_list[i])/2, len(flux_SB_list[i])/2
+            if label_SB_list[i] == 'data':
+#                print "data_mask_lists:\t", data_mask_list
+                r_SB, r_grids = SB_profile(flux_SB_list[i], center, gridspace = 'log',
+                                           radius= radi, grids = 50, mask_list=data_mask_list,
+                                           mask_cut = data_cut, msk_image=msk_image, fits_plot=False, if_annuli = if_annuli)
+                ax4.plot(r_grids, r_SB, 'o', color = 'whitesmoke',markeredgecolor="black", label=label_SB_list[i])
+            else:
+                r_SB, r_grids = SB_profile(flux_SB_list[i], center, gridspace = 'log', radius=radi,grids = 30, mask_list=None, if_annuli = if_annuli)
+                ax4.plot(r_grids, r_SB, '-', label=label_SB_list[i])
+        if host_comp_name is not None and host_comp is not None:
+            for i in range(len(host_comp_name)):
+                center = len(host_comp[i])/2, len(host_comp[i])/2
+                r_SB, r_grids = SB_profile(host_comp[i], center, gridspace = 'log', radius= radi,grids = 30, mask_list=None)
+                ax4.plot(r_grids, r_SB, '-', label=host_comp_name[i])        
+        ax4.set_xlabel('pixel', fontsize=15)
+        ax4.xaxis.set_label_position('top')
+        ax4.xaxis.tick_top() 
+        ax4.set_xscale('log')
+        ax4.set_xticks([2,4,6,10,15,20,30,50,100,150])
+        from matplotlib.ticker import ScalarFormatter
+        ax4.xaxis.set_major_formatter(ScalarFormatter())
+        ax4.set_xlim([(r_grids).min()*0.85,(r_grids).max()+6])
+    
+        ax4.set_ylabel('$SB_{annuli}$(counts, pixel$^{-2}$)', fontsize=12)
+        ax4.yaxis.set_label_position('right')
+        ax4.yaxis.tick_right()
+        ax4.yaxis.set_ticks_position('both') 
+        ax4.legend()
+        
+        x = np.linspace(1.e-4, 100, 2)
+        y = x * 0
+        r_SB_0 = (SB_profile(flux_SB_list[0], center, gridspace = 'log', radius= radi, if_annuli = if_annuli, 
+                                            mask_list=data_mask_list, mask_cut = data_cut,grids = 30,
+                                            msk_image=msk_image)[0])
+        r_SB_1 = (SB_profile(flux_SB_list[1], center, gridspace = 'log', grids = 30, if_annuli = if_annuli,radius= radi)[0])
+    #    r_mag_diff = 2.5 * np.log10(SB_profile(flux_SB_list[1], center, gridspace = 'log', radius= radi)[0])
+        ax5.plot(r_grids*delatPixel, (r_SB_0- r_SB_1), 'ro')   
+        ax5.set_ylabel('$\Delta SB$', fontsize=15)
+        ax5.set_xlabel('arcsec', fontsize=15)
+        ax5.set_xscale('log')
+        ax5.set_xticks([0.1, 0.2, 0.5, 1, 2,5,10,20])
+        import matplotlib
+        ax5.get_xaxis().set_major_formatter(matplotlib.ticker.ScalarFormatter())
+        ax5.plot(x, y, 'k--')  
+        ax5.yaxis.set_label_position('right')
+        ax5.yaxis.tick_right()
+        ax5.yaxis.set_ticks_position('both')
+        ax5.set_xlim([(r_grids*delatPixel).min()*0.85, (r_grids.max()+6)*delatPixel])
+        plt.ylim([-5,5])
+        ax5.set_yticks([-5,-2.5, 0., 2.5])
+    pos4_o = ax4.get_position() # get the original position
+    pos4 = [pos4_o.x0+0.067, pos4_o.y0 + 0.10, pos4_o.width*0.72, pos4_o.height*0.8]
+    ax4.set_position(pos4) # set a new position
+    pos5_o = ax5.get_position() # get the original position
+    pos5 = [pos5_o.x0+0.067, pos5_o.y0+0.08, pos5_o.width*0.72, pos5_o.height*1.1]
+    ax5.set_position(pos5) # set a new position
+    ax1.text(frame_size*0.05, frame_size*1.05, label_list[0],fontsize=20,weight='bold', color='black')
+    ax2.text(frame_size*0.05, frame_size*1.05, label_list[-2],weight='bold',
+      fontsize=20, color='black')
+    ax3.text(frame_size*0.05, frame_size*1.05, label_list[-1],weight='bold',
+          fontsize=17, color='black')    
+    axE.text(frame_size*0.05, frame_size*1.05, 'data - Point Sources', weight='bold',
+         fontsize=17, color='black')
+    axR.text(frame_size*0.05, frame_size*1.05, 'data - model', weight='bold',
+         fontsize=17, color='black')    
     if plot_compare == True:
         plt.show()
     else:
