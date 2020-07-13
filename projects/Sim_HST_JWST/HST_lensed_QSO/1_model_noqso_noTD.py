@@ -36,9 +36,9 @@ filt='f160w'
 def cal_Ddt(zl, zs, H0_ini=100, om=0.27):
     cosmo = FlatLambdaCDM(H0=H0_ini, Om0=0.27) 
     lensunits=LensCosmo(z_lens=zl, z_source=zs,cosmo= cosmo)
-    D_l=lensunits.D_d
-    D_s=lensunits.D_s
-    D_ls=lensunits.D_ds 
+    D_l=lensunits.dd
+    D_s=lensunits.ds
+    D_ls=lensunits.dds 
     Ddt_corr = (1+zl)*D_l*D_s/D_ls
     return Ddt_corr
 
@@ -47,16 +47,16 @@ def cal_h0(zl, zs, Ddt, om=0.27):
     ratio = Ddt_corr/Ddt
     return 100 * ratio
 
-folder_list = glob.glob('sim_lens_noqso_ID_7??')
+folder_list = glob.glob('sim_lens_noqso_ID_dire008_7??')
 folder_list.sort()
-test_numer = 30
-kernel = 6
+test_numer = 15
+kernel = 3
 run_n = int(test_numer/kernel)
 
-kernel_i = 5 # 0, 1 ,2, 3 .. max = kernel-1
+kernel_i = 2 # 0, 1 ,2, 3 .. max = kernel-1
 folder_list = folder_list[:test_numer]
 
-savename = 'model_result_noTD_calNoisemap_subg4.pkl'
+savename = 'model_result_noTD_subg2.pkl'
 # savename = 'model_result_noTD_calNoisemap_subg3.pkl'
 for folder in folder_list[kernel_i*run_n:kernel_i*run_n+run_n]:
 # for folder in ['sim_lens_noqso_ID_710']:    
@@ -66,6 +66,7 @@ for folder in folder_list[kernel_i*run_n:kernel_i*run_n+run_n]:
     qso_folder = 'sim_lens_ID_{0}/'.format(ID)
     model_lists, para_s, lens_info= pickle.load(open(folder+'sim_kwargs.pkl','rb'))
     lens_model_list, lens_light_model_list, source_model_list, point_source_list = model_lists
+    lens_model_list[0] = 'PEMD'
     z_l, z_s, TD_distance, TD_true, TD_obs, TD_err_l = lens_info
     kwargs_lens_list, kwargs_lens_light_list, kwargs_source_list, kwargs_ps = para_s
     solver_type = 'PROFILE_SHEAR'
@@ -164,7 +165,7 @@ for folder in folder_list[kernel_i*run_n:kernel_i*run_n+run_n]:
                              'source_marg': False,
                              'image_likelihood_mask_list': [lens_mask]
                                      }
-        kwargs_numerics = {'supersampling_factor': 4}
+        kwargs_numerics = {'supersampling_factor': 2}
         image_band = [kwargs_data, kwargs_psf, kwargs_numerics]
         multi_band_list = [image_band]
         kwargs_data_joint = {'multi_band_list': multi_band_list, 'multi_band_type': 'multi-linear'}
@@ -194,36 +195,36 @@ for folder in folder_list[kernel_i*run_n:kernel_i*run_n+run_n]:
         # sampler_type, samples_mcmc, param_mcmc, dist_mcmc  = chain_list[-1]
         mcmc_new_list = []
         pickle.dump([multi_band_list, kwargs_model, kwargs_result, chain_list, fix_setting, mcmc_new_list], open(folder+savename, 'wb'))
-    # #Print fitting result:
-    # multi_band_list, kwargs_model, kwargs_result, chain_list, fix_setting, _ = pickle.load(open(folder+savename,'rb'))
-    # fixed_lens, fixed_source, fixed_lens_light, fixed_ps, fixed_cosmo = fix_setting
-    # labels_new = [r"$\gamma$", r"$e1$", r"$e2$"]    
-    # modelPlot = ModelPlot(multi_band_list, kwargs_model, kwargs_result, arrow_size=0.02, cmap_string="gist_heat")
-    # f, axes = modelPlot.plot_main()
-    # f.show()
-    # f, axes = modelPlot.plot_separate()
-    # f.show()
-    # f, axes = modelPlot.plot_subtract_from_data_all()
-    # f.show()
+    #%%Print fitting result:
+    multi_band_list, kwargs_model, kwargs_result, chain_list, fix_setting, _ = pickle.load(open(folder+savename,'rb'))
+    fixed_lens, fixed_source, fixed_lens_light, fixed_ps, fixed_cosmo = fix_setting
+    labels_new = [r"$\gamma$", r"$e1$", r"$e2$"]    
+    modelPlot = ModelPlot(multi_band_list, kwargs_model, kwargs_result, arrow_size=0.02, cmap_string="gist_heat")
+    f, axes = modelPlot.plot_main()
+    f.show()
+    f, axes = modelPlot.plot_separate()
+    f.show()
+    f, axes = modelPlot.plot_subtract_from_data_all()
+    f.show()
 
-    # sampler_type, samples_mcmc, param_mcmc, dist_mcmc  = chain_list[-1]
-    # for i in range(len(chain_list)):
-    #     chain_plot.plot_chain_list(chain_list, i)
+    sampler_type, samples_mcmc, param_mcmc, dist_mcmc  = chain_list[-1]
+    for i in range(len(chain_list)):
+        chain_plot.plot_chain_list(chain_list, i)
 
-    # param = Param(kwargs_model, fixed_lens, fixed_source, fixed_lens_light,
-    #               kwargs_lens_init=kwargs_result['kwargs_lens'], **kwargs_constraints)    
-    # mcmc_new_list = []        
-    # steps = len(samples_mcmc)
-    # for i in range(steps):
-    #     kwargs_result = param.args2kwargs(samples_mcmc[i])
-    #     gamma = kwargs_result['kwargs_lens'][0]['gamma']
-    #     e1 = kwargs_result['kwargs_lens'][0]['e1']
-    #     e2 = kwargs_result['kwargs_lens'][0]['e2']
-    #     mcmc_new_list.append([gamma, e1, e2])    
-    # plt.show()
-    # truths=[para_s[0][0]['gamma'],para_s[0][0]['e1'], para_s[0][0]['e2']]	
-    # plot = corner.corner(mcmc_new_list, labels=labels_new, show_titles=True, #range= [[0.8,1.5],[1,3],[0,1],[0, 1],[2000,5000],[20,100]], 
-    #                       quantiles=[0.16, 0.5, 0.84], truths =truths,
-    #                       title_kwargs={"fontsize": 15}, label_kwargs = {"fontsize": 25},
-    #                       levels=1.0 - np.exp(-0.5 * np.array([1.,2.]) ** 2))
-    # plt.show()
+    param = Param(kwargs_model, fixed_lens, fixed_source, fixed_lens_light,
+                  kwargs_lens_init=kwargs_result['kwargs_lens'], **kwargs_constraints)    
+    mcmc_new_list = []        
+    steps = len(samples_mcmc)
+    for i in range(steps):
+        kwargs_result = param.args2kwargs(samples_mcmc[i])
+        gamma = kwargs_result['kwargs_lens'][0]['gamma']
+        e1 = kwargs_result['kwargs_lens'][0]['e1']
+        e2 = kwargs_result['kwargs_lens'][0]['e2']
+        mcmc_new_list.append([gamma, e1, e2])    
+    plt.show()
+    truths=[para_s[0][0]['gamma'],para_s[0][0]['e1'], para_s[0][0]['e2']]	
+    plot = corner.corner(mcmc_new_list, labels=labels_new, show_titles=True, #range= [[0.8,1.5],[1,3],[0,1],[0, 1],[2000,5000],[20,100]], 
+                          quantiles=[0.16, 0.5, 0.84], truths =truths,
+                          title_kwargs={"fontsize": 15}, label_kwargs = {"fontsize": 25},
+                          levels=1.0 - np.exp(-0.5 * np.array([1.,2.]) ** 2))
+    plt.show()

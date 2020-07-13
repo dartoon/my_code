@@ -45,9 +45,9 @@ class gene_para:
         else:
             raise ValueError("the fixz is not give correctly" % fixz)
         lensunits=LensCosmo(z_lens=self.z_lens, z_source=self.z_source,cosmo=self.cosmo)
-        self.D_l=lensunits.D_d
-        self.D_s=lensunits.D_s
-        self.D_ls=lensunits.D_ds
+        self.D_l=lensunits.dd
+        self.D_s=lensunits.ds
+        self.D_ls=lensunits.dds
         
     def spemd(self):
         """

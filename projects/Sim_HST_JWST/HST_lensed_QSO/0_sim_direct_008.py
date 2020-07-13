@@ -24,14 +24,24 @@ import lenstronomy.Util.simulation_util as sim_util
 from lenstronomy.Data.imaging_data import ImageData as Data
 from lenstronomy.Data.psf import PSF
 
-# data specifics
-numPix = 241  #  pixel size  #!!!
-deltaPix = 0.13/4 #  pixel size in arcsec (area per pixel = deltaPix**2)
+# # data specifics
+# numPix = 241  #  pixel size  #!!!
+# deltaPix = 0.13/4 #  pixel size in arcsec (area per pixel = deltaPix**2)
+numPix = 99
+deltaPix = 0.08
 
-psf = pyfits.open('psf_F160W_sub4.fits'.format(filt))
+import glob
+folder_type = 'simulations_700_subg30/sim_lens_noqso_ID_subg30_'
+file_type = 'model_result_subg2.pkl'
+folder_list = glob.glob(folder_type+'*')
+folder_list.sort()
+test_numer = 15
+folder_list = folder_list[:test_numer]
+
+psf = pyfits.open(folder_list[0]+'/Drz_PSF.fits')
 psf_data = psf[0].data
-cut =25 
-psf_data = psf_data[1+cut:-cut,1+cut:-cut]+ 0  #shave PSF to singular size, as max in the middle
+# cut =25 
+# psf_data = psf_data[1+cut:-cut,1+cut:-cut]+ 0  #shave PSF to singular size, as max in the middle
 plt.imshow(psf_data, origin='lower',cmap='gist_heat', norm=LogNorm())
 plt.colorbar()
 plt.close()
@@ -42,13 +52,15 @@ psf_class = PSF(**kwargs_psf_high_res)
 zp= 25.9463
 kwargs_data_high_res = sim_util.data_configure_simple(numPix, deltaPix) #,inverse=True)
 data_class = Data(**kwargs_data_high_res)
-kwargs_numerics = {'supersampling_factor': 3, 'supersampling_convolution': False}
+kwargs_numerics = {'supersampling_factor': 2, 'supersampling_convolution': False}
 
 import sys
 sys.path.insert(0,'../share_tools/')
+
+#%%
 from gene_para import gene_para
-#seed=221 #input("The seed for simulation:\n")
-for seed in range(521, 522):
+for folder in folder_list:
+    seed = int(folder[-3:])
     print(seed)
     para=gene_para(seed=seed,fixh0=102)
     
@@ -85,19 +97,18 @@ for seed in range(521, 522):
     
     kwargs_spemd['q'] = 0.9 + np.random.normal(0,0.01)
     kwargs_spemd['e1'], kwargs_spemd['e2'] = param_util.phi_q2_ellipticity(phi=kwargs_spemd['phi_G'], q=kwargs_spemd['q'])
-    lens_model_list = ['SPEMD','SHEAR']
+    lens_model_list = ['PEMD','SHEAR']
     #kwargs_spemd['gamma'] = 2.
     kwargs_mass_copy = copy.deepcopy([kwargs_spemd])
     del kwargs_spemd['phi_G']
     del kwargs_spemd['q']    
     ex_shear = {'gamma1': para.shear()[0]['e1'], 'gamma2': para.shear()[0]['e2']}
     kwargs_lens_list = [kwargs_spemd, ex_shear]
-    
     lens_model_class = LensModel(lens_model_list)
     #==============================================================================
     # #########source light
     #==============================================================================
-    source_pos=[-0.02, 0.01]  #Seed 220  cored-Powerlaw
+    source_pos=[-0.02, 0.02]  #Seed 220  cored-Powerlaw
     source_model_list = ['SERSIC_ELLIPSE']
     source_para=para.source_light()
     source_amp= mva.getAmp(SERSIC_in_mag=source_para,zp=zp,deltaPix=deltaPix)
@@ -152,7 +163,7 @@ for seed in range(521, 522):
     qso_amp= 10.**(-0.4*(source_para['mag_sersic']-zp))*amp_qRh_s_plane
     
 #    add_qso = int(input("add QSO?:\n input 0 no qso, others add qso:\t"))
-    add_qso= 1
+    add_qso= 0
 #    add_qso= 0
     
     if add_qso == 0:
@@ -192,9 +203,9 @@ for seed in range(521, 522):
     plt.show()
     
     if add_qso == 0:
-    	sim_folder_name = 'sim_lens_noqso_ID_'+repr(seed)
+    	sim_folder_name = 'sim_lens_noqso_ID_dire008_'+repr(seed)
     else:
-    	sim_folder_name = 'sim_lens_ID_'+repr(seed)
+    	sim_folder_name = 'sim_lens_ID_dire008_'+repr(seed)
     #==============================================================================
     # Creat a folder save the fits file
     #==============================================================================
@@ -204,57 +215,61 @@ for seed in range(521, 522):
         shutil.rmtree(sim_folder_name)
     os.mkdir(sim_folder_name)
     
-    ##==============================================================================
-    ## #Bin the image res. from high to low. 
-    ##==============================================================================
-    sys.path.insert(0, '../share_tools')
-    import rebin
-    factor=4
-    pattern_x=[0,2,0,2,1,3,1,3]
-    pattern_y=[0,0,2,2,3,3,1,1]      #from the info. given by observation
-    ################Bin the lensed image################
-    exp_grid=rebin.expend_grid(image_highres)
-    cut_out=np.zeros([len(pattern_x),image_highres.shape[0]-5,image_highres.shape[1]-5])
-    image_bin =np.zeros([len(pattern_x),int(image_highres.shape[0]/factor)-1,int(image_highres.shape[1]/factor)-1])
-    for i in range(len(pattern_x)):
-        cut_out[i]=exp_grid[pattern_x[i]:(numPix-5)+pattern_x[i],pattern_y[i]:(numPix-5)+pattern_y[i]]   #the size before bin
-        image_bin[i]=rebin.block(cut_out[i],(int(numPix/factor)-1,int(numPix/factor)-1),factor=factor)
-    plt.imshow(image_bin[0], origin='lower',cmap='gist_heat', norm=LogNorm())
-    plt.colorbar()
-    plt.show()
-    ################Bin the PSF and save it################
-    #exp_psf=rebin.expend_grid(psf_pixel_high_res)
-    cut_fd=int((len(psf_data)-((int(len(psf_data)/8*2)-1)*4+3))/2)
-    exp_psf_o=psf_data[1+cut_fd:-cut_fd,1+cut_fd:-cut_fd]+ 0  # To change it from 251 to 247.
-    exp_psf=rebin.expend_grid(exp_psf_o)
-    cut_len=int(round(len(exp_psf_o)/factor)*factor)
-    cut_out_psf=np.zeros([len(pattern_x),cut_len,cut_len])
-    image_bin_psf=np.zeros([len(pattern_x),int(cut_len/factor),int(cut_len/factor)])
-    for i in range(len(pattern_x)):
-        cut_out_psf[i]=exp_psf[pattern_x[i]:cut_len+pattern_x[i],pattern_y[i]:cut_len+pattern_y[i]]   #the size before bin
-        image_bin_psf[i]=rebin.block(cut_out_psf[i],(int(cut_len/factor),int(cut_len/factor)),factor=factor)
-        image_bin_psf[i] /= np.sum(image_bin_psf[i])  #unify the psf value
-        pyfits.PrimaryHDU(image_bin_psf[i]).writeto(sim_folder_name+'/non_drizzled_psf-{0}.fits'.format(i+1),overwrite=False)
+    # ##==============================================================================
+    # ## #Bin the image res. from high to low. 
+    # ##==============================================================================
+    # sys.path.insert(0, '../share_tools')
+    # import rebin
+    # factor=4
+    # pattern_x=[0,2,0,2,1,3,1,3]
+    # pattern_y=[0,0,2,2,3,3,1,1]      #from the info. given by observation
+    # ################Bin the lensed image################
+    # exp_grid=rebin.expend_grid(image_highres)
+    # cut_out=np.zeros([len(pattern_x),image_highres.shape[0]-5,image_highres.shape[1]-5])
+    # image_bin =np.zeros([len(pattern_x),int(image_highres.shape[0]/factor)-1,int(image_highres.shape[1]/factor)-1])
+    # for i in range(len(pattern_x)):
+    #     cut_out[i]=exp_grid[pattern_x[i]:(numPix-5)+pattern_x[i],pattern_y[i]:(numPix-5)+pattern_y[i]]   #the size before bin
+    #     image_bin[i]=rebin.block(cut_out[i],(int(numPix/factor)-1,int(numPix/factor)-1),factor=factor)
+    # plt.imshow(image_bin[0], origin='lower',cmap='gist_heat', norm=LogNorm())
+    # plt.colorbar()
+    # plt.show()
+    # ################Bin the PSF and save it################
+    # #exp_psf=rebin.expend_grid(psf_pixel_high_res)
+    # cut_fd=int((len(psf_data)-((int(len(psf_data)/8*2)-1)*4+3))/2)
+    # exp_psf_o=psf_data[1+cut_fd:-cut_fd,1+cut_fd:-cut_fd]+ 0  # To change it from 251 to 247.
+    # exp_psf=rebin.expend_grid(exp_psf_o)
+    # cut_len=int(round(len(exp_psf_o)/factor)*factor)
+    # cut_out_psf=np.zeros([len(pattern_x),cut_len,cut_len])
+    # image_bin_psf=np.zeros([len(pattern_x),int(cut_len/factor),int(cut_len/factor)])
+    # for i in range(len(pattern_x)):
+    #     cut_out_psf[i]=exp_psf[pattern_x[i]:cut_len+pattern_x[i],pattern_y[i]:cut_len+pattern_y[i]]   #the size before bin
+    #     image_bin_psf[i]=rebin.block(cut_out_psf[i],(int(cut_len/factor),int(cut_len/factor)),factor=factor)
+    #     image_bin_psf[i] /= np.sum(image_bin_psf[i])  #unify the psf value
+    #     pyfits.PrimaryHDU(image_bin_psf[i]).writeto(sim_folder_name+'/non_drizzled_psf-{0}.fits'.format(i+1),overwrite=False)
     #==============================================================================
     # Add the noise same as Ding et al. 2017a 
     ######Since two long pics only ###########
     #==============================================================================
-    bf_noz = image_bin#input simulate data to bf_noz
-    rms = np.zeros_like(image_bin) #input rms
-    noiz = np.zeros_like(image_bin) #input noiz
-    image_data_noz=np.zeros_like(image_bin) #image after noiz
-    stddlong=0.016
+    bf_noz = image_highres#input simulate data to bf_noz
+    rms = np.zeros_like(image_highres) #input rms
+    noiz = np.zeros_like(image_highres) #input noiz
+    image_data_noz=np.zeros_like(image_highres) #image after noiz
+    stddlong=0.0008
     #stddshort=0.265
-    explong=599.
+    explong=599. * 2 * 8
     #expshort=43.98
     #exp_tot=2*explong+expshort
-    for i in range(len(pattern_x)):
-        rms[i]=(bf_noz[i]/(2*explong)+1/2.*stddlong**2)**0.5
-        bkg_noise=(1/2.*stddlong**2)**0.5
-        noiz[i]=np.random.normal(0, bkg_noise, size=rms[i].shape)
-        image_data_noz[i]=noiz[i]+np.random.poisson(lam=bf_noz[i]*2*explong)/(2*explong)
-        pyfits.PrimaryHDU(image_data_noz[i]).writeto(sim_folder_name+'/non_drizzled-image-{0}.fits'.format(i+1),overwrite=False)
-    plt.matshow(np.log10(image_data_noz[0]),origin='lower')
+    # for i in range(len(pattern_x)):
+        
+    rms=(abs(bf_noz/(explong))+stddlong**2)**0.5
+    bkg_noise=(stddlong**2)**0.5
+    noiz=np.random.normal(0, bkg_noise, size=rms.shape)
+    image_data_noz=noiz+np.random.poisson(lam=bf_noz*explong)/(explong)
+    pyfits.PrimaryHDU(image_data_noz).writeto(sim_folder_name+'/Drz_QSO_image.fits',overwrite=False)
+    pyfits.PrimaryHDU(rms).writeto(sim_folder_name + '/noise_map.fits',overwrite=False)
+    pyfits.PrimaryHDU(psf_data).writeto(sim_folder_name+'/Drz_PSF.fits',overwrite=False)
+
+    plt.matshow(np.log10(image_data_noz),origin='lower')
     plt.colorbar()
     plt.show()
     

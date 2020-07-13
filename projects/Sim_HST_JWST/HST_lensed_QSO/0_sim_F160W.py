@@ -42,15 +42,14 @@ psf_class = PSF(**kwargs_psf_high_res)
 zp= 25.9463
 kwargs_data_high_res = sim_util.data_configure_simple(numPix, deltaPix) #,inverse=True)
 data_class = Data(**kwargs_data_high_res)
-kwargs_numerics = {'supersampling_factor': 30, 'supersampling_convolution': False}
+kwargs_numerics = {'supersampling_factor': 3, 'supersampling_convolution': False}
 
 import sys
 sys.path.insert(0,'../share_tools/')
 from gene_para import gene_para
-for seed in range(701, 751):
+for seed in range(1, 2):
     print(seed)
     para=gene_para(seed=seed,fixh0=102)
-    
     #==============================================================================
     # #######lens light 
     #==============================================================================
@@ -84,7 +83,7 @@ for seed in range(701, 751):
     
     kwargs_spemd['q'] = 0.9 + np.random.normal(0,0.01)
     kwargs_spemd['e1'], kwargs_spemd['e2'] = param_util.phi_q2_ellipticity(phi=kwargs_spemd['phi_G'], q=kwargs_spemd['q'])
-    lens_model_list = ['SPEMD','SHEAR']
+    lens_model_list = ['PEMD','SHEAR']
     #kwargs_spemd['gamma'] = 2.
     kwargs_mass_copy = copy.deepcopy([kwargs_spemd])
     del kwargs_spemd['phi_G']
@@ -192,7 +191,7 @@ for seed in range(701, 751):
     if add_qso == 0:
     	sim_folder_name = 'sim_lens_noqso_ID_subg30_'+repr(seed)
     else:
-    	sim_folder_name = 'sim_lens_ID_'+repr(seed)
+    	sim_folder_name = 'sim_lens_ID_subg30_'+repr(seed)
     #==============================================================================
     # Creat a folder save the fits file
     #==============================================================================

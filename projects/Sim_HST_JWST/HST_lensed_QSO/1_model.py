@@ -36,9 +36,9 @@ filt='f160w'
 def cal_Ddt(zl, zs, H0_ini=100, om=0.27):
     cosmo = FlatLambdaCDM(H0=H0_ini, Om0=0.27) 
     lensunits=LensCosmo(z_lens=zl, z_source=zs,cosmo= cosmo)
-    D_l=lensunits.D_d
-    D_s=lensunits.D_s
-    D_ls=lensunits.D_ds 
+    D_l=lensunits.dd
+    D_s=lensunits.ds
+    D_ls=lensunits.dds
     Ddt_corr = (1+zl)*D_l*D_s/D_ls
     return Ddt_corr
 
@@ -47,21 +47,29 @@ def cal_h0(zl, zs, Ddt, om=0.27):
     ratio = Ddt_corr/Ddt
     return 100 * ratio
 
-folder_list = glob.glob('sim_lens_ID_7??')
+folder_list = glob.glob('simulations_700_subg30/sim_lens_ID_subg30_7??')
 folder_list.sort()
-test_numer = 10
-kernel = 5
+
+test_numer = 44
+kernel = 4
 run_n = int(test_numer/kernel)
 
-kernel_i = 4 # 0, 1 ,2, 3 .. max = kernel-1
-folder_list = folder_list[20:20+test_numer]
+kernel_i = 0 # 0, 1 ,2, 3 .. max = kernel-1
+folder_list = folder_list[:test_numer]
+# savename = 'model_result_PSF_errormap_correct_subg3.pkl'
+savename = 'model_result_use_drz_Noisemap_subg3.pkl'
 
+#%%
+# savename = 'model_result_use_drz_Noisemap_subg2.pkl'
+# for folder in ['sim_lens_ID_subg30_702']:    
+    
 for folder in folder_list[kernel_i*run_n:kernel_i*run_n+run_n]:
     ID = folder[-3:]
     folder = folder + '/'
     print(folder)
     model_lists, para_s, lens_info= pickle.load(open(folder+'sim_kwargs.pkl','rb'))
     lens_model_list, lens_light_model_list, source_model_list, point_source_list = model_lists
+    lens_model_list[0] = 'PEMD'
     z_l, z_s, TD_distance, TD_true, TD_obs, TD_err_l = lens_info
     kwargs_lens_list, kwargs_lens_light_list, kwargs_source_list, kwargs_ps = para_s
     solver_type = 'PROFILE_SHEAR'
@@ -81,7 +89,7 @@ for folder in folder_list[kernel_i*run_n:kernel_i*run_n+run_n]:
                           'solver_type': solver_type,  # 'PROFILE', 'PROFILE_SHEAR', 'ELLIPSE', 'CENTER'
                           'Ddt_sampling': True,
                                   }
-    if glob.glob(folder+'model_result.pkl') == []:    
+    if glob.glob(folder+savename) == []:    
         #Load the result from the first run:
 #        multi_band_list, kwargs_model, kwargs_result, chain_list, fix_setting = pickle.load(open(folder+'model_result.pkl','rb'))
 #        fixed_lens, fixed_source, fixed_lens_light, fixed_ps, fixed_cosmo = fix_setting
@@ -96,9 +104,9 @@ for folder in folder_list[kernel_i*run_n:kernel_i*run_n+run_n]:
         lens_mask = (1-lens_mask)[ct:-ct,ct:-ct]
         plt.imshow(lens_data, origin='lower',cmap='gist_heat', norm=LogNorm())
         plt.colorbar()
-#        exp_time = 599.* 2 * 8
-#        stdd =  0.0024  #Measurement from empty retion, 0.016*0.08**2/0.13**2/np.sqrt(8)
-#        len_std = (abs(lens_data/exp_time)+stdd**2)**0.5
+        exp_time = 599.* 2 * 8
+        stdd =  0.0008  #Measurement from empty retion, 0.016*0.08**2/0.13**2/np.sqrt(8)
+        # len_std = (abs(lens_data/exp_time)+stdd**2)**0.5
         deltaPix = 0.08
         
         x, y =find_loc_max(lens_data)
@@ -210,15 +218,15 @@ for folder in folder_list[kernel_i*run_n:kernel_i*run_n+run_n]:
         num_source_model = len(source_model_list)
         
         kwargs_likelihood = {'check_bounds': True,
-                             'force_no_add_image': False,
-                             'source_marg': False,
-                             'image_position_uncertainty': 0.004,
-                             'check_matched_source_position': True,
-                             'source_position_tolerance': 0.001,
-                             'time_delay_likelihood': True,
-                             'image_likelihood_mask_list': [lens_mask]
-                                     }
-        kwargs_numerics = {'supersampling_factor': 2}
+                              'force_no_add_image': False,
+                              'source_marg': False,
+                              'image_position_uncertainty': 0.004,
+                              'check_matched_source_position': True,
+                              'source_position_tolerance': 0.001,
+                              'time_delay_likelihood': True,
+                              'image_likelihood_mask_list': [lens_mask]
+                                      }
+        kwargs_numerics = {'supersampling_factor': 3}
         image_band = [kwargs_data, kwargs_psf, kwargs_numerics]
         multi_band_list = [image_band]
         kwargs_data_joint = {'multi_band_list': multi_band_list, 'multi_band_type': 'multi-linear',
@@ -226,10 +234,10 @@ for folder in folder_list[kernel_i*run_n:kernel_i*run_n+run_n]:
                             'time_delays_uncertainties': TD_err_l[1:]}
         
         kwargs_model = {'lens_model_list': lens_model_list, 
-                         'lens_light_model_list': lens_light_model_list,
-                         'source_light_model_list': source_model_list,
+                          'lens_light_model_list': lens_light_model_list,
+                          'source_light_model_list': source_model_list,
                         'point_source_model_list': point_source_list
-                         }
+                          }
         fitting_seq = FittingSequence(kwargs_data_joint, kwargs_model, kwargs_constraints,
                                       kwargs_likelihood, kwargs_params)
         
@@ -243,9 +251,15 @@ for folder in folder_list[kernel_i*run_n:kernel_i*run_n+run_n]:
         
         kwargs_psf_iter = {'num_iter': 150, 'psf_iter_factor': 0.5,
                             'stacking_method': 'median', 
-                           'keep_psf_error_map': True, 
-                           'psf_symmetry': 1, 
-                           'block_center_neighbour': 0.05}
+                            'keep_psf_error_map': True, 
+                            'psf_symmetry': 1, 
+                            'block_center_neighbour': 0.05}
+        
+        # kwargs_psf_iter = {'num_iter': 150, 'psf_iter_factor': 0.5,
+        #                     'stacking_method': 'median', 
+        #                     'keep_psf_error_map': False, 
+        #                     'psf_symmetry': 1, 
+        #                     'block_center_neighbour': 0.05}        
         
         fitting_kwargs_list_1 = [
                                 ['psf_iteration', kwargs_psf_iter],
@@ -279,9 +293,9 @@ for folder in folder_list[kernel_i*run_n:kernel_i*run_n+run_n]:
         #    phi_ext, gamma_ext = kwargs_result['kwargs_lens'][1]['gamma1'], kwargs_result['kwargs_lens'][1]['gamma2']
             mcmc_new_list.append([gamma, D_dt, cal_h0(z_l ,z_s, D_dt)])        
         
-        pickle.dump([multi_band_list, kwargs_model, kwargs_result, chain_list, fix_setting, mcmc_new_list], open(folder+'model_result.pkl', 'wb'))
+        pickle.dump([multi_band_list, kwargs_model, kwargs_result, chain_list, fix_setting, mcmc_new_list], open(folder+savename, 'wb'))
     #%%Print fitting result:
-    multi_band_list, kwargs_model, kwargs_result, chain_list, fix_setting, mcmc_new_list = pickle.load(open(folder+'model_result.pkl','rb'))
+    multi_band_list, kwargs_model, kwargs_result, chain_list, fix_setting, mcmc_new_list = pickle.load(open(folder+savename,'rb'))
     fixed_lens, fixed_source, fixed_lens_light, fixed_ps, fixed_cosmo = fix_setting
     labels_new = [r"$\gamma$", r"$D_{\Delta t}$","H$_0$" ]
     modelPlot = ModelPlot(multi_band_list, kwargs_model, kwargs_result, arrow_size=0.02, cmap_string="gist_heat")
@@ -298,7 +312,7 @@ for folder in folder_list[kernel_i*run_n:kernel_i*run_n+run_n]:
 #    plt.close()
     truths=[para_s[0][0]['gamma'],TD_distance, 73.907]	
     plot = corner.corner(mcmc_new_list, labels=labels_new, show_titles=True, #range= [[0.8,1.5],[1,3],[0,1],[0, 1],[2000,5000],[20,100]], 
-                         quantiles=[0.16, 0.5, 0.84], truths =truths,
-                         title_kwargs={"fontsize": 15}, label_kwargs = {"fontsize": 25},
-                         levels=1.0 - np.exp(-0.5 * np.array([1.,2.]) ** 2))
+                          quantiles=[0.16, 0.5, 0.84], truths =truths,
+                          title_kwargs={"fontsize": 15}, label_kwargs = {"fontsize": 25},
+                          levels=1.0 - np.exp(-0.5 * np.array([1.,2.]) ** 2))
     plt.show()

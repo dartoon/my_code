@@ -30,7 +30,7 @@ best_fit, chain_list_result, trans_paras, material = result
 
 source_result, image_host, ps_result, image_ps, _ =best_fit
 chain_list, _ = chain_list_result
-sampler_type, samples_mcmc, param_mcmc, dist_mcmc  = chain_list[1]
+sampler_type, samples_mcmc, param_mcmc, dist_mcmc  = chain_list[-1]
 if len(material) == 8:
     multi_band_list, kwargs_model, kwargs_result, QSO_msk, kwargs_fixed_source, kwargs_fixed_ps, kwargs_constraints, kwargs_numerics = material
 elif len(material) == 9:

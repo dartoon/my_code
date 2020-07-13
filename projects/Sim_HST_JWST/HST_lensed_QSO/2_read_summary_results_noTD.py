@@ -24,17 +24,30 @@ from lenstronomy.Plots.model_plot import ModelPlot
 from mask_objects import find_loc_max
 
 
-folder_type = 'simulations_700_sim_subg3/sim_lens_noqso_ID_'
-# # file_type = 'model_result_noTD.pkl'
-file_type_list = ['model_result_noTD.pkl', 'model_result_noTD_calNoisemap_subg3.pkl', 'model_result_noTD_calNoisemap_subg4.pkl', 'model_result_noTD_subg5.pkl']
-# file_type_list = ['model_result_noTD_subg3.pkl', 'model_result_noTD_calNoisemap_subg3.pkl','model_result_noTD_calNoisemap_subg3_boostnoisemap.pkl']
+# folder_type = 'simulations_700_sim_subg3/sim_lens_noqso_ID_'
+# # # file_type = 'model_result_noTD.pkl'
+# file_type_list = ['model_result_noTD.pkl', 'model_result_noTD_calNoisemap_subg3.pkl', 'model_result_noTD_calNoisemap_subg4.pkl', 'model_result_noTD_subg5.pkl']
+# # file_type_list = ['model_result_noTD_subg3.pkl', 'model_result_noTD_calNoisemap_subg3.pkl','model_result_noTD_calNoisemap_subg3_boostnoisemap.pkl']
 
-# folder_type = 'sim_lens_noqso_nodrz_ID_'
+# folder_type = 'simulations_700_sim_subg3/sim_lens_noqso_nodrz_ID_'
 # file_type_list = ['model_result_noTD_subg3.pkl']
 
+# folder_type = 'sim_lens_noqso_ID_subg30_'
+# file_type_list = ['model_result_subg2.pkl', 'model_result_subg3.pkl']
+
+# folder_type = 'sim_lens_noqso_ID_dire008_'
+# file_type_list = ['model_result_noTD_subg2.pkl']
+
+
+file_type_list = ['model_result_noTD_subg2.pkl']
+folder_type = 'simulations_700_subg30/sim_lens_noqso_ID_subg30_'
+
+
+
+# 
 folder_list = glob.glob(folder_type+'*')
 folder_list.sort()
-test_numer = 30
+test_numer = 20
 folder_list = folder_list[:test_numer]
 
 # del folder_list[14]
@@ -52,6 +65,7 @@ for folder in folder_list:
         print(read_file)
         model_lists, para_s, lens_info= pickle.load(open(folder+'sim_kwargs.pkl','rb'))
         lens_model_list, lens_light_model_list, source_model_list, point_source_list = model_lists
+        lens_model_list[0] = 'PEMD'
         z_l, z_s, TD_distance, TD_true, TD_obs, TD_err_l = lens_info
         kwargs_lens_list, kwargs_lens_light_list, kwargs_source_list, kwargs_ps = para_s
         solver_type = 'PROFILE_SHEAR'
@@ -72,7 +86,7 @@ for folder in folder_list:
     #        continue
         multi_band_list, kwargs_model, kwargs_result, chain_list, fix_setting, mcmc_new_list = pickle.load(open(read_file,'rb'))
         fixed_lens, fixed_source, fixed_lens_light, fixed_ps, fixed_cosmo = fix_setting
-        
+        kwargs_model['lens_model_list'][0] =  'PEMD'
         modelPlot = ModelPlot(multi_band_list, kwargs_model, kwargs_result, arrow_size=0.02, cmap_string="gist_heat")
         logL = modelPlot._imageModel.likelihood_data_given_model(source_marg=False, linear_prior=None, **kwargs_result)
         n_data = modelPlot._imageModel.num_data_evaluate
@@ -93,24 +107,25 @@ for folder in folder_list:
 which = ['kwargs_lens', 'gamma']
 #which = ['kwargs_source', 'center_y']
 fig, ax = plt.subplots(figsize=(11,8))
-c_list = ['red', 'blue', 'green', 'black']
+c_list = ['red', 'blue', 'green', 'black', 'yellow']
 gamma_bias_list = []
 for folder in folder_list:
     ID = folder[-3:]
-    read_list = [1]
+    read_list = [0]
     for i in read_list:
         file_type = file_type_list[i]
         key = folder_type + '{0}'.format(ID) + file_type
-        gamma_bias = result_dic[key][1][which[0]][0][which[1]] - result_dic[key][0][which[0]][0][which[1]]
-        gamma_bias_list.append(gamma_bias)
-        plt.plot(np.linspace(0, 37), np.linspace(0, 37)*0)
-        if file_type_list[i]  == 'model_result_noTD.pkl':
-            label = 'model_result_noTD_subg2.pkl'
-        else:
-            label = file_type_list[i]
-        plt.scatter(int(ID)-700, gamma_bias,
-                    c=c_list[i],s=280,marker=".",zorder=0, vmin=1.2, vmax=1.8, edgecolors='white',alpha=0.7, label = label)
-        plt.text(int(ID)-700, gamma_bias, repr(round(result_dic[key][-1], 1)),fontsize=15)
+        if result_dic[key][-1] < 6:
+            gamma_bias = result_dic[key][1][which[0]][0][which[1]] - result_dic[key][0][which[0]][0][which[1]]
+            gamma_bias_list.append(gamma_bias)
+            plt.plot(np.linspace(0, 20), np.linspace(0, 20)*0)
+            if file_type_list[i]  == 'model_result_noTD.pkl':
+                label = 'model_result_noTD_subg2.pkl'
+            else:
+                label = file_type_list[i]
+            plt.scatter(int(ID)-700, gamma_bias,
+                        c=c_list[i],s=280,marker=".",zorder=0, vmin=1.2, vmax=1.8, edgecolors='white',alpha=0.7, label = label)
+            plt.text(int(ID)-700, gamma_bias, repr(round(result_dic[key][-1], 1)),fontsize=15)
 #    ax.set_xticks(range(id_range[0]-1, id_range[1]+1,3)) 
 #    plt.plot(np.linspace(id_range[0]-1, id_range[1]+1), np.linspace(id_range[0]-1, id_range[1]+1)*0)
     plt.xlabel("ID",fontsize=27)

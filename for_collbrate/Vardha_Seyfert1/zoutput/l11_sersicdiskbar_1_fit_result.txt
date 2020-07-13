@@ -1,0 +1,30 @@
+Result for target l11:
+point source result:
+    [{'ra_image': array([0.14485427]), 'dec_image': array([-0.07327672]), 'point_amp': array([210809.1934707]), 'PSF_mag': array([10.01981573])}]
+obj 0 result:
+    {'amp': 5779.601, 'R_sersic': 3.202, 'n_sersic': 1.513, 'center_x': 0.09, 'center_y': -0.095, 'phi_G': -0.376, 'q': 0.356, 'host_amp': 298086.538, 'host_mag': 9.644}
+obj 1 result:
+    {'amp': 553.403, 'R_sersic': 10.734, 'n_sersic': 1.0, 'center_x': 0.199, 'center_y': -0.221, 'phi_G': -1.241, 'q': 0.356, 'host_amp': 207215.275, 'host_mag': 10.038}
+obj 2 result:
+    {'amp': 668.483, 'R_sersic': 9.625, 'n_sersic': 0.5, 'center_x': -0.026, 'center_y': 0.004, 'phi_G': 0.53, 'q': 0.356, 'host_amp': 178044.079, 'host_mag': 10.203}
+======================
+Result for target l11:
+point source result:
+    [{'ra_image': array([0.16290148]), 'dec_image': array([-0.07281384]), 'point_amp': array([167487.30917222]), 'PSF_mag': array([10.26958484])}]
+obj 0 result:
+    {'amp': 45912.916, 'R_sersic': 0.352, 'n_sersic': 1.0, 'center_x': 0.048, 'center_y': -0.072, 'phi_G': -0.626, 'q': 0.9, 'host_amp': 61103.993, 'host_mag': 11.364}
+obj 1 result:
+    {'amp': 1796.674, 'R_sersic': 5.435, 'n_sersic': 1.0, 'center_x': 0.211, 'center_y': -0.152, 'phi_G': -0.516, 'q': 0.898, 'host_amp': 523519.024, 'host_mag': 9.032}
+obj 2 result:
+    {'amp': 8459.919, 'R_sersic': 2.688, 'n_sersic': 0.5, 'center_x': 0.079, 'center_y': -0.08, 'phi_G': -0.39, 'q': 0.218, 'host_amp': 121735.89, 'host_mag': 10.616}
+======================
+Result for target l11:
+point source result:
+    [{'ra_image': array([0.15419092]), 'dec_image': array([-0.07287284]), 'point_amp': array([167096.51463238]), 'PSF_mag': array([10.27212112])}]
+obj 0 result:
+    {'amp': 46533.047, 'R_sersic': 0.351, 'n_sersic': 1.0, 'center_x': 0.064, 'center_y': -0.08, 'phi_G': -0.806, 'q': 0.88, 'host_amp': 60466.098, 'host_mag': 11.376}
+obj 1 result:
+    {'amp': 1817.699, 'R_sersic': 5.468, 'n_sersic': 1.0, 'center_x': 0.234, 'center_y': -0.183, 'phi_G': -0.533, 'q': 0.879, 'host_amp': 525552.139, 'host_mag': 9.028}
+obj 2 result:
+    {'amp': 8555.218, 'R_sersic': 2.665, 'n_sersic': 0.5, 'center_x': 0.023, 'center_y': -0.053, 'phi_G': -0.382, 'q': 0.216, 'host_amp': 120168.478, 'host_mag': 10.63}
+======================

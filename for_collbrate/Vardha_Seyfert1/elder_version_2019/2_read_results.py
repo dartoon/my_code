@@ -15,9 +15,9 @@ import copy
 
 #ID = 'l106'
 #picklename = ID+'_fitting.pkl'
-#picklename = 'result_vardha/second_share_Jan_24/'+ 'l24_sersic.pkl'
+picklename = 'result_vardha/second_share_Jan_24/'+ 'l24_sersic.pkl'
 # picklename = 'result_vardha/first_share_middle_Jan/'+ 'l24_sersic.pkl'
-picklename = 'result_vardha/third_0203/'+ 'l24_sersicdisk.pkl'
+#picklename = 'result_vardha/third_0203/'+ 'l24_sersicdisk.pkl'
 
 result = pickle.load(open(picklename,'rb'))
 [best_fit,pso_fit,mcmc_fit, trans_paras] = result
@@ -73,10 +73,18 @@ out_plot.plot_mcmc_behaviour(ax, samples_mcmc, param_mcmc, dist_mcmc)
 #%%Plot the transferred corner plots
 # here the (non-converged) MCMC chain of the non-linear parameters
 if not samples_mcmc == []:
-#    plot = corner.corner(samples_mcmc, labels=param_mcmc, show_titles=True)
-#    plt.show()
-    plot = corner.corner(mcmc_new_list, labels=labels_new, show_titles=True)
+    plot = corner.corner(samples_mcmc, labels=param_mcmc, show_titles=True)
     plt.show()
+#    plot = corner.corner(mcmc_new_list, labels=labels_new, show_titles=True)
+#    plt.show()
+#%%
+import lenstronomy.Util.param_util as param_util
+phi_q_l = []
+for i in range(len(samples_mcmc)-1000, len(samples_mcmc)):
+    phi, q = param_util.ellipticity2phi_q(samples_mcmc[i][2], samples_mcmc[i][3])
+    phi_q_l.append([phi, q])
+plot = corner.corner(phi_q_l, labels=['phi', 'q'], show_titles=True)
+plt.show()
 
 #%% To readout the parameter
 

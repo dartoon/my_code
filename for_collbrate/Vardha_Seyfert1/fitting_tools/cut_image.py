@@ -27,7 +27,7 @@ def cut_center_bright(image, center, radius,kernel = 'gaussian', return_center=F
         kernel: define the center.
     """
     temp_center = np.asarray(center)
-#    print temp_center.astype(int)
+#    print(temp_center.astype(int))
     radius = radius
     img_test = cut_image(image=image, center=temp_center.astype(int), radius=radius)
     if kernel == 'gaussian':
@@ -36,17 +36,17 @@ def cut_center_bright(image, center, radius,kernel = 'gaussian', return_center=F
             from photutils import centroid_2dg
             test_center = frm_q + centroid_2dg(img_test[frm_q:-frm_q,frm_q:-frm_q])
             if i ==2 and plot==True :
-                print test_center
+                print(test_center)
                 fig, ax = plt.subplots(1, 1)
                 ax.imshow(img_test[frm_q:-frm_q,frm_q:-frm_q], origin='lower')
                 marker = '+'
                 ms, mew = 30, 2.
                 plt.plot(test_center[0]-frm_q, test_center[1]-frm_q, color='b', marker=marker, ms=ms, mew=mew)
                 plt.show()
-                print 'test_center - radius', test_center, radius
+                print('test_center - radius', test_center, radius)
             center_shift = np.array((test_center - radius))
             if i ==2 and plot==True :
-                print 'center_shift',center_shift
+                print('center_shift',center_shift)
             center = (center.astype(int) + np.round(center_shift))
             center_f = center.astype(int) + center_shift
             img_test = cut_image(image=image, center=center, radius=radius)
@@ -77,7 +77,7 @@ def cut_center_bright(image, center, radius,kernel = 'gaussian', return_center=F
         return cut_c_b, center_f
  
 def save_loc_png(img, center_QSO, c_psf_list=None,extra_psfs=None,ID=None, label= None,
-                 reg_ty=None,ifsave=True, label_shift_NO=(), shift_where=None):
+                 reg_ty=None,ifsave=True, label_shift_NO=(), shift_where=None, v_max = None, v_min = None):
     '''
     label shift_where: 1,2,3,4 --- up, right, down, left
     '''
@@ -106,6 +106,10 @@ def save_loc_png(img, center_QSO, c_psf_list=None,extra_psfs=None,ID=None, label
         vmin = 1.e-3
         QSO_box_size = 100
         PSF_box_size = 60 
+    if v_max != None:
+        vmax = v_max
+    if v_min != None:
+        vmin = v_min
     cax=ax.imshow(img,origin='lower', cmap=my_cmap, norm=LogNorm(), vmin=vmin, vmax=vmax)
     QSO_reg = pix_region(center_QSO, radius= QSO_box_size)
     QSO_mask = QSO_reg.to_mask(mode='center')
@@ -144,7 +148,7 @@ def save_loc_png(img, center_QSO, c_psf_list=None,extra_psfs=None,ID=None, label
             else:
                 if count in label_shift_NO:
                     shift = shift_label_index(shift_where[count_shift])
-                    print extra_psfs[i][0], shift[0]*PSF_box_size
+                    print(extra_psfs[i][0], shift[0]*PSF_box_size)
                     ax.text(extra_psfs[i][0]+shift[0]*PSF_box_size, extra_psfs[i][1]+shift[1]*PSF_box_size,
                             '{1}{0}?'.format(count,name),color='white', fontsize=15)
                     count_shift += 1
@@ -398,6 +402,50 @@ def make_circle_msk(img,x=30,y=30, radius=5):
     mask = [np.sqrt((xi-x)**2+(yi-y)**2)<5]
     return mask[0]
     
+def sub_bkg(img, plot=True):
+    from astropy.stats import SigmaClip
+    from photutils import Background2D, SExtractorBackground  
+    sigma_clip = SigmaClip(sigma=3., iters=10)
+    bkg_estimator = SExtractorBackground()
+    from photutils import make_source_mask
+    mask_0 = make_source_mask(img, snr=2, npixels=5, dilate_size=11)
+    mask_1 = (np.isnan(img))
+    mask = mask_0 + mask_1
+    bkg = Background2D(img, (50, 50), filter_size=(3, 3),
+                       sigma_clip=sigma_clip, bkg_estimator=bkg_estimator,
+                       mask=mask)
+    from matplotlib.colors import LogNorm
+    fig=plt.figure(figsize=(15,15))
+    ax=fig.add_subplot(1,1,1)
+    ax.imshow(img, norm=LogNorm(), origin='lower') 
+    #bkg.plot_meshes(outlines=True, color='#1f77b4')
+    ax.xaxis.set_visible(False)
+    ax.yaxis.set_visible(False)
+    if plot:
+        plt.show()  
+    else:
+        plt.close()
+    fig=plt.figure(figsize=(15,15))
+    ax=fig.add_subplot(1,1,1)
+    ax.imshow(mask, origin='lower') 
+    #bkg.plot_meshes(outlines=True, color='#1f77b4')
+    ax.xaxis.set_visible(False)
+    ax.yaxis.set_visible(False)
+    if plot:
+        plt.show()  
+    else:
+        plt.close()    
+    back = bkg.background* ~mask_1
+    fig=plt.figure(figsize=(15,15))
+    ax=fig.add_subplot(1,1,1)
+    ax.imshow(back, origin='lower', cmap='Greys_r')
+    ax.xaxis.set_visible(False)
+    ax.yaxis.set_visible(False)
+    if plot:
+        plt.show()  
+    else:
+        plt.close()
+    return img-back, back    
     
     
     

@@ -36,9 +36,9 @@ filt='f160w'
 def cal_Ddt(zl, zs, H0_ini=100, om=0.27):
     cosmo = FlatLambdaCDM(H0=H0_ini, Om0=0.27) 
     lensunits=LensCosmo(z_lens=zl, z_source=zs,cosmo= cosmo)
-    D_l=lensunits.D_d
-    D_s=lensunits.D_s
-    D_ls=lensunits.D_ds 
+    D_l=lensunits.dd
+    D_s=lensunits.ds
+    D_ls=lensunits.dds
     Ddt_corr = (1+zl)*D_l*D_s/D_ls
     return Ddt_corr
 
@@ -47,22 +47,65 @@ def cal_h0(zl, zs, Ddt, om=0.27):
     ratio = Ddt_corr/Ddt
     return 100 * ratio
 
-folder_list = glob.glob('sim_lens_noqso_ID_7??')
+folder_list = glob.glob('simulations_700_subg30/sim_lens_noqso_ID_subg30_7??')
 folder_list.sort()
-test_numer = 1
-kernel = 1
+# use_folder = ['simulations_700_subg30/sim_lens_ID_subg30_702',
+#  'simulations_700_subg30/sim_lens_ID_subg30_705',
+#  'simulations_700_subg30/sim_lens_ID_subg30_706',
+#  'simulations_700_subg30/sim_lens_ID_subg30_708',
+#  'simulations_700_subg30/sim_lens_ID_subg30_710',
+#  'simulations_700_subg30/sim_lens_ID_subg30_712',
+#  'simulations_700_subg30/sim_lens_ID_subg30_714',
+#  'simulations_700_subg30/sim_lens_ID_subg30_716',
+#  'simulations_700_subg30/sim_lens_ID_subg30_721',
+#  'simulations_700_subg30/sim_lens_ID_subg30_722',
+#  'simulations_700_subg30/sim_lens_ID_subg30_724',
+#  'simulations_700_subg30/sim_lens_ID_subg30_725',
+#  'simulations_700_subg30/sim_lens_ID_subg30_727',
+#  'simulations_700_subg30/sim_lens_ID_subg30_730',
+#  'simulations_700_subg30/sim_lens_ID_subg30_731',
+#  'simulations_700_subg30/sim_lens_ID_subg30_734',
+#  'simulations_700_subg30/sim_lens_ID_subg30_738',
+#  'simulations_700_subg30/sim_lens_ID_subg30_739',
+#  'simulations_700_subg30/sim_lens_ID_subg30_740',
+#  'simulations_700_subg30/sim_lens_ID_subg30_744',
+#  'simulations_700_subg30/sim_lens_ID_subg30_749',
+#  'simulations_700_subg30/sim_lens_ID_subg30_752',
+#  'simulations_700_subg30/sim_lens_ID_subg30_753',
+#  'simulations_700_subg30/sim_lens_ID_subg30_758',
+#  'simulations_700_subg30/sim_lens_ID_subg30_759',
+#  'simulations_700_subg30/sim_lens_ID_subg30_761',
+#  'simulations_700_subg30/sim_lens_ID_subg30_765',
+#  'simulations_700_subg30/sim_lens_ID_subg30_767',
+#  'simulations_700_subg30/sim_lens_ID_subg30_773',
+#  'simulations_700_subg30/sim_lens_ID_subg30_780',
+#  'simulations_700_subg30/sim_lens_ID_subg30_781',
+#  'simulations_700_subg30/sim_lens_ID_subg30_783',
+#  'simulations_700_subg30/sim_lens_ID_subg30_786',
+#  'simulations_700_subg30/sim_lens_ID_subg30_792',
+#  'simulations_700_subg30/sim_lens_ID_subg30_793',
+#  'simulations_700_subg30/sim_lens_ID_subg30_794',
+#  'simulations_700_subg30/sim_lens_ID_subg30_795',
+#  'simulations_700_subg30/sim_lens_ID_subg30_796',
+#  'simulations_700_subg30/sim_lens_ID_subg30_799']
+# folder_list = ['simulations_700_subg30/sim_lens_noqso_ID_subg30_' + use_folder[i][-3:] for i in range(len(use_folder))]
+test_numer = 30 #len(50)
+kernel = 5
 run_n = int(test_numer/kernel)
 
-kernel_i = 0 # 0, 1 ,2, 3 .. max = kernel-1
-folder_list = folder_list[:test_numer]
+kernel_i = 4 # 0, 1 ,2, 3 .. max = kernel-1
+folder_list = folder_list[20:20+test_numer]
+savename = 'model_result_use_drz_Noisemap_subg3.pkl'
+with_qso_savename = 'model_result_use_drz_Noisemap_subg3.pkl'
 
 for folder in folder_list[kernel_i*run_n:kernel_i*run_n+run_n]:
     ID = folder[-3:]
     folder = folder + '/'
     print(folder)
-    qso_folder = 'sim_lens_ID_{0}/'.format(ID)
+    qso_folder = 'simulations_700_subg30/sim_lens_ID_subg30_{0}/'.format(ID)
     model_lists, para_s, lens_info= pickle.load(open(folder+'sim_kwargs.pkl','rb'))
     lens_model_list, lens_light_model_list, source_model_list, point_source_list = model_lists
+    lens_model_list[0] = 'PEMD'
     z_l, z_s, TD_distance, TD_true, TD_obs, TD_err_l = lens_info
     kwargs_lens_list, kwargs_lens_light_list, kwargs_source_list, kwargs_ps = para_s
     solver_type = 'PROFILE_SHEAR'
@@ -85,11 +128,11 @@ for folder in folder_list[kernel_i*run_n:kernel_i*run_n+run_n]:
                           'solver_type': solver_type,  # 'PROFILE', 'PROFILE_SHEAR', 'ELLIPSE', 'CENTER'
                           'Ddt_sampling': True,
                                   }
-    if glob.glob(qso_folder+'model_result.pkl') == []:
+    if glob.glob(qso_folder+with_qso_savename) == []:
         raise ValueError("The first time run of with QSO case is not finished")
-    else:        
+    if glob.glob(folder+savename) == []:
         #Load the result from the first run:
-        _, _, kwargs_result, _, _, _ = pickle.load(open(qso_folder+'model_result.pkl','rb'))
+        _, _, kwargs_result, _, _, _ = pickle.load(open(qso_folder+with_qso_savename,'rb'))
 #        fixed_lens, fixed_source, fixed_lens_light, fixed_ps, fixed_cosmo = fix_setting
         #Setting up the fitting:
         lens_data = pyfits.getdata(folder+'Drz_QSO_image.fits')
@@ -103,9 +146,9 @@ for folder in folder_list[kernel_i*run_n:kernel_i*run_n+run_n]:
         plt.imshow(lens_data, origin='lower',cmap='gist_heat', norm=LogNorm())
         plt.colorbar()
         plt.show()
-#        exp_time = 599.* 2 * 8
-#        stdd =  0.0024  #Measurement from empty retion, 0.016*0.08**2/0.13**2/np.sqrt(8)
-#        len_std = (abs(lens_data/exp_time)+stdd**2)**0.5
+        # exp_time = 599.* 2 * 8
+        # stdd =  0.0008  #Measurement from empty retion, 0.016*0.08**2/0.13**2/np.sqrt(8)
+        # len_std = (abs(lens_data/exp_time)+stdd**2)**0.5
         deltaPix = 0.08
         
         psf = pyfits.getdata(folder+'Drz_PSF.fits')
@@ -201,7 +244,7 @@ for folder in folder_list[kernel_i*run_n:kernel_i*run_n+run_n]:
                              'time_delay_likelihood': True,
                              'image_likelihood_mask_list': [lens_mask]
                                      }
-        kwargs_numerics = {'supersampling_factor': 2}
+        kwargs_numerics = {'supersampling_factor': 3}
         image_band = [kwargs_data, kwargs_psf, kwargs_numerics]
         multi_band_list = [image_band]
         kwargs_data_joint = {'multi_band_list': multi_band_list, 'multi_band_type': 'multi-linear',
@@ -231,11 +274,11 @@ for folder in folder_list[kernel_i*run_n:kernel_i*run_n+run_n]:
         print(end_time - start_time, 'total time needed for computation')
         print('============ CONGRATULATION, YOUR JOB WAS SUCCESSFUL ================ ')
         #Save in pickle
-        fix_setting =  [fixed_lens, fixed_source, fixed_lens_light, fixed_ps, fixed_cosmo]
+        fix_setting =  [fixed_lens, fixed_source, fixed_lens_light, None, fixed_cosmo]
 #        cosmo = FlatLambdaCDM(H0=70, Om0=0.3, Ob0=0.)  #!!!Wrong cosmos
 #        td_cosmo = TDCosmography(z_l, z_s, kwargs_model, cosmo_fiducial=cosmo)
         # make instance of parameter class with given model options, constraints and fixed parameters #
-        param = Param(kwargs_model, fixed_lens, fixed_source, fixed_lens_light, fixed_ps, fixed_cosmo, 
+        param = Param(kwargs_model, fixed_lens, fixed_source, fixed_lens_light, None, fixed_cosmo, 
                       kwargs_lens_init=kwargs_result['kwargs_lens'], **kwargs_constraints)
         sampler_type, samples_mcmc, param_mcmc, dist_mcmc  = chain_list[-1]
         mcmc_new_list = []
@@ -249,9 +292,9 @@ for folder in folder_list[kernel_i*run_n:kernel_i*run_n+run_n]:
             gamma = kwargs_result['kwargs_lens'][0]['gamma']
         #    phi_ext, gamma_ext = kwargs_result['kwargs_lens'][1]['gamma1'], kwargs_result['kwargs_lens'][1]['gamma2']
             mcmc_new_list.append([gamma, D_dt, cal_h0(z_l ,z_s, D_dt)])        
-        pickle.dump([multi_band_list, kwargs_model, kwargs_result, chain_list, fix_setting, mcmc_new_list], open(folder+'model_result.pkl', 'wb'))
+        pickle.dump([multi_band_list, kwargs_model, kwargs_result, chain_list, fix_setting, mcmc_new_list], open(folder+savename, 'wb'))
     #%%Print fitting result:
-    multi_band_list, kwargs_model, kwargs_result, chain_list, fix_setting, mcmc_new_list = pickle.load(open(folder+'model_result.pkl','rb'))
+    multi_band_list, kwargs_model, kwargs_result, chain_list, fix_setting, mcmc_new_list = pickle.load(open(folder+savename,'rb'))
     fixed_lens, fixed_source, fixed_lens_light, fixed_ps, fixed_cosmo = fix_setting
     labels_new = [r"$\gamma$", r"$D_{\Delta t}$","H$_0$" ]    
     modelPlot = ModelPlot(multi_band_list, kwargs_model, kwargs_result, arrow_size=0.02, cmap_string="gist_heat")
@@ -266,7 +309,7 @@ for folder in folder_list[kernel_i*run_n:kernel_i*run_n+run_n]:
         chain_plot.plot_chain_list(chain_list, i)
     plt.show()
     
-    truths=[para_s[0][0]['gamma'],TD_distance, 70.656]	
+    truths=[para_s[0][0]['gamma'],TD_distance, 73.907]	
     plot = corner.corner(mcmc_new_list, labels=labels_new, show_titles=True, #range= [[0.8,1.5],[1,3],[0,1],[0, 1],[2000,5000],[20,100]], 
                          quantiles=[0.16, 0.5, 0.84], truths =truths,
                          title_kwargs={"fontsize": 15}, label_kwargs = {"fontsize": 25},

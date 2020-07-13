@@ -56,28 +56,9 @@ def cal_h0(zl, zs, Ddt, om=0.27):
 # kernel_i = 0 # 0, 1 ,2, 3 .. max = kernel-1
 
 # folder_list = folder_list[1:2]
-# folder_list = ['simulations_700_subg30/sim_lens_ID_subg30_724']
-folder_list = ['simulations_700_subg30/sim_lens_noqso_ID_subg30_702',
-  'simulations_700_subg30/sim_lens_noqso_ID_subg30_703',
-  'simulations_700_subg30/sim_lens_noqso_ID_subg30_704',
- 'simulations_700_subg30/sim_lens_noqso_ID_subg30_705',
- 'simulations_700_subg30/sim_lens_noqso_ID_subg30_706',
- 'simulations_700_subg30/sim_lens_noqso_ID_subg30_708',
-  'simulations_700_subg30/sim_lens_noqso_ID_subg30_709',
- 'simulations_700_subg30/sim_lens_noqso_ID_subg30_710',
- 'simulations_700_subg30/sim_lens_noqso_ID_subg30_712',
- 'simulations_700_subg30/sim_lens_noqso_ID_subg30_713',
- 'simulations_700_subg30/sim_lens_noqso_ID_subg30_714',
- 'simulations_700_subg30/sim_lens_noqso_ID_subg30_715',
-  'simulations_700_subg30/sim_lens_noqso_ID_subg30_716',
- 'simulations_700_subg30/sim_lens_noqso_ID_subg30_717',
- 'simulations_700_subg30/sim_lens_noqso_ID_subg30_718',
- 'simulations_700_subg30/sim_lens_noqso_ID_subg30_720',
- 'simulations_700_subg30/sim_lens_noqso_ID_subg30_721',
- 'simulations_700_subg30/sim_lens_noqso_ID_subg30_722',
- 'simulations_700_subg30/sim_lens_noqso_ID_subg30_724']
-# loadname = 'model_result_calNoiseMap_modNoisemap_boostPossionx8_noPSFerr_subg2_fixgamma.pkl'
-# loadname = 'model_result_calNoiseMap_modNoisemap_boostPossionx8_noPSFerr_subg3.pkl'
+folder_list = ['simulations_700_subg30/sim_lens_ID_subg30_724']
+# folder_list = ['simulations_700_subg30/sim_lens_noqso_ID_subg30_724']
+
 
 for folder in folder_list:
     ID = folder[-3:]
@@ -109,14 +90,16 @@ for folder in folder_list:
                           'solver_type': solver_type,  # 'PROFILE', 'PROFILE_SHEAR', 'ELLIPSE', 'CENTER'
                           'Ddt_sampling': True,
                                   }
-    multi_band_list, kwargs_model, kwargs_result, chain_list, fix_setting, mcmc_new_list = pickle.load(open(folder+loadname,'rb'))
-    # multi_band_list, kwargs_model, kwargs_result, chain_list, fix_setting, mcmc_new_list = pickle.load(open(folder+'model_result_use_drz_Noisemap_PSFnoisemapX0.1_subg3.pkl','rb'))
-    
+    multi_band_list, kwargs_model, kwargs_result, chain_list, fix_setting, mcmc_new_list = pickle.load(open(folder+'model_result_use_drz_Noisemap_subg3.pkl','rb'))
+    multi_band_list_noqso, kwargs_model_noqso, kwargs_result_noqso, chain_list_noqso, fix_setting_noqso, mcmc_new_list_noqso = pickle.load(open('simulations_700_subg30/sim_lens_noqso_ID_subg30_724/'+'model_result_use_drz_Noisemap_subg3.pkl','rb'))
+    kwargs_result_noqso['kwargs_ps'] = kwargs_result['kwargs_ps']
+    kwargs_result = kwargs_result_noqso
+
     fixed_lens, fixed_source, fixed_lens_light, fixed_ps, fixed_cosmo = fix_setting
     labels_new = [r"$\gamma$", r"$D_{\Delta t}$","H$_0$" ]    
     modelPlot = ModelPlot(multi_band_list, kwargs_model, kwargs_result, arrow_size=0.02, cmap_string="gist_heat")
     f, axes = modelPlot.plot_main()
-    plt.show()
+    f.show()
     # f, axes = modelPlot.plot_separate()
     # f.show()
     # f, axes = modelPlot.plot_subtract_from_data_all()
