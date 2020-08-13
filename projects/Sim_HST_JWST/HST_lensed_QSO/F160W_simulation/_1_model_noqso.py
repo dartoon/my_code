@@ -49,47 +49,7 @@ def cal_h0(zl, zs, Ddt, om=0.27):
 
 folder_list = glob.glob('simulations_700_subg30/sim_lens_noqso_ID_subg30_7??')
 folder_list.sort()
-# use_folder = ['simulations_700_subg30/sim_lens_ID_subg30_702',
-#  'simulations_700_subg30/sim_lens_ID_subg30_705',
-#  'simulations_700_subg30/sim_lens_ID_subg30_706',
-#  'simulations_700_subg30/sim_lens_ID_subg30_708',
-#  'simulations_700_subg30/sim_lens_ID_subg30_710',
-#  'simulations_700_subg30/sim_lens_ID_subg30_712',
-#  'simulations_700_subg30/sim_lens_ID_subg30_714',
-#  'simulations_700_subg30/sim_lens_ID_subg30_716',
-#  'simulations_700_subg30/sim_lens_ID_subg30_721',
-#  'simulations_700_subg30/sim_lens_ID_subg30_722',
-#  'simulations_700_subg30/sim_lens_ID_subg30_724',
-#  'simulations_700_subg30/sim_lens_ID_subg30_725',
-#  'simulations_700_subg30/sim_lens_ID_subg30_727',
-#  'simulations_700_subg30/sim_lens_ID_subg30_730',
-#  'simulations_700_subg30/sim_lens_ID_subg30_731',
-#  'simulations_700_subg30/sim_lens_ID_subg30_734',
-#  'simulations_700_subg30/sim_lens_ID_subg30_738',
-#  'simulations_700_subg30/sim_lens_ID_subg30_739',
-#  'simulations_700_subg30/sim_lens_ID_subg30_740',
-#  'simulations_700_subg30/sim_lens_ID_subg30_744',
-#  'simulations_700_subg30/sim_lens_ID_subg30_749',
-#  'simulations_700_subg30/sim_lens_ID_subg30_752',
-#  'simulations_700_subg30/sim_lens_ID_subg30_753',
-#  'simulations_700_subg30/sim_lens_ID_subg30_758',
-#  'simulations_700_subg30/sim_lens_ID_subg30_759',
-#  'simulations_700_subg30/sim_lens_ID_subg30_761',
-#  'simulations_700_subg30/sim_lens_ID_subg30_765',
-#  'simulations_700_subg30/sim_lens_ID_subg30_767',
-#  'simulations_700_subg30/sim_lens_ID_subg30_773',
-#  'simulations_700_subg30/sim_lens_ID_subg30_780',
-#  'simulations_700_subg30/sim_lens_ID_subg30_781',
-#  'simulations_700_subg30/sim_lens_ID_subg30_783',
-#  'simulations_700_subg30/sim_lens_ID_subg30_786',
-#  'simulations_700_subg30/sim_lens_ID_subg30_792',
-#  'simulations_700_subg30/sim_lens_ID_subg30_793',
-#  'simulations_700_subg30/sim_lens_ID_subg30_794',
-#  'simulations_700_subg30/sim_lens_ID_subg30_795',
-#  'simulations_700_subg30/sim_lens_ID_subg30_796',
-#  'simulations_700_subg30/sim_lens_ID_subg30_799']
-# folder_list = ['simulations_700_subg30/sim_lens_noqso_ID_subg30_' + use_folder[i][-3:] for i in range(len(use_folder))]
-test_numer = 30 #len(50)
+test_numer = 20 #len(50)
 kernel = 5
 run_n = int(test_numer/kernel)
 
@@ -127,6 +87,7 @@ for folder in folder_list[kernel_i*run_n:kernel_i*run_n+run_n]:
                           'num_point_source_list': [len(kwargs_ps['ra_image'])],
                           'solver_type': solver_type,  # 'PROFILE', 'PROFILE_SHEAR', 'ELLIPSE', 'CENTER'
                           'Ddt_sampling': True,
+                          'point_source_offset': True
                                   }
     if glob.glob(qso_folder+with_qso_savename) == []:
         raise ValueError("The first time run of with QSO case is not finished")
@@ -238,10 +199,11 @@ for folder in folder_list[kernel_i*run_n:kernel_i*run_n+run_n]:
         kwargs_likelihood = {'check_bounds': True,
                              'force_no_add_image': False,
                              'source_marg': False,
-                             'image_position_uncertainty': 0.004,
+                             'image_position_uncertainty': 0.005,
                              'check_matched_source_position': True,
                              'source_position_tolerance': 0.001,
                              'time_delay_likelihood': True,
+                             'astrometric_likelihood': True,
                              'image_likelihood_mask_list': [lens_mask]
                                      }
         kwargs_numerics = {'supersampling_factor': 3}

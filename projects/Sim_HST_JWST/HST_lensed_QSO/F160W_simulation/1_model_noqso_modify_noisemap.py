@@ -49,17 +49,21 @@ def cal_h0(zl, zs, Ddt, om=0.27):
 
 folder_list = glob.glob('simulations_700_subg30/sim_lens_noqso_ID_subg30_7??')
 folder_list.sort()
-test_numer = 20 #len(50)
+test_numer = 30 #len(50)
 kernel = 5
 run_n = int(test_numer/kernel)
 
-kernel_i = 0 # 0, 1 ,2, 3 .. max = kernel-1
-folder_list = folder_list[:test_numer]
+kernel_i = 4 # 0, 1 ,2, 3 .. max = kernel-1
+folder_list = folder_list[20:20+test_numer]
 # savename = 'model_result_calNoiseMap_modNoisemap_useGrad_noPSFerr_subg3.pkl'
 # with_qso_savename = 'model_result_calNoiseMap_modNoisemap_useGrad_subg3.pkl'
 
-savename = 'model_result_calNoiseMap_modNoisemap_boostPossionx8_noPSFerr_subg3_fixgamma.pkl'
-with_qso_savename = 'model_result_calNoiseMap_modNoisemap_boostPossionx3_subg3.pkl'
+# savename = 'model_result_calNoiseMap_modNoisemap_boostPossionx8_noPSFerr_subg3_fixgamma.pkl'
+# with_qso_savename = 'model_result_calNoiseMap_modNoisemap_boostPossionx3_subg3.pkl'
+
+#After talk with Simon:
+savename = 'result_calNoiseMap_modNoisemap_boostPossionx8_noPSFerr_subg3.pkl'
+with_qso_savename = 'result_modNoisemap_boostPossionx3_subg3.pkl'
 
 for folder in folder_list[kernel_i*run_n:kernel_i*run_n+run_n]:
 # for folder in ['simulations_700_subg30/sim_lens_noqso_ID_subg30_724']:
@@ -73,7 +77,6 @@ for folder in folder_list[kernel_i*run_n:kernel_i*run_n+run_n]:
     z_l, z_s, TD_distance, TD_true, TD_obs, TD_err_l = lens_info
     kwargs_lens_list, kwargs_lens_light_list, kwargs_source_list, kwargs_ps = para_s
     solver_type = 'PROFILE_SHEAR'
-    
 #    if len(kwargs_ps['ra_image']) <4:  #Would delete all the double
 #        print(folder)
 #        import shutil
@@ -149,8 +152,8 @@ for folder in folder_list[kernel_i*run_n:kernel_i*run_n+run_n]:
         fixed_lens.append({'ra_0': 0, 'dec_0': 0})
         kwargs_lens_init = kwargs_lens_list
         kwargs_lens_sigma.append({'theta_E': .2, 'e1': 0.1, 'e2': 0.1, 'gamma': 0.1, 'center_x': 0.01, 'center_y': 0.01})
-        kwargs_lower_lens.append({'theta_E': 0.01, 'e1': -0.5, 'e2': -0.5, 'gamma': kwargs_lens_init[0]['gamma']-0.001, 'center_x': -10, 'center_y': -10})
-        kwargs_upper_lens.append({'theta_E': 10, 'e1': 0.5, 'e2': 0.5, 'gamma': kwargs_lens_init[0]['gamma']+0.001, 'center_x': 10, 'center_y': 10})
+        kwargs_lower_lens.append({'theta_E': 0.01, 'e1': -0.5, 'e2': -0.5, 'gamma': kwargs_lens_init[0]['gamma']-0.5, 'center_x': -10, 'center_y': -10})
+        kwargs_upper_lens.append({'theta_E': 10, 'e1': 0.5, 'e2': 0.5, 'gamma': kwargs_lens_init[0]['gamma']+0.5, 'center_x': 10, 'center_y': 10})
         kwargs_lens_sigma.append({'gamma1': 0.1, 'gamma2': 0.1})
         kwargs_lower_lens.append({'gamma1': -0.2, 'gamma2': -0.1})
         kwargs_upper_lens.append({'gamma1': 0.2, 'gamma2': 0.2})
@@ -186,8 +189,8 @@ for folder in folder_list[kernel_i*run_n:kernel_i*run_n+run_n]:
         fixed_ps = [{}]
         kwargs_ps_init = kwargs_result['kwargs_ps']
         kwargs_ps_sigma = [{'ra_image': 0.01 * np.ones(len(kwargs_ps_init[0]['ra_image'])), 'dec_image': 0.01 * np.ones(len(kwargs_ps_init[0]['ra_image']))}]
-        kwargs_lower_ps = [{'ra_image': kwargs_ps_init[0]['ra_image']-0.004, 'dec_image': kwargs_ps_init[0]['dec_image']-0.004 }]
-        kwargs_upper_ps = [{'ra_image': kwargs_ps_init[0]['ra_image']+0.004, 'dec_image': kwargs_ps_init[0]['dec_image']+0.004 }]
+        kwargs_lower_ps = [{'ra_image': kwargs_ps_init[0]['ra_image']-1, 'dec_image': kwargs_ps_init[0]['dec_image']-1 }]
+        kwargs_upper_ps = [{'ra_image': kwargs_ps_init[0]['ra_image']+1, 'dec_image': kwargs_ps_init[0]['dec_image']+1 }]
         ps_params = [kwargs_ps_init, kwargs_ps_sigma, fixed_ps, kwargs_lower_ps, kwargs_upper_ps]
          
         # Set cosmo
@@ -202,7 +205,8 @@ for folder in folder_list[kernel_i*run_n:kernel_i*run_n+run_n]:
                         'source_model': source_params,
                         'lens_light_model': lens_light_params,
                         'point_source_model': ps_params,
-                        'special': cosmo_params}
+                        'special': cosmo_params,
+                        'point_source_offset': True}
         
         # numerical options and fitting sequences
         num_source_model = len(source_model_list)
@@ -210,7 +214,8 @@ for folder in folder_list[kernel_i*run_n:kernel_i*run_n+run_n]:
         kwargs_likelihood = {'check_bounds': True,
                              'force_no_add_image': False,
                              'source_marg': False,
-                             'image_position_uncertainty': 0.004,
+                             'image_position_uncertainty': 0.005,
+                             'astrometric_likelihood': True,
                              'check_matched_source_position': True,
                              'source_position_tolerance': 0.001,
                              'time_delay_likelihood': True,
@@ -227,7 +232,8 @@ for folder in folder_list[kernel_i*run_n:kernel_i*run_n+run_n]:
         kwargs_model = {'lens_model_list': lens_model_list, 
                          'lens_light_model_list': lens_light_model_list,
                          'source_light_model_list': source_model_list,
-                        'point_source_model_list': point_source_list
+                        'point_source_model_list': point_source_list,
+                        'flux_from_point_source_list': [False]
                          }
         fitting_seq = FittingSequence(kwargs_data_joint, kwargs_model, kwargs_constraints,
                                       kwargs_likelihood, kwargs_params)
@@ -272,10 +278,10 @@ for folder in folder_list[kernel_i*run_n:kernel_i*run_n+run_n]:
     modelPlot = ModelPlot(multi_band_list, kwargs_model, kwargs_result, arrow_size=0.02, cmap_string="gist_heat")
     f, axes = modelPlot.plot_main()
     f.show()
-    f, axes = modelPlot.plot_separate()
-    f.show()
-    f, axes = modelPlot.plot_subtract_from_data_all()
-    f.show()
+    # f, axes = modelPlot.plot_separate()
+    # f.show()
+    # f, axes = modelPlot.plot_subtract_from_data_all()
+    # f.show()
     
     for i in range(len(chain_list)):
         chain_plot.plot_chain_list(chain_list, i)
