@@ -15,31 +15,32 @@ from matplotlib.colors import LogNorm
 import copy
 import lenstronomy.Util.param_util as param_util
 
-ID = '11' #sys.argv[1]
+# ID = '11' #sys.argv[1]
 
-rf = open("./fitting_smallpsf.dat",'r')
-for line in rf:
-    ob = line.split()[0]
-    if ob == ID:
-        snratio = int(line.split()[1])
-        numberpixels = int(line.split()[2])
-        pixsz = float(line.split()[3])
-        zero = float(line.split()[4])
-        exptime = int(line.split()[5])
-        fr = line.split()[6]
-        kernel_size = int(line.split()[7])
-        psfname = line.split()[8]
-        if len(line.split())>9:
-            mask = np.array(line.split()[9].split(',')).astype('int')
-        else:
-            mask=[]
-        print (snratio, numberpixels, pixsz, zero, exptime, fr, kernel_size, psfname, mask)
+# rf = open("./fitting_smallpsf.dat",'r')
+# for line in rf:
+#     ob = line.split()[0]
+#     if ob == ID:
+#         snratio = int(line.split()[1])
+#         numberpixels = int(line.split()[2])
+#         pixsz = float(line.split()[3])
+#         zero = float(line.split()[4])
+#         exptime = int(line.split()[5])
+#         fr = line.split()[6]
+#         kernel_size = int(line.split()[7])
+#         psfname = line.split()[8]
+#         if len(line.split())>9:
+#             mask = np.array(line.split()[9].split(',')).astype('int')
+#         else:
+#             mask=[]
+#         print (snratio, numberpixels, pixsz, zero, exptime, fr, kernel_size, psfname, mask)
 
-pix_sz = pixsz
+# pix_sz = pixsz
 
 # picklename = 'zoutput/l'+ID+'_sersicdiskbar.pkl'
-picklename = 'zoutput/' + 'l11_sersicdiskbar_6.pkl'
+# picklename = 'zoutput/' + 'l11_sersicdiskbar_6.pkl'
 
+picklename = 'zoutput/' + 'l35_sersicdisk_1.pkl'
 result = pickle.load(open(picklename,'rb'))
 
 best_fit, chain_list_result, trans_paras, material = result
@@ -72,6 +73,7 @@ logL = modelPlot._imageModel.likelihood_data_given_model(source_marg=False, line
 n_data = modelPlot._imageModel.num_data_evaluate
 print(- logL * 2 / n_data, 'reduced X^2 of all evaluated imaging data combined.')
 
+"""
 #%%diagnose the PSO chain convergency
 from lenstronomy.Plots import chain_plot
 for i in range(len(chain_list)):
@@ -114,3 +116,4 @@ from fit_qso import condition_bulgediskbar
 prior_test = condition_bulgediskbar(kwargs_lens = None, kwargs_source=source_result, kwargs_lens_light = None, kwargs_ps = None, kwargs_special = None, kwargs_extinction = None)
 if prior_test < 0:
     print("Warning: The Prior not work!")
+"""    
