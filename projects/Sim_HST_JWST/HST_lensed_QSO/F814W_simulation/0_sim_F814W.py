@@ -15,7 +15,7 @@ from lenstronomy.Util import constants as const
 import lenstronomy.Util.param_util as param_util
 
 #file name:
-filt='f160w'
+filt='F814W'
 
 #==============================================================================
 # # import main simulation class of lenstronomy
@@ -25,13 +25,13 @@ from lenstronomy.Data.imaging_data import ImageData as Data
 from lenstronomy.Data.psf import PSF
 
 # data specifics
-numPix = 241  #  pixel size  #!!!
-deltaPix = 0.13/4 #  pixel size in arcsec (area per pixel = deltaPix**2)
+numPix = int( 240 * 0.13/0.05 ) + 1  #  pixel size  #!!!
+deltaPix = 0.05/4 #  pixel size in arcsec (area per pixel = deltaPix**2)
 
-psf = pyfits.open('psf_F160W_sub4.fits'.format(filt))
+psf = pyfits.open('psf_{0}_sub4.fits'.format(filt))
 psf_data = psf[0].data
 cut =25 
-psf_data = psf_data[1+cut:-cut,1+cut:-cut]+ 0  #shave PSF to singular size, as max in the middle
+# psf_data = psf_data[1+cut:-cut,1+cut:-cut]+ 0  #shave PSF to singular size, as max in the middle
 plt.imshow(psf_data, origin='lower',cmap='gist_heat', norm=LogNorm())
 plt.colorbar()
 plt.close()
@@ -39,15 +39,15 @@ plt.close()
 kwargs_psf_high_res = {'psf_type': 'PIXEL', 'kernel_point_source': psf_data, 'pixel_size': deltaPix}
 psf_class = PSF(**kwargs_psf_high_res)
 
-zp= 25.9463
+zp= 25.9463   #Assuming it same as F160W
 kwargs_data_high_res = sim_util.data_configure_simple(numPix, deltaPix) #,inverse=True)
 data_class = Data(**kwargs_data_high_res)
-kwargs_numerics = {'supersampling_factor': 3, 'supersampling_convolution': False}
+kwargs_numerics = {'supersampling_factor': 12, 'supersampling_convolution': False}
 
 import sys
 sys.path.insert(0,'../../share_tools/')
 from gene_para import gene_para
-for seed in range(702, 703):
+for seed in range(702, 799):
     print(seed)
     para=gene_para(seed=seed,fixh0=102)
     #==============================================================================
@@ -58,19 +58,28 @@ for seed in range(702, 703):
     np.random.seed(seed)
     
     import magVSamp as mva
-    lens_amp=mva.getAmp(SERSIC_in_mag=lens_light_para,zp=zp,deltaPix=deltaPix)
-    lens_light_para['amp_sersic']=lens_amp * 963.490605#!!!
+    
     lens_light_para['q'] = 0.9 + np.random.normal(0,0.01)
     
     lens_light_tran_Reff=lens_light_para['R_sersic']/np.sqrt(lens_light_para['q'])  #!!!
     #lens_light_tran_Reff = 1.1
     lens_light_para['e1'], lens_light_para['e2'] = param_util.phi_q2_ellipticity(phi=lens_light_para['phi_G'], q=lens_light_para['q'])
+    
+    lens_amp=mva.getAmp_lenstronomy(SERSIC_in_mag=lens_light_para,zp=zp)
+    lens_light_para['amp_sersic']=lens_amp
     lens_light_model_list = ['SERSIC_ELLIPSE']
     kwargs_lens_light = {'amp':lens_light_para['amp_sersic'], 'R_sersic': lens_light_tran_Reff, 'n_sersic': lens_light_para['n_sersic'],
     					  'center_x': 0.0, 'center_y': 0.0, 'e1':lens_light_para['e1'], 'e2':lens_light_para['e2']}
     kwargs_lens_light_copy = copy.deepcopy(kwargs_lens_light)
     kwargs_lens_light_copy['phi_G'] =  lens_light_para['phi_G']
     kwargs_lens_light_copy['q'] =  lens_light_para['q']
+    
+    lens_light_para['amp_sersic'] = 1
+    light = LightModel(['SERSIC_ELLIPSE'])
+    total_flux_testamp1 = light.total_flux([kwargs_lens_light])  #The total flux for each sersic components as list
+    flux_should = 10.**(-0.4*(lens_light_para['mag_sersic']-zp))
+
+#%%    
     
     kwargs_lens_light_list = [kwargs_lens_light]
     lens_light_model_class = LightModel(light_model_list=lens_light_model_list)
@@ -94,19 +103,16 @@ for seed in range(702, 703):
     #==============================================================================
     # #########source light
     #==============================================================================
-    source_pos=[-0.02, 0.02]  #Seed 220  cored-Powerlaw
-    source_model_list = ['SERSIC_ELLIPSE']
     source_para=para.source_light()
-    source_amp= mva.getAmp(SERSIC_in_mag=source_para,zp=zp,deltaPix=deltaPix)
-    source_para['amp_sersic']=source_amp * 963.490605   #!!!
+    source_pos=[-0.02, 0.02]
+    source_model_list = ['SERSIC_ELLIPSE']
     source_light_tran_Reff=source_para['R_sersic']/np.sqrt(source_para['q'])  #To unfiy the defintion R_eff in the paper
-    kwargs_source_light = {'amp': source_para['amp_sersic'], 'R_sersic': source_light_tran_Reff, 'n_sersic': source_para['n_sersic'],
-                             'center_x': source_pos[0], 'center_y': source_pos[1], 'phi_G': source_para['phi_G'], 'q': source_para['q']} 
-    kwargs_source_light['e1'], kwargs_source_light['e2'] = param_util.phi_q2_ellipticity(phi=kwargs_source_light['phi_G'], q=kwargs_source_light['q'])
+    source_para['e1'], source_para['e2'] = param_util.phi_q2_ellipticity(phi=source_para['phi_G'], q=source_para['q'])
+    kwargs_source_light = {'R_sersic': source_light_tran_Reff, 'n_sersic': source_para['n_sersic'],
+                             'center_x': source_pos[0], 'center_y': source_pos[1], 'e1': source_para['e1'], 'e2': source_para['e2']} 
+    kwargs_source_light['amp']= mva.getAmp_lenstronomy(SERSIC_in_mag=source_para,zp=zp)
     kwargs_source_light_copy = copy.deepcopy(kwargs_source_light)
     #kwargs_source_light_copy['mag'] = source_para['mag_sersic']
-    del kwargs_source_light['phi_G']
-    del kwargs_source_light['q']
     kwargs_source_list = [kwargs_source_light]
     source_model_class = LightModel(light_model_list=source_model_list)
     
@@ -149,7 +155,7 @@ for seed in range(702, 703):
     qso_amp= 10.**(-0.4*(source_para['mag_sersic']-zp))*amp_qRh_s_plane
     
 #    add_qso = int(input("add QSO?:\n input 0 no qso, others add qso:\t"))
-    add_qso= 0
+    add_qso= 1
 #    add_qso= 0
     
     if add_qso == 0:
@@ -204,6 +210,7 @@ for seed in range(702, 703):
     ##==============================================================================
     ## #Bin the image res. from high to low. 
     ##==============================================================================
+    sys.path.insert(0, '../share_tools')
     import rebin
     factor=4
     pattern_x=[0,2,0,2,1,3,1,3]
@@ -239,7 +246,7 @@ for seed in range(702, 703):
     rms = np.zeros_like(image_bin) #input rms
     noiz = np.zeros_like(image_bin) #input noiz
     image_data_noz=np.zeros_like(image_bin) #image after noiz
-    stddlong=0.016
+    stddlong=np.sqrt(0.016**2 / 4 )    #
     #stddshort=0.265
     explong=599.
     #expshort=43.98

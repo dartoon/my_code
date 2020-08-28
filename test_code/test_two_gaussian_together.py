@@ -34,4 +34,4 @@ plt.yticks([])
 plt.show()
 
 from scipy import stats
-print stats.ks_2samp(dis_mix, dis3).pvalue
+print(stats.ks_2samp(dis_mix, dis3).pvalue)

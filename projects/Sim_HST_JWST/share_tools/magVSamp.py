@@ -91,4 +91,17 @@ def getAmp(SERSIC_in_mag,zp=None,deltaPix=None):
 #    print 'conts_getamp', cnts
     amp= cnts/((re**2)*exp(k)*n*(k**(-2*n))*gamma(2*n)*2*pi)
     return amp
-#print getAmp(SERSIC_in_mag,zp=25.9463, deltaPix=0.13/4)
+# #print getAmp(SERSIC_in_mag,zp=25.9463, deltaPix=0.13/4)
+
+def getAmp_lenstronomy(SERSIC_in_mag,zp=None):
+    kwargs_lens_light = [{'amp': 1, 'R_sersic': SERSIC_in_mag['R_sersic']/np.sqrt(SERSIC_in_mag['q']),
+                         'n_sersic': SERSIC_in_mag['n_sersic'], 'center_x': 0.0,
+                         'center_y': 0.0, 'e1':SERSIC_in_mag['e1'],
+                         'e2':SERSIC_in_mag['e2']}]
+    from lenstronomy.LightModel.light_model import LightModel
+    light = LightModel(['SERSIC_ELLIPSE'])
+    total_flux = light.total_flux(kwargs_lens_light)[0]  #The total flux for each sersic components as list
+    mag=SERSIC_in_mag['mag_sersic']
+    cnts= 10.**(-0.4*(mag-zp))
+    amp = cnts/total_flux
+    return amp
