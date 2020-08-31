@@ -27,7 +27,7 @@ from lenstronomy.Data.psf import PSF
 import lenstronomy.Util.simulation_util as sim_util
 from lenstronomy.Data.imaging_data import ImageData
 import sys
-sys.path.insert(0,'../../../py_tools/')
+sys.path.insert(0,'../../../../py_tools/')
 from flux_profile import cr_mask
 from mask_objects import find_loc_max
 #file name:
@@ -77,7 +77,7 @@ folder_list = ['simulations_700_subg30/sim_lens_noqso_ID_subg30_702',
  'simulations_700_subg30/sim_lens_noqso_ID_subg30_722',
  'simulations_700_subg30/sim_lens_noqso_ID_subg30_724']
 # loadname = 'model_result_calNoiseMap_modNoisemap_boostPossionx8_noPSFerr_subg2_fixgamma.pkl'
-# loadname = 'model_result_calNoiseMap_modNoisemap_boostPossionx8_noPSFerr_subg3.pkl'
+loadname = 'model_result_calNoiseMap_modNoisemap_boostPossionx8_noPSFerr_subg3.pkl'
 
 for folder in folder_list:
     ID = folder[-3:]
