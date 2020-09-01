@@ -396,3 +396,5 @@ for seed in range(702, 799):
 #plt.xscale('log')
 #plt.yscale('log')
 #plt.show()
+
+#rm -r *07 *11 *19 *23 *32 *41 *46 *48 *50 *56 *66 *75 *85 *91
