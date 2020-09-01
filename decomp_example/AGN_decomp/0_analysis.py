@@ -65,9 +65,9 @@ source_params = [kwargs_source_init, kwargs_source_sigma, fixed_source, kwargs_l
 # Creat the QSO mask
 # =============================================================================
 from mask_objects import mask_obj
-_ , _, deblend_sources = mask_obj(QSO_img, snr=1.2, npixels=50, return_deblend = True)
+_ , _, deblend_sources = mask_obj(QSO_img, snr=1.3, npixels=20, return_deblend = True)
 
-print "deblend image to find the ID for the Objects for the mask:"
+print("deblend image to find the ID for the Objects for the mask:")
 plt.imshow(deblend_sources, origin='lower',cmap=deblend_sources.cmap(random_state=12345))
 plt.colorbar()
 if pltshow == 0:
@@ -85,7 +85,7 @@ else:
             mask += (np.array(deblend_sources)==block_id[i])
         
         QSO_msk = 1- mask
-print "The QSO mask for the fitting:"
+print("The QSO mask for the fitting:")
 plt.imshow(QSO_msk, origin='lower')
 if pltshow == 0:
     plt.close()
