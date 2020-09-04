@@ -72,3 +72,4 @@ temp_test/
 projects/Sim_HST_JWST/HST_lensed_QSO/pre_simulations/*
 for_collbrate/Shenli_host_masses/Initial_fits/*
 for_collbrate/Shenli_host_masses/MCMC_fits/*/*
+package_code/cookiecutter-pypackage/
