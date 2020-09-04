@@ -27,7 +27,7 @@ from lenstronomy.Data.psf import PSF
 import lenstronomy.Util.simulation_util as sim_util
 from lenstronomy.Data.imaging_data import ImageData
 import sys
-sys.path.insert(0,'../../../py_tools/')
+sys.path.insert(0,'../../../../py_tools/')
 from flux_profile import cr_mask
 from mask_objects import find_loc_max
 #file name:
@@ -50,12 +50,12 @@ def cal_h0(zl, zs, Ddt, om=0.27):
 folder_list = glob.glob('simulations_700_subg30/sim_lens_ID_subg30_7??')
 folder_list.sort()
 
-test_numer = 30
+test_numer = 5
 kernel = 5
 run_n = int(test_numer/kernel)
 
-kernel_i =  4 #, 1 ,2, 3 .. max = kernel-1
-folder_list = folder_list[20:20+test_numer]
+kernel_i = 0  #, 1 ,2, 3 .. max = kernel-1
+folder_list = folder_list[:test_numer]
 # savename = 'model_result_PSF_errormap_correct_subg3.pkl'
 # folder_list = ['simulations_700_subg30/sim_lens_ID_subg30_724'] 
 # savename = 'model_result_calNoiseMap_modNoisemap_boostPossionx3_subg3.pkl'
@@ -98,7 +98,7 @@ for folder in folder_list[kernel_i*run_n:kernel_i*run_n+run_n]:
                           'solver_type': solver_type,  # 'PROFILE', 'PROFILE_SHEAR', 'ELLIPSE', 'CENTER'
                           'Ddt_sampling': True
                                   }
-    if glob.glob(folder+savename) == []:    
+    if glob.glob(folder+savename) != []:    
         #Load the result from the first run:
 #        multi_band_list, kwargs_model, kwargs_result, chain_list, fix_setting = pickle.load(open(folder+'model_result.pkl','rb'))
 #        fixed_lens, fixed_source, fixed_lens_light, fixed_ps, fixed_cosmo = fix_setting
@@ -314,9 +314,9 @@ for folder in folder_list[kernel_i*run_n:kernel_i*run_n+run_n]:
     multi_band_list, kwargs_model, kwargs_result, chain_list, fix_setting, mcmc_new_list = pickle.load(open(folder+savename,'rb'))
     fixed_lens, fixed_source, fixed_lens_light, fixed_ps, fixed_cosmo = fix_setting
     labels_new = [r"$\gamma$", r"$D_{\Delta t}$","H$_0$" ]
-    # modelPlot = ModelPlot(multi_band_list, kwargs_model, kwargs_result, arrow_size=0.02, cmap_string="gist_heat")
-    # f, axes = modelPlot.plot_main()
-    # f.show()
+    modelPlot = ModelPlot(multi_band_list, kwargs_model, kwargs_result, arrow_size=0.02, cmap_string="gist_heat")
+    f, axes = modelPlot.plot_main()
+    f.show()
     # f, axes = modelPlot.plot_separate()
     # f.show()
     # f, axes = modelPlot.plot_subtract_from_data_all()

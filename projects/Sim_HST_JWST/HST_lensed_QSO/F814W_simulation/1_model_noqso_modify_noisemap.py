@@ -53,7 +53,7 @@ test_numer = 30 #len(50)
 kernel = 5
 run_n = int(test_numer/kernel)
 
-kernel_i = 4 # 0, 1 ,2, 3 .. max = kernel-1
+kernel_i = 0 # 0, 1 ,2, 3 .. max = kernel-1
 folder_list = folder_list[:test_numer]
 # savename = 'model_result_calNoiseMap_modNoisemap_useGrad_noPSFerr_subg3.pkl'
 # with_qso_savename = 'model_result_calNoiseMap_modNoisemap_useGrad_subg3.pkl'
@@ -62,12 +62,11 @@ folder_list = folder_list[:test_numer]
 # with_qso_savename = 'model_result_calNoiseMap_modNoisemap_boostPossionx3_subg3.pkl'
 
 #After talk with Simon:
-savename = 'result_quicktest_subg3.pkl'
-with_qso_savename = 'result_quicktest_subg3.pkl'
+savename = 'result_subg3.pkl' #+ Simon's points; no mask, Possionx8
+with_qso_savename = 'result_subg3.pkl'
 
-for folder in ['simulations_700_subg30/sim_lens_noqso_ID_subg30_702']:
-# for folder in folder_list[kernel_i*run_n:kernel_i*run_n+run_n]:
-# for folder in ['simulations_700_subg30/sim_lens_noqso_ID_subg30_724']:
+# for folder in ['simulations_700_subg30/sim_lens_noqso_ID_subg30_702']:
+for folder in folder_list[kernel_i*run_n:kernel_i*run_n+run_n]:
     ID = folder[-3:]
     folder = folder + '/'
     print(folder)
@@ -78,19 +77,6 @@ for folder in ['simulations_700_subg30/sim_lens_noqso_ID_subg30_702']:
     z_l, z_s, TD_distance, TD_true, TD_obs, TD_err_l = lens_info
     kwargs_lens_list, kwargs_lens_light_list, kwargs_source_list, kwargs_ps = para_s
     solver_type = 'PROFILE_SHEAR'
-#    if len(kwargs_ps['ra_image']) <4:  #Would delete all the double
-#        print(folder)
-#        import shutil
-#        shutil.rmtree(folder)
-##        continue
-##        if abs(kwargs_ps['ra_image']).min() != abs(kwargs_ps['ra_image'][-1]) and abs(kwargs_ps['dec_image']).min() != abs(kwargs_ps['dec_image'][-1]):
-##            raise ValueError("The double image is not taken the points position correctly")
-##        kwargs_ps['ra_image'] = kwargs_ps['ra_image'][:2] 
-##        kwargs_ps['dec_image'] = kwargs_ps['dec_image'][:2]
-##        kwargs_ps['point_amp'] = kwargs_ps['point_amp'][:2]
-##        TD_obs = TD_obs[:2]
-##        TD_err_l = TD_err_l[:2]
-##        solver_type = 'THETA_E_PHI'
     kwargs_constraints = {'joint_source_with_point_source': [[0, 0]],
                           'num_point_source_list': [len(kwargs_ps['ra_image'])],
                           'solver_type': solver_type,  # 'PROFILE', 'PROFILE_SHEAR', 'ELLIPSE', 'CENTER'
@@ -106,7 +92,7 @@ for folder in ['simulations_700_subg30/sim_lens_noqso_ID_subg30_702']:
         lens_data = pyfits.getdata(folder+'Drz_QSO_image.fits')
         # len_std = pyfits.getdata(folder+'noise_map.fits')        
         lens_mask = cr_mask(lens_data, 'normal_mask.reg')
-        framesize = 131
+        framesize = 185
         ct = int((len(lens_data) - framesize)/2)
         lens_data = lens_data[ct:-ct,ct:-ct]
         # len_std = len_std[ct:-ct,ct:-ct]
@@ -116,9 +102,9 @@ for folder in ['simulations_700_subg30/sim_lens_noqso_ID_subg30_702']:
         plt.show()
         exp_time = 599.* 2 * 8
         stdd =  0.0004  #Measurement from empty retion, 0.016*0.08**2/0.13**2/np.sqrt(8)
-        len_std = (abs(lens_data/exp_time)+stdd**2)**0.5
+        # len_std = (abs(lens_data/exp_time)+stdd**2)**0.5
         
-        # len_std = (abs(lens_data/exp_time)*8+stdd**2)**0.5
+        len_std = (abs(lens_data/exp_time)*8+stdd**2)**0.5
         
         # vgrad = np.gradient(lens_data)
         # fulgrad = np.sqrt(vgrad[0]**2 + vgrad[1]**2)
@@ -128,7 +114,7 @@ for folder in ['simulations_700_subg30/sim_lens_noqso_ID_subg30_702']:
         deltaPix = 0.04
         
         psf = pyfits.getdata(folder+'Drz_PSF.fits')
-        psf_fsize = 121
+        psf_fsize = 135
         psf_half_r = int(psf_fsize/2)
         psf_peak = np.where(psf==psf.max())
         psf_peak = [psf_peak[0][0], psf_peak[1][0]]
@@ -220,7 +206,7 @@ for folder in ['simulations_700_subg30/sim_lens_noqso_ID_subg30_702']:
                              'check_matched_source_position': True,
                              'source_position_tolerance': 0.001,
                              'time_delay_likelihood': True,
-                             'image_likelihood_mask_list': [lens_mask]
+                             # 'image_likelihood_mask_list': [lens_mask]
                                      }
         kwargs_numerics = {'supersampling_factor': 3}
         image_band = [kwargs_data, kwargs_psf, kwargs_numerics]
