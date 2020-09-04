@@ -399,7 +399,7 @@ def make_circle_msk(img,x=30,y=30, radius=5):
     Create a mask for the image, at position x, y with radius as radius.
     """
     yi,xi = np.indices((len(img),len(img))).astype(np.float64)
-    mask = [np.sqrt((xi-x)**2+(yi-y)**2)<5]
+    mask = [np.sqrt((xi-x)**2+(yi-y)**2)<radius]
     return mask[0]
     
 def sub_bkg(img, plot=True):
