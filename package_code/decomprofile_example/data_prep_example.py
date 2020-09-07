@@ -26,8 +26,9 @@ ax.xaxis.set_visible(False)
 ax.yaxis.set_visible(False)
 plt.show()  
 
-from decomprofile.tools_data.astro_tools import read_fits_exp
-read_fits_exp(fitsFile)
+import decomprofile.tools_data.astro_tools as astro_tools
+print(astro_tools.read_fits_exp(fitsFile), astro_tools.read_pixel_scale(fitsFile,frame=1))
+
 #%%
 from astropy.visualization import SqrtStretch
 from astropy.stats import SigmaClip
