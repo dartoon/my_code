@@ -4,6 +4,8 @@
 Created on Mon Sep  7 14:38:27 2020
 
 @author: Xuheng Ding
+
+A group of function to measure the photometry.
 """
 
 import numpy as np
@@ -12,13 +14,28 @@ import astropy.io.fits as pyfits
 
 import scipy.ndimage as ndimage
 import scipy.ndimage.filters as filters
+from matplotlib.colors import LogNorm
+from matplotlib.ticker import AutoMinorLocator
 
-def find_loc_max(data, neighborhood_size = 8, threshold = 5):
-    neighborhood_size = neighborhood_size
-    threshold = threshold
-    data_max = filters.maximum_filter(data, neighborhood_size) 
-    maxima = (data == data_max)
-    data_min = filters.minimum_filter(data, neighborhood_size)
+def find_loc_max(image, neighborhood_size = 8, threshold = 5):
+    """
+    Find all the local maximazation in a 2D array, used to search the targets such as QSOs and PSFs.
+    This function is created and inspired based on:
+        https://stackoverflow.com/questions/9111711/get-coordinates-of-local-maxima-in-2d-array-above-certain-value
+   
+    Parameter
+    --------
+        image: input image (2D array)
+        neighborhood_size: Define the region size to filter the local minima.
+        threshold: define the significance (flux value) of the maximazation point. The lower, the more would be found.
+    
+    Return
+    --------
+        A list of x and y of the targets.
+    """    
+    data_max = filters.maximum_filter(image, neighborhood_size) 
+    maxima = (image == data_max)
+    data_min = filters.minimum_filter(image, neighborhood_size)
     diff = ((data_max - data_min) > threshold)
     maxima[diff == 0] = 0
     labeled, num_objects = ndimage.label(maxima)
@@ -31,16 +48,28 @@ def find_loc_max(data, neighborhood_size = 8, threshold = 5):
         y.append(y_center)
     return x, y
 
-def search_local_max(img, radius=100, view=False):
+def search_local_max(image, radius=120, view=False):
+    """
+    Search all the maxs. The edges position with a lot of zeros would be excluded.
+    
+    Parameter
+    --------
+        image: the input image (2D array)
+        radius: a radius used to test if any empty pixels around.
+        
+    Return
+    --------
+        A list of positions of 'PSF'
+    """
     from .cutout_tools import cutout
     from .astro_tools import plt_fits
-    PSFx, PSFy =find_loc_max(img)
+    PSFx, PSFy =find_loc_max(image)
     PSF_locs = []
     ct = 0
     for i in range(len(PSFx)):
-        cut_img = cutout(img, [PSFx[i], PSFy[i]], radius=radius)
+        cut_img = cutout(image, [PSFx[i], PSFy[i]], radius=radius)
         cut_img[np.isnan(cut_img)] = 0
-        if np.sum(cut_img==0)  > len(cut_img)**2/5:
+        if np.sum(cut_img==0)  > len(cut_img)**2/20:
             continue
         PSF_locs.append([PSFx[i], PSFy[i]])
         if view ==True:
@@ -52,28 +81,251 @@ def search_local_max(img, radius=100, view=False):
             ct += 1
     return  PSF_locs
     
-
-def measure_FWHM(image, measure_radius = 10):
-    seed_num = 2*measure_radius+1
+def measure_FWHM(image, radius = 10):
+    """
+    Fit image as 2D gaussion to calculate the FWHM on four directions.
+    
+    Parameter
+    --------
+        image: the input image (2D array)
+        radius: define the distance (2*radius) to sample the pixel value and fit Gaussian.
+        
+    Return
+    --------
+        FWHM on 4 different direcions.
+    """    
+    seed_num = 2*radius+1
     frm = len(image)
     q_frm = int(frm/4)
     x_center = np.where(image == image[q_frm:-q_frm,q_frm:-q_frm].max())[1][0]
     y_center = np.where(image == image[q_frm:-q_frm,q_frm:-q_frm].max())[0][0]
     
-    x_n = np.asarray([image[y_center][x_center+i] for i in range(-measure_radius, measure_radius+1)]) # The x value, vertcial 
-    y_n = np.asarray([image[y_center+i][x_center] for i in range(-measure_radius, measure_radius+1)]) # The y value, horizontal 
-    xy_n = np.asarray([image[y_center+i][x_center+i] for i in range(-measure_radius, measure_radius+1)]) # The up right value, horizontal
-    xy__n =  np.asarray([image[y_center-i][x_center+i] for i in range(-measure_radius, measure_radius+1)]) # The up right value, horizontal
+    x_n = np.asarray([image[y_center][x_center+i] for i in range(-radius, radius+1)]) # The x value, vertcial 
+    y_n = np.asarray([image[y_center+i][x_center] for i in range(-radius, radius+1)]) # The y value, horizontal 
+    xy_n = np.asarray([image[y_center+i][x_center+i] for i in range(-radius, radius+1)]) # The up right value, horizontal
+    xy__n =  np.asarray([image[y_center-i][x_center+i] for i in range(-radius, radius+1)]) # The up right value, horizontal
     from astropy.modeling import models, fitting
-    g_init = models.Gaussian1D(amplitude=y_n.max(), mean=measure_radius, stddev=1.5)
+    g_init = models.Gaussian1D(amplitude=y_n.max(), mean=radius, stddev=1.5)
     fit_g = fitting.LevMarLSQFitter()
     g_x = fit_g(g_init, range(seed_num), x_n)
     g_y = fit_g(g_init, range(seed_num), y_n)
     g_xy = fit_g(g_init, range(seed_num), xy_n)
     g_xy_ = fit_g(g_init, range(seed_num), xy__n)
-    
-    FWHM_ver = g_x.stddev.value * 2.355  # The FWHM = 2*np.sqrt(2*np.log(2)) * stdd = 2.355*stdd
-    FWHM_hor = g_y.stddev.value * 2.355
-    FWHM_xy = g_xy.stddev.value * 2.355 * np.sqrt(2.)
-    FWHM_xy_ = g_xy_.stddev.value * 2.355 * np.sqrt(2.)
+    from astropy.stats import gaussian_fwhm_to_sigma
+    FWHM_ver = g_x.stddev.value /gaussian_fwhm_to_sigma  # The FWHM = 2*np.sqrt(2*np.log(2)) * stdd = 2.355*stdd
+    FWHM_hor = g_y.stddev.value /gaussian_fwhm_to_sigma
+    FWHM_xy = g_xy.stddev.value /gaussian_fwhm_to_sigma * np.sqrt(2.)   #the sampling on the xy direction is expend by a factor of np.sqrt(2.).
+    FWHM_xy_ = g_xy_.stddev.value /gaussian_fwhm_to_sigma * np.sqrt(2.)
     return FWHM_ver, FWHM_hor, FWHM_xy, FWHM_xy_
+
+def flux_in_region(image,region,mode='exact'):
+    '''
+    Measure the total flux inside a region.
+    
+    Parameter
+    --------
+        image: 2-D array image;
+        region: region generated by pix_region;
+        mode: mask mode, 'exact', 'center', default is 'exact'.
+        
+    Returns
+    --------
+        Total flux
+    '''
+    mask = region.to_mask(mode=mode)
+    data = mask.cutout(image)
+    tot_flux= np.sum(mask.data * data)
+    return tot_flux
+
+from .cutout_tools import pix_region
+
+def flux_profile(image, center, radius=35,start_p=1.5, grids=20, x_gridspace=None, ifplot=False,
+                 fits_plot=False, mask_image=None):
+    '''
+    Obtain the flux profile of a 2D image, region at the center position.
+    
+    Parameters
+    --------
+        image: A 2-D array image;
+        center: center point of the profile;
+        radius: radius of the profile edge, default = 35;
+        grids: number of points to sample the flux, default = 20;
+        ifplot: if plot the profile
+        fits_plot: if plot the fits file with the regions.
+        mask_list: a list of reg filenames used to generate a mask.
+        
+    Returns
+    --------
+        1. A 1-D array of the tot_flux value of each 'grids' in the profile sampled radius. 
+        2. The grids of each pixel radius.
+        3. The region file for each radius.
+    '''
+    if x_gridspace == None:
+        r_grids=(np.linspace(0,1,grids+1)*radius)[1:]
+        diff = start_p - r_grids[0]
+        r_grids += diff             #starts from pixel 0.5
+    elif x_gridspace == 'log':
+        r_grids=(np.logspace(-2,0,grids+1)*radius)[1:]
+        diff =  start_p - r_grids[0]
+        r_grids += diff             #starts from pixel 0.5
+    r_flux = np.empty(grids)
+    regions = []
+    mask = np.ones(image.shape)
+    if mask_image is not None:
+        mask = mask_image * mask
+    for i in range(len(r_grids)):
+        region = pix_region(center, r_grids[i])
+        r_flux[i] =flux_in_region(image*mask, region)
+        regions.append(region)
+    if fits_plot == True:
+        ax=plt.subplot(1,1,1)
+        cax=ax.imshow((image*mask),norm=LogNorm(),origin='lower')#,cmap='gist_heat')
+        #ax.add_patch(mask.bbox.as_artist(facecolor='none', edgecolor='white'))
+        for i in range(grids):
+            ax.add_patch(regions[i].as_artist(facecolor='none', edgecolor='orange'))
+        plt.colorbar(cax)
+        plt.show()
+    if ifplot == True:
+        minorLocator = AutoMinorLocator()
+        fig, ax = plt.subplots()
+        plt.plot(r_grids, r_flux, 'x-')
+        ax.xaxis.set_minor_locator(minorLocator)
+        plt.tick_params(which='both', width=2)
+        plt.tick_params(which='major', length=7)
+        plt.tick_params(which='minor', length=4, color='r')
+        plt.grid()
+        ax.set_ylabel("Total Flux")
+        ax.set_xlabel("Pixels")
+        if x_gridspace == 'log':
+            ax.set_xscale('log')
+            plt.xlim(start_p*0.7, ) 
+        plt.grid(which="minor")
+        plt.show()
+    return r_flux, r_grids, regions
+
+def SB_profile(image, center, radius=35, start_p=1.5, grids=20, x_gridspace = None, 
+               ifplot=False, fits_plot=False,
+               if_annuli= False, mask_image=None):
+    '''
+    Derive the SB profile of one image start at the center.
+    
+    Parameters
+    --------
+        image: A 2-D array image;
+        center: The center point of the profile;
+        radius: The radius of the profile favourable with default equals to 35;
+        grids: The number of points to sample the flux with default equals to 20;
+        ifplot: if plot the profile
+        fits_plot: if plot the fits file with the regions.
+        if_annuli: False: The overall surface brightness with a circle. True, return annuli surface brightness between i and i-1 cirle.
+        mask_image: if is not None, will use this image as mask.
+    Returns
+    --------
+        A 1-D array of the SB value of each 'grids' in the profile with the sampled radius.
+    '''
+    mask = np.ones(image.shape)
+    if mask_image is not None:
+        mask = mask * mask_image
+    r_flux, r_grids, regions=flux_profile(image*mask, center, radius=radius, start_p=start_p, grids=grids,
+                                          x_gridspace=x_gridspace, ifplot=False, fits_plot=False)
+    region_size = np.zeros([len(r_flux)])
+    for i in range(len(r_flux)):
+        circle=regions[i].to_mask(mode='exact')
+        circle_mask =  circle.cutout(mask)              #Define the mask for the region frame.
+        region_size[i]=(circle.data * circle_mask).sum()    #circle.data is the region size of each pixel. 
+    if if_annuli ==False:
+        r_SB= r_flux/region_size
+    elif if_annuli == True:
+        r_SB = np.zeros_like(r_flux)
+        r_SB[0] = r_flux[0]/region_size[0]
+        r_SB[1:] = (r_flux[1:]-r_flux[:-1]) / (region_size[1:]-region_size[:-1])
+    if fits_plot == True:
+        ax=plt.subplot(1,1,1)
+        if mask_image is None:
+            cax=ax.imshow(image, norm=LogNorm(),origin='lower')
+        else:
+            cax=ax.imshow(image*mask,norm=LogNorm(),origin='lower')
+        for i in range(grids):
+            ax.add_patch(regions[i].as_artist(facecolor='none', edgecolor='orange'))
+        plt.colorbar(cax)
+        plt.show()
+    if ifplot == True:
+        minorLocator = AutoMinorLocator()
+        fig, ax = plt.subplots()
+        plt.plot(r_grids, r_SB, 'x-')
+        ax.xaxis.set_minor_locator(minorLocator)
+        plt.tick_params(which='both', width=2)
+        plt.tick_params(which='major', length=7)
+        plt.tick_params(which='minor', length=4, color='r')
+        plt.grid()
+        ax.set_ylabel("Surface Brightness")
+        ax.set_xlabel("Pixels")
+        if x_gridspace == 'log':
+            ax.set_xscale('log')
+            plt.xlim(start_p*0.7, ) 
+        plt.grid(which="minor")
+        plt.show()
+    return r_SB, r_grids
+
+def profiles_compare(prf_list, prf_name_list = None, x_gridspace = None ,
+                     grids = 20,  norm_pix = 3, if_annuli=False,
+                     y_log=False, scale_list=None):
+    '''
+    Compare the SB profile between different images. 
+    Parameter
+    --------
+        prf_list: a list of image profiles.
+        prf_name_list: a list of name for each profiles.
+        norm_pix: The x-position (i.e. pixel) to norm the profiles.
+        scale_list: a list for the scaled value for the resultion, default as scale as 1 (set by None), i.e. same resolution.
+    Return
+    --------
+        A plot of SB comparison.
+    '''
+    if x_gridspace == None:
+        radius = 6
+    elif x_gridspace == 'log':
+        radius = len(prf_list[1])/2
+    if scale_list == None:
+        scale_list = [1] * len(prf_list)
+    minorLocator = AutoMinorLocator()
+    fig, ax = plt.subplots(figsize=(10,7))
+    prf_NO = len(prf_list)
+    if prf_name_list == None:
+        prf_name_list = ["Profile-{0}".format(i) for i in range(len(prf_list))]
+    if len(prf_name_list)!=len(prf_list):
+        raise ValueError("The profile name is not in right length")
+    for i in range(prf_NO):
+        b_c = int(len(prf_list[i])/2)
+        b_r = int(len(prf_list[i])/6)
+        center = np.reshape(np.asarray(np.where(prf_list[i]== prf_list[i][b_c-b_r:b_c+b_r,b_c-b_r:b_c+b_r].max())),(2))[::-1]
+        scale = scale_list[i]
+        r_SB, r_grids = SB_profile(prf_list[i], center, radius=radius*scale,
+                                   grids=grids, x_gridspace=x_gridspace,if_annuli=if_annuli)
+        
+        if isinstance(norm_pix,int) or isinstance(norm_pix,float):
+            count = r_grids <= norm_pix * scale
+            idx = count.sum() -1
+#            print("idx:",idx)
+            r_SB /= r_SB[idx]      #normalize the curves
+        r_grids /= scale
+        
+        if y_log == False:
+            plt.plot(r_grids, r_SB, 'x-', label=prf_name_list[i])
+        elif y_log == True:
+            plt.plot(r_grids, np.log10(r_SB), 'x-', label=prf_name_list[i])
+            # plt.ylim(0, 0.5) 
+    ax.xaxis.set_minor_locator(minorLocator)
+    plt.tick_params(which='both', width=2)
+    plt.tick_params(which='major', length=7)
+    plt.tick_params(which='minor', length=4, color='r')
+    plt.grid()
+    ax.set_ylabel("Scaled Surface Brightness")
+    ax.set_xlabel("Pixels")
+    if x_gridspace == 'log':
+        ax.set_xscale('log')
+        # plt.xlim(1.3, ) 
+    plt.grid(which="minor")
+    plt.legend()
+#    plt.close() 
+    return fig
