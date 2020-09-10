@@ -16,61 +16,47 @@ import matplotlib.pyplot as plt
 import astropy.io.fits as pyfits
 from matplotlib.colors import LogNorm
 
+from decomprofile.tools_data.astro_tools import plt_fits
 #Load data and plot:
 fitsFile = pyfits.open('../example_data/HST/QSO/1104_final_drz.fits')
 img = fitsFile[1].data # check the back grounp
-fig=plt.figure(figsize=(15,15))
-ax=fig.add_subplot(1,1,1)
-ax.imshow(img, norm=LogNorm(), origin='lower') 
-ax.xaxis.set_visible(False)
-ax.yaxis.set_visible(False)
-plt.show()  
 
+plt_fits(img, figsize=(15,15))
+
+#%%
 import decomprofile.tools_data.astro_tools as astro_tools
 print(astro_tools.read_fits_exp(fitsFile), astro_tools.read_pixel_scale(fitsFile,frame=1))  #Read the exposure time and pixel scale.
 
-#%%
-from astropy.visualization import SqrtStretch
-from astropy.stats import SigmaClip
-from photutils import Background2D, SExtractorBackground  
-from astropy.visualization.mpl_normalize import ImageNormalize
-from photutils import make_source_mask
+from decomprofile.tools_data.measure_tools import measure_bkg
+bkglight = measure_bkg(img, if_plot=True)
+img = img - bkglight   #remove the bkglight
 
-norm = ImageNormalize(stretch=SqrtStretch())         
-sigma_clip = SigmaClip(sigma=3., maxiters=10)
-bkg_estimator = SExtractorBackground()
-#Define the regions where contains the signal.
-mask_0 = make_source_mask(img, nsigma=2, npixels=25, dilate_size=11) 
-fig=plt.figure(figsize=(15,15))
-ax=fig.add_subplot(1,1,1)
-ax.imshow(mask_0, origin='lower') 
-ax.xaxis.set_visible(False)
-ax.yaxis.set_visible(False)
-plt.show() 
-
-#%%
-mask_1 = (np.isnan(img))
-mask = mask_0 + mask_1
-#estimate the 2D background light:
-bkg = Background2D(img, (50, 50), filter_size=(3, 3),
-                   sigma_clip=sigma_clip, bkg_estimator=bkg_estimator,
-                   mask=mask)
-back = bkg.background* ~mask_1  #The 2-D back ground light estimated from the whole field.
-fig=plt.figure(figsize=(15,15))
-ax=fig.add_subplot(1,1,1)
-ax.imshow(back, origin='lower', cmap='Greys_r')
-ax.xaxis.set_visible(False)
-ax.yaxis.set_visible(False)
-plt.show()
-
-img = img - back             
- 
 #%%
 from decomprofile.tools_data.cutout_tools import cut_center_auto
-from decomprofile.tools_data.astro_tools import plt_fits
 QSO_loc = [1135, 648]  # The postion of the QSO in the frame
-QSO_img, QSO_center_pos = cut_center_auto(image=img, center= QSO_loc,  kernel = 'center_gaussian', radius=60, return_center=True, if_plot=True)
-plt_fits(QSO_img)
+QSO_img, QSO_center_pos = cut_center_auto(image=img, center= QSO_loc, 
+                                          kernel = 'center_gaussian', radius=60,
+                                          return_center=True, if_plot=True)
+plt_fits(QSO_img, colorbar = True)
+
+#%%Creat the SB profile of the QSO:
+from decomprofile.tools_data.measure_tools import SB_profile, esti_bgkstd
+# r_SB, r_grids = SB_profile(QSO_img, center = [(len(QSO_img)-1)/2]*2 , radius=20,
+#                            grids=50, x_gridspace='log',if_annuli=True, if_plot=True, fits_plot = True)
+std = esti_bgkstd(QSO_img, if_plot=True)
+
+#%%Test the way to creat the mask for the QSO:
+from decomprofile.tools_data.measure_tools import detect_obj, mask_obj
+apertures = detect_obj(QSO_img, if_plot=True)
+
+select_mask_idx = [0,1,3]
+
+apertures = [apertures[i] for i in select_mask_idx]
+mask_list = mask_obj(QSO_img, apertures, if_plot=False)
+mask = np.ones_like(QSO_img)
+for i in range(len(mask_list)):
+    mask *= mask_list[i]
+plt_fits(mask, colorbar = False)
 
 #%%Auto find the PSF in the frames
 from decomprofile.tools_data.measure_tools import search_local_max, measure_FWHM
@@ -92,17 +78,13 @@ for i in range(len(PSF_locs)):
     cut_image = cut_center_auto(img, center = PSF_locs[i], kernel = 'center_gaussian', radius=60)
     print('PSF location:', PSF_locs[i])
     print('id:', i, 'FWHMs:', np.round(measure_FWHM(cut_image , radius = 10),3), 'flux:', round(np.sum(cut_image),) )
-    # plt_fits(cut_image)
+    plt_fits(cut_image)
     
 select = [3, 4, 5, 10]
 PSF_locs_final = [PSF_locs[i] for i in select]
 PSF_lists = [cut_center_auto(img, center = PSF_locs[i], kernel = 'center_gaussian', radius=50) for i in select]
-#%%
-from decomprofile.tools_data.measure_tools import SB_profile
-r_SB, r_grids = SB_profile(QSO_img, center = [(len(QSO_img)-1)/2]*2 , radius=20,
-                           grids=50, x_gridspace='log',if_annuli=True, ifplot=True, fits_plot = True)
 
-#%%
+
 from decomprofile.tools_data.measure_tools import profiles_compare
 profiles_compare([QSO_img] + PSF_lists, x_gridspace= 'log', norm_pix = 5, if_annuli=True, y_log = False,
                  prf_name_list = (['QSO'] + ['PSF{0}'.format(i) for i in range(len(PSF_lists))]))

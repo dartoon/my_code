@@ -16,6 +16,12 @@ import scipy.ndimage as ndimage
 import scipy.ndimage.filters as filters
 from matplotlib.colors import LogNorm
 from matplotlib.ticker import AutoMinorLocator
+import copy
+import matplotlib
+from photutils import make_source_mask
+from decomprofile.tools_data.astro_tools import plt_fits 
+my_cmap = copy.copy(matplotlib.cm.get_cmap('gist_heat')) # copy the default cmap
+my_cmap.set_bad('black')
 
 def find_loc_max(image, neighborhood_size = 8, threshold = 5):
     """
@@ -137,9 +143,9 @@ def flux_in_region(image,region,mode='exact'):
     tot_flux= np.sum(mask.data * data)
     return tot_flux
 
-from .cutout_tools import pix_region
+from decomprofile.tools_data.cutout_tools import pix_region
 
-def flux_profile(image, center, radius=35,start_p=1.5, grids=20, x_gridspace=None, ifplot=False,
+def flux_profile(image, center, radius=35,start_p=1.5, grids=20, x_gridspace=None, if_plot=False,
                  fits_plot=False, mask_image=None):
     '''
     Obtain the flux profile of a 2D image, region at the center position.
@@ -150,7 +156,7 @@ def flux_profile(image, center, radius=35,start_p=1.5, grids=20, x_gridspace=Non
         center: center point of the profile;
         radius: radius of the profile edge, default = 35;
         grids: number of points to sample the flux, default = 20;
-        ifplot: if plot the profile
+        if_plot: if plot the profile
         fits_plot: if plot the fits file with the regions.
         mask_list: a list of reg filenames used to generate a mask.
         
@@ -185,7 +191,7 @@ def flux_profile(image, center, radius=35,start_p=1.5, grids=20, x_gridspace=Non
             ax.add_patch(regions[i].as_artist(facecolor='none', edgecolor='orange'))
         plt.colorbar(cax)
         plt.show()
-    if ifplot == True:
+    if if_plot == True:
         minorLocator = AutoMinorLocator()
         fig, ax = plt.subplots()
         plt.plot(r_grids, r_flux, 'x-')
@@ -204,7 +210,7 @@ def flux_profile(image, center, radius=35,start_p=1.5, grids=20, x_gridspace=Non
     return r_flux, r_grids, regions
 
 def SB_profile(image, center, radius=35, start_p=1.5, grids=20, x_gridspace = None, 
-               ifplot=False, fits_plot=False,
+               if_plot=False, fits_plot=False,
                if_annuli= False, mask_image=None):
     '''
     Derive the SB profile of one image start at the center.
@@ -215,7 +221,7 @@ def SB_profile(image, center, radius=35, start_p=1.5, grids=20, x_gridspace = No
         center: The center point of the profile;
         radius: The radius of the profile favourable with default equals to 35;
         grids: The number of points to sample the flux with default equals to 20;
-        ifplot: if plot the profile
+        if_plot: if plot the profile
         fits_plot: if plot the fits file with the regions.
         if_annuli: False: The overall surface brightness with a circle. True, return annuli surface brightness between i and i-1 cirle.
         mask_image: if is not None, will use this image as mask.
@@ -227,7 +233,7 @@ def SB_profile(image, center, radius=35, start_p=1.5, grids=20, x_gridspace = No
     if mask_image is not None:
         mask = mask * mask_image
     r_flux, r_grids, regions=flux_profile(image*mask, center, radius=radius, start_p=start_p, grids=grids,
-                                          x_gridspace=x_gridspace, ifplot=False, fits_plot=False)
+                                          x_gridspace=x_gridspace, if_plot=False, fits_plot=False)
     region_size = np.zeros([len(r_flux)])
     for i in range(len(r_flux)):
         circle=regions[i].to_mask(mode='exact')
@@ -249,7 +255,7 @@ def SB_profile(image, center, radius=35, start_p=1.5, grids=20, x_gridspace = No
             ax.add_patch(regions[i].as_artist(facecolor='none', edgecolor='orange'))
         plt.colorbar(cax)
         plt.show()
-    if ifplot == True:
+    if if_plot == True:
         minorLocator = AutoMinorLocator()
         fig, ax = plt.subplots()
         plt.plot(r_grids, r_SB, 'x-')
@@ -329,3 +335,224 @@ def profiles_compare(prf_list, prf_name_list = None, x_gridspace = None ,
     plt.legend()
 #    plt.close() 
     return fig
+
+def measure_bkg(img, if_plot=False, nsigma=2, npixels=25, dilate_size=11):
+    from astropy.stats import SigmaClip
+    from photutils import Background2D, SExtractorBackground  
+    sigma_clip = SigmaClip(sigma=3., maxiters=10)
+    bkg_estimator = SExtractorBackground()
+    mask_0 = make_source_mask(img, nsigma=nsigma, npixels=npixels, dilate_size=dilate_size)
+    mask_1 = (np.isnan(img))
+    mask = mask_0 + mask_1
+    bkg = Background2D(img, (50, 50), filter_size=(3, 3),
+                       sigma_clip=sigma_clip, bkg_estimator=bkg_estimator,
+                       mask=mask)
+    from matplotlib.colors import LogNorm
+    fig=plt.figure(figsize=(15,15))
+    ax=fig.add_subplot(1,1,1)
+    ax.imshow(img, norm=LogNorm(), origin='lower') 
+    #bkg.plot_meshes(outlines=True, color='#1f77b4')
+    ax.xaxis.set_visible(False)
+    ax.yaxis.set_visible(False)
+    if if_plot:
+        plt.show()  
+    else:
+        plt.close()
+    fig=plt.figure(figsize=(15,15))
+    ax=fig.add_subplot(1,1,1)
+    ax.imshow(mask, origin='lower') 
+    #bkg.plot_meshes(outlines=True, color='#1f77b4')
+    ax.xaxis.set_visible(False)
+    ax.yaxis.set_visible(False)
+    if if_plot:
+        plt.show()  
+    else:
+        plt.close()    
+    bkg_light = bkg.background* ~mask_1
+    fig=plt.figure(figsize=(15,15))
+    ax=fig.add_subplot(1,1,1)
+    ax.imshow(bkg_light, origin='lower', cmap='Greys_r')
+    ax.xaxis.set_visible(False)
+    ax.yaxis.set_visible(False)
+    if if_plot:
+        plt.show()  
+    else:
+        plt.close()
+    return bkg_light   
+
+def string_find_between(s, first, last ):
+    try:
+        start = s.index( first ) + len( first )
+        end = s.index( last, start )
+        return s[start:end]
+    except ValueError:
+        return ""
+
+def cr_mask(image, filename='test_circle.reg'):
+    '''
+    The creat a mask using a DS9 .reg file. The pixels in the region are 0, ouside ones are 1.
+    
+    Parameter
+    --------
+        image: a 2D array image as a template frame.
+        filename: full name of the region file.
+        
+    Return
+    --------
+        A image.shape array. Pixels in the region is 0, otherwise 1.
+    '''
+    with open(filename, 'r') as input_file:
+        reg_string=input_file.read().replace('\n', '')
+    if "physicalcircle" in reg_string:
+        abc=string_find_between(reg_string, "(", ")")
+        reg_info=np.fromstring(abc, dtype=float, sep=',')
+        center, radius = reg_info[:2]-1 , reg_info[2]
+        region = pix_region(center, radius)
+        box = 1-region.to_mask(mode='center').data
+    elif "physicalbox" in reg_string:
+        abc=string_find_between(reg_string, "(", ")")
+        reg_info=np.fromstring(abc, dtype=float, sep=',')
+        center = reg_info[:2] - 1
+        x_r, y_r = reg_info[2:4]  # x_r is the length of the x, y_r is the length of the y
+        box = np.zeros([np.int(x_r)+1, np.int(y_r)+1]).T
+    else:
+        print(reg_string)
+        raise ValueError("The input reg is un-defined yet")
+    frame_size = image.shape
+    box_size = box.shape
+    x_edge = np.int(center[1]-box_size[0]/2) #The position of the center is x-y switched.
+    y_edge = np.int(center[0]-box_size[1]/2)
+    mask = np.ones(frame_size)
+    mask_box_part = mask[x_edge:x_edge+box_size[0],y_edge: y_edge + box_size[1]]
+    mask_box_part *= box
+    return mask    
+
+
+def detect_obj(image, nsigma=2.8, exp_sz= 1.2, npixels = 15, if_plot=False):  
+    """
+    Define the apeatures for all the objects in the image.
+    
+    Parameter
+    --------
+        img : 2-D array like
+        The input image
+    
+        exp_sz : float
+        The level to expand the mask region.
+    
+        nsigma : float
+        The number of standard deviations per pixel above the
+        ``background`` for which to consider a pixel as possibly being
+        part of a source.
+        
+        npixels: int
+        The number of connected pixels, each greater than ``threshold``,
+        that an object must have to be detected.  ``npixels`` must be a
+        positive integer.
+        b: The blash of blash.
+        
+        if_plot: bool
+        If ture, plot the detection figure.    
+        
+    Return
+    --------
+        A list of photutils defined apeatures that cover the detected objects.
+    """ 
+    from photutils import detect_threshold
+    from astropy.stats import gaussian_fwhm_to_sigma
+    from astropy.convolution import Gaussian2DKernel
+    from photutils import detect_sources,deblend_sources   
+    from photutils import source_properties
+    threshold = detect_threshold(image, nsigma=nsigma)
+    # center_image = len(image)/2
+    sigma = 3.0 * gaussian_fwhm_to_sigma # FWHM = 3.
+    kernel = Gaussian2DKernel(sigma, x_size=3, y_size=3)
+    kernel.normalize()
+    segm = detect_sources(image, threshold, npixels=npixels, filter_kernel=kernel)
+    segm_deblend = deblend_sources(image, segm, npixels=npixels,
+                                    filter_kernel=kernel, nlevels=25,
+                                    contrast=0.001)
+    #Number of objects segm_deblend.data.max()
+    columns = ['id', 'xcentroid', 'ycentroid', 'source_sum', 'orientation', 'area']
+    cat = source_properties(image, segm_deblend)
+    tbl = cat.to_table(columns=columns)
+    tbl['xcentroid'].info.format = '.2f'  # optional format
+    tbl['ycentroid'].info.format = '.2f'
+    cat = source_properties(image, segm_deblend)
+    apertures = []
+    segm_deblend_size = segm_deblend.areas
+    from photutils import EllipticalAperture
+    for obj in cat:
+        size = segm_deblend_size[obj.id-1]
+        position = (obj.xcentroid.value, obj.ycentroid.value)
+        a_o = obj.semimajor_axis_sigma.value
+        b_o = obj.semiminor_axis_sigma.value
+        size_o = np.pi * a_o * b_o
+        r = np.sqrt(size/size_o)*exp_sz
+        a, b = a_o*r, b_o*r
+        theta = obj.orientation.value / 180 * np.pi
+        apertures.append(EllipticalAperture(position, a, b, theta=theta))        
+    if if_plot == True:
+        fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12.5, 10))
+        vmin = 1.e-3
+        vmax = 2.1 
+        ax1.imshow(image, origin='lower', cmap=my_cmap, norm=LogNorm(), vmin=vmin, vmax=vmax)
+        ax1.set_title('Data')
+        ax2.imshow(segm_deblend, origin='lower', cmap=segm_deblend.cmap(random_state=12345))
+        for i in range(len(cat)):
+            ax2.text(cat[i].xcentroid.value, cat[i].ycentroid.value, '{0}'.format(i), fontsize=15,
+                     bbox={'facecolor': 'white', 'alpha': 0.5, 'pad': 1})
+        for i in range(len(apertures)):
+            aperture = apertures[i]
+            aperture.plot(color='white', lw=1.5, ax=ax1)
+            aperture.plot(color='white', lw=1.5, ax=ax2)            
+        ax2.set_title('Segmentation Image')
+        plt.show()    
+        print(tbl)
+    return apertures
+
+def mask_obj(image, apertures, if_plot = True):
+    from regions import PixCoord, EllipsePixelRegion
+    from astropy.coordinates import Angle
+    masks = []  # In the script, the objects are 1, emptys are 0.
+    for i in range(len(apertures)):
+        aperture = apertures[i]
+        if isinstance(apertures[0].positions[0],np.ndarray):
+            x, y = aperture.positions[0]
+        elif isinstance(apertures[0].positions[0],float):
+            x, y = aperture.positions
+        center = PixCoord(x=x, y=y)
+        theta = Angle(aperture.theta/np.pi*180.,'deg')
+        reg = EllipsePixelRegion(center=center, width=aperture.a*2, height=aperture.b*2, angle=theta)
+        patch = reg.as_artist(facecolor='none', edgecolor='red', lw=2)
+        mask_set = reg.to_mask(mode='center')
+        mask = mask_set.to_image((len(image),len(image)))
+        mask = 1- mask
+        if if_plot:
+            print( "plot mask for object {0}:".format(i) )
+            fig, axi = plt.subplots(1, 1, figsize=None)
+            axi.add_patch(patch)
+            axi.imshow(mask, origin='lower')
+            plt.show()
+        masks.append(mask)
+    return masks
+
+def esti_bgkstd(image, nsigma=2, exp_sz= 1.5, npixels = 15, if_plot=False):
+    apertures = detect_obj(image, nsigma=nsigma , exp_sz=exp_sz, npixels = npixels)
+    mask_list = mask_obj(image, apertures, if_plot=False)
+    mask = np.ones_like(image)
+    for i in range(len(mask_list)):
+        mask *= mask_list[i]
+    if if_plot == True:
+        image_mask = image*mask
+        fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12.5, 6))
+        ax1.imshow(image_mask, origin='lower', cmap=my_cmap, norm=LogNorm())
+        ax1.set_title('pixels used to estimate background stdd')
+        values = ax2.hist(image_mask[image_mask!=0])
+        ax2.plot(np.zeros(5)+np.median(image_mask[image_mask!=0]), np.linspace(0,values[0].max(),num=5), 'k--', linewidth = 4)
+        ax2.set_title('pixel value histogram and median point (mid = {0:.4f}).'.format(np.median(image_mask[image_mask!=0])))
+    stdd = np.std(image_mask[image_mask!=0])
+    return stdd
+        
+
+    

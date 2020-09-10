@@ -21,7 +21,7 @@ import scipy.ndimage.filters as filters
 def detect_obj(img, snr=2.8, exp_sz= 1.2, pltshow=1):
     threshold = detect_threshold(img, snr=snr)
     center_img = len(img)/2
-    sigma = 3.0 * gaussian_fwhm_to_sigma# FWHM = 3.
+    sigma = 3.0 * gaussian_fwhm_to_sigma # FWHM = 3.
     kernel = Gaussian2DKernel(sigma, x_size=3, y_size=3)
     kernel.normalize()
     npixels = 15
