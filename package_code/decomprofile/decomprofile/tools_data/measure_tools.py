@@ -54,7 +54,7 @@ def find_loc_max(image, neighborhood_size = 8, threshold = 5):
         y.append(y_center)
     return x, y
 
-def search_local_max(image, radius=120, view=False):
+def search_local_max(image, radius=120, view=False, **kwargs):
     """
     Search all the maxs. The edges position with a lot of zeros would be excluded.
     
@@ -67,9 +67,8 @@ def search_local_max(image, radius=120, view=False):
     --------
         A list of positions of 'PSF'
     """
-    from .cutout_tools import cutout
-    from .astro_tools import plt_fits
-    PSFx, PSFy =find_loc_max(image)
+    from decomprofile.tools_data.cutout_tools import cutout
+    PSFx, PSFy =find_loc_max(image, **kwargs)
     PSF_locs = []
     ct = 0
     for i in range(len(PSFx)):
@@ -478,6 +477,7 @@ def detect_obj(image, nsigma=2.8, exp_sz= 1.2, npixels = 15, if_plot=False):
     tbl = cat.to_table(columns=columns)
     tbl['xcentroid'].info.format = '.2f'  # optional format
     tbl['ycentroid'].info.format = '.2f'
+    tbl['id'] -= 1
     cat = source_properties(image, segm_deblend)
     apertures = []
     segm_deblend_size = segm_deblend.areas

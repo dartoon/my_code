@@ -18,15 +18,16 @@ from matplotlib.colors import LogNorm
 
 from decomprofile.tools_data.astro_tools import plt_fits
 #Load data and plot:
-fitsFile = pyfits.open('../example_data/HST/QSO/1104_final_drz.fits')
+fitsFile = pyfits.open('../example_data/HST/QSO/1147_final_drz.fits')
 img = fitsFile[1].data # check the back grounp
 
 plt_fits(img, figsize=(15,15))
 
 #%%
 import decomprofile.tools_data.astro_tools as astro_tools
-print(astro_tools.read_fits_exp(fitsFile), astro_tools.read_pixel_scale(fitsFile,frame=1))  #Read the exposure time and pixel scale.
+print(astro_tools.read_fits_exp(fitsFile), astro_tools.read_pixel_scale(fitsFile,frame=0))  #Read the exposure time and pixel scale.
 
+#%%
 from decomprofile.tools_data.measure_tools import measure_bkg
 bkglight = measure_bkg(img, if_plot=True)
 img = img - bkglight   #remove the bkglight
@@ -41,8 +42,8 @@ plt_fits(QSO_img, colorbar = True)
 
 #%%Creat the SB profile of the QSO:
 from decomprofile.tools_data.measure_tools import SB_profile, esti_bgkstd
-# r_SB, r_grids = SB_profile(QSO_img, center = [(len(QSO_img)-1)/2]*2 , radius=20,
-#                            grids=50, x_gridspace='log',if_annuli=True, if_plot=True, fits_plot = True)
+r_SB, r_grids = SB_profile(QSO_img, center = [(len(QSO_img)-1)/2]*2 , radius=20,
+                            grids=50, x_gridspace='log',if_annuli=True, if_plot=True, fits_plot = True)
 std = esti_bgkstd(QSO_img, if_plot=True)
 
 #%%Test the way to creat the mask for the QSO:
