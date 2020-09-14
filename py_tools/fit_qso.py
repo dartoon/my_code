@@ -93,7 +93,6 @@ def fit_qso(QSO_im, psf_ave, psf_std=None, source_params=None,ps_param=None, bac
         kwargs_lower_source = []
         kwargs_upper_source = []
         
-        # Disk component, as modelled by an elliptical Sersic profile
         if fix_n == None:
             fixed_source.append({})  # we fix the Sersic index to n=1 (exponential)
             kwargs_source_init.append({'R_sersic': 0.3, 'n_sersic': 2., 'e1': 0., 'e2': 0., 'center_x': 0., 'center_y': 0.})

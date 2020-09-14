@@ -332,7 +332,7 @@ def profiles_compare(prf_list, prf_name_list = None, x_gridspace = None ,
         # plt.xlim(1.3, ) 
     plt.grid(which="minor")
     plt.legend()
-#    plt.close() 
+    plt.show() 
     return fig
 
 def measure_bkg(img, if_plot=False, nsigma=2, npixels=25, dilate_size=11):

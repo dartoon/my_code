@@ -29,7 +29,7 @@ class DataProcess(object):
         - measure the target surface brightness profile, PSF FWHM, background.
     """
     def __init__(self, fov_image, target_pos, pos_type = 'pixel', header=None, exptime = None,
-                 rm_bkglight = True, if_plot = False, nsigma=2, npixels=25, dilate_size=11):
+                 rm_bkglight = True, if_plot = False, **kwargs):
         """
         Parameter
         --------
@@ -63,21 +63,20 @@ class DataProcess(object):
         self.header = header
         self.deltaPix = read_pixel_scale(header)
         if rm_bkglight == True:
-            bkglight = measure_bkg(fov_image, if_plot=if_plot, nsigma=nsigma,
-                                   npixels=npixels,dilate_size=dilate_size)
+            bkglight = measure_bkg(fov_image, if_plot=if_plot, **kwargs)
             fov_image = fov_image-bkglight
         self.fov_image = fov_image
         
 
 
-    def generate_target_materials(self, cut_kernel = 'center_gaussian',  target_radius=60, 
+    def generate_target_materials(self, cut_kernel = 'center_gaussian',  radius=60, 
                                   bkg_std = None, create_mask = False, if_plot=None, **kwargs):
         """
         Produce the materials that would be used for the fitting.
         
         Parameter
         --------
-            target_radius: int or float
+            radius: int or float
             The radius of aperture to cutout the target
             
             bkg_std: The blash of blash
@@ -87,11 +86,11 @@ class DataProcess(object):
             if_plot = self.if_plot
         
         target_stamp, target_cut_pos = cut_center_auto(image=self.fov_image, center= self.target_pos, 
-                                          kernel = cut_kernel, radius=target_radius,
+                                          kernel = cut_kernel, radius=radius,
                                           return_center=True, if_plot=if_plot)
         if bkg_std == None:
             from decomprofile.tools_data.measure_tools import esti_bgkstd
-            target_2xlarger_stamp = cutout(image=self.fov_image, center= target_cut_pos, radius=target_radius*2)
+            target_2xlarger_stamp = cutout(image=self.fov_image, center= target_cut_pos, radius=radius*2)
             self.bkg_std = esti_bgkstd(target_2xlarger_stamp, if_plot=if_plot)
         exptime = deepcopy(self.exptime)
         if exptime is None:
@@ -100,17 +99,18 @@ class DataProcess(object):
             else:
                 raise ValueError("No Exposure time information in the header, should input a value.")
         if isinstance(exptime, np.ndarray):
-            exptime_stamp = cutout(image=self.exptime, center= target_cut_pos, radius=target_radius)
+            exptime_stamp = cutout(image=self.exptime, center= target_cut_pos, radius=radius)
         noise_map = np.sqrt(abs(target_stamp/exptime_stamp) + self.bkg_std**2)
         target_mask = np.ones_like(target_stamp)
+        from decomprofile.tools_data.measure_tools import detect_obj, mask_obj
+        apertures = detect_obj(target_stamp, if_plot=True, **kwargs)
         if create_mask == True:
-            from decomprofile.tools_data.measure_tools import detect_obj, mask_obj
-            apertures = detect_obj(target_stamp, if_plot=True, **kwargs)
             select_idx = input('Input directly the a obj idx to mask, use space between each id:\n')
             select_idx = select_idx.split(" ")
             select_idx = [int(select_idx[i]) for i in range(len(select_idx)) if select_idx[i].isnumeric()]
-            apertures = [apertures[i] for i in select_idx]
-            mask_list = mask_obj(target_stamp, apertures, if_plot=False)
+            apertures_ = [apertures[i] for i in select_idx]
+            apertures = [apertures[i] for i in range(len(apertures)) if i not in select_idx]
+            mask_list = mask_obj(target_stamp, apertures_, if_plot=False)
             for i in range(len(mask_list)):
                 target_mask *= mask_list[i]
         if if_plot:
@@ -122,36 +122,84 @@ class DataProcess(object):
             ax3.imshow(target_stamp * target_mask, origin='lower', norm=LogNorm())
             ax3.set_title('data * mask')
             plt.show()  
+        self.apertures = apertures
         self.target_stamp = target_stamp
         self.noise_map = noise_map
         self.target_mask = target_mask
     
-    def find_PSF(self, radius = 50):
-        from decomprofile.tools_data.measure_tools import search_local_max, measure_FWHM
-        init_PSF_locs_ = search_local_max(self.fov_image)
-        init_PSF_locs, FWHMs, fluxs = [], [], []
-        for i in range(len(init_PSF_locs_)):
-            cut_image = cut_center_auto(self.fov_image, center = init_PSF_locs_[i], radius=radius)
-            _fwhms = measure_FWHM(cut_image , radius = int(radius/5))
-            if np.std(_fwhms)/np.mean(_fwhms) < 0.2 :
-                init_PSF_locs.append(init_PSF_locs_[i])
-                FWHMs.append(np.mean(_fwhms))
-                fluxs.append(np.sum(cut_image))
-        init_PSF_locs = np.array(init_PSF_locs)
-        FWHMs = np.array(FWHMs)
-        fluxs = np.array(fluxs)
-        select_bool = (FWHMs<4.2)*(fluxs<5000)*(fluxs>200) #!!! A threshold to rule out the PSFs that are too board/bright/faint.
-        PSF_locs = init_PSF_locs[select_bool]     
-        for i in range(len(PSF_locs)):
-            cut_image = cut_center_auto(self.fov_image, center = PSF_locs[i], kernel = 'center_gaussian', radius=radius)
-            print('PSF location:', PSF_locs[i])
-            print('id:', i, 'FWHMs:', np.round(measure_FWHM(cut_image , radius = int(radius/5)),3), 'flux:', round(np.sum(cut_image),1) )
-            plt_fits(cut_image)
-        select_idx = input('Input directly the a obj idx to mask, use space between each id:\n')
-        select_idx = select_idx.split(" ")
-        select_idx = [int(select_idx[i]) for i in range(len(select_idx)) if select_idx[i].isnumeric()]
-        self.PSF_pos_list = [PSF_locs[i] for i in select_idx]
-        self.PSF_lists = [cut_center_auto(self.fov_image, center = PSF_locs[i], kernel = 'center_gaussian', radius=radius) for i in select_idx]
+    def find_PSF(self, radius = 50, PSF_pos_list = None, user_option= True):
+        """
+        The purpose of this def
+        
+        Parameter
+        --------
+            a: The blash of blash
+            user_option: bool
+            If user want to select the PSF list by their own selection.
+            
+        Return
+        --------
+            A sth sth
+        """
+        if PSF_pos_list is None:
+            from decomprofile.tools_data.measure_tools import search_local_max, measure_FWHM
+            init_PSF_locs_ = search_local_max(self.fov_image)
+            init_PSF_locs, FWHMs, fluxs = [], [], []
+            for i in range(len(init_PSF_locs_)):
+                cut_image = cut_center_auto(self.fov_image, center = init_PSF_locs_[i],
+                                            radius=radius)
+                _fwhms = measure_FWHM(cut_image , radius = int(radius/5))
+                if np.std(_fwhms)/np.mean(_fwhms) < 0.1 :  #Remove the deteced "PSFs" at the edge.
+                    init_PSF_locs.append(init_PSF_locs_[i])
+                    FWHMs.append(np.mean(_fwhms))
+                    fluxs.append(np.sum(cut_image))
+            init_PSF_locs = np.array(init_PSF_locs)
+            FWHMs = np.array(FWHMs)
+            fluxs = np.array(fluxs)
+            if hasattr(self, 'target_stamp'):
+                target_flux = np.sum(self.target_stamp)
+                select_bool = (FWHMs<np.median(FWHMs)*1.5)*(fluxs<target_flux*10)*(fluxs>target_flux/2)
+            else:
+                select_bool = (FWHMs<np.median(FWHMs)*1.5)
+            PSF_locs = init_PSF_locs[select_bool]    
+            FWHMs = FWHMs[select_bool]
+            fluxs = fluxs[select_bool]
+            if user_option == True:
+                for i in range(len(PSF_locs)):
+                    cut_image = cut_center_auto(self.fov_image, center = PSF_locs[i],
+                                                kernel = 'center_gaussian', radius=radius)
+                    print('PSF location:', PSF_locs[i])
+                    print('id:', i, 'FWHMs:', 
+                          np.round(measure_FWHM(cut_image ,radius = int(radius/5)),3),
+                          'flux:', round(np.sum(cut_image),1) )
+                    plt_fits(cut_image)
+                select_idx = input('Input directly the a obj idx to mask, use space between each id:\n')
+                select_idx = select_idx.split(" ")
+                select_idx = [int(select_idx[i]) for i in range(len(select_idx)) if select_idx[i].isnumeric()]
+                self.PSF_pos_list = [PSF_locs[i] for i in select_idx]
+            else:
+                select_idx = [np.where(FWHMs == FWHMs.min())[0][0] ]
+                self.PSF_pos_list = [PSF_locs[i] for i in select_idx]                
+        else:
+            self.PSF_pos_list = PSF_pos_list
+        self.PSF_lists = [cut_center_auto(self.fov_image, center = self.PSF_pos_list[i],
+                                          kernel = 'center_gaussian', radius=radius) for i in range(len(self.PSF_pos_list))]
+
+    def profiles_compare(self, **kargs):
+        from decomprofile.tools_data.measure_tools import profiles_compare    
+        profiles_compare([self.target_stamp] + self.PSF_lists, **kargs)
+        
+    def plot_overview(self, **kargs):
+        from decomprofile.tools_data.cutout_tools import plot_overview
+        if hasattr(self, 'PSF_pos_list'):
+            PSF_pos_list = self.PSF_pos_list
+        else:
+            PSF_pos_list = None
+        plot_overview(self.fov_image, center_QSO= self.target_pos,
+                      c_psf_list=PSF_pos_list, **kargs)
         
 
-# [] Test exptime in float or array        
+        
+
+#TODO
+    # [] A user's interation? default no, If no, all automatic.
