@@ -32,15 +32,17 @@ result_dic = {}
 # # file_type = 'model_result_use_drz_Noisemap_subg3.pkl'
 # file_type = 'model_result_calNoiseMap_modNoisemap_boostPossionx3_subg3.pkl'
 # # file_type = 'model_result_calNoiseMap_modNoisemap_boostPossionx3_subg3.pkl'
-# file_type = 'result_subg3.pkl'
-# folder_type = 'simulations_700_subg30/sim_lens_ID_subg30_'
+file_type = 'result_subg3_addmask.pkl'
+folder_type = 'simulations_700_subg30/sim_lens_ID_subg30_'
 
 
 # # # # file_type = 'model_result_subg3.pkl'
 # # file_type = 'model_result_calNoiseMap_modNoisemap_boostPossionx8_noPSFerr_subg2_fixgamma.pkl'
 # # # file_type = 'model_result_calNoiseMap_modNoisemap_useGrad_noPSFerr_subg3.pkl'
-file_type = 'result_subg3.pkl'
-folder_type = 'simulations_700_subg30/sim_lens_noqso_ID_subg30_'
+# file_type = 'result_subg3.pkl'
+# folder_type = 'simulations_700_subg30/sim_lens_noqso_ID_subg30_'
+# file_type = 'result_subg3_addmask.pkl'
+# folder_type = 'simulations_700_subg30/sim_lens_noqso_ID_subg30_'
 
 
 
@@ -137,14 +139,14 @@ for folder in folder_list:
     ID = folder[-3:]
     key = folder_type + '{0}'.format(ID)
     # if abs(result_dic[key][-1]) < 3.0 and result_dic[key][2][1] < 90 and result_dic[key][2][1] >61:      #Use folders meets this requirments
-    if abs(result_dic[key][-1]) < 30 and result_dic[key][2][1] < 100 and result_dic[key][2][1] >50:      #Use folders meets this requirments
+    if abs(result_dic[key][-1]) < 30 and result_dic[key][2][1] < 100 and result_dic[key][2][1] >60:      #Use folders meets this requirments
         ID = int(ID)
         H0 = result_dic[key][2]
         plt.scatter(ID, H0[1],
                     c='darkred',s=280,marker=".",zorder=0, vmin=1.2, vmax=1.8, edgecolors='white',alpha=0.7)
         plt.errorbar(ID, H0[1], yerr = [[H0[2]-H0[1]], [H0[1]-H0[0]]],
                     ecolor='black', fmt='o', zorder=-500,markersize=1)  
-        # plt.text(ID, H0[1], repr(round(result_dic[key][-1], 1)),fontsize=15)
+        plt.text(ID, H0[1], repr(round(result_dic[key][-1], 1)),fontsize=15)
         H0_list.append([H0[1], (H0[2]-H0[1]+ H0[1]-H0[0])/2 ])
         use_folder.append(folder)
 #        ax.set_xticks(range(id_range[0]-1, id_range[1]+1,3)) 

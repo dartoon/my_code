@@ -63,7 +63,7 @@ folder_list = folder_list[:test_numer]
 
 
 #After talk with Simon:
-savename = 'result_subg3.pkl' #+ Simon's points; PSF not change, psf_error_map 0.1, no mask, Possionx3
+savename = 'result_subg3_addmask.pkl' #+ Simon's points; PSF not change, psf_error_map 0.1, no mask, Possionx3
 # savename = 'result_modNoisemap_boostPossionx3_subg3.pkl' #+ Simon's points; PSF not change, psf_error_map 0.1
 # savename = 'result_calNoisemap_PSFcorrect.pkl'  #Correct PSF; psf_error_map 0.1
 # savename = 'result_modNoisemap_boostPossionx3_PSFcorrect.pkl'  #Correct PSF; PSF correct; psf_error_map 0.1
@@ -93,12 +93,12 @@ for folder in folder_list[kernel_i*run_n:kernel_i*run_n+run_n]:
         lens_data = pyfits.getdata(folder+'Drz_QSO_image.fits')
         # len_std = pyfits.getdata(folder+'noise_map.fits')
         lens_mask = cr_mask(lens_data, 'normal_mask.reg')
-        framesize = 185
+        framesize = 155
         ct = int((len(lens_data) - framesize)/2)
         lens_data = lens_data[ct:-ct,ct:-ct]
         # len_std = len_std[ct:-ct,ct:-ct]
         lens_mask = (1-lens_mask)[ct:-ct,ct:-ct]
-        plt.imshow(lens_data, origin='lower',cmap='gist_heat', norm=LogNorm())
+        plt.imshow(lens_data * lens_mask, origin='lower',cmap='gist_heat', norm=LogNorm())
         plt.colorbar()
         exp_time = 599.* 2 * 8
         stdd =  0.0004  #Measurement from empty retion, 0.016*0.08**2/0.13**2/np.sqrt(8)
@@ -225,7 +225,7 @@ for folder in folder_list[kernel_i*run_n:kernel_i*run_n+run_n]:
                               'check_matched_source_position': True,
                               'source_position_tolerance': 0.001,
                               'time_delay_likelihood': True,
-                              # 'image_likelihood_mask_list': [lens_mask]
+                               'image_likelihood_mask_list': [lens_mask]
                                       }
         kwargs_numerics = {'supersampling_factor': 3}
         image_band = [kwargs_data, kwargs_psf, kwargs_numerics]

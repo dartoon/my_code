@@ -53,7 +53,7 @@ test_numer = 30 #len(50)
 kernel = 5
 run_n = int(test_numer/kernel)
 
-kernel_i = 0 # 0, 1 ,2, 3 .. max = kernel-1
+kernel_i = 4 # 0, 1 ,2, 3 .. max = kernel-1
 folder_list = folder_list[:test_numer]
 # savename = 'model_result_calNoiseMap_modNoisemap_useGrad_noPSFerr_subg3.pkl'
 # with_qso_savename = 'model_result_calNoiseMap_modNoisemap_useGrad_subg3.pkl'
@@ -62,8 +62,8 @@ folder_list = folder_list[:test_numer]
 # with_qso_savename = 'model_result_calNoiseMap_modNoisemap_boostPossionx3_subg3.pkl'
 
 #After talk with Simon:
-savename = 'result_subg3.pkl' #+ Simon's points; no mask, Possionx8
-with_qso_savename = 'result_subg3.pkl'
+savename = 'result_subg3_addmask.pkl' #+ Simon's points; no mask, Possionx8
+with_qso_savename = 'result_subg3_addmask.pkl'
 
 # for folder in ['simulations_700_subg30/sim_lens_noqso_ID_subg30_702']:
 for folder in folder_list[kernel_i*run_n:kernel_i*run_n+run_n]:
@@ -92,12 +92,12 @@ for folder in folder_list[kernel_i*run_n:kernel_i*run_n+run_n]:
         lens_data = pyfits.getdata(folder+'Drz_QSO_image.fits')
         # len_std = pyfits.getdata(folder+'noise_map.fits')        
         lens_mask = cr_mask(lens_data, 'normal_mask.reg')
-        framesize = 185
+        framesize = 145
         ct = int((len(lens_data) - framesize)/2)
         lens_data = lens_data[ct:-ct,ct:-ct]
         # len_std = len_std[ct:-ct,ct:-ct]
         lens_mask = (1-lens_mask)[ct:-ct,ct:-ct]
-        plt.imshow(lens_data, origin='lower',cmap='gist_heat', norm=LogNorm())
+        plt.imshow(lens_data * lens_mask, origin='lower',cmap='gist_heat', norm=LogNorm())
         plt.colorbar()
         plt.show()
         exp_time = 599.* 2 * 8
@@ -206,7 +206,7 @@ for folder in folder_list[kernel_i*run_n:kernel_i*run_n+run_n]:
                              'check_matched_source_position': True,
                              'source_position_tolerance': 0.001,
                              'time_delay_likelihood': True,
-                             # 'image_likelihood_mask_list': [lens_mask]
+                              'image_likelihood_mask_list': [lens_mask]
                                      }
         kwargs_numerics = {'supersampling_factor': 3}
         image_band = [kwargs_data, kwargs_psf, kwargs_numerics]
@@ -262,7 +262,7 @@ for folder in folder_list[kernel_i*run_n:kernel_i*run_n+run_n]:
     multi_band_list, kwargs_model, kwargs_result, chain_list, fix_setting, mcmc_new_list = pickle.load(open(folder+savename,'rb'))
     fixed_lens, fixed_source, fixed_lens_light, fixed_ps, fixed_cosmo = fix_setting
     labels_new = [r"$\gamma$", r"$D_{\Delta t}$","H$_0$" ]    
-    modelPlot = ModelPlot(multi_band_list, kwargs_model, kwargs_result, arrow_size=0.02, cmap_string="gist_heat")
+    modelPlot = ModelPlot(multi_band_list, kwargs_model, kwargs_result, arrow_size=0.02, cmap_string="gist_heat",likelihood_mask_list = [lens_mask])
     f, axes = modelPlot.plot_main()
     f.show()
     # f, axes = modelPlot.plot_separate()
@@ -270,9 +270,9 @@ for folder in folder_list[kernel_i*run_n:kernel_i*run_n+run_n]:
     # f, axes = modelPlot.plot_subtract_from_data_all()
     # f.show()
     
-    for i in range(len(chain_list)):
-        chain_plot.plot_chain_list(chain_list, i)
-    plt.show()
+    # for i in range(len(chain_list)):
+    #     chain_plot.plot_chain_list(chain_list, i)
+    # plt.show()
     
     truths=[para_s[0][0]['gamma'],TD_distance, 73.907]	
     plot = corner.corner(mcmc_new_list, labels=labels_new, show_titles=True, #range= [[0.8,1.5],[1,3],[0,1],[0, 1],[2000,5000],[20,100]], 

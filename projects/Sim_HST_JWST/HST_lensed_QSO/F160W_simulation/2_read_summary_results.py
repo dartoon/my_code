@@ -18,7 +18,7 @@ import glob
 filt='f160w'
 import pickle
 import sys
-sys.path.insert(0,'../../../py_tools/')
+sys.path.insert(0,'../../../../py_tools/')
 from flux_profile import cr_mask
 from lenstronomy.Plots.model_plot import ModelPlot
 from mask_objects import find_loc_max
@@ -39,14 +39,14 @@ folder_type = 'simulations_700_subg30/sim_lens_ID_subg30_'
 # # # # file_type = 'model_result_subg3.pkl'
 # # file_type = 'model_result_calNoiseMap_modNoisemap_boostPossionx8_noPSFerr_subg2_fixgamma.pkl'
 # # # file_type = 'model_result_calNoiseMap_modNoisemap_useGrad_noPSFerr_subg3.pkl'
-file_type = 'result_calNoiseMap_modNoisemap_boostPossionx8_noPSFerr_subg3.pkl'
-folder_type = 'simulations_700_subg30/sim_lens_noqso_ID_subg30_'
+# file_type = 'result_calNoiseMap_modNoisemap_boostPossionx8_noPSFerr_subg3.pkl'
+# folder_type = 'simulations_700_subg30/sim_lens_noqso_ID_subg30_'
 
 
 
 folder_list = glob.glob(folder_type+'*')
 folder_list.sort()
-test_numer = 50 #len(folder_list)
+test_numer = 30 #len(folder_list)
 folder_list = folder_list[:test_numer]
 
 
@@ -137,7 +137,7 @@ for folder in folder_list:
     ID = folder[-3:]
     key = folder_type + '{0}'.format(ID)
     # if abs(result_dic[key][-1]) < 3.0 and result_dic[key][2][1] < 90 and result_dic[key][2][1] >61:      #Use folders meets this requirments
-    if abs(result_dic[key][-1]) < 30 and result_dic[key][2][1] < 100 and result_dic[key][2][1] >50:      #Use folders meets this requirments
+    if abs(result_dic[key][-1]) < 30 and result_dic[key][2][1] < 100 and result_dic[key][2][1] >60:      #Use folders meets this requirments
         ID = int(ID)
         H0 = result_dic[key][2]
         plt.scatter(ID, H0[1],
@@ -194,29 +194,29 @@ plt.tick_params(labelsize=20)
 plt.show()
 """
 
-#%%test parameter bias:
-#para = 'theta_E'  #'gamma'
-#para = 'gamma'
-which = ['kwargs_lens', 'gamma']
-#which = ['kwargs_source', 'center_y']
-fig, ax = plt.subplots(figsize=(11,8))
-ct = 0
-gamma_bias_list = []
-for folder in folder_list:
-    ID = folder[-3:]
-    key = folder_type + '{0}'.format(ID)
-    gamma_bias = result_dic[key][1][which[0]][0][which[1]] - result_dic[key][0][which[0]][0][which[1]]
-    gamma_bias_list.append(gamma_bias)
-    plt.scatter(ct, gamma_bias,
-                c='darkred',s=280,marker=".",zorder=0, vmin=1.2, vmax=1.8, edgecolors='white',alpha=0.7)
-    plt.errorbar(ct, gamma_bias, yerr = result_dic[key][3],
-                ecolor='black', fmt='o', zorder=-500,markersize=1)
-    # print(result_dic[key][3])
-    plt.plot(np.linspace(0, len(result_dic)), np.linspace(0, len(result_dic))*0)
-    plt.xlabel("ID",fontsize=27)
-    plt.ylabel(which[1]+" bias (inferred - truth)",fontsize=27)
-    plt.ylim(-0.4,0.4)
-    plt.tick_params(labelsize=20)
-    ct = ct+1
-plt.show()
-print(np.mean(gamma_bias_list), np.std(gamma_bias_list))
+# #%%test parameter bias:
+# #para = 'theta_E'  #'gamma'
+# #para = 'gamma'
+# which = ['kwargs_lens', 'gamma']
+# #which = ['kwargs_source', 'center_y']
+# fig, ax = plt.subplots(figsize=(11,8))
+# ct = 0
+# gamma_bias_list = []
+# for folder in folder_list:
+#     ID = folder[-3:]
+#     key = folder_type + '{0}'.format(ID)
+#     gamma_bias = result_dic[key][1][which[0]][0][which[1]] - result_dic[key][0][which[0]][0][which[1]]
+#     gamma_bias_list.append(gamma_bias)
+#     plt.scatter(ct, gamma_bias,
+#                 c='darkred',s=280,marker=".",zorder=0, vmin=1.2, vmax=1.8, edgecolors='white',alpha=0.7)
+#     plt.errorbar(ct, gamma_bias, yerr = result_dic[key][3],
+#                 ecolor='black', fmt='o', zorder=-500,markersize=1)
+#     # print(result_dic[key][3])
+#     plt.plot(np.linspace(0, len(result_dic)), np.linspace(0, len(result_dic))*0)
+#     plt.xlabel("ID",fontsize=27)
+#     plt.ylabel(which[1]+" bias (inferred - truth)",fontsize=27)
+#     plt.ylim(-0.4,0.4)
+#     plt.tick_params(labelsize=20)
+#     ct = ct+1
+# plt.show()
+# print(np.mean(gamma_bias_list), np.std(gamma_bias_list))
