@@ -427,7 +427,7 @@ def cr_mask(image, filename='test_circle.reg'):
     return mask    
 
 
-def detect_obj(image, nsigma=2.8, exp_sz= 1.2, npixels = 15, if_plot=False):  
+def detect_obj(image, nsigma=2.8, exp_sz= 1.2, npixels = 15, if_plot=False, auto_sort_center = True):  
     """
     Define the apeatures for all the objects in the image.
     
@@ -472,13 +472,13 @@ def detect_obj(image, nsigma=2.8, exp_sz= 1.2, npixels = 15, if_plot=False):
                                     filter_kernel=kernel, nlevels=25,
                                     contrast=0.001)
     #Number of objects segm_deblend.data.max()
-    columns = ['id', 'xcentroid', 'ycentroid', 'source_sum', 'orientation', 'area']
     cat = source_properties(image, segm_deblend)
+    columns = ['id', 'xcentroid', 'ycentroid', 'source_sum', 'orientation', 'area']
     tbl = cat.to_table(columns=columns)
     tbl['xcentroid'].info.format = '.2f'  # optional format
     tbl['ycentroid'].info.format = '.2f'
     tbl['id'] -= 1
-    cat = source_properties(image, segm_deblend)
+    
     apertures = []
     segm_deblend_size = segm_deblend.areas
     from photutils import EllipticalAperture
@@ -491,7 +491,18 @@ def detect_obj(image, nsigma=2.8, exp_sz= 1.2, npixels = 15, if_plot=False):
         r = np.sqrt(size/size_o)*exp_sz
         a, b = a_o*r, b_o*r
         theta = obj.orientation.value / 180 * np.pi
-        apertures.append(EllipticalAperture(position, a, b, theta=theta))        
+        apertures.append(EllipticalAperture(position, a, b, theta=theta))     
+    
+    if auto_sort_center == True:
+        center = np.array([len(image)/2, len(image)/2])
+        dis_sq = [np.sum((apertures[i].positions - center)**2) for i in range(len(apertures))]
+        dis_sq = np.array(dis_sq)
+        c_idx = np.where(dis_sq == dis_sq.min())[0][0]
+        apertures = [apertures[c_idx]] + [apertures[i] for i in range(len(apertures)) if i != c_idx] 
+        cat = [cat[c_idx]] + [cat[i] for i in range(len(cat)) if i != c_idx] 
+        tbl['id'][0] = c_idx
+        tbl['id'][c_idx] = 0
+        
     if if_plot == True:
         fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12.5, 10))
         vmin = 1.e-3
@@ -543,15 +554,15 @@ def esti_bgkstd(image, nsigma=2, exp_sz= 1.5, npixels = 15, if_plot=False):
     mask = np.ones_like(image)
     for i in range(len(mask_list)):
         mask *= mask_list[i]
+    image_mask = image*mask
+    stdd = np.std(image_mask[image_mask!=0])
     if if_plot == True:
-        image_mask = image*mask
         fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12.5, 6))
         ax1.imshow(image_mask, origin='lower', cmap=my_cmap, norm=LogNorm())
         ax1.set_title('pixels used to estimate background stdd')
         values = ax2.hist(image_mask[image_mask!=0])
         ax2.plot(np.zeros(5)+np.median(image_mask[image_mask!=0]), np.linspace(0,values[0].max(),num=5), 'k--', linewidth = 4)
         ax2.set_title('pixel value histogram and median point (mid = {0:.4f}).'.format(np.median(image_mask[image_mask!=0])))
-    stdd = np.std(image_mask[image_mask!=0])
     return stdd
         
 

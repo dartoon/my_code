@@ -28,22 +28,31 @@ exp_map = exp * wht/mean_wht
 
 #%%Start to use decomprofile
 from decomprofile.data_process import DataProcess
-data_class = DataProcess(fov_image = fov_image, target_pos = [1135, 648], header = header,
+data_process = DataProcess(fov_image = fov_image, target_pos = [1135, 648], header = header,
                          rm_bkglight = False, exptime = exp_map, if_plot=False)
-data_class.generate_target_materials(radius=60, create_mask = True, nsigma=2.8,
-                                     exp_sz= 1.2, npixels = 15, if_plot=True)
-
-from decomprofile.fitting_specify import source_params_generator
-source_params = source_params_generator(deltaPix = data_class.deltaPix, frame_size = len(data_class.target_stamp), apertures = data_class.apertures, fix_n = [[2,5]])
+data_process.generate_target_materials(radius=60, create_mask = False, nsigma=2.8,
+                                     exp_sz= 1.2, npixels = 15, if_plot=False)
 
 #%%PSF works.
-data_class.find_PSF(radius = 50, user_option = False)
-# data_class.find_PSF(radius = 50, PSF_pos_list = [[ 350., 1055.], [2078., 1910.]], user_option = False)
-data_class.plot_overview(label = None)
-data_class.profiles_compare(norm_pix = 5, if_annuli=False, y_log = False,
-                  prf_name_list = (['QSO'] + ['PSF{0}'.format(i) for i in range(len(data_class.PSF_lists))]) )
+data_process.find_PSF(radius = 30, user_option = False)
+# data_process.find_PSF(radius = 50, PSF_pos_list = [[ 350., 1055.], [2078., 1910.]], user_option = False)
+# data_process.plot_overview(label = None)
+# data_process.profiles_compare(norm_pix = 5, if_annuli=False, y_log = False,
+#                   prf_name_list = (['QSO'] + ['PSF{0}'.format(i) for i in range(len(data_process.PSF_lists))]) )
 
 #%%Start to produce the class and params for lens fitting.
 from decomprofile.fitting_specify import FittingSpeficy
-fitting = FittingSpeficy(data_class)
-fitting_seq, imageModel = fitting.build_fitting_seq()
+fit_sepc = FittingSpeficy(data_process)
+fit_sepc.build_fitting_seq()
+
+#%%Setting the fitting method and run.
+from decomprofile.fitting_run import FittingRun
+fit_run = FittingRun(fit_sepc)
+fit_run.run()
+fit_run.model_plot()
+fit_run.params_corner_plot()
+fit_run.flux_corner_plot()
+#%%
+fit_run.dump_result()
+
+

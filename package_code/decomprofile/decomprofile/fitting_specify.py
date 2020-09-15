@@ -7,10 +7,6 @@ Created on Mon Sep 14 12:16:43 2020
 """
 
 import numpy as np
-import matplotlib.pyplot as plt
-import astropy.io.fits as pyfits
-from decomprofile.data_process import DataProcess
-
 
 class FittingSpeficy(object):
     """
@@ -35,7 +31,7 @@ class FittingSpeficy(object):
         kwargs_data['noise_map'] = self.data_process_class.noise_map
         
         if psf_data is None:
-            psf_data = self.data_process_class.PSF_lists[0]
+            psf_data = self.data_process_class.PSF_lists[0]  #!!! The psf_list[0] would be used for the fitting! 
         kwargs_psf = {'psf_type': 'PIXEL', 'kernel_point_source': psf_data}
         kwargs_numerics = {'supersampling_factor': supersampling_factor, 'supersampling_convolution': False} 
         image_band = [kwargs_data, kwargs_psf, kwargs_numerics]
@@ -114,7 +110,6 @@ class FittingSpeficy(object):
         from lenstronomy.Data.psf import PSF
         
         data_class = ImageData(**self.kwargs_data)
-        data_class.update_data(self.data_process_class.target_stamp)
         
         from lenstronomy.PointSource.point_source import PointSource
         pointSource = PointSource(point_source_type_list=self.point_source_list)
@@ -126,8 +121,12 @@ class FittingSpeficy(object):
             imageModel = ImageModel(data_class, psf_class, point_source_class=pointSource, kwargs_numerics=self.kwargs_numerics)  
         else:
             imageModel = ImageModel(data_class, psf_class, source_model_class=lightModel,
-                                    point_source_class=pointSource, kwargs_numerics=self.kwargs_numerics)      
+                                    point_source_class=pointSource, kwargs_numerics=self.kwargs_numerics)   
+        self.data_class = data_class
+        self.psf_class = psf_class
+        self.lightModel = lightModel
         self.imageModel = imageModel
+        self.pointSource = pointSource
     
     def build_fitting_seq(self, supersampling_factor = 2, psf_data = None,
                           extend_source_model = None,
@@ -142,10 +141,10 @@ class FittingSpeficy(object):
         self.sepc_kwargs_likelihood()
         self.sepc_kwargs_params(source_params = None, fix_n = None, ps_params = None)
         self.sepc_imageModel()
-        fitting_seq = FittingSequence(self.kwargs_data_joint, self.kwargs_model, 
+        self.fitting_seq = FittingSequence(self.kwargs_data_joint, self.kwargs_model, 
                                       self.kwargs_constraints, self.kwargs_likelihood, 
                                       self.kwargs_params)
-        return fitting_seq, self.imageModel
+        # return fitting_seq, self.imageModel
     
 def source_params_generator(frame_size, apertures = [], deltaPix = 1, fix_n = None):
     """
@@ -194,9 +193,9 @@ def source_params_generator(frame_size, apertures = [], deltaPix = 1, fix_n = No
                 fixed_source.append({fix_n_value})
                 kwargs_source_init.append({'R_sersic': Reff, 'n_sersic': fix_n_value,
                                            'e1': e1, 'e2': e2, 'center_x': c_x, 'center_y': c_y})
-            else:
-                fixed_source.append({})  # we fix the Sersic index to n=1 (exponential)
-                kwargs_source_init.append({'R_sersic': Reff, 'n_sersic': 2., 'e1': e1, 'e2': e2, 'center_x': c_x, 'center_y': c_y})
+        else:
+            fixed_source.append({})  # we fix the Sersic index to n=1 (exponential)
+            kwargs_source_init.append({'R_sersic': Reff, 'n_sersic': 2., 'e1': e1, 'e2': e2, 'center_x': c_x, 'center_y': c_y})
         kwargs_source_sigma.append({'n_sersic': 0.3, 'R_sersic': 0.5*deltaPix, 'e1': 0.1, 'e2': 0.1, 'center_x': 0.1*deltaPix, 'center_y': 0.1*deltaPix})
         kwargs_lower_source.append({'e1': -0.5, 'e2': -0.5, 'R_sersic': Reff*0.1*deltaPix, 'n_sersic': 0.3, 'center_x': c_x-10*deltaPix, 'center_y': c_y-10*deltaPix})
         kwargs_upper_source.append({'e1': 0.5, 'e2': 0.5, 'R_sersic': Reff*30*deltaPix, 'n_sersic': 9., 'center_x': c_x+10*deltaPix, 'center_y': c_y+10*deltaPix})        
@@ -222,5 +221,4 @@ def ps_params_generator(centers, flux_list, deltaPix = 1):
     ps_params = [kwargs_ps_init, kwargs_ps_sigma, fixed_ps, kwargs_lower_ps, kwargs_upper_ps]
     return ps_params
     
-
 

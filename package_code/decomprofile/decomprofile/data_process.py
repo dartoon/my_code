@@ -68,7 +68,6 @@ class DataProcess(object):
         self.fov_image = fov_image
         
 
-
     def generate_target_materials(self, cut_kernel = 'center_gaussian',  radius=60, 
                                   bkg_std = None, create_mask = False, if_plot=None, **kwargs):
         """
@@ -199,7 +198,3 @@ class DataProcess(object):
                       c_psf_list=PSF_pos_list, **kargs)
         
 
-        
-
-#TODO
-    # [] A user's interation? default no, If no, all automatic.
