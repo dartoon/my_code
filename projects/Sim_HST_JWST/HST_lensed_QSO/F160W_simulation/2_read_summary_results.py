@@ -32,15 +32,15 @@ result_dic = {}
 # # file_type = 'model_result_use_drz_Noisemap_subg3.pkl'
 # file_type = 'model_result_calNoiseMap_modNoisemap_boostPossionx3_subg3.pkl'
 # # file_type = 'model_result_calNoiseMap_modNoisemap_boostPossionx3_subg3.pkl'
-# file_type = 'result_modNoisemap_boostPossionx3_subg3.pkl'
-# folder_type = 'simulations_700_subg30/sim_lens_ID_subg30_'
+file_type = 'result_modNoisemap_boostPossionx3_subg3.pkl'
+folder_type = 'simulations_700_subg30/sim_lens_ID_subg30_'
 
 
 # # # # file_type = 'model_result_subg3.pkl'
 # # file_type = 'model_result_calNoiseMap_modNoisemap_boostPossionx8_noPSFerr_subg2_fixgamma.pkl'
 # # # file_type = 'model_result_calNoiseMap_modNoisemap_useGrad_noPSFerr_subg3.pkl'
-file_type = 'result_calNoiseMap_modNoisemap_boostPossionx8_noPSFerr_subg3.pkl'
-folder_type = 'simulations_700_subg30/sim_lens_noqso_ID_subg30_'
+# file_type = 'result_calNoiseMap_modNoisemap_boostPossionx8_noPSFerr_subg3.pkl'
+# folder_type = 'simulations_700_subg30/sim_lens_noqso_ID_subg30_'
 
 
 folder_list = glob.glob(folder_type+'*')
@@ -141,7 +141,7 @@ for folder in folder_list:
                     c='darkred',s=280,marker=".",zorder=0, vmin=1.2, vmax=1.8, edgecolors='white',alpha=0.7)
         plt.errorbar(ID, H0[1], yerr = [[H0[2]-H0[1]], [H0[1]-H0[0]]],
                     ecolor='black', fmt='o', zorder=-500,markersize=1)  
-        # plt.text(ID, H0[1], repr(round(result_dic[key][-1], 1)),fontsize=15)
+        plt.text(ID, H0[1], repr(round(result_dic[key][-1], 3)),fontsize=15)
         H0_list.append([H0[1], (H0[2]-H0[1]+ H0[1]-H0[0])/2 ])
         use_folder.append(folder)
 #        ax.set_xticks(range(id_range[0]-1, id_range[1]+1,3)) 
@@ -166,28 +166,28 @@ accuracy_sum = round(1/float(len(submit_sum))*np.sum((submit_sum[:,0]-H0_true)/H
 
 print( precision_sum, accuracy_sum)
 
-#%%test H0 Bias as function of other parameter's bias
-#para = 'theta_E'  #'gamma'
-#para = 'gamma'
-which = ['kwargs_lens', 'gamma']
-#which = ['kwargs_source', 'center_y']
-fig, ax = plt.subplots(figsize=(11,8))
-for folder in folder_list:
-    ID = folder[-3:]
-    key = folder_type + '{0}'.format(ID)
-    H0 = result_dic[key][2]
-    gamma_bias = result_dic[key][1][which[0]][0][which[1]] - result_dic[key][0][which[0]][0][which[1]]
-    plt.scatter(gamma_bias, H0[1] - H0_true,
-                c='darkred',s=280,marker=".",zorder=0, vmin=1.2, vmax=1.8, edgecolors='white',alpha=0.7)
-    plt.errorbar(gamma_bias, H0[1] - H0_true,
-                 yerr = [[H0[2]-H0[1]], [H0[1]-H0[0]]],
-                ecolor='black', fmt='o', zorder=-500,markersize=1)      
-#    ax.set_xticks(range(id_range[0]-1, id_range[1]+1,3)) 
-plt.xlabel(which[1]+" bias (inferred - truth)", fontsize=27)
-plt.ylabel("$H_0$ bias (inferred - truth)", fontsize=27)
-plt.ylim(-20,20)
-plt.tick_params(labelsize=20)
-plt.show()
+# #%%test H0 Bias as function of other parameter's bias
+# #para = 'theta_E'  #'gamma'
+# #para = 'gamma'
+# which = ['kwargs_lens', 'gamma']
+# #which = ['kwargs_source', 'center_y']
+# fig, ax = plt.subplots(figsize=(11,8))
+# for folder in folder_list:
+#     ID = folder[-3:]
+#     key = folder_type + '{0}'.format(ID)
+#     H0 = result_dic[key][2]
+#     gamma_bias = result_dic[key][1][which[0]][0][which[1]] - result_dic[key][0][which[0]][0][which[1]]
+#     plt.scatter(gamma_bias, H0[1] - H0_true,
+#                 c='darkred',s=280,marker=".",zorder=0, vmin=1.2, vmax=1.8, edgecolors='white',alpha=0.7)
+#     plt.errorbar(gamma_bias, H0[1] - H0_true,
+#                  yerr = [[H0[2]-H0[1]], [H0[1]-H0[0]]],
+#                 ecolor='black', fmt='o', zorder=-500,markersize=1)      
+# #    ax.set_xticks(range(id_range[0]-1, id_range[1]+1,3)) 
+# plt.xlabel(which[1]+" bias (inferred - truth)", fontsize=27)
+# plt.ylabel("$H_0$ bias (inferred - truth)", fontsize=27)
+# plt.ylim(-20,20)
+# plt.tick_params(labelsize=20)
+# plt.show()
 
 #%%test parameter bias:
 #para = 'theta_E'  #'gamma'
