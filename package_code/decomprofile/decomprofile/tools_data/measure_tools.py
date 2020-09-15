@@ -509,14 +509,14 @@ def detect_obj(image, nsigma=2.8, exp_sz= 1.2, npixels = 15, if_plot=False, auto
         vmax = 2.1 
         ax1.imshow(image, origin='lower', cmap=my_cmap, norm=LogNorm(), vmin=vmin, vmax=vmax)
         ax1.set_title('Data')
-        ax2.imshow(segm_deblend, origin='lower', cmap=segm_deblend.cmap(random_state=12345))
+        ax2.imshow(segm_deblend, origin='lower', cmap=segm_deblend.make_cmap(random_state=12345))
         for i in range(len(cat)):
             ax2.text(cat[i].xcentroid.value, cat[i].ycentroid.value, '{0}'.format(i), fontsize=15,
                      bbox={'facecolor': 'white', 'alpha': 0.5, 'pad': 1})
         for i in range(len(apertures)):
             aperture = apertures[i]
-            aperture.plot(color='white', lw=1.5, ax=ax1)
-            aperture.plot(color='white', lw=1.5, ax=ax2)            
+            aperture.plot(color='white', lw=1.5, axes=ax1)
+            aperture.plot(color='white', lw=1.5, axes=ax2)            
         ax2.set_title('Segmentation Image')
         plt.show()    
         print(tbl)
