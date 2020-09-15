@@ -32,26 +32,23 @@ result_dic = {}
 # # file_type = 'model_result_use_drz_Noisemap_subg3.pkl'
 # file_type = 'model_result_calNoiseMap_modNoisemap_boostPossionx3_subg3.pkl'
 # # file_type = 'model_result_calNoiseMap_modNoisemap_boostPossionx3_subg3.pkl'
-file_type = 'result_modNoisemap_boostPossionx3_subg3.pkl'
-folder_type = 'simulations_700_subg30/sim_lens_ID_subg30_'
+# file_type = 'result_modNoisemap_boostPossionx3_subg3.pkl'
+# folder_type = 'simulations_700_subg30/sim_lens_ID_subg30_'
 
 
 # # # # file_type = 'model_result_subg3.pkl'
 # # file_type = 'model_result_calNoiseMap_modNoisemap_boostPossionx8_noPSFerr_subg2_fixgamma.pkl'
 # # # file_type = 'model_result_calNoiseMap_modNoisemap_useGrad_noPSFerr_subg3.pkl'
-# file_type = 'result_calNoiseMap_modNoisemap_boostPossionx8_noPSFerr_subg3.pkl'
-# folder_type = 'simulations_700_subg30/sim_lens_noqso_ID_subg30_'
-
+file_type = 'result_calNoiseMap_modNoisemap_boostPossionx8_noPSFerr_subg3.pkl'
+folder_type = 'simulations_700_subg30/sim_lens_noqso_ID_subg30_'
 
 
 folder_list = glob.glob(folder_type+'*')
 folder_list.sort()
-test_numer = 30 #len(folder_list)
+test_numer = 50 #len(folder_list)
 folder_list = folder_list[:test_numer]
 
-
 id_range = int(folder_list[0][-3:]), int(folder_list[-1][-3:])
-
 
 for folder in folder_list:
     folder = folder+'/'
@@ -163,12 +160,11 @@ plt.show()
 submit_sum = np.array(H0_list)
 print(np.mean(submit_sum[:,0]), np.std(submit_sum[:,0]))
 
-"""
-goodness_sum = round(1/float(len(submit_sum))*np.sum(((submit_sum[:,0]-H0_true)/submit_sum[:,1])**2),3)
+# goodness_sum = round(1/float(len(submit_sum))*np.sum(((submit_sum[:,0]-H0_true)/submit_sum[:,1])**2),3)
 precision_sum = round(1/float(len(submit_sum))*np.sum(submit_sum[:,1]/H0_true)*100, 3)
 accuracy_sum = round(1/float(len(submit_sum))*np.sum((submit_sum[:,0]-H0_true)/H0_true)*100, 3)
 
-# print(goodness_sum, precision_sum, accuracy_sum)
+print( precision_sum, accuracy_sum)
 
 #%%test H0 Bias as function of other parameter's bias
 #para = 'theta_E'  #'gamma'
@@ -192,31 +188,30 @@ plt.ylabel("$H_0$ bias (inferred - truth)", fontsize=27)
 plt.ylim(-20,20)
 plt.tick_params(labelsize=20)
 plt.show()
-"""
 
-# #%%test parameter bias:
-# #para = 'theta_E'  #'gamma'
-# #para = 'gamma'
-# which = ['kwargs_lens', 'gamma']
-# #which = ['kwargs_source', 'center_y']
-# fig, ax = plt.subplots(figsize=(11,8))
-# ct = 0
-# gamma_bias_list = []
-# for folder in folder_list:
-#     ID = folder[-3:]
-#     key = folder_type + '{0}'.format(ID)
-#     gamma_bias = result_dic[key][1][which[0]][0][which[1]] - result_dic[key][0][which[0]][0][which[1]]
-#     gamma_bias_list.append(gamma_bias)
-#     plt.scatter(ct, gamma_bias,
-#                 c='darkred',s=280,marker=".",zorder=0, vmin=1.2, vmax=1.8, edgecolors='white',alpha=0.7)
-#     plt.errorbar(ct, gamma_bias, yerr = result_dic[key][3],
-#                 ecolor='black', fmt='o', zorder=-500,markersize=1)
-#     # print(result_dic[key][3])
-#     plt.plot(np.linspace(0, len(result_dic)), np.linspace(0, len(result_dic))*0)
-#     plt.xlabel("ID",fontsize=27)
-#     plt.ylabel(which[1]+" bias (inferred - truth)",fontsize=27)
-#     plt.ylim(-0.4,0.4)
-#     plt.tick_params(labelsize=20)
-#     ct = ct+1
-# plt.show()
-# print(np.mean(gamma_bias_list), np.std(gamma_bias_list))
+#%%test parameter bias:
+#para = 'theta_E'  #'gamma'
+#para = 'gamma'
+which = ['kwargs_lens', 'gamma']
+#which = ['kwargs_source', 'center_y']
+fig, ax = plt.subplots(figsize=(11,8))
+ct = 0
+gamma_bias_list = []
+for folder in folder_list:
+    ID = folder[-3:]
+    key = folder_type + '{0}'.format(ID)
+    gamma_bias = result_dic[key][1][which[0]][0][which[1]] - result_dic[key][0][which[0]][0][which[1]]
+    gamma_bias_list.append(gamma_bias)
+    plt.scatter(ct, gamma_bias,
+                c='darkred',s=280,marker=".",zorder=0, vmin=1.2, vmax=1.8, edgecolors='white',alpha=0.7)
+    plt.errorbar(ct, gamma_bias, yerr = result_dic[key][3],
+                ecolor='black', fmt='o', zorder=-500,markersize=1)
+    # print(result_dic[key][3])
+    plt.plot(np.linspace(0, len(result_dic)), np.linspace(0, len(result_dic))*0)
+    plt.xlabel("ID",fontsize=27)
+    plt.ylabel(which[1]+" bias (inferred - truth)",fontsize=27)
+    plt.ylim(-0.4,0.4)
+    plt.tick_params(labelsize=20)
+    ct = ct+1
+plt.show()
+print(np.mean(gamma_bias_list), np.std(gamma_bias_list))

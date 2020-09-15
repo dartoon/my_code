@@ -15,17 +15,17 @@ geometry_mismatch_list = []
     #folder_type = 'sim_lens_ID_'
     #file_type = 'model_result.pkl'
 
-folder_type = 'simulations_700_subg30/sim_lens_ID_subg30_'
-file_type = 'result_modNoisemap_boostPossionx3_subg3.pkl'
+# folder_type = 'simulations_700_subg30/sim_lens_ID_subg30_'
+# file_type = 'result_subg3_addmask.pkl'
 
-# folder_type = 'simulations_700_subg30/sim_lens_noqso_ID_subg30_'
-# file_type = 'result_calNoiseMap_modNoisemap_boostPossionx8_noPSFerr_subg3.pkl'
+folder_type = 'simulations_700_subg30/sim_lens_noqso_ID_subg30_'
+file_type = 'result_subg3_addmask.pkl'
 # file_type = 'model_result_noTD_subg3.pkl'
 
 import glob
 folder_list = glob.glob(folder_type+'*')
 folder_list.sort()
-test_numer = 50 #len(folder_list)
+test_numer = 30 #len(folder_list)
 folder_list = folder_list[:test_numer]
 
 for folder in folder_list:    
