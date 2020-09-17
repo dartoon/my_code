@@ -22,6 +22,7 @@ class FittingSpeficy(object):
         self.data_process_class = data_process_class
         self.deltaPix = data_process_class.deltaPix
         self.numPix = len(self.data_process_class.target_stamp)
+        self.zp = data_process_class.zp
     
     def sepc_kwargs_data(self, supersampling_factor = 2, psf_data = None):
         import lenstronomy.Util.simulation_util as sim_util
@@ -31,7 +32,7 @@ class FittingSpeficy(object):
         kwargs_data['noise_map'] = self.data_process_class.noise_map
         
         if psf_data is None:
-            psf_data = self.data_process_class.PSF_lists[0]  #!!! The psf_list[0] would be used for the fitting! 
+            psf_data = self.data_process_class.PSF_list[self.data_process_class.psf_id_4_fitting]
         kwargs_psf = {'psf_type': 'PIXEL', 'kernel_point_source': psf_data}
         kwargs_numerics = {'supersampling_factor': supersampling_factor, 'supersampling_convolution': False} 
         image_band = [kwargs_data, kwargs_psf, kwargs_numerics]
@@ -80,21 +81,38 @@ class FittingSpeficy(object):
             kwargs_likelihood['check_positive_flux'] = True #penalty is any component's flux is 'negative'.
         self.kwargs_likelihood = kwargs_likelihood
         
-    def sepc_kwargs_params(self, source_params = None, fix_n = None, ps_params = None):
+    def sepc_kwargs_params(self, source_params = None, fix_n_list = None, ps_params = None):
         kwargs_params = {}
         if self.light_model_list != []:
             if source_params is None:
                 source_params = source_params_generator(frame_size = self.numPix, 
                                                         apertures = self.data_process_class.apertures,
                                                         deltaPix = self.deltaPix,
-                                                        fix_n = fix_n)
+                                                        fix_n_list = fix_n_list)
             else:
                 source_params = source_params
             kwargs_params['source_model'] = source_params
             
         if ps_params is None:
-            ps_params = ps_params_generator(centers = [[0,0]]*len(self.point_source_list),
-                                            flux_list = [self.data_process_class.target_stamp.sum()/3.]*len(self.point_source_list),
+            from decomprofile.tools_data.measure_tools import find_loc_max
+            x, y = find_loc_max(self.data_process_class.target_stamp)  #Automaticlly find the local max as PS center.
+            if len(x) < len(self.point_source_list):
+                print("Warning: could not find the enough number of local max to match the PS numbers.")
+            flux_ = []
+            for i in range(len(x)):
+                flux_.append(self.data_process_class.target_stamp[int(x[i]), int(y[i])])
+            _id = np.flipud(np.argsort(flux_))
+            arr_x = np.array(x)
+            arr_y = np.array(y)
+            ps_x = -1 * ((arr_x - self.numPix/2) * self.deltaPix)
+            ps_y = (arr_y - self.numPix/2) * self.deltaPix
+            center_list = []
+            flux_list = []
+            for i in range(len(self.point_source_list)):
+                center_list.append([ps_x[_id[i]], ps_y[_id[i]]])
+                flux_list.append(flux_[_id[i]*10])
+            ps_params = ps_params_generator(centers = center_list,
+                                            flux_list = flux_list,
                                             deltaPix = self.deltaPix)
         else:
             ps_params = ps_params            
@@ -128,25 +146,28 @@ class FittingSpeficy(object):
         self.imageModel = imageModel
         self.pointSource = pointSource
     
-    def build_fitting_seq(self, supersampling_factor = 2, psf_data = None,
+    def prepare_fitting_seq(self, supersampling_factor = 2, psf_data = None,
                           extend_source_model = None,
                           point_source_num = 1, fix_center_list = None, source_params = None,
-                          fix_n = None, ps_params = None):
-        from lenstronomy.Workflow.fitting_sequence import FittingSequence
+                          fix_n_list = None, ps_params = None):
         if extend_source_model is None:
             extend_source_model = ['SERSIC_ELLIPSE'] * len(self.data_process_class.apertures)
         self.sepc_kwargs_data(supersampling_factor = supersampling_factor, psf_data = psf_data)
         self.sepc_kwargs_model(extend_source_model = extend_source_model, point_source_num = point_source_num)
         self.sepc_kwargs_constraints(fix_center_list = fix_center_list)
         self.sepc_kwargs_likelihood()
-        self.sepc_kwargs_params(source_params = None, fix_n = None, ps_params = None)
+        self.sepc_kwargs_params(source_params = None, fix_n_list = fix_n_list, ps_params = None)
         self.sepc_imageModel()
+        print("The settings for the fitting is done. Ready to pass to FittingProcess. \n\tHowever, please update self.settings manullay if needed.")
+    
+    def build_fitting_seq(self):
+        from lenstronomy.Workflow.fitting_sequence import FittingSequence
         self.fitting_seq = FittingSequence(self.kwargs_data_joint, self.kwargs_model, 
                                       self.kwargs_constraints, self.kwargs_likelihood, 
                                       self.kwargs_params)
         # return fitting_seq, self.imageModel
     
-def source_params_generator(frame_size, apertures = [], deltaPix = 1, fix_n = None):
+def source_params_generator(frame_size, apertures = [], deltaPix = 1, fix_n_list = None):
     """
     Quickly generate a source parameters for the fitting
     
@@ -159,8 +180,8 @@ def source_params_generator(frame_size, apertures = [], deltaPix = 1, fix_n = No
         
         deltaPix: The pixel size of the data
         
-        fix_n: A list to define how to fix the sersic index, default = []
-        use example: fix_n = [[0,1],[1,4]], fix first and disk and second as bulge.
+        fix_n_list: A list to define how to fix the sersic index, default = []
+        use example: fix_n_list = [[0,1],[1,4]], fix first and disk and second as bulge.
         
     Return
     --------
@@ -182,17 +203,21 @@ def source_params_generator(frame_size, apertures = [], deltaPix = 1, fix_n = No
         e1, e2 = param_util.phi_q2_ellipticity(phi, q)
         c_x = -(aper.positions[0] - center) * deltaPix  #Lenstronomy defines x flipped, (i.e., East on the left.)
         c_y = (aper.positions[1] - center) * deltaPix
-        if fix_n is not None:
-            fix_n = np.array(fix_n)
-            if i in fix_n[:,0]:
-                fix_n_value = (fix_n[:,1])[fix_n[:,0]==i]
+        if fix_n_list is not None:
+            fix_n_list = np.array(fix_n_list)
+            if i in fix_n_list[:,0]:
+                fix_n_value = (fix_n_list[:,1])[fix_n_list[:,0]==i]
                 if len(fix_n_value) != 1:
                     raise ValueError("fix_n are not assigned correctly - {0} component have two assigned values.".format(i))
                 else:
                     fix_n_value = fix_n_value[0] #extract the fix n value from the list
-                fixed_source.append({fix_n_value})
+                fixed_source.append({'n_sersic': fix_n_value})
                 kwargs_source_init.append({'R_sersic': Reff, 'n_sersic': fix_n_value,
                                            'e1': e1, 'e2': e2, 'center_x': c_x, 'center_y': c_y})
+            else:
+                fixed_source.append({})  # we fix the Sersic index to n=1 (exponential)
+                kwargs_source_init.append({'R_sersic': Reff, 'n_sersic': 2., 'e1': e1, 'e2': e2, 'center_x': c_x, 'center_y': c_y})
+
         else:
             fixed_source.append({})  # we fix the Sersic index to n=1 (exponential)
             kwargs_source_init.append({'R_sersic': Reff, 'n_sersic': 2., 'e1': e1, 'e2': e2, 'center_x': c_x, 'center_y': c_y})
@@ -201,7 +226,6 @@ def source_params_generator(frame_size, apertures = [], deltaPix = 1, fix_n = No
         kwargs_upper_source.append({'e1': 0.5, 'e2': 0.5, 'R_sersic': Reff*30*deltaPix, 'n_sersic': 9., 'center_x': c_x+10*deltaPix, 'center_y': c_y+10*deltaPix})        
     source_params = [kwargs_source_init, kwargs_source_sigma, fixed_source, kwargs_lower_source, kwargs_upper_source]
     return source_params
-
 
 def ps_params_generator(centers, flux_list, deltaPix = 1):
     fixed_ps = []
@@ -221,4 +245,4 @@ def ps_params_generator(centers, flux_list, deltaPix = 1):
     ps_params = [kwargs_ps_init, kwargs_ps_sigma, fixed_ps, kwargs_lower_ps, kwargs_upper_ps]
     return ps_params
     
-
+#TODO: Test if double PSF. i.e., dual AGN

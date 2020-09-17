@@ -157,3 +157,4 @@ def plot_overview(img, center_QSO, c_psf_list=None, label=None, ifsave=False):
         ax.text(len(img)*0.05, len(img)*0.8, label,color='white', fontsize=30)
     if ifsave == True:
         fig.savefig('QSO_{0}_loc.pdf'.format(name))    
+    plt.show()

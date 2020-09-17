@@ -208,8 +208,8 @@ def flux_profile(image, center, radius=35,start_p=1.5, grids=20, x_gridspace=Non
         plt.show()
     return r_flux, r_grids, regions
 
-def SB_profile(image, center, radius=35, start_p=1.5, grids=20, x_gridspace = None, 
-               if_plot=False, fits_plot=False,
+def SB_profile(image, center, radius=35, start_p=1.5, grids=20,
+               x_gridspace = None, if_plot=False, fits_plot=False,
                if_annuli= False, mask_image=None):
     '''
     Derive the SB profile of one image start at the center.
@@ -246,10 +246,7 @@ def SB_profile(image, center, radius=35, start_p=1.5, grids=20, x_gridspace = No
         r_SB[1:] = (r_flux[1:]-r_flux[:-1]) / (region_size[1:]-region_size[:-1])
     if fits_plot == True:
         ax=plt.subplot(1,1,1)
-        if mask_image is None:
-            cax=ax.imshow(image, norm=LogNorm(),origin='lower')
-        else:
-            cax=ax.imshow(image*mask,norm=LogNorm(),origin='lower')
+        cax=ax.imshow(image*mask,norm=LogNorm(),origin='lower')
         for i in range(grids):
             ax.add_patch(regions[i].as_artist(facecolor='none', edgecolor='orange'))
         plt.colorbar(cax)
@@ -564,6 +561,22 @@ def esti_bgkstd(image, nsigma=2, exp_sz= 1.5, npixels = 15, if_plot=False):
         ax2.plot(np.zeros(5)+np.median(image_mask[image_mask!=0]), np.linspace(0,values[0].max(),num=5), 'k--', linewidth = 4)
         ax2.set_title('pixel value histogram and median point (mid = {0:.4f}).'.format(np.median(image_mask[image_mask!=0])))
     return stdd
-        
 
+def model_flux_cal(params_list, model_list = None):
+    """
+    Calculate the flux, itergral to infinite, i.e., same defination as Galfit.
     
+    Parameter
+    --------
+        params_list: a list of (Sersic) Soure params defined by Lenstronomy
+        model_list: a list of names of light profile model.
+    Return
+    --------
+        Total calcualted flux 
+    """    
+    from lenstronomy.LightModel.light_model import LightModel
+    if model_list is None:
+        model_list = ['SERSIC_ELLIPSE'] * len(params_list)
+    light = LightModel(model_list)
+    flux = light.total_flux(params_list)
+    return flux
