@@ -62,5 +62,3 @@ fit_run.plot_all()
 #fitting_run_class = pickle.load(open(picklename,'rb'))
 #fitting_run_class.run_diag()
 
-
-# # TODO: Test python 2.7
