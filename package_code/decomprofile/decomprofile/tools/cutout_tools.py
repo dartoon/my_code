@@ -111,14 +111,14 @@ def cut_center_auto(image, center, radius, kernel = 'center_bright', return_cent
     elif return_center==True:
         return cutout_image, center_pos
 
-def plot_overview(img, center_QSO, c_psf_list=None, label=None, ifsave=False):
+def plot_overview(img, center_target,  target_label = None, c_psf_list=None, label=None, ifsave=False):
     """
     Plot the overview of the image, highlight the location of the QSO and PSFs
     
     Parameter
     --------
         img: A FOV image
-        center_QSO: The central position of the pixels of the QSO
+        center_target: The central position of the pixels of the QSO
         c_psf_list: A list of PSF positions.
         label: define label if want to lable this plot
         
@@ -137,9 +137,11 @@ def plot_overview(img, center_QSO, c_psf_list=None, label=None, ifsave=False):
     fig = plt.figure(figsize=(15,15))
     ax=fig.add_subplot(1,1,1)
     ax.imshow(img,origin='lower', cmap=my_cmap, norm=LogNorm(), vmin=vmin, vmax=vmax)
-    QSO_reg = pix_region(center_QSO, radius= QSO_box_size)
+    QSO_reg = pix_region(center_target, radius= QSO_box_size)
     QSO_mask = QSO_reg.to_mask(mode='center')
-    ax.text(center_QSO[0]-2*QSO_box_size, center_QSO[1]+1.5*QSO_box_size, 'QSO',color='white', fontsize=20)
+    if target_label == None:
+        target_label = 'target'
+    ax.text(center_target[0]-2*QSO_box_size, center_target[1]+1.5*QSO_box_size, target_label,color='white', fontsize=20)
     ax.add_patch(QSO_mask.bbox.as_artist(facecolor='none', edgecolor='white', linewidth=2))
     name = 'PSF'
     count=0

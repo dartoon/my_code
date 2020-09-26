@@ -13,11 +13,14 @@ import numpy as np
 import matplotlib.pyplot as plt
 import astropy.io.fits as pyfits
 from astropy.wcs import WCS
-from decomprofile.tools_data.measure_tools import measure_bkg
-from decomprofile.tools_data.cutout_tools import cut_center_auto, cutout
+from decomprofile.tools.measure_tools import measure_bkg
+from decomprofile.tools.cutout_tools import cut_center_auto, cutout
 from copy import deepcopy
 from matplotlib.colors import LogNorm
-from decomprofile.tools_data.astro_tools import plt_fits, read_pixel_scale
+from decomprofile.tools.astro_tools import plt_fits, read_pixel_scale
+
+import sys
+from packaging import version
 
 class DataProcess(object):
     """
@@ -28,7 +31,7 @@ class DataProcess(object):
         - creat mask for the objects.
         - measure the target surface brightness profile, PSF FWHM, background.
     """
-    def __init__(self, fov_image=None, target_pos = None, pos_type = 'pixel', header=None, exptime = None,
+    def __init__(self, fov_image=None, target_pos = None, pos_type = 'pixel', header=None, exptime = None, fov_noise_map = None,
                  rm_bkglight = False, if_plot = False, zp = None, **kwargs):
         """
         Parameter
@@ -55,7 +58,7 @@ class DataProcess(object):
                 self.target_pos = target_pos
             elif pos_type == 'wcs':
                 wcs = WCS(header)
-                self.target_pos = wcs.all_world2pix([[target_pos[0], target_pos[1]]], 1)
+                self.target_pos = wcs.all_world2pix([[target_pos[0], target_pos[1]]], 1)[0]
             else:
                 raise ValueError("'pos_type' is should be either 'pixel' or 'wcs'.")
 
@@ -70,6 +73,7 @@ class DataProcess(object):
             bkglight = measure_bkg(fov_image, if_plot=if_plot, **kwargs)
             fov_image = fov_image-bkglight
         self.fov_image = fov_image
+        self.fov_noise_map = fov_noise_map
         
         self.psf_id_4_fitting = 0 #The psf id in the PSF_list that would be used in the fitting.
         if zp is None:
@@ -97,26 +101,37 @@ class DataProcess(object):
         target_stamp, target_cut_pos = cut_center_auto(image=self.fov_image, center= self.target_pos, 
                                           kernel = cut_kernel, radius=radius,
                                           return_center=True, if_plot=if_plot)
-        if bkg_std == None:
-            from decomprofile.tools_data.measure_tools import esti_bgkstd
-            target_2xlarger_stamp = cutout(image=self.fov_image, center= target_cut_pos, radius=radius*2)
-            self.bkg_std = esti_bgkstd(target_2xlarger_stamp, if_plot=if_plot)
-        exptime = deepcopy(self.exptime)
-        if exptime is None:
-            if 'EXPTIME' in self.header.keys():
-                exptime = self.header['EXPTIME']
-            else:
-                raise ValueError("No Exposure time information in the header, should input a value.")
-        if isinstance(exptime, np.ndarray):
-            exptime_stamp = cutout(image=self.exptime, center= target_cut_pos, radius=radius)
-        noise_map = np.sqrt(abs(target_stamp/exptime_stamp) + self.bkg_std**2)
+        
+        if self.fov_noise_map is not None:
+            self.noise_map = cutout(image = self.fov_noise_map, center = target_cut_pos, radius=radius)
+        else:
+            if bkg_std == None:
+                from decomprofile.tools.measure_tools import esti_bgkstd
+                target_2xlarger_stamp = cutout(image=self.fov_image, center= target_cut_pos, radius=radius*2)
+                self.bkg_std = esti_bgkstd(target_2xlarger_stamp, if_plot=if_plot)
+            exptime = deepcopy(self.exptime)
+            if exptime is None:
+                if 'EXPTIME' in self.header.keys():
+                    exptime = self.header['EXPTIME']
+                else:
+                    raise ValueError("No Exposure time information in the header, should input a value.")
+            if isinstance(exptime, np.ndarray):
+                exptime_stamp = cutout(image=self.exptime, center= target_cut_pos, radius=radius)
+            noise_map = np.sqrt(abs(target_stamp/exptime_stamp) + self.bkg_std**2)
+            self.noise_map = noise_map
+        
         target_mask = np.ones_like(target_stamp)
-        from decomprofile.tools_data.measure_tools import detect_obj, mask_obj
+        from decomprofile.tools.measure_tools import detect_obj, mask_obj
         apertures = detect_obj(target_stamp, if_plot=True, **kwargs)
         if create_mask == True:
-            select_idx = input('Input directly the a obj idx to mask, use space between each id:\n')
-            select_idx = select_idx.split(" ")
-            select_idx = [int(select_idx[i]) for i in range(len(select_idx)) if select_idx[i].isnumeric()]
+            if sys.version_info.major > 2:
+                select_idx = input('Input directly the a obj idx to mask, use space between each id:\n')
+                select_idx = select_idx.split(' ')
+                select_idx = [int(select_idx[i]) for i in range(len(select_idx)) if select_idx[i].isnumeric()]
+            else:
+                select_idx = raw_input('Input directly the a obj idx to mask, use space between each id:\n')
+                select_idx = select_idx.split(' ')
+                select_idx = [int(select_idx[i]) for i in range(len(select_idx)) if select_idx[i].isdigit()]
             apertures_ = [apertures[i] for i in select_idx]
             apertures = [apertures[i] for i in range(len(apertures)) if i not in select_idx]
             mask_list = mask_obj(target_stamp, apertures_, if_plot=False)
@@ -133,7 +148,6 @@ class DataProcess(object):
             plt.show()  
         self.apertures = apertures
         self.target_stamp = target_stamp
-        self.noise_map = noise_map
         self.target_mask = target_mask
     
     def find_PSF(self, radius = 50, PSF_pos_list = None, pos_type = 'pixel', user_option= False):
@@ -153,7 +167,7 @@ class DataProcess(object):
             A sth sth
         """
         if PSF_pos_list is None:
-            from decomprofile.tools_data.measure_tools import search_local_max, measure_FWHM
+            from decomprofile.tools.measure_tools import search_local_max, measure_FWHM
             init_PSF_locs_ = search_local_max(self.fov_image)
             init_PSF_locs, FWHMs, fluxs = [], [], []
             for i in range(len(init_PSF_locs_)):
@@ -184,9 +198,14 @@ class DataProcess(object):
                           np.round(measure_FWHM(cut_image ,radius = int(radius/5)),3),
                           'flux:', round(np.sum(cut_image),1) )
                     plt_fits(cut_image)
-                select_idx = input('Input directly the a obj idx to mask, use space between each id:\n')
-                select_idx = select_idx.split(" ")
-                select_idx = [int(select_idx[i]) for i in range(len(select_idx)) if select_idx[i].isnumeric()]
+                if sys.version_info.major > 2:
+                    select_idx = input('Input directly the a obj idx to mask, use space between each id:\n')
+                    select_idx = select_idx.split(" ")
+                    select_idx = [int(select_idx[i]) for i in range(len(select_idx)) if select_idx[i].isnumeric()]
+                else:
+                    select_idx = raw_input('Input directly the a obj idx to mask, use space between each id:\n')
+                    select_idx = select_idx.split(" ")
+                    select_idx = [int(select_idx[i]) for i in range(len(select_idx)) if select_idx[i].isdigit()]                    
                 self.PSF_pos_list = [PSF_locs[i] for i in select_idx]
             else:
                 select_idx = [np.where(FWHMs == FWHMs.min())[0][0] ]
@@ -201,16 +220,16 @@ class DataProcess(object):
                                           kernel = 'center_gaussian', radius=radius) for i in range(len(self.PSF_pos_list))]
 
     def profiles_compare(self, **kargs):
-        from decomprofile.tools_data.measure_tools import profiles_compare    
+        from decomprofile.tools.measure_tools import profiles_compare    
         profiles_compare([self.target_stamp] + self.PSF_list, **kargs)
         
     def plot_overview(self, **kargs):
-        from decomprofile.tools_data.cutout_tools import plot_overview
+        from decomprofile.tools.cutout_tools import plot_overview
         if hasattr(self, 'PSF_pos_list'):
             PSF_pos_list = self.PSF_pos_list
         else:
             PSF_pos_list = None
-        plot_overview(self.fov_image, center_QSO= self.target_pos,
+        plot_overview(self.fov_image, center_target= self.target_pos,
                       c_psf_list=PSF_pos_list, **kargs)
     
     def checkout(self):

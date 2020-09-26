@@ -61,7 +61,9 @@ class FittingSpeficy(object):
         
         Parameter
         --------
-            fix_center_list: a list of 2-D list
+            fix_center_list: list 
+            if not None, describe how to fix the center [[0,0]] for example.
+            
             Define how to 'joint_source_with_point_source':
                 for example [[0, 1]], joint first extend source with second ps.
         """
@@ -81,7 +83,7 @@ class FittingSpeficy(object):
             kwargs_likelihood['check_positive_flux'] = True #penalty is any component's flux is 'negative'.
         self.kwargs_likelihood = kwargs_likelihood
         
-    def sepc_kwargs_params(self, source_params = None, fix_n_list = None, ps_params = None):
+    def sepc_kwargs_params(self, source_params = None, fix_n_list = None, ps_params = None, neighborhood_size = 4, threshold = 5):
         kwargs_params = {}
         if self.light_model_list != []:
             if source_params is None:
@@ -94,14 +96,16 @@ class FittingSpeficy(object):
             kwargs_params['source_model'] = source_params
             
         if ps_params is None:
-            from decomprofile.tools_data.measure_tools import find_loc_max
-            x, y = find_loc_max(self.data_process_class.target_stamp)  #Automaticlly find the local max as PS center.
+            from decomprofile.tools.measure_tools import find_loc_max
+            x, y = find_loc_max(self.data_process_class.target_stamp, neighborhood_size = neighborhood_size, threshold = threshold)  #Automaticlly find the local max as PS center.
             if len(x) < len(self.point_source_list):
-                print("Warning: could not find the enough number of local max to match the PS numbers.")
+                raise ValueError("Warning: could not find the enough number of local max to match the PS numbers. Thus,\
+                                 the ps_params must input manually or change the neighborhood_size and threshold values")
             flux_ = []
             for i in range(len(x)):
                 flux_.append(self.data_process_class.target_stamp[int(x[i]), int(y[i])])
             _id = np.flipud(np.argsort(flux_))
+            print("_id", _id)
             arr_x = np.array(x)
             arr_y = np.array(y)
             ps_x = -1 * ((arr_x - self.numPix/2) * self.deltaPix)
@@ -110,7 +114,7 @@ class FittingSpeficy(object):
             flux_list = []
             for i in range(len(self.point_source_list)):
                 center_list.append([ps_x[_id[i]], ps_y[_id[i]]])
-                flux_list.append(flux_[_id[i]*10])
+                flux_list.append(flux_[_id[i]] * 10 )
             ps_params = ps_params_generator(centers = center_list,
                                             flux_list = flux_list,
                                             deltaPix = self.deltaPix)
@@ -149,14 +153,15 @@ class FittingSpeficy(object):
     def prepare_fitting_seq(self, supersampling_factor = 2, psf_data = None,
                           extend_source_model = None,
                           point_source_num = 1, fix_center_list = None, source_params = None,
-                          fix_n_list = None, ps_params = None):
+                          fix_n_list = None, ps_params = None, neighborhood_size = 4, threshold = 5):
         if extend_source_model is None:
             extend_source_model = ['SERSIC_ELLIPSE'] * len(self.data_process_class.apertures)
         self.sepc_kwargs_data(supersampling_factor = supersampling_factor, psf_data = psf_data)
         self.sepc_kwargs_model(extend_source_model = extend_source_model, point_source_num = point_source_num)
         self.sepc_kwargs_constraints(fix_center_list = fix_center_list)
         self.sepc_kwargs_likelihood()
-        self.sepc_kwargs_params(source_params = None, fix_n_list = fix_n_list, ps_params = None)
+        self.sepc_kwargs_params(source_params = None, fix_n_list = fix_n_list, ps_params = None,
+                                neighborhood_size = neighborhood_size, threshold = threshold)
         self.sepc_imageModel()
         print("The settings for the fitting is done. Ready to pass to FittingProcess. \n\tHowever, please update self.settings manullay if needed.")
     
@@ -201,8 +206,13 @@ def source_params_generator(frame_size, apertures = [], deltaPix = 1, fix_n_list
         q = aper.b/aper.a
         phi = aper.theta
         e1, e2 = param_util.phi_q2_ellipticity(phi, q)
-        c_x = -(aper.positions[0] - center) * deltaPix  #Lenstronomy defines x flipped, (i.e., East on the left.)
-        c_y = (aper.positions[1] - center) * deltaPix
+        
+        if isinstance(apertures[0].positions[0],float): 
+            pos_x, pos_y = aper.positions[0], aper.positions[1]
+        elif isinstance(apertures[0].positions[0],np.ndarray):
+            pos_x, pos_y = aper.positions[0]
+        c_x = -(pos_x - center) * deltaPix  #Lenstronomy defines x flipped, (i.e., East on the left.)
+        c_y = (pos_y - center) * deltaPix
         if fix_n_list is not None:
             fix_n_list = np.array(fix_n_list)
             if i in fix_n_list[:,0]:

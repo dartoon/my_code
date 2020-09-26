@@ -199,7 +199,7 @@ class FittingProcess(object):
             plt.close()
             
     def plot_final_qso_fit(self, if_annuli=False, show_plot = True, arrows=False, save_plot = False):
-        from decomprofile.tools_data.plot_tools import total_compare
+        from decomprofile.tools.plot_tools import total_compare
         data = self.fitting_specify_class.kwargs_data['image_data']
         noise = self.fitting_specify_class.kwargs_data['noise_map']
         ps_list = self.image_ps_list
@@ -229,7 +229,7 @@ class FittingProcess(object):
             fig.savefig(savename+"_qso_final_plot.pdf")   
 
     def plot_final_galaxy_fit(self, if_annuli=False, show_plot = True, arrows=False, save_plot = False):
-        from decomprofile.tools_data.plot_tools import total_compare
+        from decomprofile.tools.plot_tools import total_compare
         data = self.fitting_specify_class.kwargs_data['image_data']
         noise = self.fitting_specify_class.kwargs_data['noise_map']
         galaxy_list = self.image_host_list
@@ -252,7 +252,6 @@ class FittingProcess(object):
         if save_plot == True:
             savename = self.savename
             fig.savefig(savename+"_qso_final_plot.pdf")   
-            
     
     def plot_all(self):
         self.run_diag()
@@ -266,7 +265,7 @@ class FittingProcess(object):
 
     def translate_result(self):
         import lenstronomy.Util.param_util as param_util
-        from decomprofile.tools_data.measure_tools import model_flux_cal
+        from decomprofile.tools.measure_tools import model_flux_cal
         self.final_galaxy_result = copy.deepcopy(self.source_result)
         flux_sersic_model = model_flux_cal(self.final_galaxy_result)
         for i in range(len(self.final_galaxy_result)):
@@ -280,7 +279,20 @@ class FittingProcess(object):
         for i in range(len(self.final_ps_result)):
             ps = self.final_ps_result[i]
             ps['flux_within_frame'] = np.sum(self.image_ps_list[i])
-            ps['magnitude'] = -2.5*np.log10(ps['flux_within_frame']) + self.zp            
+            ps['magnitude'] = -2.5*np.log10(ps['flux_within_frame']) + self.zp      
+            
+    def mcmc_result_range(self, chain=None, param=None):
+        if chain is None:
+            chain = self.samples_mcmc
+            param = self.param_mcmc
+        for i in range(len(param)):
+            print(i, ':', param[i])
+        checkid = int(input("Which parameter to checkout?\n"))
+        print("Low {0:.3f}, Mid {1:.3f}, High: {2:.3f}".format(np.percentile(chain[:, checkid],16),
+                                                                np.percentile(chain[:, checkid],50), 
+                                                                np.percentile(chain[:, checkid],84)) )
+        #TODO: Add q and theta range 
+        
 
     def dump_result(self):
         savename = self.savename
@@ -293,7 +305,7 @@ def fitting_setting_temp(algorithm, fill_value_list = None):
     if algorithm == 'PSO':
         if fill_value_list is None:
             # setting = {'sigma_scale': 0.8, 'n_particles': 150, 'n_iterations': 150}
-            setting = {'sigma_scale': 0.8, 'n_particles': 150, 'n_iterations': 100}
+            setting = {'sigma_scale': 0.8, 'n_particles': 50, 'n_iterations': 50}
         else:
             setting = {'sigma_scale': fill_value_list[0], 'n_particles': fill_value_list[1], 'n_iterations': fill_value_list[2]}
     elif algorithm == 'MCMC':     
@@ -305,4 +317,5 @@ def fitting_setting_temp(algorithm, fill_value_list = None):
                        'walkerRatio': fill_value_list[2], 'sigma_scale': fill_value_list[3]}
     return setting
 
-#TODO: How to add other priors? i.e., the q? host flux ratio?
+#TODO: add other priors? i.e., the q? host flux ratio?
+#TODO: Translate MCMC Chains to 1 sigma.
