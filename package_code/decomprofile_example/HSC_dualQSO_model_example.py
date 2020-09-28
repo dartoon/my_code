@@ -29,11 +29,11 @@ image_RA = 214.156021
 image_DEC = 0.564521
 data_process = DataProcess(fov_image = fov_image, fov_noise_map = err_data, target_pos = [image_RA, image_DEC],
                            pos_type = 'wcs', header = header,
-                          rm_bkglight = True, if_plot=False, zp = zp)
+                          rm_bkglight = False, if_plot=False, zp = zp)
 
 data_process.noise_map = err_data
 
-data_process.generate_target_materials(radius=45, create_mask = True, nsigma=2.8,
+data_process.generate_target_materials(radius=45, create_mask = False, nsigma=2.8,
                                       exp_sz= 1.2, npixels = 15, if_plot=False)
 
 data_process.PSF_list = [PSF]
@@ -46,12 +46,15 @@ fit_sepc = FittingSpeficy(data_process)
 fit_sepc.prepare_fitting_seq(point_source_num = 2)#, fix_n_list= [[0,4]], fix_center_list = [[0,0]])
 fit_sepc.build_fitting_seq()
 
-#%%Setting the fitting method and run.
-from decomprofile.fitting_process import FittingProcess
-fit_run = FittingProcess(fit_sepc, savename = 'dualQSO_HSC')
-fit_run.run()
-fit_run.plot_all()
-fit_run.dump_result()
-# # print(fit_run.final_galaxy_result[0])
+from decomprofile.tools.measure_tools import plot_data_apertures, plot_data_apertures_point
+plot_data_apertures_point(fit_sepc.data_class.data, fit_sepc.apertures, fit_sepc.center_pix_pos)
+
+# #%%Setting the fitting method and run.
+# from decomprofile.fitting_process import FittingProcess
+# fit_run = FittingProcess(fit_sepc, savename = 'dualQSO_HSC')
+# fit_run.run()
+# fit_run.plot_all()
+# fit_run.dump_result()
+# # # print(fit_run.final_galaxy_result[0])
 
 

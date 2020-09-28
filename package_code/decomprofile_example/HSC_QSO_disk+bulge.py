@@ -60,22 +60,28 @@ elif isinstance(add_aperture1.positions[0],np.ndarray):
 add_aperture1.a, add_aperture1.b = 2, 2
 apertures = apertures + [add_aperture1]
 
+data_process.apertures = apertures
+
 from decomprofile.tools.measure_tools import plot_data_apertures
 plot_data_apertures(data_process.target_stamp, apertures)
-
-data_process.apertures = apertures
 
 #%%Start to produce the class and params for lens fitting.
 from decomprofile.fitting_specify import FittingSpeficy
 fit_sepc = FittingSpeficy(data_process)
+
+
 fit_sepc.prepare_fitting_seq(point_source_num = 1, fix_n_list= [[0,4], [1,1]],   #First component fix n = 4 (bluge), second one fix to 1 (disk).
                               fix_center_list = [[0,0]])
+
+from decomprofile.tools.measure_tools import plot_data_apertures, plot_data_apertures_point
+plot_data_apertures_point(fit_sepc.data_class.data, fit_sepc.apertures, fit_sepc.center_pix_pos)
 fit_sepc.build_fitting_seq()
 
-#%%Setting the fitting method and run.
-from decomprofile.fitting_process import FittingProcess
-fit_run = FittingProcess(fit_sepc, savename = 'test_bulge_disk')
-fit_run.run()
-fit_run.plot_all()
-fit_run.dump_result()
-# # print(fit_run.final_galaxy_result[0])
+
+# #%%Setting the fitting method and run.
+# from decomprofile.fitting_process import FittingProcess
+# fit_run = FittingProcess(fit_sepc, savename = 'test_bulge_disk')
+# fit_run.run()
+# fit_run.plot_all()
+# fit_run.dump_result()
+# # # print(fit_run.final_galaxy_result[0])
