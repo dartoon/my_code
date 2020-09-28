@@ -15,12 +15,11 @@ geometry_mismatch_list = []
     #folder_type = 'sim_lens_ID_'
     #file_type = 'model_result.pkl'
 
-# folder_type = 'simulations_700_subg30/sim_lens_ID_subg30_'
-# file_type = 'result_subg3_addmask.pkl'
-
-folder_type = 'simulations_700_subg30/sim_lens_noqso_ID_subg30_'
+folder_type = 'simulations_700_subg30/sim_lens_ID_subg30_'
 file_type = 'result_subg3_addmask.pkl'
-# file_type = 'model_result_noTD_subg3.pkl'
+
+# folder_type = 'simulations_700_subg30/sim_lens_noqso_ID_subg30_'
+# file_type = 'result_subg3_addmask.pkl'
 
 import glob
 folder_list = glob.glob(folder_type+'*')
@@ -52,7 +51,7 @@ for folder in folder_list:
 #    
     #Load the inferred parameter:    
     multi_band_list, kwargs_model, kwargs_result, chain_list, fix_setting, mcmc_new_list = pickle.load(open(folder+'/'+file_type,'rb'))
-    print(kwargs_result['kwargs_lens'][0])
+    # print(kwargs_result['kwargs_lens'][0])
     # x_image_infe, y_image_infe = x_image, y_image
     # kwargs_lens_list_infe = kwargs_lens_list
     
@@ -98,3 +97,5 @@ plt.ylim(0,300)
 plt.tick_params(labelsize=20)
 plt.legend(prop={'size':20})
 plt.show()
+
+print("np.std(geometry_mismatch_list):", np.std(geometry_mismatch_list))

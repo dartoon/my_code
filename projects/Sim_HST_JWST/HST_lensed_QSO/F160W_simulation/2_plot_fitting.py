@@ -27,7 +27,7 @@ from lenstronomy.Data.psf import PSF
 import lenstronomy.Util.simulation_util as sim_util
 from lenstronomy.Data.imaging_data import ImageData
 import sys
-sys.path.insert(0,'../../../py_tools/')
+sys.path.insert(0,'../../../../py_tools/')
 from flux_profile import cr_mask
 from mask_objects import find_loc_max
 #file name:
@@ -53,21 +53,21 @@ run_n = int(test_numer/kernel)
 
 kernel_i = 0 # 0, 1 ,2, 3 .. max = kernel-1
 
-folder_list = glob.glob('simulations_700_subg30/sim_lens_ID_subg30_7??')
-folder_list.sort()
-savename = 'result_modNoisemap_boostPossionx3_subg3.pkl' #+ Simon's points; PSF not change, psf_error_map 0.1
-
-# folder_list = glob.glob('simulations_700_subg30/sim_lens_noqso_ID_subg30_7??')
+# folder_list = glob.glob('simulations_700_subg30/sim_lens_ID_subg30_7??')
 # folder_list.sort()
-# savename = 'result_calNoiseMap_modNoisemap_boostPossionx8_noPSFerr_subg3.pkl'
+# savename = 'result_modNoisemap_boostPossionx3_subg3.pkl' #+ Simon's points; PSF not change, psf_error_map 0.1
+
+folder_list = glob.glob('simulations_700_subg30/sim_lens_noqso_ID_subg30_7??')
+folder_list.sort()
+savename = 'result_calNoiseMap_modNoisemap_boostPossionx8_noPSFerr_subg3.pkl'
 
 
 folder_list = folder_list[:test_numer]
 #After talk with Simon:
 
 
-for folder in folder_list[kernel_i*run_n:kernel_i*run_n+run_n]:
-# for folder in ['simulations_700_subg30/sim_lens_noqso_ID_subg30_724']:
+# for folder in folder_list[kernel_i*run_n:kernel_i*run_n+run_n]:
+for folder in [folder_list[47]]:
     ID = folder[-3:]
     folder = folder + '/'
     print(folder)
@@ -94,7 +94,8 @@ for folder in folder_list[kernel_i*run_n:kernel_i*run_n+run_n]:
     multi_band_list, kwargs_model, kwargs_result, chain_list, fix_setting, mcmc_new_list = pickle.load(open(folder+savename,'rb'))
     fixed_lens, fixed_source, fixed_lens_light, fixed_ps, fixed_cosmo = fix_setting
     labels_new = [r"$\gamma$", r"$D_{\Delta t}$","H$_0$" ]    
-    modelPlot = ModelPlot(multi_band_list, kwargs_model, kwargs_result, arrow_size=0.02, cmap_string="gist_heat",likelihood_mask_list=[lens_mask])
+    modelPlot = ModelPlot(multi_band_list, kwargs_model, kwargs_result, arrow_size=0.02, cmap_string="gist_heat",
+                          likelihood_mask_list=[lens_mask])
     f, axes = modelPlot.plot_main()
     f.show()
     # f, axes = modelPlot.plot_separate()
