@@ -67,9 +67,11 @@ if os.path.exists('fit_result_detect')==False:
 
 filename_ascii = 'RESULTS/' + image_ID + '_result.txt'
 
-#band_run_list = [2,0,1,3,4]  #run I band first
-band_run_list=[0]
-band_seq = ['I']
+band_run_list = [2,0,1,3,4]  #run I band first
+band_seq = ['G', 'R', 'I', 'Z', 'Y']
+
+#band_run_list=[0]
+#band_seq = ['I']
 filename_list = [image_ID+'_HSC-{0}.fits'.format(band_seq[i]) for i in range(len(band_run_list))]
 
 run_list = copy.deepcopy(band_run_list)
@@ -79,7 +81,7 @@ for i in range(len(band_seq)):
     # The pixel scale is all 0.168
     if len(glob.glob(image_folder+filename_list[i])) == 0:
         print(filename_list[i] + " DOES NOT EXIST!!!")
-        QSO_im, err_map, PSF, pix_scale, zp, qso_center, fr_c_RA_DEC = [], [], [], [], [], [], [], []
+        QSO_im, err_map, PSF, _, zp, qso_center, fr_c_RA_DEC = [], [], [], [], [], [], []
         run_list.remove(i)
     else:
         QSO_im, err_map, PSF, pix_scale, zp, qso_center, fr_c_RA_DEC = gen_fit_id_binary(image_folder, image_RA, image_DEC, filename_list[i], cut_frame=80)
@@ -109,7 +111,6 @@ for i in range(len(band_seq)):
         background_rms_list.append([])
 
 fit_frame_size = 81
-ct = int((len(QSO_im)-fit_frame_size)/2)     # If want to cut to 61, QSO_im[ct:-ct,ct:-ct]
 
 #==============================================================================
 # Start set up for fitting:
@@ -117,6 +118,7 @@ ct = int((len(QSO_im)-fit_frame_size)/2)     # If want to cut to 61, QSO_im[ct:-
 psf_l, QSO_img_l, QSO_std_l = [], [], []
 for k in range(len(band_seq)):
     if k in run_list:
+        ct = int((len(QSO_im_list[k])-fit_frame_size)/2)     # If want to cut to 61, QSO_im[ct:-ct,ct:-ct]
         psf_l.append(PSF_list[k])
         QSO_img_l.append(QSO_im_list[k][ct:-ct,ct:-ct])
         QSO_std_l.append(err_map_list[k][ct:-ct,ct:-ct])
@@ -125,11 +127,12 @@ for k in range(len(band_seq)):
         QSO_img_l.append([])
         QSO_std_l.append([])            
 
+ct = 0
 for k in run_list:
     objs, Q_index = detect_obj(QSO_img_l[k], pltshow=pltshow)
     qso_info = objs[Q_index]
     obj_temp = [objs[i] for i in range(len(objs)) if i != Q_index]
-    if k == 0:
+    if ct == 0:
         obj = obj_temp
     if k>0 and len(obj_temp)>0:
         for i in range(len(obj_temp)):
@@ -143,6 +146,7 @@ for k in run_list:
             if count == 0:
                 obj.append(obj_temp[i])
         print("the number of nearby objs:", len(obj))
+    ct = ct + 1
 
 from mask_objects import find_loc_max, measure_FWHM
 
