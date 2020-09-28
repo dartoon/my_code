@@ -81,7 +81,7 @@ for i in range(len(band_seq)):
     # The pixel scale is all 0.168
     if len(glob.glob(image_folder+filename_list[i])) == 0:
         print(filename_list[i] + " DOES NOT EXIST!!!")
-        QSO_im, err_map, PSF, _, zp, qso_center, fr_c_RA_DEC = [], [], [], [], [], [], []
+        QSO_im, err_map, PSF, _, _, qso_center, fr_c_RA_DEC = [], [], [], [], [], [], []
         run_list.remove(i)
     else:
         QSO_im, err_map, PSF, pix_scale, zp, qso_center, fr_c_RA_DEC = gen_fit_id_binary(image_folder, image_RA, image_DEC, filename_list[i], cut_frame=80)

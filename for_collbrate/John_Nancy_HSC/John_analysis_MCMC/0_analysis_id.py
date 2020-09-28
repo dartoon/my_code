@@ -93,9 +93,10 @@ if if_file == []:
     image_not_exit.write("#The following images are not exist:\n")
     
 #ID, RA, DEC, zp, pixel_scale, host_flux_ratio(%),host_x, host_y, host_flux, host_mag, Kron_radius(arcsec), host_Kron_flux, host_Kron_mag, Reff(arcsec), n_sersic, host_q,qso_x, qso_y, qso_flux, qso_mag, host_qso_center_mismatch(arcsec)                               
-band_run_list = [2,0,1,3,4]  #run I band first
+band_run_list = [2,0,1]  #run I band first
 run_list = copy.deepcopy(band_run_list)
-band_seq = ['G', 'R', 'I', 'Z', 'Y']
+band_seq = ['G', 'R', 'I']
+#band_seq = ['G', 'R', 'I', 'Z', 'Y']
 filename_list = [QSO_id+'_HSC-{0}.fits'.format(band_seq[i]) for i in range(len(band_seq))]
 QSO_im_list, err_map_list, QSO_bkg_list, PSF_list=[], [], [], []
 zp_list = []
@@ -109,7 +110,8 @@ for i in range(len(band_seq)):
         print filename_list[i] + " DOES NOT EXIST!!!"
         image_not_exit.write(filename_list[i] + ' DOES NOT EXIST!!!'+ '\n')
         QSO_im, err_map, QSO_bkg, PSF, pix_scale, zp, qso_fr_center, fr_c_RA_DEC = [], [], [], [], [], [], [], []
-        run_list.remove(i)
+        if i in band_run_list:
+            run_list.remove(i)
     else:
         QSO_im, err_map, QSO_bkg, PSF, pix_scale, zp, qso_fr_center, fr_c_RA_DEC = gen_fit_id(image_folder, QSO_RA, QSO_DEC, filename_list[i],cut_frame=120, subbkl=sub_bkg)
     QSO_im_list.append(QSO_im)
