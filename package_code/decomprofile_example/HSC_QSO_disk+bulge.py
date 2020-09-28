@@ -44,23 +44,22 @@ data_process.checkout() #Check if all the materials is known.
 import copy
 apertures = copy.deepcopy(data_process.apertures)
 
-idx = 0
-add_aperture0 = copy.deepcopy(apertures[idx])
+comp_id = 0 #Change the component (galaxy) id = 0 into to components (i.e., bulge + disk)
+add_aperture0 = copy.deepcopy(apertures[comp_id])
 add_aperture0.a, add_aperture0.b = add_aperture0.a/2, add_aperture0.b/2
-apertures = apertures[:idx] + [add_aperture0] + apertures[idx:]
+apertures = apertures[:comp_id] + [add_aperture0] + apertures[comp_id:]
 
+#Manually input another component:
 add_aperture1 = copy.deepcopy(apertures[0])
-add_pos = [36, 45] 
+add_pos = [36, 45]   #The position of the component.
 if isinstance(add_aperture1.positions[0],float): 
     add_aperture1.positions = np.array(add_pos)
 elif isinstance(add_aperture1.positions[0],np.ndarray):
     add_aperture1.positions = np.array([add_pos])
-# add_aperture1.positions = np.array([[36, 45]])  #Add the position of the subtructure manually
+add_aperture1.a, add_aperture1.b = 2, 2  #define the a, b value of this component, i.e., Reff = sqrt(a^2 +b^2)
+apertures = apertures + [add_aperture1]  #attach the added aperture into the group.
 
-add_aperture1.a, add_aperture1.b = 2, 2
-apertures = apertures + [add_aperture1]
-
-data_process.apertures = apertures
+data_process.apertures = apertures #Pass apertures to the data
 
 from decomprofile.tools.measure_tools import plot_data_apertures
 plot_data_apertures(data_process.target_stamp, apertures)
@@ -73,8 +72,8 @@ fit_sepc = FittingSpeficy(data_process)
 fit_sepc.prepare_fitting_seq(point_source_num = 1, fix_n_list= [[0,4], [1,1]],   #First component fix n = 4 (bluge), second one fix to 1 (disk).
                               fix_center_list = [[0,0]])
 
-from decomprofile.tools.measure_tools import plot_data_apertures, plot_data_apertures_point
-plot_data_apertures_point(fit_sepc.data_class.data, fit_sepc.apertures, fit_sepc.center_pix_pos)
+fit_sepc.plot_fitting_sets()
+
 fit_sepc.build_fitting_seq()
 
 
