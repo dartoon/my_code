@@ -38,7 +38,7 @@ data_process.find_PSF(radius = 30, user_option = False)
 # data_process.find_PSF(radius = 50, PSF_pos_list = [[ 350., 1055.], [2078., 1910.]], user_option = False)
 data_process.plot_overview(label = 'Example', target_label = None)
 # data_process.profiles_compare(norm_pix = 5, if_annuli=False, y_log = False,
-#                   prf_name_list = (['target'] + ['PSF{0}'.format(i) for i in range(len(data_process.PSF_lists))]) )
+#                   prf_name_list = (['target'] + ['PSF{0}'.format(i) for i in range(len(data_process.PSF_list))]) )
 data_process.checkout() #Check if all the materials is known.
 
 #%%Start to produce the class and params for lens fitting.

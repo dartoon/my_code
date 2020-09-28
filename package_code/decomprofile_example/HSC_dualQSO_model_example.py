@@ -29,7 +29,7 @@ image_RA = 214.156021
 image_DEC = 0.564521
 data_process = DataProcess(fov_image = fov_image, fov_noise_map = err_data, target_pos = [image_RA, image_DEC],
                            pos_type = 'wcs', header = header,
-                          rm_bkglight = False, if_plot=False, zp = zp)
+                          rm_bkglight = True, if_plot=False, zp = zp)
 
 data_process.noise_map = err_data
 
