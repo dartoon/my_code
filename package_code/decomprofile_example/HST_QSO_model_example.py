@@ -45,6 +45,10 @@ data_process.checkout() #Check if all the materials is known.
 from decomprofile.fitting_specify import FittingSpeficy
 fit_sepc = FittingSpeficy(data_process)
 fit_sepc.prepare_fitting_seq(point_source_num = 1, fix_n_list= [[0,4]], fix_center_list = [[0,0]])
+
+#Plot the initial settings for fittings. 
+fit_sepc.plot_fitting_sets()
+
 fit_sepc.build_fitting_seq()
 
 #%%Setting the fitting method and run.
@@ -52,7 +56,7 @@ from decomprofile.fitting_process import FittingProcess
 fit_run = FittingProcess(fit_sepc, savename = 'test_fix_n_4')
 fit_run.run()
 fit_run.plot_all()
-#fit_run.dump_result()
+fit_run.dump_result()
 #print(fit_run.final_galaxy_result[0])
 #
 ##%%

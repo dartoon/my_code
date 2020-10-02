@@ -32,7 +32,7 @@ QSO_RA = 0.07452999800443649
 QSO_DEC = 0.4368380010128021
 data_process = DataProcess(fov_image = fov_image, fov_noise_map = err_data, target_pos = [QSO_RA, QSO_DEC],
                            pos_type = 'wcs', header = header,
-                          rm_bkglight = False, if_plot=False, zp = zp)
+                          rm_bkglight = True, if_plot=False, zp = zp)
 
 data_process.noise_map = err_data
 

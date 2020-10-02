@@ -29,11 +29,11 @@ QSO_RA = 0.07452999800443649
 QSO_DEC = 0.4368380010128021
 data_process = DataProcess(fov_image = fov_image, fov_noise_map = err_data, target_pos = [QSO_RA, QSO_DEC],
                            pos_type = 'wcs', header = header,
-                          rm_bkglight = False, if_plot=False, zp = zp)
+                          rm_bkglight = True, if_plot=False, zp = zp)
 
 data_process.noise_map = err_data
 
-data_process.generate_target_materials(radius=35, create_mask = False, nsigma=2.8,
+data_process.generate_target_materials(radius=35, create_mask = True, nsigma=2.8,
                                       exp_sz= 1.2, npixels = 15, if_plot=False)
 
 data_process.PSF_list = [PSF]
