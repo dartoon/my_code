@@ -29,7 +29,7 @@ import rebin #From my share_tools
 oversample = 4
 #seed = 0
 zp_dic = {'F444W':27.3012, 'F356W':27.1841, 'F200W':27.0383, 'F150W':26.8627} #Using mirage
-for seed in range(201,221):
+for seed in range(301,321):
     for ID in range(1,7): #int(input("input simulation ID:\n"))  #The ID for this simulation
         host_flux_rescale = False
         count = 0 
@@ -43,8 +43,10 @@ for seed in range(201,221):
             z_s = qso_info['ID'+repr(ID)]['z']       #AGN redshift
             point_mag = qso_info['ID'+repr(ID)]['AGN_{0}_mag'.format(filt)]
             host_mag = qso_info['ID'+repr(ID)]['galaxy_{0}_mag'.format(filt)]
-            host_n = np.random.uniform(2,4)   #Host effective radius, unit: Kpc
-            host_Reff_kpc = np.random.uniform(2,3)   #Host effective radius, unit: Kpc
+            # host_n = np.random.uniform(2,4)   #Host effective radius, unit: Kpc
+            # host_Reff_kpc = np.random.uniform(2,3)   #Host effective radius, unit: Kpc
+            host_n = 4  #Host effective radius, unit: Kpc
+            host_Reff_kpc = np.random.uniform(1,2)   #Host effective radius, unit: Kpc            
             q = np.random.uniform(0.5,0.9)
             phi = np.random.uniform(0.,2*np.pi)            
             #host_ratio = np.random.uniform(0.4, 0.7) #Set the random host flux ratio [40% - 70%].

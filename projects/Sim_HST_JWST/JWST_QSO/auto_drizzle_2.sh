@@ -4,7 +4,7 @@
 #read -p 'Simulation ID:' id
 for filt in F444W F356W F200W F150W
 do
-for seed in 106 107 108 109 110
+for seed in 306 307 308 309 310
 do
 for id in 1 2 3 4 5 6
 do

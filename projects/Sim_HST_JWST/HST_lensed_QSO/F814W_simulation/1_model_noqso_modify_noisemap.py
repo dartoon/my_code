@@ -62,7 +62,7 @@ folder_list = folder_list[:test_numer]
 # with_qso_savename = 'model_result_calNoiseMap_modNoisemap_boostPossionx3_subg3.pkl'
 
 #After talk with Simon:
-savename = 'result_subg3_addmask.pkl' #+ Simon's points; no mask, Possionx8
+savename = 'result_subg3_add_bigmask.pkl' #+ Simon's points; no mask, Possionx8
 with_qso_savename = 'result_subg3_addmask.pkl'
 
 # for folder in ['simulations_700_subg30/sim_lens_noqso_ID_subg30_702']:
@@ -91,8 +91,8 @@ for folder in folder_list[kernel_i*run_n:kernel_i*run_n+run_n]:
         #Setting up the fitting:
         lens_data = pyfits.getdata(folder+'Drz_QSO_image.fits')
         # len_std = pyfits.getdata(folder+'noise_map.fits')        
-        lens_mask = cr_mask(lens_data, 'normal_mask.reg')
-        framesize = 145
+        lens_mask = cr_mask(lens_data, 'big_mask.reg')
+        framesize = 195
         ct = int((len(lens_data) - framesize)/2)
         lens_data = lens_data[ct:-ct,ct:-ct]
         # len_std = len_std[ct:-ct,ct:-ct]

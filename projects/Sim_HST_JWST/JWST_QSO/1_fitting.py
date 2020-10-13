@@ -35,9 +35,11 @@ save_SNR = True
 zp_dic = {'F444W':27.3012, 'F356W':27.1841, 'F200W':27.0383, 'F150W':26.8627} #Using mirage
 
 #folder_suf = 'sim_seed201_2500s/'
-folder_suf = 'sim_seed201_5000s/'
+# folder_suf = 'sim_seed201_5000s/'
+folder_suf = 'sim_seed301_2500s_reff12n1/'
 
-seed_l, seed_h = [[201, 208], [208,215], [215, 221]][0]
+# seed_l, seed_h = [[201, 208], [208,215], [215, 221]][0]
+seed_l, seed_h = [316, 321]
 
 for seed in range(seed_l, seed_h):
     for ID in range(1, 7):
@@ -68,7 +70,7 @@ for seed in range(seed_l, seed_h):
                 pix_scale = [0.04, 0.04, 0.029, 0.029][filt_i] #After dirzzled
                 zp= zp_dic[filt]
                 framesize_list = []
-                for check_seed in range(201, 221):
+                for check_seed in range(seed_l, seed_h):
                     QSO_img_org_i = pyfits.getdata(folder[:-3]+repr(check_seed)+'/Drz_QSO_image.fits')
                     for framesize in range(61, len(QSO_img_org_i), 10):
                         half_r = int(framesize/2)
@@ -88,7 +90,7 @@ for seed in range(seed_l, seed_h):
                 peak = [peak[0][0], peak[1][0]]                
                 QSO_img = QSO_img_org[peak[0]-half_r:peak[0]+half_r+1,peak[1]-half_r:peak[1]+half_r+1]                
                 QSO_std = rms_org[peak[0]-half_r:peak[0]+half_r+1,peak[1]-half_r:peak[1]+half_r+1]
-                plt.imshow(QSO_img, origin='lower', cmap='gist_heat', norm=LogNorm())
+                plt.imshow(QSO_img, origin='lower', cmap='gist_heat', norm=LogNorm(), vmin = 0.001, vmax = QSO_img.max())
                 plt.colorbar()
                 plt.show()   
                 if framesize < len(psf)-10:
@@ -135,7 +137,7 @@ for seed in range(seed_l, seed_h):
                     plot_compare=True
                     fits_plot =True
                 result = transfer_to_result(data=QSO_img, pix_sz = pix_scale,
-                                            source_result=source_result, ps_result=ps_result, image_ps=image_ps, image_host=image_host, error_map=error_map,
+                                            source_result=source_result, ps_result=ps_result, image_ps=image_ps[0], image_host=image_host, error_map=error_map,
                                             zp=zp, fixcenter=fixcenter,ID='ID'+repr(ID), tag=tag, plot_compare = plot_compare)
             
                 print("Saving results:")

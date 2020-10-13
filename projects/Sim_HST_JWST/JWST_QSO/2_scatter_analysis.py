@@ -41,7 +41,7 @@ zp_dic = {'F444W':27.3012, 'F356W':27.1841, 'F200W':27.0383, 'F150W':26.8627} #U
 #save_name = 'fit_result_diffPSF_biggerframe'
 #save_name = 'fit_result_samedrizzle_biggerframecalrms'
 #folder_suf = 'sim_seed201_5000s/'
-folder_suf = 'sim_seed201_2500s/'
+folder_suf = 'sim_seed301_2500s_reff12n3/'
 save_name = 'fit_result_diffPSF'
 #if use_true_PSF == True:
 #    save_name = 'fit_result_truePSF'
@@ -51,6 +51,7 @@ save_name = 'fit_result_diffPSF'
 #    save_name = 'fit_result_samedrizzle'
 
 ID_range = [1,7]   
+seed_range = [301,321]
 #%%Mag bias
 
 for ID in range(ID_range[0],ID_range[1]):
@@ -59,7 +60,7 @@ for ID in range(ID_range[0],ID_range[1]):
         filt  = ['F150W', 'F200W', 'F356W','F444W'][filt_i]
         zp = zp_dic[filt]
         bias_list = []
-        for seed in range(201,221):
+        for seed in range(seed_range[0],seed_range[1]):
             folder = folder_suf + 'sim'+'_ID'+repr(ID)+'_'+filt+'_seed'+repr(seed)    
             f = open(folder+"/sim_info.txt","r")
             string = f.read()
@@ -116,7 +117,7 @@ for ID in range(ID_range[0],ID_range[1]):
         zp = zp_dic[filt]
         true_mag_list = []
         infe_mag_list = []
-        for seed in range(201,221):
+        for seed in range(seed_range[0],seed_range[1]):
             folder = folder = folder_suf + 'sim'+'_ID'+repr(ID)+'_'+filt+'_seed'+repr(seed)
             f = open(folder+"/sim_info.txt","r")
             string = f.read()
@@ -164,7 +165,7 @@ for ID in range(ID_range[0],ID_range[1]):
     for filt_i in range(4):    
         filt  = ['F150W', 'F200W', 'F356W','F444W'][filt_i]
         bias_list = []
-        for seed in range(201,221):
+        for seed in range(seed_range[0],seed_range[1]):
             folder = folder_suf + 'sim'+'_ID'+repr(ID)+'_'+filt+'_seed'+repr(seed) 
             f = open(folder+"/sim_info.txt","r")
             string = f.read()

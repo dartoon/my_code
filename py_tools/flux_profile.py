@@ -570,7 +570,7 @@ def total_compare(label_list, flux_list, zp=27.0, target_ID = 'target_ID',
     ax4 = plt.subplot2grid((6,5), (0,4), rowspan=5)
     ax5 = plt.subplot2grid((6,5), (5,4), rowspan=1)
 
-    im1 = ax1.imshow(flux_list[0] + add_background,origin='lower',cmap=my_cmap, norm=norm, vmax = flux_list[0].max())
+    im1 = ax1.imshow(flux_list[0] + add_background,origin='lower',cmap=my_cmap, norm=norm, vmax = flux_list[0].max(), vmin = 1.e-4)
     clim=im1.properties()['clim']
     frame_size = len(flux_list[0])
     ax1.set_ylabel(target_ID, fontsize=15, weight='bold')
