@@ -63,15 +63,16 @@ folder_list = folder_list[:test_numer]
 
 
 #After talk with Simon:
-savename = 'result_modNoisemap_boostPossionx3_subg3.pkl' #+ Simon's points; PSF not change, psf_error_map 0.1
+savename = 'result_modNoisemap_useDrzRms_subg3_psferr001_addspecial_noJoinSource.pkl' #+ Simon's points; PSF not change, psf_error_map 0.1
 # savename = 'result_calNoisemap_PSFcorrect.pkl'  #Correct PSF; psf_error_map 0.1
 # savename = 'result_modNoisemap_boostPossionx3_PSFcorrect.pkl'  #Correct PSF; PSF correct; psf_error_map 0.1
 
-#%%
+#%%plot_spec_filter
 # savename = 'model_result_use_drz_Noisemap_subg2.pkl'
 # for folder in ['sim_lens_ID_subg30_702']:    
     
-for folder in folder_list[kernel_i*run_n:kernel_i*run_n+run_n]:
+# for folder in folder_list[kernel_i*run_n:kernel_i*run_n+run_n]:
+for folder in ['simulations_700_subg30/sim_lens_ID_subg30_718']:
 # for folder in folder_list:
     ID = folder[-3:]
     folder = folder + '/'
@@ -93,34 +94,34 @@ for folder in folder_list[kernel_i*run_n:kernel_i*run_n+run_n]:
 ##        TD_err_l = TD_err_l[:2]
 ##        solver_type = 'THETA_E_PHI'
     
-    kwargs_constraints = {'joint_source_with_point_source': [[0, 0]],
+    kwargs_constraints = {#'joint_source_with_point_source': [[0, 0]],
                           'num_point_source_list': [len(kwargs_ps['ra_image'])],
                           'solver_type': solver_type,  # 'PROFILE', 'PROFILE_SHEAR', 'ELLIPSE', 'CENTER'
                           'Ddt_sampling': True
                                   }
-    if glob.glob(folder+savename) != []:    
+    if glob.glob(folder+savename) == []:    
         #Load the result from the first run:
 #        multi_band_list, kwargs_model, kwargs_result, chain_list, fix_setting = pickle.load(open(folder+'model_result.pkl','rb'))
 #        fixed_lens, fixed_source, fixed_lens_light, fixed_ps, fixed_cosmo = fix_setting
         #Setting up the fitting:
         lens_data = pyfits.getdata(folder+'Drz_QSO_image.fits')
-        # len_std = pyfits.getdata(folder+'noise_map.fits')
+        len_std = pyfits.getdata(folder+'noise_map.fits')
         lens_mask = cr_mask(lens_data, 'normal_mask.reg')
         framesize = 81
         ct = int((len(lens_data) - framesize)/2)
         lens_data = lens_data[ct:-ct,ct:-ct]
-        # len_std = len_std[ct:-ct,ct:-ct]
+        len_std = len_std[ct:-ct,ct:-ct]
         lens_mask = (1-lens_mask)[ct:-ct,ct:-ct]
-        plt.imshow(lens_data, origin='lower',cmap='gist_heat', norm=LogNorm())
+        plt.imshow(lens_data * lens_mask, origin='lower',cmap='gist_heat', norm=LogNorm())
         plt.colorbar()
         exp_time = 599.* 2 * 8
-        stdd =  0.0008  #Measurement from empty retion, 0.016*0.08**2/0.13**2/np.sqrt(8)
+        # stdd =  0.0008  #Measurement from empty retion, 0.016*0.08**2/0.13**2/np.sqrt(8)
         # vgrad = np.gradient(lens_data)
         # fulgrad = np.sqrt(vgrad[0]**2 + vgrad[1]**2)
         # len_std = (abs(lens_data/exp_time)+stdd**2)**0.5
         
         # len_std = len_std + fulgrad/fulgrad.max() * len_std.max()
-        len_std = (abs(lens_data/exp_time)*3+stdd**2)**0.5
+        # len_std = (abs(lens_data/exp_time)+stdd**2)**0.5
         deltaPix = 0.08
         
         x, y =find_loc_max(lens_data)
@@ -128,7 +129,13 @@ for folder in folder_list[kernel_i*run_n:kernel_i*run_n+run_n]:
 #        for i in range(len(x)):
 #            plt.plot(x[i], y[i], 'ro')
 #        plt.show()
-        x_s, y_s = [], []
+
+        QSO_pos= []
+        for i in range(len(x)):
+            QSO_pos.append([float(x[i]-0.5), float(y[i]-0.5)])
+        xy_index = np.indices((len(lens_data),len(lens_data)))
+        # for i in range(len(x)):
+
         count = 0
         for i in range(len(x)):
             x0, y0 =  (float(x[i]) - center) * deltaPix , (float(y[i]) - center) * deltaPix
@@ -139,7 +146,16 @@ for folder in folder_list[kernel_i*run_n:kernel_i*run_n+run_n]:
 #                print("shift: ", kwargs_ps['ra_image'][ds == ds.min()] - x0, kwargs_ps['dec_image'][ds == ds.min()]-y0)
                 kwargs_ps['ra_image'][ds == ds.min()] = x0
                 kwargs_ps['dec_image'][ds == ds.min()] = y0
+                # #Boost central noise
+                # if count == 0:
+                #     areas = (np.sqrt((QSO_pos[i][1]-xy_index[0])**2+(QSO_pos[i][0]-xy_index[1])**2) <3. )  # five piexls
+                # else:
+                #     areas += (np.sqrt((QSO_pos[i][1]-xy_index[0])**2+(QSO_pos[i][0]-xy_index[1])**2) <3. )  # five piexls
                 count += 1
+        # len_std = len_std * (areas == 0) + 10**6 * (areas != 0)
+        # plt.imshow(len_std, origin='low', norm=LogNorm(), vmax = 0.2)
+        # plt.show()                
+                
         if count!= len(kwargs_ps['ra_image']):
             raise ValueError("the PS positions is not assigned correctly")
         for i in range(len(kwargs_ps['ra_image'])):
@@ -158,7 +174,7 @@ for folder in folder_list[kernel_i*run_n:kernel_i*run_n+run_n]:
         kwargs_data['noise_map'] = len_std
         
         data_class = ImageData(**kwargs_data)
-        kwargs_psf = {'psf_type': 'PIXEL', 'kernel_point_source': psf, 'pixel_size': deltaPix, 'psf_error_map': np.ones_like(psf)*0.1}
+        kwargs_psf = {'psf_type': 'PIXEL', 'kernel_point_source': psf, 'pixel_size': deltaPix, 'psf_error_map': np.ones_like(psf)*0.01}
         psf_class = PSF(**kwargs_psf)
         
         #%%
@@ -212,21 +228,32 @@ for folder in folder_list[kernel_i*run_n:kernel_i*run_n+run_n]:
         kwargs_ps_sigma = [{'ra_image': 0.01 * np.ones(len(kwargs_ps_init[0]['ra_image'])), 'dec_image': 0.01 * np.ones(len(kwargs_ps_init[0]['ra_image']))}]
         kwargs_lower_ps = [{'ra_image': -10 * np.ones(len(kwargs_ps_init[0]['ra_image'])), 'dec_image': -10 * np.ones(len(kwargs_ps_init[0]['ra_image']))}]
         kwargs_upper_ps = [{'ra_image': 10* np.ones(len(kwargs_ps_init[0]['ra_image'])), 'dec_image': 10 * np.ones(len(kwargs_ps_init[0]['ra_image']))}]
+        ps_params = [kwargs_ps_init, kwargs_ps_sigma, fixed_ps, kwargs_lower_ps, kwargs_upper_ps]
         
         # Set cosmo
-        fixed_cosmo = {}
-        kwargs_cosmo_init = {'D_dt': TD_distance}
-        kwargs_cosmo_sigma = {'D_dt': 500}
-        kwargs_lower_cosmo = {'D_dt': TD_distance/2}
-        kwargs_upper_cosmo = {'D_dt': TD_distance*1.5}
-        cosmo_params = [kwargs_cosmo_init, kwargs_cosmo_sigma, fixed_cosmo, kwargs_lower_cosmo, kwargs_upper_cosmo]
-        ps_params = [kwargs_ps_init, kwargs_ps_sigma, fixed_ps, kwargs_lower_ps, kwargs_upper_ps]
+        fixed_special = {}
+        kwargs_special_init = {}
+        kwargs_special_sigma = {}
+        kwargs_lower_special = {}
+        kwargs_upper_special = {}
+        kwargs_special_init = {'D_dt': TD_distance}
+        kwargs_special_sigma = {'D_dt': 500}
+        kwargs_lower_special = {'D_dt': TD_distance/2}
+        kwargs_upper_special = {'D_dt': TD_distance*1.5}
+        #Suggested by Simon: 
+        astrometry_sigma = 0.005
+        ximg, yimg = kwargs_ps_init[0]['ra_image'], kwargs_ps_init[0]['dec_image']
+        kwargs_special_init['delta_x_image'], kwargs_special_init['delta_y_image'] = np.zeros_like(ximg), np.zeros_like(yimg)
+        kwargs_special_sigma['delta_x_image'], kwargs_special_sigma['delta_y_image'] = np.ones_like(ximg) * astrometry_sigma, np.ones_like(yimg) * astrometry_sigma
+        kwargs_lower_special['delta_x_image'], kwargs_lower_special['delta_y_image'] = np.ones_like(ximg) * (-1), np.ones_like(yimg) * (-1)
+        kwargs_upper_special['delta_x_image'], kwargs_upper_special['delta_y_image'] = np.ones_like(ximg) * (1), np.ones_like(yimg) * (1)
+        special_params = [kwargs_special_init, kwargs_special_sigma, fixed_special, kwargs_lower_special, kwargs_upper_special]
         
         kwargs_params = {'lens_model': lens_params,
                         'source_model': source_params,
                         'lens_light_model': lens_light_params,
                         'point_source_model': ps_params,
-                        'special': cosmo_params,
+                        'special': special_params,
                         'point_source_offset': True}
         
         # numerical options and fitting sequences
@@ -235,10 +262,10 @@ for folder in folder_list[kernel_i*run_n:kernel_i*run_n+run_n]:
         kwargs_likelihood = {'check_bounds': True,
                               'force_no_add_image': False,
                               'source_marg': False,
-                              'image_position_uncertainty': 0.005,
+                              'image_position_uncertainty': astrometry_sigma,
                               'astrometric_likelihood': True,
                               'check_matched_source_position': True,
-                              'source_position_tolerance': 0.001,
+                              'source_position_tolerance': 0.01,
                               'time_delay_likelihood': True,
                               'image_likelihood_mask_list': [lens_mask]
                                       }
@@ -260,6 +287,7 @@ for folder in folder_list[kernel_i*run_n:kernel_i*run_n+run_n]:
         start_time = time.time()
         fitting_kwargs_list_0 = [
                                 ['PSO', {'sigma_scale': 1., 'n_particles': 150, 'n_iterations': 200}],
+                                ['PSO', {'sigma_scale': 1., 'n_particles': 200, 'n_iterations': 400}],
                                 ['PSO', {'sigma_scale': 1., 'n_particles': 200, 'n_iterations': 400}]
                                 ]
         
@@ -285,17 +313,17 @@ for folder in folder_list[kernel_i*run_n:kernel_i*run_n+run_n]:
                                 ['MCMC', {'n_burn': 300, 'n_run': 400, 'walkerRatio': 6, 'sigma_scale': 0.1}],
                                 ]
         chain_list = fitting_seq.fit_sequence(fitting_kwargs_list_1)
-        kwargs_result = fitting_seq.best_fit()
+        kwargs_result_best = fitting_seq.best_fit()
         end_time = time.time()
         print(end_time - start_time, 'total time needed for computation')
         print('============ CONGRATULATION, YOUR JOB WAS SUCCESSFUL ================ ')
         #Save in pickle
-        fix_setting =  [fixed_lens, fixed_source, fixed_lens_light, fixed_ps, fixed_cosmo]
+        fix_setting =  [fixed_lens, fixed_source, fixed_lens_light, fixed_ps, fixed_special]
 #        cosmo = FlatLambdaCDM(H0=70, Om0=0.3, Ob0=0.)  #!!!Wrong cosmos
 #        td_cosmo = TDCosmography(z_l, z_s, kwargs_model, cosmo_fiducial=cosmo)
         # make instance of parameter class with given model options, constraints and fixed parameters #
-        param = Param(kwargs_model, fixed_lens, fixed_source, fixed_lens_light, fixed_ps, fixed_cosmo, 
-                      kwargs_lens_init=kwargs_result['kwargs_lens'], **kwargs_constraints)
+        param = Param(kwargs_model, fixed_lens, fixed_source, fixed_lens_light, fixed_ps, fixed_special, 
+                      kwargs_lens_init=kwargs_result_best['kwargs_lens'], **kwargs_constraints)
         sampler_type, samples_mcmc, param_mcmc, dist_mcmc  = chain_list[-1]
         mcmc_new_list = []
         labels_new = [r"$\gamma$", r"$D_{\Delta t}$","H$_0$" ]
@@ -311,10 +339,10 @@ for folder in folder_list[kernel_i*run_n:kernel_i*run_n+run_n]:
         
         pickle.dump([multi_band_list, kwargs_model, kwargs_result, chain_list, fix_setting, mcmc_new_list], open(folder+savename, 'wb'))
     #%%Print fitting result:
-    multi_band_list, kwargs_model, kwargs_result, chain_list, fix_setting, mcmc_new_list = pickle.load(open(folder+savename,'rb'))
+    multi_band_list, kwargs_model, kwargs_result_best, chain_list, fix_setting, mcmc_new_list = pickle.load(open(folder+savename,'rb'))
     fixed_lens, fixed_source, fixed_lens_light, fixed_ps, fixed_cosmo = fix_setting
     labels_new = [r"$\gamma$", r"$D_{\Delta t}$","H$_0$" ]
-    modelPlot = ModelPlot(multi_band_list, kwargs_model, kwargs_result, arrow_size=0.02, cmap_string="gist_heat")
+    modelPlot = ModelPlot(multi_band_list, kwargs_model, kwargs_result_best, arrow_size=0.02, cmap_string="gist_heat")
     f, axes = modelPlot.plot_main()
     f.show()
     # f, axes = modelPlot.plot_separate()

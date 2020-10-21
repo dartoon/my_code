@@ -25,22 +25,39 @@ from mask_objects import find_loc_max
 
 result_dic = {}
 
+
+from astropy.cosmology import FlatLambdaCDM
+from lenstronomy.Cosmo.lens_cosmo import LensCosmo
+def cal_Ddt(zl, zs, H0_ini=100, om=0.27):
+    cosmo = FlatLambdaCDM(H0=H0_ini, Om0=0.27) 
+    lensunits=LensCosmo(z_lens=zl, z_source=zs,cosmo= cosmo)
+    D_l=lensunits.dd
+    D_s=lensunits.ds
+    D_ls=lensunits.dds
+    Ddt_corr = (1+zl)*D_l*D_s/D_ls
+    return Ddt_corr
+
+def cal_h0(zl, zs, Ddt, om=0.27):
+    Ddt_corr = cal_Ddt(zl, zs, H0_ini=100)
+    ratio = Ddt_corr/Ddt
+    return 100 * ratio
+
 # folder_list = use_folder #['simulations_700_subg30/sim_lens_noqso_ID_subg30_' + use_folder[i][-3:] for i in range(len(use_folder))]
 # folder_list = ['simulations_700_subg30/sim_lens_noqso_ID_subg30_' + use_folder[i][-3:] for i in range(len(use_folder))]
 
-# # # folder_type  = folder_list[0][:-3]
-# # # file_type = 'model_result_use_drz_Noisemap_subg3.pkl'
+# # folder_type  = folder_list[0][:-3]
+# # file_type = 'model_result_use_drz_Noisemap_subg3.pkl'
+# file_type = 'model_result_calNoiseMap_modNoisemap_boostPossionx3_subg3.pkl'
 # # file_type = 'model_result_calNoiseMap_modNoisemap_boostPossionx3_subg3.pkl'
-# # # file_type = 'model_result_calNoiseMap_modNoisemap_boostPossionx3_subg3.pkl'
-# file_type = 'result_modNoisemap_boostPossionx3_subg3.pkl'
-# folder_type = 'simulations_700_subg30/sim_lens_ID_subg30_'
+file_type = 'result_modNoisemap_boostPossionx3_subg3.pkl'
+folder_type = 'simulations_700_subg30/sim_lens_ID_subg30_'
 
 
-# # # file_type = 'model_result_subg3.pkl'
-# file_type = 'model_result_calNoiseMap_modNoisemap_boostPossionx8_noPSFerr_subg2_fixgamma.pkl'
-# # file_type = 'model_result_calNoiseMap_modNoisemap_useGrad_noPSFerr_subg3.pkl'
-file_type = 'result_calNoiseMap_modNoisemap_boostPossionx8_noPSFerr_subg3.pkl'
-folder_type = 'simulations_700_subg30/sim_lens_noqso_ID_subg30_'
+# # # # file_type = 'model_result_subg3.pkl'
+# # file_type = 'model_result_calNoiseMap_modNoisemap_boostPossionx8_noPSFerr_subg2_fixgamma.pkl'
+# # # file_type = 'model_result_calNoiseMap_modNoisemap_useGrad_noPSFerr_subg3.pkl'
+# file_type = 'result_calNoiseMap_modNoisemap_boostPossionx8_noPSFerr_subg3.pkl'
+# folder_type = 'simulations_700_subg30/sim_lens_noqso_ID_subg30_'
 
 
 folder_list = glob.glob(folder_type+'*')
@@ -78,7 +95,7 @@ for folder in folder_list:
     multi_band_list, kwargs_model, kwargs_result, chain_list, fix_setting, mcmc_new_list = pickle.load(open(read_file,'rb'))
     fixed_lens, fixed_source, fixed_lens_light, fixed_ps, fixed_cosmo = fix_setting
     mcmc_new_list = np.array(mcmc_new_list)
-    H0_list = mcmc_new_list[:,-1]
+    H0i_list = mcmc_new_list[:,-1]
     
     lens_data = pyfits.getdata(folder+'Drz_QSO_image.fits')
     lens_mask = cr_mask(lens_data, 'normal_mask.reg')
@@ -111,11 +128,9 @@ for folder in folder_list:
     n_data = modelPlot._imageModel.num_data_evaluate
     chisq = -logL * 2 / n_data
     
-    #!!!
-    kwargs_result['kwargs_lens'][0]['gamma'] = np.median(chain_list[-1][1][:,0])
     
     if chisq< 0.0:
-        print(folder[-4:-1], round(np.median(H0_list), 3))
+        print(folder[-4:-1], round(np.median(H0i_list), 3))
         f, axes = modelPlot.plot_main()
         f.show()
         plt.show()
@@ -125,8 +140,12 @@ for folder in folder_list:
     truth_dic['kwargs_lens_light'] =kwargs_lens_light_list
     truth_dic['kwargs_ps'] = kwargs_ps
     truth_dic['D_dt'] = TD_distance
+    
+    #!!!
+    H0i_list = cal_h0(z_l, z_s, kwargs_result['kwargs_special']['D_dt'])
+
     result_dic[folder[:-1]] = [truth_dic, kwargs_result, 
-                               [np.percentile(H0_list,16), np.percentile(H0_list,50), np.percentile(H0_list,84)], 
+                               [H0i_list-2, H0i_list-2, H0i_list+2], 
                                (np.percentile(chain_list[-1][1][:,0],84) - np.percentile(chain_list[-1][1][:,0],16))/2, chisq]
     chisq_list.append(chisq)
 

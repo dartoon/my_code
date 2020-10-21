@@ -15,11 +15,11 @@ geometry_mismatch_list = []
     #folder_type = 'sim_lens_ID_'
     #file_type = 'model_result.pkl'
 
-folder_type = 'simulations_700_subg30/sim_lens_ID_subg30_'
-file_type = 'result_modNoisemap_boostPossionx3_subg3.pkl'
+# folder_type = 'simulations_700_subg30/sim_lens_ID_subg30_'
+# file_type = 'result_modNoisemap_boostPossionx3_subg3.pkl'
 
-# folder_type = 'simulations_700_subg30/sim_lens_noqso_ID_subg30_'
-# file_type = 'result_calNoiseMap_modNoisemap_boostPossionx8_noPSFerr_subg3.pkl'
+folder_type = 'simulations_700_subg30/sim_lens_noqso_ID_subg30_'
+file_type = 'result_calNoiseMap_modNoisemap_boostPossionx8_noPSFerr_subg3.pkl'
 
 import glob
 folder_list = glob.glob(folder_type+'*')
@@ -59,11 +59,11 @@ for folder in folder_list:
     kwargs_lens_list_infe = kwargs_result['kwargs_lens']
     if kwargs_result['kwargs_ps'] != []:
         x_image_infe, y_image_infe = kwargs_result['kwargs_ps'][0]['ra_image'], kwargs_result['kwargs_ps'][0]['dec_image']
-    else:    
-        ID = folder[-3:]
-        qso_folder = folder_type[:-16] + 'ID_subg30_{0}/'.format(ID)
-        _, _, kwargs_result_withQSO, _, _, _ = pickle.load(open(qso_folder+'model_result_calNoiseMap_modNoisemap_boostPossionx3_subg3.pkl','rb'))
-        x_image_infe, y_image_infe = kwargs_result_withQSO['kwargs_ps'][0]['ra_image'], kwargs_result_withQSO['kwargs_ps'][0]['dec_image']
+    # else:    
+    #     ID = folder[-3:]
+    #     qso_folder = folder_type[:-16] + 'ID_subg30_{0}/'.format(ID)
+    #     _, _, kwargs_result_withQSO, _, _, _ = pickle.load(open(qso_folder+'model_result_calNoiseMap_modNoisemap_boostPossionx3_subg3.pkl','rb'))
+    #     x_image_infe, y_image_infe = kwargs_result_withQSO['kwargs_ps'][0]['ra_image'], kwargs_result_withQSO['kwargs_ps'][0]['dec_image']
     
     source_pos_infe = [kwargs_result['kwargs_source'][0]['center_x'], kwargs_result['kwargs_source'][0]['center_y']]
     potential_infe = lens_model_class.potential(x_image_infe, y_image_infe, kwargs=kwargs_lens_list_infe)

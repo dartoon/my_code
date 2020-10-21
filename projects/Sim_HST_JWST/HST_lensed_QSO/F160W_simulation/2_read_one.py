@@ -47,12 +47,12 @@ def cal_h0(zl, zs, Ddt, om=0.27):
     ratio = Ddt_corr/Ddt
     return 100 * ratio
 
-# # # folder_type  = folder_list[0][:-3]
-# # # file_type = 'model_result_use_drz_Noisemap_subg3.pkl'
+# # folder_type  = folder_list[0][:-3]
+# # file_type = 'model_result_use_drz_Noisemap_subg3.pkl'
+# file_type = 'model_result_calNoiseMap_modNoisemap_boostPossionx3_subg3.pkl'
 # # file_type = 'model_result_calNoiseMap_modNoisemap_boostPossionx3_subg3.pkl'
-# # # file_type = 'model_result_calNoiseMap_modNoisemap_boostPossionx3_subg3.pkl'
-# file_type = 'result_modNoisemap_boostPossionx3_subg3.pkl'
-# folder_type = 'simulations_700_subg30/sim_lens_ID_subg30_'
+file_type = 'result_modNoisemap_boostPossionx3_subg3.pkl'
+folder_type = 'simulations_700_subg30/sim_lens_ID_subg30_'
 
 
 # # # # file_type = 'model_result_subg3.pkl'
@@ -70,8 +70,8 @@ folder_list = folder_list[:test_numer]
 # for folder in folder_list:
 # for folder in ['simulations_700_subg30/sim_lens_ID_subg30_718']:   #Gamma strongly biased.
 # for folder in ['simulations_700_subg30/sim_lens_ID_subg30_724']:   #Chisq large
-# for folder in ['simulations_700_subg30/sim_lens_ID_subg30_758']: 
-for folder in ['simulations_700_subg30/sim_lens_ID_subg30_740']:  #larger gamma bias, but small H0 bias
+for folder in ['simulations_700_subg30/sim_lens_ID_subg30_758']: 
+# for folder in ['simulations_700_subg30/sim_lens_ID_subg30_740']:  #larger gamma bias, but small H0 bias
     ID = folder[-3:]
     folder = folder + '/'
     print(folder)

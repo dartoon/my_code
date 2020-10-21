@@ -67,7 +67,7 @@ folder_list = folder_list[:test_numer]
 
 
 # for folder in folder_list[kernel_i*run_n:kernel_i*run_n+run_n]:
-for folder in [folder_list[47]]:
+for folder in [folder_list[-3]]:
     ID = folder[-3:]
     folder = folder + '/'
     print(folder)
