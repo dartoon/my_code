@@ -53,9 +53,9 @@ def cal_filt_flam(array_spec, fil):
 
 #Download from SDSS: http://classic.sdss.org/dr5/algorithms/spectemplates/
 filename_p  = 'sdss_temp/spDR2-029.fit'  #QSO ID: 30
-#filename_p  = 'sdss_temp/spDR2-030.fit'  #QSO with some BAL activity (QSO)
-#filename_p  = 'sdss_temp/spDR2-031.fit'  #QSO with some BAL activity (QSO)
-#filename_p  = 'sdss_temp/spDR2-032.fit'  #High-luminosity QSO (QSO) !!! Not work, no short Wavelen information
+# filename_p  = 'sdss_temp/spDR2-030.fit'  #QSO with some BAL activity (QSO)
+# filename_p  = 'sdss_temp/spDR2-031.fit'  #QSO with some BAL activity (QSO)
+# filename_p  = 'sdss_temp/spDR2-032.fit'  #High-luminosity QSO (QSO) !!! Not work, no short Wavelen information
 hdul = pyfits.open(filename_p)
 spec_header = hdul[0].header
 spec_data = hdul[0].data
@@ -79,10 +79,10 @@ plt.scatter(1450, array_spec[idx,1], c='r')
 plt.tick_params(labelsize=15)
 plt.xlabel("A",fontsize=27)
 plt.ylabel(r"f$_\lambda$ erg/s/cm$^2$/$\AA$",fontsize=27)
-plt.close()
+plt.show()
 
 #%%Shift to redshift z = 6 and norm based on M1450 value
-ID = 6 #1, 2, 3, 4, 5
+ID = 2 #1, 2, 3, 4, 5
 #The data information of the five system
 if ID ==1:
     M1450, m_zAB, m_yAB, z, M_dyn = -23.82, 22.775, 22.942, 6.10, 82.
