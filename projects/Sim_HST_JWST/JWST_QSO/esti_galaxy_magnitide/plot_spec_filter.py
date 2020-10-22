@@ -46,7 +46,6 @@ for i in range(len(table_spec)):
     array_spec[i, :] = table_spec[i]
 
 #%%
-
 sov_jwst_f144w_fil = np.loadtxt('../esti_filter_magnitude/JWST_NIRCam.F{0}W.dat'.format(filt))
 sov_jwst_f144w_fil[:,1] = sov_jwst_f144w_fil[:,1]/sov_jwst_f144w_fil[:,1].max()* array_spec[:,2].max()/6
 
