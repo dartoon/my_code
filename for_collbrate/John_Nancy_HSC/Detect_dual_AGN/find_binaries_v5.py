@@ -10,7 +10,7 @@ import astropy.io.fits as pyfits
 # import matplotlib
 # matplotlib.use('Agg')
 import matplotlib.pyplot as plt
-import os, copy, glob
+import sys, os, copy, glob
 from subprocess import call
 from matplotlib.colors import LogNorm
 from decomprofile.tools.measure_tools import find_loc_max, measure_FWHM, twoD_Gaussian, fit_data_twoD_Gaussian #, esti_bgkstd
