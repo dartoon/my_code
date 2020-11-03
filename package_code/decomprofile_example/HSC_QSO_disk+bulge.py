@@ -33,7 +33,7 @@ data_process = DataProcess(fov_image = fov_image, fov_noise_map = err_data, targ
 
 data_process.noise_map = err_data
 
-data_process.generate_target_materials(radius=35, create_mask = False, nsigma=2.8,
+data_process.generate_target_materials(radius=None, create_mask = False, nsigma=2.8,
                                       exp_sz= 1.2, npixels = 15, if_plot=False)
 
 data_process.PSF_list = [PSF]
