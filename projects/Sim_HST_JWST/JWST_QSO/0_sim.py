@@ -30,7 +30,7 @@ oversample = 4
 #seed = 0
 zp_dic = {'F444W':27.3012, 'F356W':27.1841, 'F200W':27.0383, 'F150W':26.8627} #Using mirage
 for seed in range(301,321):
-    for ID in range(1,7): #int(input("input simulation ID:\n"))  #The ID for this simulation
+    for ID in [2,4,6]: #range(1,7): #int(input("input simulation ID:\n"))  #The ID for this simulation
         host_flux_rescale = False
         count = 0 
         for filt_i in [3,2,1,0]: #int(input("which filter 0: 'F444W', 1: 'F356W', 2: 'F200W', 3: 'F150W':\n"))
@@ -43,14 +43,15 @@ for seed in range(301,321):
             z_s = qso_info['ID'+repr(ID)]['z']       #AGN redshift
             point_mag = qso_info['ID'+repr(ID)]['AGN_{0}_mag'.format(filt)]
             host_mag = qso_info['ID'+repr(ID)]['galaxy_{0}_mag'.format(filt)]
-            # host_n = np.random.uniform(2,4)   #Host effective radius, unit: Kpc
-            # host_Reff_kpc = np.random.uniform(2,3)   #Host effective radius, unit: Kpc
-            host_n = 4  #Host effective radius, unit: Kpc
-            host_Reff_kpc = np.random.uniform(1,2)   #Host effective radius, unit: Kpc            
+            host_n = np.random.uniform(1,4)   #Host effective radius, unit: Kpc
+            host_Reff_kpc = np.random.uniform(1,3)   #Host effective radius, unit: Kpc
+            # host_n = 4  #Host effective radius, unit: Kpc
+            # host_Reff_kpc = np.random.uniform(1,2)   #Host effective radius, unit: Kpc            
             q = np.random.uniform(0.5,0.9)
             phi = np.random.uniform(0.,2*np.pi)            
             #host_ratio = np.random.uniform(0.4, 0.7) #Set the random host flux ratio [40% - 70%].
             host_flux = 10**(0.4*(zp - host_mag))
+<<<<<<< HEAD
             
             # point_flux = 10**(0.4*(zp - point_mag))
             # total_flux =  point_flux + host_flux
@@ -78,6 +79,35 @@ for seed in range(301,321):
                 host_flux = host_flux_F150W * ratio
                 total_flux =  point_flux + host_flux
                 host_ratio = host_flux/total_flux                
+=======
+            # point_flux = 10**(0.4*(zp - point_mag))
+            # total_flux =  point_flux + host_flux
+            
+            total_flux = 10**(0.4*(zp - point_mag))
+            point_flux = total_flux - host_flux
+            host_ratio = host_flux/total_flux
+            
+            # if count == 0:
+            #     if host_ratio< 0.1:
+            #         host_ratio =np.random.uniform(0.1,0.2)
+            #         total_flux = point_flux/(1-host_ratio)
+            #         host_flux = total_flux - point_flux
+            #         host_flux_rescale = True
+            #     elif host_ratio > 0.95:
+            #         host_ratio =np.random.uniform(0.8,0.95)
+            #         total_flux = point_flux/(1-host_ratio)
+            #         host_flux = total_flux - point_flux
+            #         host_flux_rescale = True
+            #     host_flux_F150W = host_flux   
+            #     ref_filt = filt
+            # if host_flux_rescale == True:
+            #     temp_flux_F150w = 10**(0.4*(zp_dic[ref_filt] - qso_info['ID'+repr(ID)]['galaxy_{0}_mag'.format(ref_filt)]))
+            #     temp_flux = 10**(0.4*(zp - qso_info['ID'+repr(ID)]['galaxy_{0}_mag'.format(filt)]))
+            #     ratio = temp_flux/temp_flux_F150w
+            #     host_flux = host_flux_F150W * ratio
+            #     total_flux =  point_flux + host_flux
+            #     host_ratio = host_flux/total_flux                
+>>>>>>> 38e37a1a44a1b258fca809fe3bdda3448622fdbb
             count = count+1    
             cosmo = FlatLambdaCDM(H0=70, Om0=0.3)
             scale_relation = cosmo.angular_diameter_distance(z_s).value * 10**3 * (1/3600./180.*np.pi)  #Kpc/arc
@@ -120,14 +150,14 @@ for seed in range(301,321):
             e1, e2 = param_util.phi_q2_ellipticity(phi=phi, q=q)
             kwargs_numerics = {'supersampling_factor': 2, 'supersampling_convolution': False}
             kwargs_sersic_medi = {'amp': 1. , 'n_sersic': host_n, 'R_sersic': host_Reff/np.sqrt(q), 'e1': e1, 'e2': e2,
-                             'center_x': center_x, 'center_y': center_y}
+                              'center_x': center_x, 'center_y': center_y}
             kwargs_host_medi = [kwargs_sersic_medi]
             imageModel = ImageModel(data_class, psf_class, lens_light_model_class=lightModel,
                                             point_source_class=pointSource, kwargs_numerics=kwargs_numerics)
             medi_host_flux = np.sum(imageModel.image(kwargs_lens_light=kwargs_host_medi, unconvolved=True))
             amp = 1. / medi_host_flux * host_flux
             kwargs_sersic = {'amp': amp, 'n_sersic': host_n, 'R_sersic': host_Reff/np.sqrt(q), 'e1': e1, 'e2': e2,
-                             'center_x': center_x, 'center_y': center_y}
+                              'center_x': center_x, 'center_y': center_y}
             kwargs_host = [kwargs_sersic]
             
             ## simulate image with the parameters we have defined above #
@@ -191,7 +221,7 @@ for seed in range(301,321):
             rms = np.zeros_like(total_image_bin) #input rms
             noiz = np.zeros_like(total_image_bin) #input noiz
             image_data_noise=np.zeros_like(total_image_bin) #image after noiz
-            exptim= 312.5   #units of seconds. 
+            exptim= 125.   #units of seconds. 
             stdd = [1.6, 1.06, 0.77, 0.75][filt_i] /np.sqrt(exptim)   #An empirical formula from ETC
             for i in range(len(pattern_x)):
                 rms[i]=(bf_noz[i]/(exptim)+stdd**2)**0.5 #RMS not saved, thus its value not used here
