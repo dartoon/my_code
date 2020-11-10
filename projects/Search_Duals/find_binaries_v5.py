@@ -22,9 +22,14 @@ from decomprofile.fitting_process import FittingProcess
 #image_RA = float(sys.argv[2]) #214.15602111816406
 #image_DEC = float(sys.argv[3]) #0.5645210146903992
 
-image_ID ='100043.13+020637.2' 
-image_RA = 150.1797789
-image_DEC = 2.110369603
+# image_ID ='100043.13+020637.2' 
+# image_RA = 150.1797789
+# image_DEC = 2.110369603
+
+image_ID ='010048.81+021604.0'
+image_RA = 15.2033809 
+image_DEC = 2.2677925
+
 
 print(image_ID, image_RA, image_DEC)
 
@@ -62,8 +67,8 @@ for i in range(len(band_seq)):
         err_data= fitsFile[3].data ** 0.5
         
         file_header0 = fitsFile[0].header
-        FLUXMAG0 = file_header0['FLUXMAG0']
-        zp =  2.5 * np.log10(FLUXMAG0)   # This is something Xuheng can't make sure.
+        # FLUXMAG0 = file_header0['FLUXMAG0']
+        zp =  27.0 #2.5 * np.log10(FLUXMAG0)   # This is something Xuheng can't make sure.
         
         data_process_i = DataProcess(fov_image = fov_image, fov_noise_map = err_data, target_pos = [image_RA, image_DEC],
                                    pos_type = 'wcs', header = header,
@@ -87,7 +92,6 @@ for i in range(len(band_seq)):
 
 #%%
 for k in run_list:  #['G', 'R', 'I', 'Z', 'Y']
-    print("Fiting the: "+ filename_list[k])
     if_dual = False
     QSO_img = data_process_list[k].target_stamp
     x, y = find_loc_max(QSO_img, neighborhood_size = 3, threshold = 1)
@@ -138,6 +142,7 @@ for k in run_list:  #['G', 'R', 'I', 'Z', 'Y']
                 plt.close()
             
     if if_dual == True and fit_data == True:
+        print("Fiting the: "+ filename_list[k])
         print(claim)
         print("Comparing the fitting Chisq:")
         write_result =  open('fit_result_detect/{0}/fit_result.txt'.format(qsoid),'w') 

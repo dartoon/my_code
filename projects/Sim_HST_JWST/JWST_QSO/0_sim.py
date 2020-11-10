@@ -51,10 +51,13 @@ for seed in range(301,321):
             phi = np.random.uniform(0.,2*np.pi)            
             #host_ratio = np.random.uniform(0.4, 0.7) #Set the random host flux ratio [40% - 70%].
             host_flux = 10**(0.4*(zp - host_mag))
-            point_flux = 10**(0.4*(zp - point_mag))
-            total_flux =  point_flux + host_flux
-            host_ratio = host_flux/total_flux
             
+            # point_flux = 10**(0.4*(zp - point_mag))
+            # total_flux =  point_flux + host_flux
+            total_flux = 10**(0.4*(zp - point_mag))
+            point_flux =  total_flux - host_flux
+            
+            host_ratio = host_flux/total_flux
             if count == 0:
                 if host_ratio< 0.1:
                     host_ratio =np.random.uniform(0.1,0.2)

@@ -28,19 +28,19 @@ result_dic = {}
 # folder_list = use_folder #['simulations_700_subg30/sim_lens_noqso_ID_subg30_' + use_folder[i][-3:] for i in range(len(use_folder))]
 # folder_list = ['simulations_700_subg30/sim_lens_noqso_ID_subg30_' + use_folder[i][-3:] for i in range(len(use_folder))]
 
-# # # folder_type  = folder_list[0][:-3]
-# # # file_type = 'model_result_use_drz_Noisemap_subg3.pkl'
+# # folder_type  = folder_list[0][:-3]
+# # file_type = 'model_result_use_drz_Noisemap_subg3.pkl'
+# file_type = 'model_result_calNoiseMap_modNoisemap_boostPossionx3_subg3.pkl'
 # # file_type = 'model_result_calNoiseMap_modNoisemap_boostPossionx3_subg3.pkl'
-# # # file_type = 'model_result_calNoiseMap_modNoisemap_boostPossionx3_subg3.pkl'
-# file_type = 'result_modNoisemap_boostPossionx3_subg3.pkl'
-# folder_type = 'simulations_700_subg30/sim_lens_ID_subg30_'
+file_type = 'result_modNoisemap_boostPossionx3_subg3.pkl'
+folder_type = 'simulations_700_subg30/sim_lens_ID_subg30_'
 
 
-# # # file_type = 'model_result_subg3.pkl'
-# file_type = 'model_result_calNoiseMap_modNoisemap_boostPossionx8_noPSFerr_subg2_fixgamma.pkl'
-# # file_type = 'model_result_calNoiseMap_modNoisemap_useGrad_noPSFerr_subg3.pkl'
-file_type = 'result_calNoiseMap_modNoisemap_boostPossionx8_noPSFerr_subg3.pkl'
-folder_type = 'simulations_700_subg30/sim_lens_noqso_ID_subg30_'
+# # # # file_type = 'model_result_subg3.pkl'
+# # file_type = 'model_result_calNoiseMap_modNoisemap_boostPossionx8_noPSFerr_subg2_fixgamma.pkl'
+# # # file_type = 'model_result_calNoiseMap_modNoisemap_useGrad_noPSFerr_subg3.pkl'
+# file_type = 'result_calNoiseMap_modNoisemap_boostPossionx8_noPSFerr_subg3.pkl'
+# folder_type = 'simulations_700_subg30/sim_lens_noqso_ID_subg30_'
 
 
 folder_list = glob.glob(folder_type+'*')
