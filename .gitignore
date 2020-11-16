@@ -75,3 +75,7 @@ for_collbrate/Shenli_host_masses/MCMC_fits/*/*
 package_code/cookiecutter-pypackage/
 projects/Search_Duals/initial_1k/*
 *.pages
+projects/GSF_esti_stellar_mass/TDCOSMO_esti_temp/*
+*.asc
+package_code/decomprofile_example/000017.88+002612.6_result.txt
+package_code/decomprofile_example/run_batch_job.sh
