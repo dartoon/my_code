@@ -30,13 +30,17 @@ file_type = 'result_PSFerr001_PSFinter_subg3.pkl'
 folder_type = 'simulations_700_subg30/sim_lens_ID_subg30_'
 
 
-# file_type = 'result_PSFerr001_subg3.pkl'
-# folder_type = 'simulations_700_subg30/sim_lens_noqso_ID_subg30_'
+file_type = 'result_PSFerr001_subg3.pkl'
+folder_type = 'simulations_700_subg30/sim_lens_noqso_ID_subg30_'
 
 
 folder_list = glob.glob(folder_type+'*')
 folder_list.sort()
-test_numer = 40 #len(folder_list)
+outlier = [736, 728, 748, 710, 715]
+folder_list = [folder_list[i] for i in range(len(folder_list)) if int(folder_list[i][-3:]) not in outlier]
+
+
+test_numer = len(folder_list)
 folder_list = folder_list[:test_numer]
 
 id_range = int(folder_list[0][-3:]), int(folder_list[-1][-3:])
@@ -202,7 +206,8 @@ for folder in folder_list:
     #    ax.set_xticks(range(id_range[0]-1, id_range[1]+1,3)) 
 plt.xlabel(which[1]+" bias (inferred - truth)", fontsize=27)
 plt.ylabel("$H_0$ bias (inferred - truth)", fontsize=27)
-plt.ylim(-20,30)
+plt.ylim(-20,20)
+plt.xlim(-0.2, 0.2)
 plt.tick_params(labelsize=20)
 plt.show()
 
