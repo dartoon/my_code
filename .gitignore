@@ -74,3 +74,4 @@ for_collbrate/Shenli_host_masses/Initial_fits/*
 for_collbrate/Shenli_host_masses/MCMC_fits/*/*
 package_code/cookiecutter-pypackage/
 projects/Search_Duals/initial_1k/*
+*.pages
