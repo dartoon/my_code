@@ -18,24 +18,34 @@ from decomprofile.data_process import DataProcess
 from decomprofile.fitting_specify import FittingSpeficy
 from decomprofile.fitting_process import FittingProcess
 
-#image_ID = sys.argv[1] #'141637.44+003352.2' 
-#image_RA = float(sys.argv[2]) #214.15602111816406
-#image_DEC = float(sys.argv[3]) #0.5645210146903992
+image_ID = sys.argv[1] #'141637.44+003352.2' 
+image_RA = float(sys.argv[2]) #214.15602111816406
+image_DEC = float(sys.argv[3]) #0.5645210146903992
 
 # image_ID ='100043.13+020637.2' 
 # image_RA = 150.1797789
 # image_DEC = 2.110369603
 
-image_ID ='010048.81+021604.0'
-image_RA = 15.2033809 
-image_DEC = 2.2677925
+# image_ID ='010048.81+021604.0'
+# image_RA = 15.2033809 
+# image_DEC = 2.2677925
 
+# # run_line = [5069, 5070, 5086, 5093, 5096, 5110][1]
+# run_line = 0
+# targets_info = open("QSO_id_file.txt", "r")
+# targets_info = targets_info.read().split('\n')
+# info = copy.deepcopy(targets_info[run_line])
+# info = info.split(' ')
+# info = [info[i] for i in range(len(info)) if info[i] != '']
+# image_ID, image_RA, image_DEC = info[:3]
+# image_RA, image_DEC = float(image_RA), float(image_DEC)
 
+#%%
 print(image_ID, image_RA, image_DEC)
 
 deep_seed = True  #Set as True to put more seed and steps to fit,
 show_plot = 1
-fit_data = False  #If you simply want to do the search without fitting, set False
+fit_data = True  #If you simply want to do the search without fitting, set False
 
 image_folder = './images_directory/'
     
@@ -92,56 +102,61 @@ for i in range(len(band_seq)):
 
 #%%
 for k in run_list:  #['G', 'R', 'I', 'Z', 'Y']
-    if_dual = False
     QSO_img = data_process_list[k].target_stamp
-    x, y = find_loc_max(QSO_img, neighborhood_size = 3, threshold = 1)
+    x, y = find_loc_max(QSO_img, neighborhood_size = 4, threshold = 4)
     arr_x, arr_y = np.asarray(x, dtype=float), np.asarray(y, dtype=float)
     center = len(QSO_img)/2
     bool_x, bool_y = (arr_x>(center-18))*(arr_x<(center+18)), (arr_y>(center-18))*(arr_y<(center+18))
     arr_x = arr_x[bool_x*bool_y]
     arr_y = arr_y[bool_x*bool_y]
+    #Remove arr_x's elememt if the corresponding pixel is too faint:
+    arr_bool = np.array([True] * len(arr_x), dtype=bool)
+    for i in range(len(arr_x)):
+        if QSO_img[int(arr_y[i]), int(arr_x[i])] < 3.0 :
+            arr_bool[i] = False
+    arr_x = arr_x[arr_bool]
+    
     qsoid = filename_list[k].split('.fits')[0]
+    claim = ''
     if len(arr_x)>=2:
-        if_dual = True
-        claim = "This {0} is likely to be a {1} system (based on multi-peaks)!!!".format(filename_list[k], 'BH'*len(arr_x))
-    elif len(arr_x)==1:
-        twoD_Gau_p_PSF =  fit_data_twoD_Gaussian(data_process_list[k].PSF_list[0])
-        frz = int(center/2)
-        twoD_Gau_p_data = fit_data_twoD_Gaussian(QSO_img[frz:-frz,frz:-frz])
-        q_PSF = twoD_Gau_p_PSF[3]/twoD_Gau_p_PSF[4]
-        q_PSF = min(q_PSF, 1/q_PSF)
-        q_data = twoD_Gau_p_data[3]/twoD_Gau_p_data[4]
-        q_data = min(q_data, 1/q_data)
-        if abs((q_data-q_PSF)/q_PSF) > 0.15 :   #!!! Set the level as 15% mismatch to PSF
-            if_dual = True
-            claim = "This {0} is likely to have closed dual AGN pair (based on FWHM)!!!".format(filename_list[k])
-
-    if if_dual == True and os.path.exists('fit_result_detect/{0}/'.format(qsoid))==False:
-        os.mkdir('fit_result_detect/{0}/'.format(qsoid))
-        if len(arr_x)==1:
-            fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12.5, 10))
-            ax1.imshow(QSO_img[frz:-frz,frz:-frz], origin='lower', cmap='gist_heat', norm=LogNorm(), vmin=1.e-4 , vmax = np.max(QSO_img) )
-            ax1.set_title('Data')
-            QSO_2D_fitted = twoD_Gaussian(len(QSO_img[frz:-frz,frz:-frz]), *twoD_Gau_p_data)
-            ax2.imshow(QSO_2D_fitted.reshape(len(QSO_img[frz:-frz,frz:-frz]), len(QSO_img[frz:-frz,frz:-frz])), origin='lower', cmap='gist_heat', norm=LogNorm(), vmin=1.e-4 , vmax = np.max(QSO_img) )
-            ax2.set_title('fitted Gaussian Image')
-            plt.savefig('fit_result_detect/{0}/proof-2close.pdf'.format(qsoid))
-            if show_plot == 1:
-                plt.show()
-            else:
-                plt.close()
+        if os.path.exists('fit_result_detect/{0}/'.format(qsoid))==False:
+            os.mkdir('fit_result_detect/{0}/'.format(qsoid))
+        claim = claim+"\nThis {0} is likely to be a {1} system (based on multi-peaks)!!!".format(filename_list[k], 'BH'*len(arr_x))
+        plt.imshow(QSO_img, origin='low', norm=LogNorm())
+        for i in range(len(arr_x)):
+            plt.text(arr_x[i], arr_y[i],'BH{0}'.format(i))
+            plt.plot(arr_x[i], arr_y[i],'ro')
+        plt.savefig('fit_result_detect/{0}/proof-BHBH.pdf'.format(qsoid))
+        if show_plot == 1:
+            plt.show()
         else:
-            plt.imshow(QSO_img, origin='low', norm=LogNorm())
-            for i in range(len(arr_x)):
-                plt.text(arr_x[i], arr_y[i],'BH{0}'.format(i))
-                plt.plot(arr_x[i], arr_y[i],'ro')
-            plt.savefig('fit_result_detect/{0}/proof-BHBH.pdf'.format(qsoid))
-            if show_plot == 1:
-                plt.show()
-            else:
-                plt.close()
-            
-    if if_dual == True and fit_data == True:
+            plt.close()
+
+    #Fit central as twoD Gaussian Anyway.            
+    twoD_Gau_p_PSF =  fit_data_twoD_Gaussian(data_process_list[k].PSF_list[0])
+    frz = int(center/2)
+    twoD_Gau_p_data = fit_data_twoD_Gaussian(QSO_img[frz:-frz,frz:-frz])
+    q_PSF = twoD_Gau_p_PSF[3]/twoD_Gau_p_PSF[4]
+    q_PSF = min(q_PSF, 1/q_PSF)
+    q_data = twoD_Gau_p_data[3]/twoD_Gau_p_data[4]
+    q_data = min(q_data, 1/q_data)
+    if abs((q_data-q_PSF)/q_PSF) > 0.15 :   #!!! Set the level as 15% mismatch to PSF
+        if os.path.exists('fit_result_detect/{0}/'.format(qsoid))==False:
+            os.mkdir('fit_result_detect/{0}/'.format(qsoid))
+        claim = claim+"\nThis {0} is also likely to have closed dual AGN pair (based on FWHM)!!!".format(filename_list[k])
+        fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12.5, 10))
+        ax1.imshow(QSO_img[frz:-frz,frz:-frz], origin='lower', cmap='gist_heat', norm=LogNorm(), vmin=1.e-4 , vmax = np.max(QSO_img) )
+        ax1.set_title('Data')
+        QSO_2D_fitted = twoD_Gaussian(len(QSO_img[frz:-frz,frz:-frz]), *twoD_Gau_p_data)
+        ax2.imshow(QSO_2D_fitted.reshape(len(QSO_img[frz:-frz,frz:-frz]), len(QSO_img[frz:-frz,frz:-frz])), origin='lower', cmap='gist_heat', norm=LogNorm(), vmin=1.e-4 , vmax = np.max(QSO_img) )
+        ax2.set_title('fitted Gaussian Image')
+        plt.savefig('fit_result_detect/{0}/proof-2close.pdf'.format(qsoid))
+        if show_plot == 1:
+            plt.show()
+        else:
+            plt.close()
+
+    if os.path.exists('fit_result_detect/{0}/'.format(qsoid)) == True and fit_data == True:
         print("Fiting the: "+ filename_list[k])
         print(claim)
         print("Comparing the fitting Chisq:")
