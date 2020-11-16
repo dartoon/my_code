@@ -12,15 +12,15 @@ import astropy.io.fits as pyfits
 
 #%%
 import sys
-image_id = sys.argv[1] 
-band = sys.argv[2] 
-image_RA = float(sys.argv[3]) 
-image_DEC = float(sys.argv[4]) 
+# image_id = sys.argv[1] 
+# band = sys.argv[2] 
+# image_RA = float(sys.argv[3]) 
+# image_DEC = float(sys.argv[4]) 
 
-# image_id = '000017.88+002612.6'
-# band = 'I'
-# image_RA = 0.07452999800443649
-# image_DEC = 0.4368380010128021
+image_id = '000017.88+002612.6'
+band = 'I'
+image_RA = 0.07452999800443649
+image_DEC = 0.4368380010128021
 
 fitsFile = pyfits.open('../example_data/HSC/QSO/{0}_HSC-{1}.fits'.format(image_id, band))
 
@@ -61,10 +61,17 @@ savename = image_id+'-'+band
 fit_run = FittingProcess(fit_sepc, savename = savename)
 fit_run.run(algorithm_list = ['PSO'], setting_list = [None])  #Only PSO, not MCMC
 # fit_run.plot_all()
-fit_run.plot_final_galaxy_fit(target_ID= savename) 
+fit_run.plot_final_galaxy_fit(target_ID= savename, show_plot = False) 
 fit_run.translate_result()
 # fit_run.dump_result()  #To save result as pickle file
-print(fit_run.final_result_galaxy[0])
+# print(fit_run.final_result_galaxy[0])
+
+#%%
+filename_ascii = image_id + '_result.txt'
+_ascii =  open(filename_ascii,'w')
+_ascii.write(str(fit_run.final_result_galaxy[0]))
+_ascii.close()
+
 
 # #%%
 # # Test load pkl
