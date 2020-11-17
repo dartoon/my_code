@@ -11,7 +11,11 @@ import astropy.io.fits as pyfits
 import matplotlib.pyplot as plt
 import glob
 #To estimate the AB mag for a given stellar template
+
+
 filename  = 'SED_files_HSC_Y/summary_*_PA00.fits'
+# filename = '../Sim_HST_JWST/JWST_QSO/esti_galaxy_magnitide/f150w/summary_1503_PA00.fits'
+
 filename = glob.glob(filename)[0]
 hdul_sum = pyfits.open(filename)
 name_sum = hdul_sum[1].columns
@@ -25,6 +29,8 @@ stellar_ini = table_sum[1][stellar_idx] #stellar mass inferred, to be normed, in
 mel = table_sum[1][mel_idx] #Metallicity 
 
 filename_p  = 'SED_files_HSC_Y/SFH_*_PA00_param.fits'
+# filename_p  = '../Sim_HST_JWST/JWST_QSO/esti_galaxy_magnitide/f150w/SFH_1503_PA00_param.fits'
+
 filename_p = glob.glob(filename_p)[0]
 hdul = pyfits.open(filename_p)
 table = hdul[1].data
@@ -52,5 +58,7 @@ def esti_abmag(stellar , fnu_ini = fnu_ini, stellar_ini = stellar_ini):
     print('fnu', fnu)
     return ab_mag
 
-s_mass = 10.3
+M_dyn = 56. #For ID 3
+s_mass = np.log10(M_dyn * 10 **9) 
+# s_mass = 10.3
 print("stellar mass", s_mass, "esti, AB mag:", esti_abmag(s_mass))
