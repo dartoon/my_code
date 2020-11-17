@@ -11,7 +11,7 @@ import astropy.io.fits as pyfits
 import matplotlib.pyplot as plt
 import glob
 
-ID = 2 #1, 2, 3, 4, 5
+ID = 3 #1, 2, 3, 4, 5
 #The data information of the five system
 if ID ==1:
     M1450, m_zAB, m_yAB, z, M_dyn = -23.82, 22.775, 22.942, 6.10, 82.
@@ -74,7 +74,7 @@ for i in range(len(filt_l)):
     print("galaxy F{0}W mag:".format(filt), round(esti_abmag(s_mass, fnu_ini, stellar_ini),3))
 
 #%%Calcualte it's corresponding M1450:
-filt,ID = 444, 1
+filt = 444
 filename  = 'f{0}w/summary_{0}{1}_PA00.fits'.format(filt,ID)
 filename = glob.glob(filename)[0]
 hdul_sum = pyfits.open(filename)
@@ -87,7 +87,7 @@ z = table_sum[1][z_idx] #Redshift
 stellar_ini = table_sum[1][stellar_idx] #stellar mass inferred, to be normed, in M_star
 mel = table_sum[1][mel_idx] #Metallicity 
 
-spec1d = hdul_sum = pyfits.open("/Users/Dartoon/Astro/Packages/gsf/gsf/example/templates/gsf_spec_{0}{1}.fits".format(filt,ID))  
+spec1d = hdul_sum = pyfits.open("/Users/Dartoon/Astro/Packages/gsf_v1.3/gsf/example/templates/gsf_spec_{0}{1}.fits".format(filt,ID))  
 name_spec = spec1d[1].columns
 table_spec = spec1d[1].data
 # array_spec = np.zeros((len(table_spec), 7))

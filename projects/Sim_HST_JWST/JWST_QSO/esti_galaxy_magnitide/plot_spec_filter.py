@@ -22,7 +22,7 @@ import glob
 #mel_idx = [i for i in range(len(name_sum)) if 'logZsun' in str(name_sum[i])][0]
 #z = table_sum[1][z_idx] #Redshift
 #mel = table_sum[1][mel_idx] #Metallicity 
-ID = 1 #1, 2, 3, 4, 5
+ID = 3 #1, 2, 3, 4, 5
 filt = ['444','356', '200', '150'][3]
 color = {'150': 'cyan', '200':'lime', '356':'tomato', '444':'firebrick'}
 filename_p  = 'f{0}w/SFH_{0}{1}_PA00_param.fits'.format(filt,ID)
@@ -38,7 +38,7 @@ mel_idx = [i for i in range(len(name)) if 'Z_MW' in str(name[i])][0]
 mel = str(round(10**table[1][mel_idx],3)) # 'Mel:' Z*/Z_sun
 
 #%%
-spec1d = hdul_sum = pyfits.open("/Users/Dartoon/Astro/Packages/gsf/gsf/example/templates/gsf_spec_{0}{1}.fits".format(filt,ID))  
+spec1d = hdul_sum = pyfits.open("/Users/Dartoon/Astro/Packages/gsf_v1.3/gsf/example/templates/gsf_spec_{0}{1}.fits".format(filt,ID))  
 name_spec = spec1d[1].columns
 table_spec = spec1d[1].data
 array_spec = np.zeros((len(table_spec), 7))

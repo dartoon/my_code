@@ -82,7 +82,7 @@ plt.ylabel(r"f$_\lambda$ erg/s/cm$^2$/$\AA$",fontsize=27)
 plt.show()
 
 #%%Shift to redshift z = 6 and norm based on M1450 value
-ID = 2 #1, 2, 3, 4, 5
+ID = 3 #1, 2, 3, 4, 5
 #The data information of the five system
 if ID ==1:
     M1450, m_zAB, m_yAB, z, M_dyn = -23.82, 22.775, 22.942, 6.10, 82.
@@ -110,11 +110,11 @@ idx = np.where( abs(array_spec[:,0] - lam) == np.min(abs(array_spec[:,0] - lam))
 norm = f_lambda_1450/array_spec[idx, 1]
 array_spec[:,1] *= norm
 
-z_fil = np.loadtxt('/Users/Dartoon/Astro/Packages/gsf/gsf/example/filter/317.fil')
+z_fil = np.loadtxt('/Users/Dartoon/Astro/Packages/gsf_v1.3/gsf/example/filter/317.fil')
 z_fil = z_fil[:,1:]
 z_fil[:,1] = z_fil[:,1]/z_fil[:,1].max()* array_spec[:,1].max()/6
 
-y_fil = np.loadtxt('/Users/Dartoon/Astro/Packages/gsf/gsf/example/filter/318.fil')
+y_fil = np.loadtxt('/Users/Dartoon/Astro/Packages/gsf_v1.3/gsf/example/filter/318.fil')
 y_fil = y_fil[:,1:]
 y_fil[:,1] = y_fil[:,1]/y_fil[:,1].max()* array_spec[:,1].max()/6
 
