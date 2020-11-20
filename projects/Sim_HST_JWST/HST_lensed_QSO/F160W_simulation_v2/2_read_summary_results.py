@@ -7,12 +7,7 @@ Created on Tue Aug 29 21:20:09 2017
 """
 import numpy as np
 import matplotlib.pyplot as plt
-from matplotlib.colors import LogNorm
 import astropy.io.fits as pyfits
-import copy
-import time
-from lenstronomy.Util import constants as const
-import lenstronomy.Util.param_util as param_util
 import glob
 #file name:
 filt='f160w'
@@ -22,6 +17,10 @@ sys.path.insert(0,'../../../../py_tools/')
 from flux_profile import cr_mask
 from lenstronomy.Plots.model_plot import ModelPlot
 from mask_objects import find_loc_max
+
+import matplotlib as mat
+mat.rcParams['font.family'] = 'STIXGeneral'
+
 
 result_dic = {}
 
@@ -190,7 +189,13 @@ plt.ylim(-0.4,0.4)
 plt.tick_params(labelsize=20)
 plt.close()
 print(which[1], np.mean(gamma_bias_list), np.std(gamma_bias_list))
-fig, ax = plt.subplots(figsize=(11,8))
+
+#%%
+if 'noqso' in folder_type:
+    text = 'non-AGN'
+else:
+    text = 'AGN'
+fig, ax = plt.subplots(figsize=(8,8))
 for folder in folder_list:
     ID = folder[-3:]
     key = folder_type + '{0}'.format(ID)
@@ -202,13 +207,17 @@ for folder in folder_list:
         # plt.errorbar(gamma_bias, H0[1] - H0_true,
         #               yerr = [[H0[2]-H0[1]], [H0[1]-H0[0]]],
         #             ecolor='black', fmt='o', zorder=-500,markersize=1)      
-        plt.text(gamma_bias, H0[1] - H0_true, key[-3:],fontsize=15)
+        # plt.text(gamma_bias, H0[1] - H0_true, key[-3:],fontsize=15)
     #    ax.set_xticks(range(id_range[0]-1, id_range[1]+1,3)) 
-plt.xlabel(which[1]+" bias (inferred - truth)", fontsize=27)
+plt.plot(np.linspace(-0.3,0.3), np.linspace(-0.3,0.3)*0, 'k', alpha = 0.5 )
+plt.title('Lensed {0} case'.format(text), fontsize=27)    
+plt.xlabel("$\gamma$ bias (inferred - truth)", fontsize=27)
 plt.ylabel("$H_0$ bias (inferred - truth)", fontsize=27)
 plt.ylim(-20,20)
 plt.xlim(-0.2, 0.2)
-plt.tick_params(labelsize=20)
+# plt.tick_params(labelsize=30)
+plt.tick_params(which='both', width=2, length = 7, labelsize=30)
+plt.savefig('bias_result_{0}.pdf'.format(text), bbox_inches = "tight")
 plt.show()
 
 # #%%test parameter bias on q. #!!! Not right because the current kwarg_result is not the best answer yet...

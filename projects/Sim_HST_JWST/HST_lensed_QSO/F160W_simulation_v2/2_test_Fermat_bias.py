@@ -9,6 +9,10 @@ import numpy as np
 import matplotlib.pyplot as plt
 import pickle
 
+import matplotlib as mat
+mat.rcParams['font.family'] = 'STIXGeneral'
+
+
 potential_mismatch_list = []
 geometry_mismatch_list = []
 
@@ -16,16 +20,20 @@ geometry_mismatch_list = []
     #file_type = 'model_result.pkl'
 
 folder_type = 'simulations_700_subg30/sim_lens_ID_subg30_'
-file_type = 'result_modNoisemap_boostPossionx3_subg3.pkl'
+file_type = 'result_PSFerr001_PSFinter_subg3.pkl'
 
 # folder_type = 'simulations_700_subg30/sim_lens_noqso_ID_subg30_'
-# file_type = 'result_calNoiseMap_modNoisemap_boostPossionx8_noPSFerr_subg3.pkl'
+# file_type = 'result_PSFerr001_subg3.pkl'
 
 import glob
 folder_list = glob.glob(folder_type+'*')
 folder_list.sort()
-test_numer = 50 #len(folder_list)
-folder_list = folder_list[:test_numer]
+# test_numer = 50 #len(folder_list)
+# folder_list = folder_list[:test_numer]
+
+outlier = [736, 728, 748, 710, 715]
+folder_list = [folder_list[i] for i in range(len(folder_list)) if int(folder_list[i][-3:]) not in outlier]
+
 
 for folder in folder_list:    
     #==============================================================================
@@ -80,23 +88,34 @@ for folder in folder_list:
 #    print("A-BCD infer: potential, geometry:",infe_potential_diff, infe_geometry_diff)
 #    print("Mismatch:", true_potential_diff- infe_potential_diff, true_geometry_diff- infe_geometry_diff) 
     for i in range(len(true_potential_diff)):
-        potential_mismatch_list.append(true_potential_diff[i]- infe_potential_diff[i])
-        geometry_mismatch_list.append(true_geometry_diff[i]- infe_geometry_diff[i])
+        potential_mismatch_list.append(infe_potential_diff[i] - true_potential_diff[i])
+        geometry_mismatch_list.append(infe_geometry_diff[i]- true_geometry_diff[i])
     # potential_mismatch_list.append(np.average( true_potential_diff - infe_potential_diff ))
     # geometry_mismatch_list.append(np.average( true_geometry_diff - infe_geometry_diff ))
 
-plt.figure(figsize=(8,6))
+#%%
+if 'noqso' in folder_type:
+    text = 'non-AGN'
+else:
+    text = 'AGN'
+plt.figure(figsize=(8,8))
 high0, x0, _ = plt.hist(potential_mismatch_list,normed=True, histtype=u'step',
-         label=('potential mismatch'), linewidth = 2, color='orange')
+         label=('Shapiro delay mismatch'), linewidth = 2, color='orange')
 high1, x1, _ = plt.hist(geometry_mismatch_list,normed=True, histtype=u'step',
-         label=('geometry mismatch'), linewidth = 2, color='green')
-plt.xlabel("mismatch",fontsize=27)
-plt.ylabel("Density",fontsize=27)
-plt.xlim(-0.02, 0.02)
-plt.ylim(0,300)
-plt.tick_params(labelsize=20)
+         label=('geometric delay mismatch'), linewidth = 2, color='green')
+
+plt.title('Lensed {0} case'.format(text), fontsize=27)    
+plt.xlabel("mismatch (inferred - truth)",fontsize=27)
+plt.ylabel("Distribution density",fontsize=27)
+plt.xlim(-0.025, 0.025)
+plt.ylim(0,400)
+plt.tick_params(which='both', width=2, length = 7, labelsize=20)
 plt.legend(prop={'size':20})
+plt.savefig('Fermat_bias_dis_{0}.pdf'.format(text), bbox_inches = "tight")
 plt.show()
 
+print("np.mean(geometry_mismatch_list):", np.mean(geometry_mismatch_list))
 print("np.std(geometry_mismatch_list):", np.std(geometry_mismatch_list))
+
+print("np.mean(potential_mismatch_list):", np.mean(potential_mismatch_list))
 print("np.std(potential_mismatch_list):", np.std(potential_mismatch_list))

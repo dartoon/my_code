@@ -31,7 +31,7 @@ $^{2}$School of Science, Wuhan University of Technology, Wuhan 430070, China}
 \label{firstpage}
 
 \begin{abstract}
-  Strongly lensed explosive transients like supernovae, gamma ray bursts, fast radio bursts and gravitational waves are very promising to determine the Hubble constant ($H_0$) in the next stage. Compared to the traditional targets: lensed quasars, they can give much more precise time delay measurements due to either the transient nature or well-known light curves. In this work, we quantitatively study how lens modelling improves without the contamination from bright point source, i.e., the AGN, since the complete host arcs can be observed before or after the transient's appearance. We simulate 8 lensing systems with and without adding point sources and compare the inferred Fermat potential difference.
+  See the review by Oguri M. \citep{Oguri2019}. Strongly lensed explosive transients like supernovae, gamma ray bursts, fast radio bursts and gravitational waves are very promising to determine the Hubble constant ($H_0$) in the next stage. Compared to the traditional targets: lensed quasars, they can give much more precise time delay measurements due to either the transient nature or well-known light curves. In this work, we quantitatively study how lens modelling improves without the contamination from bright point source, i.e., the AGN, since the complete host arcs can be observed before or after the transient's appearance. We simulate 8 lensing systems with and without adding point sources and compare the inferred Fermat potential difference.
   Generally, the lens modelling can be improved by 3?? times. Moreover, we incorporate
   the information on the magnifications and find lens modelling can be further improved by ??.
 \end{abstract}
@@ -50,7 +50,7 @@ Strong gravitational lensing provides an independent and one-step way to determi
 
 Lensed transient systems resulting in precise time-delay cosmology
 include supernovae in all types,
-GW/SGRB+kilonava/afterglow association, LGRB+SN Ic/afterglow association and repeated FRB.
+GW/SGRB+kilonava/afterglow association~\citep{Liao2017}, LGRB+SN Ic/afterglow association and repeated FRB.
 
 
 \section{Time delay cosmology}
@@ -77,12 +77,10 @@ It is well-known that one of the major difficulties in the lensed AGN modelling 
 To investigate at which level the bright AGN affects the inference of the lens model and the inference of \hc, we make a group of two samples and perform a control experiment. The first group is a sample of 50 mock HST observed lensed AGN systems, the data quality is based on the real observation as used by the TDCOSMO collaboration. As a contrast sample, the second group are generated based on the same parameters and only that the AGN image is not added. We then adopt the lens modelling software lenstronomy to model these two samples to make direct comparison of the inference using the two samples. In addition, the kinematics information of the deflector would be helpful to get extra constrains on the lens model [ref]. However, the aim of this work is to test the lens modelling by comparing the fittings when with/without AGN, and using lens velocity dispersion information to give extra constrains on the lens model is beyond the scope of this paper. 
 
 \subsection{Mock data simulations}
-The simulations of the 50 lensed AGN systems are based on the pipeline introduced by [Ding et al.].  The mock data are based on the observations using HST WFC/F160W.
-This pipeline has also been used in TDLMC and TDCOSMO-1 [ref]. We adopt the same simulating strategy as used TDLMC to generate the mock sample, which are summarized as below.
+The simulations of the 50 lensed AGN systems are based on the pipeline introduced by [Ding et al.].
+This approach has also been used in TDLMC and TDCOSMO-1 [ref]. The mock data are assumed to be observed by HST through WFC/F160W. %We adopt the same simulating strategy as used TDLMC to generate the mock sample, which are summarized as below.
 
-The simulating ingredients includes the light from the deflector and active galaxies in the source plane. 
-
-The light profile of the galaxy is assumed as S\'ersic profile is parameterized by:
+The simulating image is composed of the light from the deflector galaxy in the image plane and active galaxies in the source plane. The light profile of the galaxy is assumed as S\'ersic profile is parameterized by:
 \begin{eqnarray}
    \label{eq:sersic}
    &I(R) = A \exp\left[-k\left(\left(\frac{R}{R_{\mathrm{eff}}}\right)^{1/n}-1\right)\right] ,\\
@@ -95,7 +93,7 @@ inner profile and a highly extended outer wing.
  $k$ is a constant which
 depends on $n$ so as to ensure that the isophote at $R=R_{\mathrm{eff}}$
 encloses half of the total light \citep{C+B99} and
-$q$ denotes the axis ratio.
+$q$ denotes the axis ratio. The light of the active nuclei is assumed as a non-resolved point source.
 
 The mass of the deflector is assumed as a elliptical power-law model, whose surface mass density is given by:
 %
@@ -115,26 +113,28 @@ We refer the reader to the reviews by \citet{Sch06, Bar10, Tre10} for more detai
 An external shear component is also considered.
 
 
-The assumed lensing parameters are randomly generated using the Table 2 in TDLMC-2. The position of the source AGN is manually input so that all the lensed image are quads. The noise includes the Gaussian background noise and the Poisson noise which is based on the realistic HST condition with exposure time as 9,584 s. The PSF is generated by tinytim. The pixel scale is drizzled from 0\farcs{13} to 0\farcs{08} into the frame size with $99\times99$ pixels. The 50 lensed non-AGN systems are also simulated using the identical parameters as the 50 lensed AGN sample, expect that the point-source flux is muted. 
+The assumed lensing parameters are randomly generated using the based on the same strategy as in Table 2 in TDLMC-2. The position of the source AGN is manually input so that all the lensed image are quads. The noise includes the Gaussian background noise and the Poisson noise which is based on the realistic HST condition with exposure time as $\sim$9,600 s. The PSF is generated by tinytim. The pixel scale is drizzled from 0\farcs{13} to 0\farcs{08} into the frame size with $99\times99$ pixels. The 50 lensed non-AGN systems are also simulated using the identical parameters as the 50 lensed AGN sample, expect that the point-source flux is muted. 
 
-The time delays are calculated based on the lens parameters based on a standard flat $\Lambda$CDM model, with Om = 0.27 and Om$_\Lambda$ = 0.73. The true H0 value is assumed as 74. Note that since the two samples share the same parameters, their time delays are the same. For the uncertainties level, we assume a non-biased error with rms level as the larger on between 1\% level and 0.25 days.
+The time delays are calculated based on the lens parameters based on a standard flat $\Lambda$CDM model, with Om = 0.27 and Om$_\Lambda$ = 0.73. The true H0 value is assumed as 74. Note that since the two samples (i.e., with AGN and without AGN) share the same parameters, their time delays are the identical. For the uncertainties level, we assume a non-biased error with rms level as the larger on between 1\% level and 0.25 days.
 
 In figure~, we illustrate the simulated lensed image that based on the same lensing parameters.
 
 [fig]
 
-\subsection{Model test}
+\subsection{Model }
 %3. Modelling. Based on Lenstronomy, start with PSO and then MCMC. For lensed AGN, we adopt the PSF iteration. For lensed galaxy, the position of the invisible point source are taken from the lensed AGNs. We use a sample of 40 systems to estimate the scatter of the H0 inference. The kinematic information is not considered, since the goal of this paper is to make a direct comparisons.
-We use the strong lensing modeling tool lenstronomy to perform the modelling. For the lensed AGN systems, the typical modelling approaching is adopted. We manually boost the Poisson noise level to mitigate the drizzling effects. 
-[] The PSF uncertainty 0.1. 
-[] The lens images are combining with the time delay data to joint infer the time delay distance, hence the h0.
-[] Mask was added.
-[] We input the true parameters as the initial values to perform the Minimization. Finally, the H0 inferred from the overall 50 systems are considered as 50 times realizations to investigate the uncertainty and the accuracy.
+We adopt the strong lensing modeling tool lenstronomy to perform the modelling.
 
-We adopt the same approach to model the lensed non-AGN systems. Since the point source are not appeared in the image, we applied the astrometry information inferred from lensed AGN systems to mimic the situation when a SN is blooming with point source available.  
+For the lensed AGN systems, the typical modelling approaching is adopted. We manually boost the Poisson noise level to mitigate the drizzling effects. A mask region is defined to bracket the pixels with sufficient SNR with would be used to calculate the likelihood. To account for the fact that the information of the PSF is unknown, we assumed a 0.1 variance uncertainty on the input PSF image when modelling the point source. The true values used in the simulation are adopted as the initial values to allow a fast convergence of the particles. The lensing image are combined with the time delay data to achieve a joint-inference for the time delay distance. We adopt the particle swarm optimization (PSO) to derive the minimization best-fit result for each system. The resulting H0 is derived with Om fixed to the truth value 0.27.
+Finally, we consider the 50 lensed systems are considered as 50 times realizations to investigate the uncertainty and the accuracy.
+
+The same approach is adopted to fit the lensed non-AGN system. Note that when calculate the time delay, the positions of the point source in the image plane and source plane are needed (i.e., alpha and beta in eq). However, for the non-AGN case the point source position in the image plane does not appear. We use the twin lensed AGN system and adopt the fitted point source position as the astrometry information. This strategy is to mimic the situation when a SN is explosion  with point source position captured.  
+
+Figure illustrate the modelling result for a twin systems.
+[ref]
 
 
-\section{Comparison results}
+\section{Results}
 [] The lensed AGN case is non-biased, but the scatter is larger. This scatter represent the precision level when modeling the lensed without taken the kinematic information. 
 []When AGN disappear, the non-biased H0 can be still inferred and the scatter is improved by a factor of $\sim$3. 
 
@@ -154,62 +154,8 @@ This work was supported by the National Natural Science Foundation of China (NSF
 
 
 \begin{thebibliography}{}
-\bibitem[\protect\citeauthoryear{Abbott et al.}{2016}]{Abbott2016} Abbott B. P., Abbott R., Abbott T. D., et al. 2016, Phys. Rev. Lett., 116, 061102
-\bibitem[\protect\citeauthoryear{Abbott et al.}{2019}]{Abbott2019b} Abbott B. P., Abbott T. D., Abraham S., et al. 2019, ApJL, 882, L24
-\bibitem[\protect\citeauthoryear{Alcock et al.}{2000}]{Alcock2000} Alcock C., et al. [MACHO Collaboration], 2000, ApJ, 542, 281
-\bibitem[\protect\citeauthoryear{Ali-Haimoud et al.}{2017}]{Ali-Haimoud2017}  Ali-Ha\"{\i}moud Y., Kamionkowski M. 2017, Phys. Rev. D, 95, 043534
-\bibitem[\protect\citeauthoryear{Benton et al.}{2007}]{Benton2007} Benton Metcalf R., Silk J. 2007, Phys. Rev. Lett., 98, 071302
-\bibitem[\protect\citeauthoryear{Bird et al.}{2016}]{Bird2016} Bird S., Cholis I., Mu\~noz J. B., et al. 2016, Phys. Rev. Lett., 116, 201301
-\bibitem[\protect\citeauthoryear{Brandt et al.}{2016}]{Brandt2016} Brandt T. D. 2016, ApJ, 824, L31
-\bibitem[\protect\citeauthoryear{Carr et al.}{1974}]{Carr1974} Carr B. J., Hawking S. W. 1974, MNRAS, 168, 399
-\bibitem[\protect\citeauthoryear{Carr et al.}{1975}]{Carr1975} Carr B. J. 1975, ApJ, 201, 1
-\bibitem[\protect\citeauthoryear{Calchi Novati et al.}{2013}]{Calchi Novati2013} Calchi Novati S., Mirzoyan S., Jetzer P., Scarpetta G. 2013, MNRAS, 435, 1582
-\bibitem[\protect\citeauthoryear{Cao et al.}{2014}]{Cao2014} Cao Z., Li L.-F., Wang Y. 2014, Phys. Rev. D, 90, 062003
-\bibitem[\protect\citeauthoryear{Collett et al.}{2017}]{Collett2017} Collett T. E., Bacon D. 2017, Phys. Rev. Lett., 118, 091101
-\bibitem[\protect\citeauthoryear{Christian et al.}{2018}]{Christian2018} Christian P., Vitale S., Loeb A. 2018, Phys. Rev. D, 98, 103022
-\bibitem[\protect\citeauthoryear{Dai et al.}{2018}]{Dai2018} Dai L., Li S.-S., Zackay B., Mao S., Lu Y. 2018, Phys. Rev. D, 98, 104029
-\bibitem[\protect\citeauthoryear{Ding et al.}{2015}]{Ding2015} Ding X., Biesiada M., Zhu Z.-H. 2015, JCAP, 12, 006
-\bibitem[\protect\citeauthoryear{Ding et al.}{2020}]{Ding2020} Ding X., Liao K., Biesiada M., Zhu Z.-H. 2020, ApJ, 891, 76
-\bibitem[\protect\citeauthoryear{Dominik et al.}{2013}]{Dominik2013} Dominik M., Belczynski K., Fryer C., et al. 2013, ApJ, 779, 72
-\bibitem[\protect\citeauthoryear{Fan et al.}{2017}]{Fan2017} Fan X.-L., Liao K., Biesiada M.,  et al. 2017, Phys. Rev. Lett., 118, 091102
-\bibitem[\protect\citeauthoryear{Finn et al.}{1996}]{Finn1996} Finn L. S. 1996, Phys. Rev. D, 53, 2878
-\bibitem[\protect\citeauthoryear{Fishbach et al.}{2018}]{Fishbach2018}Fishbach M., Holz D. E., Farr W. M. 2018, ApJL, 863, L41
-\bibitem[\protect\citeauthoryear{Griest et al.}{1991}]{Griest1991} Griest K. 1991, ApJ, 366, 412
-\bibitem[\protect\citeauthoryear{Hardy et al.}{2017}]{Hardy2017} Hardy E. 2017, JHEP, 02, 046
-\bibitem[\protect\citeauthoryear{Hou et al.}{2019}]{Hou2019} Hou S., Fan X.-L., Liao K., Zhu Z.-H. 2019, arXiv: 1911.02798
-\bibitem[\protect\citeauthoryear{Ji et al.}{2018}]{Ji2018} Ji L., Kovetz E. D., Kamionkowski M. 2018, Phys. Rev. D, 98, 123523
-\bibitem[\protect\citeauthoryear{Jung et al.}{2019}]{Jung2019} Jung S., Shin C. S. 2019, Phys. Rev. Lett., 122, 041103
-\bibitem[\protect\citeauthoryear{Kovetz et al.}{2017}]{Kovetz2017}Kovetz E. D., Cholis I., Breysse P. C.,  Kamionkowski M. 2017, Phys. Rev. D, 95, 103010
-\bibitem[\protect\citeauthoryear{Lai et al.}{2018}]{Lai2018} Lai K.-H., Hannuksela O. A., Herrera-Martin A.,  et al. 2018, Phys. Rev. D, 98, 083005
+\bibitem[\protect\citeauthoryear{Oguri}{2019}]{Oguri2019} Oguri M. 2019, Reports on Progress in Physics, 82, 12
 \bibitem[\protect\citeauthoryear{Liao et al.}{2017}]{Liao2017} Liao K., Fan X.-L., Ding X., Biesiada M., Zhu Z.-H. 2017, Nature Communications, 8, 1148
-\bibitem[\protect\citeauthoryear{Liao et al.}{2019}]{Liao2019} Liao K., Biesiada M., Fan X.-L. 2019, ApJ, 875. 139
-\bibitem[\protect\citeauthoryear{Li et al.}{2018}]{Li2018} Li S.-S., Mao S., Zhao Y., Lu Y. 2018, MNRAS, 476, 2220
-\bibitem[\protect\citeauthoryear{Mediavilla et al.}{2009}]{Mediavilla2009} Mediavilla E., Mu\~{n}oz J. A., Falco E., et al. 2009, ApJ, 706, 1451
-\bibitem[\protect\citeauthoryear{Monroy-Rodriguez et al.}{2014}]{Monroy-Rodriguez2014} Monroy-Rodr\'{\i}guez M. A., Allen C. 2014, ApJ, 790, 159
-\bibitem[\protect\citeauthoryear{Munoz et al. 2016}{}]{Munoz2016} Mu\~{n}oz J. B., Kovetz E. D., Dai L., Kamionkowski M. 2016, Phys. Rev. Lett., 117, 091301
-\bibitem[\protect\citeauthoryear{Mishra et al.}{2010}]{Mishra2010} Mishra C. K., Arun K. G., Iyer B. R., Sathyaprakash B. S. 2010, Phys. Rev. D, 82, 064010
-\bibitem[\protect\citeauthoryear{Nakamura et al.}{1998}]{Nakamura1998} Nakamura, T. T. 1998, Phys. Rev. Lett., 80, 6
-\bibitem[\protect\citeauthoryear{Niikura et al.}{2017}]{Niikura2017} Niikura H., Takada M., Yasuda N.,  et al. 2017, Nature Astronomy, 3, 524
-\bibitem[\protect\citeauthoryear{Oguri et al.}{2018}]{Oguri2018} Oguri M., Diego J. M., Kaiser N., Kelly P. L., Broadhurst T. 2018, Phys. Rev. D, 97, 023518
-\bibitem[\protect\citeauthoryear{Oguri}{2018}]{Oguri2018a} Oguri, M. 2018, MNRAS, 480, 3842
-\bibitem[\protect\citeauthoryear{Pooley et al.}{2009}]{Pooley2009} Pooley D., Rappaport S., Blackburne J., et al. 2009, ApJ, 697, 1892
-\bibitem[\protect\citeauthoryear{Quinn et al.}{2009}]{Quinn2009} Quinn D. P., Wilkinson M. I., Irwin M. J.,  et al. 2009, MNRAS, 396, 11
-\bibitem[\protect\citeauthoryear{Ricotti et al.}{2009}]{Ricotti2009} Ricotti M., Gould A. 2009, ApJ, 707, 979
-\bibitem[\protect\citeauthoryear{Ricotti et al.}{2008}]{Ricotti2008} Ricotti M., Ostriker J. P., Mack K. J. 2008, ApJ, 680, 829
-\bibitem[\protect\citeauthoryear{Sasaki et al.}{2016}]{Sasaki2016} Sasaki M., Suyama T., Tanaka T., Yokoyama S. 2016, Phys. Rev. Lett., 117, 061101
-\bibitem[\protect\citeauthoryear{Sereno et al.}{2010}]{Sereno2010} Sereno M., Bleuler A., Jetzer P.,  et al. 2010, Phys. Rev. Lett., 105, 251101
-\bibitem[\protect\citeauthoryear{Smith et al.}{2018}]{Smith2018} Smith G. P., Jauzac M., Veitch J.,  et al. 2018, MNRAS, 475, 3823
-\bibitem[\protect\citeauthoryear{Takahashi et al.}{2003}]{Takahashi2003} Takahashi R., Nakamura, T. 2003, ApJ, 595, 1039
-\bibitem[\protect\citeauthoryear{Takahashi et al.}{2017}]{Takahashi2017} Takahashi R. 2017, ApJ, 835, 103
-\bibitem[\protect\citeauthoryear{Tisserand et al.}{2007}]{Tisserand2007} Tisserand P., et al. [EROS-2 Collaboration], 2007, A\&A, 469, 387
-\bibitem[\protect\citeauthoryear{Udalski et al.}{2015}]{Udalski2015} Udalski A., Szyma\'{n}ski M. K., Szyma\'{n}ski G. 2015, Acta Astromonica, 65, 1
-\bibitem[\protect\citeauthoryear{Wang et al.}{1996}]{Wang1996} Wang Y., Stebbins A., Turner E. L. 1996, Phys. Rev. Lett., 77, 2875
-\bibitem[\protect\citeauthoryear{Wei et al.}{2017}]{Wei2017} Wei J.-J., Wu X.-F. 2017, MNRAS, 472, 2906
-\bibitem[\protect\citeauthoryear{Wilkinson et al.}{2001}]{Wilkinson2001} Wilkinson P. N., Henstock D. R., Browne I. W. A.,  et al. 2001, Phys. Rev. Lett., 86, 584
-\bibitem[\protect\citeauthoryear{Wyrzykowski et al.}{2011}]{Wyrzykowski2011}  Wyrzykowski L., et al. 2011, MNRAS, 416, 2949
-\bibitem[\protect\citeauthoryear{Yang et al.}{2019}]{Yang2019}Yang L., Ding X., Biesiada M., Liao K., Zhu Z.-H. 2019, ApJ, 874, 139Y
-
-
 \end{thebibliography}
 
 \label{lastpage}

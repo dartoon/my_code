@@ -47,7 +47,7 @@ def cal_h0(zl, zs, Ddt, om=0.27):
     ratio = Ddt_corr/Ddt
     return 100 * ratio
 
-folder_list = glob.glob('sim_lens_ID_subg30_7??')
+folder_list = glob.glob('simulations_700_subg30/sim_lens_ID_subg30_7??')
 folder_list.sort()
 
 test_numer = 8
@@ -344,7 +344,7 @@ for folder in folder_list[kernel_i*run_n:kernel_i*run_n+run_n]:
         pickle.dump([multi_band_list, kwargs_model, kwargs_result, chain_list, fix_setting, mcmc_new_list], open(folder+savename, 'wb'))
     #%%Print fitting result:
     multi_band_list, kwargs_model, kwargs_result_best, chain_list, fix_setting, mcmc_new_list = pickle.load(open(folder+savename,'rb'))
-    fixed_lens, fixed_source, fixed_lens_light, fixed_ps, fixed_cosmo = fix_setting
+    # fixed_lens, fixed_source, fixed_lens_light, fixed_ps, fixed_cosmo = fix_setting
     labels_new = [r"$\gamma$", r"$D_{\Delta t}$","H$_0$" ]
     modelPlot = ModelPlot(multi_band_list, kwargs_model, kwargs_result_best, arrow_size=0.02, cmap_string="gist_heat")
     f, axes = modelPlot.plot_main()
