@@ -77,6 +77,7 @@ for ID in [3]:
             true_host = true_host[peak[0]-half_r:peak[0]+half_r+1,peak[1]-half_r:peak[1]+half_r+1]        
             true_host_flux = true_host.sum()
             true_host_mag = -2.5*np.log10(true_host_flux) + zp
+            # print(true_host_mag)
             true_host_ratio = [lines[i] for i in range(len(lines)) if 'host_flux_ratio' in lines[i]][0].split('\t')[1]
             true_total_flux = true_host_flux/float(true_host_ratio[:-1])*100  #!!!
             true_total_mag = -2.5*np.log10(true_total_flux) + zp

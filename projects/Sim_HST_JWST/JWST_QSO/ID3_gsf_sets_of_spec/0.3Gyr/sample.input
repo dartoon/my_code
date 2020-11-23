@@ -18,21 +18,20 @@ TAU_COMP	1 # comparison between different tau for each ssp when plot.
 #
 # Params for data
 #
-DIR_TEMP	/Users/Dartoon/Astro/Packages/gsf/gsf/example/templates/ # Directory of extracted spectra.
+DIR_TEMP	/Users/Dartoon/Astro/Packages/gsf-version1.4/example/templates/ # Directory of extracted spectra.
 DIR_EXTR	./ # Directory of extracted spectra.
-DIR_FILT	/Users/Dartoon/Astro/Packages/gsf/gsf/example/filter/ 
+DIR_FILT	/Users/Dartoon/Astro/Packages/gsf-version1.4/example/filter/
 CAT_BB		./sample.cat # Directory of extracted spectra.
-FILTER		353,357 # #!!! Using hst/wfc3/IR/f140w.dat
+FILTER		354,356 # #!!! Using hst/wfc3/IR/f140w.dat
 
 #
 # Params for SED
 #
-AGE			0.23  #!!! 0.01,0.03,0.1,0.3,0.5,0.7,1.0,2.0,3.0 #I only select one value
-#AGE			0.01,0.03,0.1,0.3,0.5,0.7,1.0,2.0,3.0 #0.01,0.03,0.1,0.3,0.5,0.7,1.0,2.0,3.0
+AGE			0.3 # in Gyr
 #ZMAX		0.0 # Max metalicity
-#ZMIN		0.0 # Min metalicity
-#DELZ		0.0  # Should be smaller than the gap between ZMAX and ZMIN.
-ZFIX		-0.3979 # logZ/Zsun
+#ZMIN		-1.0 # Min metalicity
+#DELZ		0.1  # Should be smaller than the gap between ZMAX and ZMIN.
+ZFIX		0 # logZ/Zsun
 ZEVOL		0 # Evolution in Z; 1=yes, 0=no.
 #AVMIN		0.0
 #AVMAX		0.0
@@ -44,9 +43,9 @@ NIMF		1 # Choice of IMF. 0=Salpeter, 1=Chabrier, 2=Kroupa, 3=van Dokkum, 4=Dave,
 #
 # Params for target
 #
-ID		    1234 # Tell the ID for the cat, need to run one by one.
+ID		    085903 # Tell the ID for the cat, need to run one by one.
 PA		    00
-ZGAL		6.0 #!!! Initial guess of source redshift.   #If redshift is know, set the NMCZ very smalled
+ZGAL		6.39 #!!! Initial guess of source redshift.   #If redshift is know, set the NMCZ very smalled
 ###IGNORE the following.
 CZ0 		0.83167 # Initial guess of spectral normalization for G102. #Doesn't affect, have to be here.
 CZ1		    10.96804 # Initial guess of spectral normalization for G141.
