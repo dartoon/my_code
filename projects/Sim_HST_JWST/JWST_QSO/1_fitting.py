@@ -38,16 +38,16 @@ zp_dic = {'F444W':27.3012, 'F356W':27.1841, 'F200W':27.0383, 'F150W':26.8627} #U
 # folder_suf = 'sim_seed201_5000s/'
 # folder_suf = 'sim_seed301_2500s_reff12n1/'
 # folder_suf = 'sim_seed301_1000s_reff13n14/'
-folder_suf = 'sim_seed301_1500s_ID3/'
+folder_suf = 'sim_seed301_3000s_ID3/'
 
 
 
 # seed_l, seed_h = [[201, 208], [208,215], [215, 221]][0]
-seed_l, seed_h = 301, 351
+seed_l, seed_h = [[301, 311], [311, 321], [321, 331], [331, 341], [341, 351]][4]
 
 for seed in range(seed_l, seed_h):
     for ID in [3]:#range(1, 7):
-        for filt_i in [1, 2]:
+        for filt_i in [0, 3]:
             filt  = ['F444W', 'F356W', 'F200W', 'F150W'][filt_i]
             folder = folder_suf + 'sim'+'_ID'+repr(ID)+'_'+filt+'_seed'+repr(seed)
             if use_true_PSF == True:

@@ -2,7 +2,7 @@
 #Run using iraf27 environment
 #read -p 'Drizzling filter:' filt
 #read -p 'Simulation ID:' id
-for filt in F356W F200W
+for filt in F444W F150W
 do
 for seed in {301..350}
 do

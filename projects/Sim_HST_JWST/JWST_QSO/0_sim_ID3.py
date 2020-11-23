@@ -33,7 +33,7 @@ for seed in range(301,351):
     for ID in [3]: #range(1,7): #int(input("input simulation ID:\n"))  #The ID for this simulation
         host_flux_rescale = False
         count = 0 
-        for filt_i in [2,1]: #int(input("which filter 0: 'F444W', 1: 'F356W', 2: 'F200W', 3: 'F150W':\n"))
+        for filt_i in [3,0]: #int(input("which filter 0: 'F444W', 1: 'F356W', 2: 'F200W', 3: 'F150W':\n"))
             filt  = ['F444W', 'F356W', 'F200W', 'F150W'][filt_i]
             numPix = [341, 341, 645, 645][filt_i]  # total frame pixel size #!!!Need to be changed for different filter
             np.random.seed(seed = seed)
@@ -192,7 +192,7 @@ for seed in range(301,351):
             rms = np.zeros_like(total_image_bin) #input rms
             noiz = np.zeros_like(total_image_bin) #input noiz
             image_data_noise=np.zeros_like(total_image_bin) #image after noiz
-            exptim= 187.5   #units of seconds. total/8
+            exptim= 375.0   #units of seconds. total/8
             stdd = [1.6, 1.06, 0.77, 0.75][filt_i] /np.sqrt(exptim)   #An empirical formula from ETC
             for i in range(len(pattern_x)):
                 rms[i]=(bf_noz[i]/(exptim)+stdd**2)**0.5 #RMS not saved, thus its value not used here

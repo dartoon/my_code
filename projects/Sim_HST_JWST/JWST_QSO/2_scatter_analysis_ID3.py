@@ -30,7 +30,7 @@ import pickle
 #
 import matplotlib as mat
 mat.rcParams['font.family'] = 'STIXGeneral'
-color = {'F150W': 'cyan', 'F200W':'lime', 'F356W':'tomato', 'F444W':'firebrick'}
+color = {'F150W': 'lime', 'F200W':'lime', 'F356W':'tomato', 'F444W':'tomato'}
 #seed = 0
 #use_true_PSF =False
 use_true_PSF ='same_drizzle'
@@ -54,14 +54,18 @@ save_name = 'fit_result_diffPSF'
 #elif use_true_PSF == 'same_drizzle':
 #    save_name = 'fit_result_samedrizzle'
 
-ID_range = [2,3]   
+# ID_range = [2,3]   
 seed_range = [301,351]
 #%%Mag bias
 
 for ID in [3]:
     fig, ax = plt.subplots(figsize=(11,8))
-    for filt_i in [1,2]:    
-        filt  = ['F150W', 'F200W', 'F356W','F444W'][filt_i]
+    labels = []
+    for filt_i in [0,3]:   
+        filt_l = ['F150W', 'F200W', 'F356W','F444W']
+        filt  = filt_l[filt_i]
+        labels.append(filt)
+        x_p = [1,1,2,2]
         zp = zp_dic[filt]
         bias_list = []
         for seed in range(seed_range[0],seed_range[1]):
@@ -84,7 +88,7 @@ for ID in [3]:
             fit_host_mag = result['host_mag'] 
             bias= fit_host_mag - true_host_mag
             bias_list.append(bias)
-            plt.scatter(filt_i, bias,
+            plt.scatter(x_p[filt_i], bias,
                     c=color[filt],s=200, marker=".",zorder=0, edgecolors='w',alpha=0.5)
         if filt == 'F356W':
             seed = np.where(bias_list == np.min(bias_list))[0][0]
@@ -95,16 +99,15 @@ for ID in [3]:
             y_loc = np.mean(bias_list)
         else:
             y_loc = 0.85
-        plt.errorbar(filt_i-0.1, np.mean(bias_list), yerr=np.std(bias_list), color=color[filt],ecolor='black', fmt='o',zorder=-500,markersize=10)
-        plt.text(filt_i-0.55, y_loc-0.05, '{0:.2f}\n$\pm${1:.2f}'.format(np.mean(bias_list),np.std(bias_list)), color='black',fontsize=24)
-        plt.text(filt_i, -1.4+0.15, '{0}'.format(round(true_total_mag,2)), color='g',fontsize=24)
-        plt.text(filt_i, -1.4-0.05, '{0}%'.format(round(float(true_host_ratio[:-1]),1)), color='crimson',fontsize=24)
+        plt.errorbar(x_p[filt_i]-0.1, np.mean(bias_list), yerr=np.std(bias_list), color=color[filt],ecolor='black', fmt='o',zorder=-500,markersize=10)
+        plt.text(x_p[filt_i]-0.55, y_loc-0.05, '{0:.2f}\n$\pm${1:.2f}'.format(np.mean(bias_list),np.std(bias_list)), color='black',fontsize=24)
+        plt.text(x_p[filt_i], -1.4+0.15, '{0}'.format(round(true_total_mag,2)), color='g',fontsize=24)
+        plt.text(x_p[filt_i], -1.4-0.05, '{0}%'.format(round(float(true_host_ratio[:-1]),1)), color='crimson',fontsize=24)
     plt.plot(np.linspace(-1, 5), np.linspace(-1, 5)*0,'k')   
     plt.title('Tested mag bias for J085907.19+002255.9 ', fontsize=32)
     #legend:
     plt.text(-0.5, -1.4+0.15, 'AGN total magnitude', color='g',fontsize=24)
     plt.text(-0.5, -1.4-0.05, 'Host flux ratio', color='crimson',fontsize=24)
-    labels = ['F200W', 'F356W']
     ax.set_xticks([1,2])
     plt.tick_params(which='both', width=3, length = 7)
     ax.set_xticklabels(labels)
