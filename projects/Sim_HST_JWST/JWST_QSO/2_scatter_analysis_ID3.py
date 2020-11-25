@@ -61,7 +61,7 @@ seed_range = [301,351]
 for ID in [3]:
     fig, ax = plt.subplots(figsize=(11,8))
     labels = []
-    for filt_i in [0,3]:   
+    for filt_i in [0,2]:   
         filt_l = ['F150W', 'F200W', 'F356W','F444W']
         filt  = filt_l[filt_i]
         labels.append(filt)
@@ -115,7 +115,7 @@ for ID in [3]:
     plt.xlim(-0.5, 3.2)
     plt.ylim(-1.5, 1.)    
     plt.tick_params(labelsize=40)
-    plt.savefig("ID3_host_mag_bias_ID{0}_3000s.pdf".format(ID), bbox_inches = "tight")
+    # plt.savefig("ID3_host_mag_bias_ID{0}_3000s.pdf".format(ID), bbox_inches = "tight")
     plt.show()
     
 # #%%Color bias
