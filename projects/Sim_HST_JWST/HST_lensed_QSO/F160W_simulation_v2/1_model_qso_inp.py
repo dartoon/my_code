@@ -51,7 +51,7 @@ folder_list.sort()
 index = int(sys.argv[1])
 print("Which index:", index)
 # index = int(input("which index:\n"))
-savename = 'result_centerPSF001_PSFinter.pkl'
+savename = 'centerPSF001_PSFinter.pkl'
 
 #%%plot_spec_filter
 save_pkl_folder = 'AGN_result_folder/'
@@ -126,8 +126,8 @@ for folder in [folder_list[index]]:
         
         data_class = ImageData(**kwargs_data)
         psf_err_map = np.ones_like(psf)*0.01
-        psf_err_map[psf>0.003] = 0
-        kwargs_psf = {'psf_type': 'PIXEL', 'kernel_point_source': psf, 'pixel_size': deltaPix, 'psf_error_map': np.ones_like(psf)*0.01}
+        psf_err_map[psf<0.003] = 0
+        kwargs_psf = {'psf_type': 'PIXEL', 'kernel_point_source': psf, 'pixel_size': deltaPix, 'psf_error_map': psf_err_map}
         psf_class = PSF(**kwargs_psf)
         
         #%%
@@ -299,9 +299,9 @@ for folder in [folder_list[index]]:
     multi_band_list, kwargs_model, kwargs_result_best, chain_list, fix_setting, mcmc_new_list = pickle.load(open(save_file,'rb'))
     # fixed_lens, fixed_source, fixed_lens_light, fixed_ps, fixed_cosmo = fix_setting
     labels_new = [r"$\gamma$", r"$D_{\Delta t}$","H$_0$" ]
-    modelPlot = ModelPlot(multi_band_list, kwargs_model, kwargs_result_best, arrow_size=0.02, cmap_string="gist_heat")
-    f, axes = modelPlot.plot_main()
-    f.close()
+    # modelPlot = ModelPlot(multi_band_list, kwargs_model, kwargs_result_best, arrow_size=0.02, cmap_string="gist_heat")
+    # f, axes = modelPlot.plot_main()
+    # f.show()
     # f, axes = modelPlot.plot_separate()_
     # f.show()
     # f, axes = modelPlot.plot_subtract_from_data_all()
