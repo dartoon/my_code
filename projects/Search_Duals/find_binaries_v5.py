@@ -26,6 +26,14 @@ image_DEC = float(sys.argv[3]) #0.5645210146903992
 # image_RA = 150.1797789
 # image_DEC = 2.110369603
 
+# image_ID = '141637.44+003352.2' 
+# image_RA = 214.15602111816406
+# image_DEC = 0.5645210146903992
+
+# image_ID = '000047.43+004337.1' 
+# image_RA = 0.1976759185
+# image_DEC = 0.7270061463
+
 # image_ID ='010048.81+021604.0'
 # image_RA = 15.2033809 
 # image_DEC = 2.2677925
@@ -44,7 +52,7 @@ image_DEC = float(sys.argv[3]) #0.5645210146903992
 print(image_ID, image_RA, image_DEC)
 
 deep_seed = True  #Set as True to put more seed and steps to fit,
-show_plot = 1
+show_plot = 0
 fit_data = True  #If you simply want to do the search without fitting, set False
 
 image_folder = './images_directory/'
@@ -103,7 +111,8 @@ for i in range(len(band_seq)):
 #%%
 for k in run_list:  #['G', 'R', 'I', 'Z', 'Y']
     QSO_img = data_process_list[k].target_stamp
-    x, y = find_loc_max(QSO_img, neighborhood_size = 4, threshold = 4)
+    neighborhood_size, threshold = 4, 4
+    x, y = find_loc_max(QSO_img, neighborhood_size = neighborhood_size, threshold = threshold)
     arr_x, arr_y = np.asarray(x, dtype=float), np.asarray(y, dtype=float)
     center = len(QSO_img)/2
     bool_x, bool_y = (arr_x>(center-18))*(arr_x<(center+18)), (arr_y>(center-18))*(arr_y<(center+18))
@@ -122,7 +131,7 @@ for k in run_list:  #['G', 'R', 'I', 'Z', 'Y']
         if os.path.exists('fit_result_detect/{0}/'.format(qsoid))==False:
             os.mkdir('fit_result_detect/{0}/'.format(qsoid))
         claim = claim+"\nThis {0} is likely to be a {1} system (based on multi-peaks)!!!".format(filename_list[k], 'BH'*len(arr_x))
-        plt.imshow(QSO_img, origin='low', norm=LogNorm())
+        plt.imshow(QSO_img, origin='lower', norm=LogNorm())
         for i in range(len(arr_x)):
             plt.text(arr_x[i], arr_y[i],'BH{0}'.format(i))
             plt.plot(arr_x[i], arr_y[i],'ro')
@@ -144,17 +153,21 @@ for k in run_list:  #['G', 'R', 'I', 'Z', 'Y']
         if os.path.exists('fit_result_detect/{0}/'.format(qsoid))==False:
             os.mkdir('fit_result_detect/{0}/'.format(qsoid))
         claim = claim+"\nThis {0} is also likely to have closed dual AGN pair (based on FWHM)!!!".format(filename_list[k])
-        fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12.5, 10))
+        fig, (ax1, ax2, ax3) = plt.subplots(1, 3, figsize=(12.5, 10))
         ax1.imshow(QSO_img[frz:-frz,frz:-frz], origin='lower', cmap='gist_heat', norm=LogNorm(), vmin=1.e-4 , vmax = np.max(QSO_img) )
         ax1.set_title('Data')
         QSO_2D_fitted = twoD_Gaussian(len(QSO_img[frz:-frz,frz:-frz]), *twoD_Gau_p_data)
         ax2.imshow(QSO_2D_fitted.reshape(len(QSO_img[frz:-frz,frz:-frz]), len(QSO_img[frz:-frz,frz:-frz])), origin='lower', cmap='gist_heat', norm=LogNorm(), vmin=1.e-4 , vmax = np.max(QSO_img) )
         ax2.set_title('fitted Gaussian Image')
+        
+        ax3.imshow(data_process_list[k].PSF_list[0], origin='lower', cmap='gist_heat', norm=LogNorm())
+        ax3.set_title('PSF image')
         plt.savefig('fit_result_detect/{0}/proof-2close.pdf'.format(qsoid))
         if show_plot == 1:
             plt.show()
         else:
             plt.close()
+        pyfits.PrimaryHDU(data_process_list[k].PSF_list[0]).writeto('fit_result_detect/{0}/{1}_PSF.fits'.format(qsoid,filename_list[k]),overwrite=True)
 
     if os.path.exists('fit_result_detect/{0}/'.format(qsoid)) == True and fit_data == True:
         print("Fiting the: "+ filename_list[k])
@@ -198,7 +211,7 @@ for k in run_list:  #['G', 'R', 'I', 'Z', 'Y']
             tag = 'fit_result_detect/{0}/fit_image1_PSPS_fittime-{1}'.format(qsoid,fit_time+1)
             _fit_sepc = FittingSpeficy(data_process_list[k])
             del _fit_sepc.apertures[0]
-            _fit_sepc.prepare_fitting_seq(point_source_num = num_BHBH)
+            _fit_sepc.prepare_fitting_seq(point_source_num = num_BHBH, neighborhood_size = neighborhood_size, threshold = threshold)
             _fit_sepc.build_fitting_seq()
             _fit_run = FittingProcess(_fit_sepc, savename = tag)
             _fit_run.run(algorithm_list = ['PSO'], setting_list= [None]) 
@@ -236,7 +249,7 @@ for k in run_list:  #['G', 'R', 'I', 'Z', 'Y']
             fit_time = ft
             tag = 'fit_result_detect/{0}/fit_image2_PSPS+Sersic_fittime-{1}'.format(qsoid,fit_time+1)
             _fit_sepc = FittingSpeficy(data_process_list[k])
-            _fit_sepc.prepare_fitting_seq(point_source_num = num_BHBH)
+            _fit_sepc.prepare_fitting_seq(point_source_num = num_BHBH, neighborhood_size = neighborhood_size, threshold = threshold)
             _fit_sepc.build_fitting_seq()
             _fit_run = FittingProcess(_fit_sepc, savename = tag)
             _fit_run.run(algorithm_list = ['PSO'], setting_list= [None]) 
@@ -278,6 +291,19 @@ for k in run_list:  #['G', 'R', 'I', 'Z', 'Y']
             file_header['CRPIX2'] = file_header['CRPIX2']-qso_center[1]+len(QSO_img)/2
             pyfits.PrimaryHDU(QSO_img-image_ps_2-objs_img,header=file_header).writeto('fit_result_detect/{0}/data-BHBH(host).fits'.format(qsoid),overwrite=True)
             print(call("mv {0} {1}".format(tag_name+'.pdf', tag+"_chisq_"+repr(round(reduced_Chisq_2,1)))+'.pdf', shell=True)   )
+            
+            #Plot the PSPS potision in the step3 and save plot
+            plt.imshow(QSO_img, origin='lower', norm=LogNorm())
+            for i in range(len(ps_result_2)):
+                x, y = -ps_result_2[i]['ra_image'][0]/data_process_list[k].deltaPix + len(QSO_img)/2,  ps_result_2[i]['dec_image'][0]/data_process_list[k].deltaPix+len(QSO_img)/2
+                plt.text(x, y,' PS{0}'.format(i))
+                plt.plot(x, y,'ro')
+            plt.savefig('fit_result_detect/{0}/step3_fitted_PSPSpos.pdf'.format(qsoid))
+            if show_plot == 1:
+                plt.show()
+            else:
+                plt.close()
+            
         write_result.close()                             
 #os.system('say "your program has finished"')
 print("Program has finished")

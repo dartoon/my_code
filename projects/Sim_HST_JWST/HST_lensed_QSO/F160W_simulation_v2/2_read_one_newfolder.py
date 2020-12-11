@@ -47,37 +47,10 @@ def cal_h0(zl, zs, Ddt, om=0.27):
     ratio = Ddt_corr/Ddt
     return 100 * ratio
 
-# folder_type = 'simulations_700_subg30/sim_lens_ID_subg30_'
-# # folder_type  = folder_list[0][:-3]
-# # file_type = 'model_result_use_drz_Noisemap_subg3.pkl'
-# file_type = 'model_result_calNoiseMap_modNoisemap_boostPossionx3_subg3.pkl'
-# # file_type = 'model_result_calNoiseMap_modNoisemap_boostPossionx3_subg3.pkl'
-file_type = 'result_PSFerr001_PSFinter_subg3.pkl'
-
-
-# # # file_type = 'model_result_subg3.pkl'
-# # file_type = 'model_result_calNoiseMap_modNoisemap_boostPossionx8_noPSFerr_subg2_fixgamma.pkl'
-# # # file_type = 'model_result_calNoiseMap_modNoisemap_useGrad_noPSFerr_subg3.pkl'
-# file_type = 'result_PSFerr001_subg3.pkl'
-# folder_type = 'simulations_700_subg30/sim_lens_noqso_ID_subg30_'
-
-
-# folder_list = glob.glob(folder_type+'*')
-# folder_list.sort()
-# test_numer = 10 #len(folder_list)
-# folder_list = folder_list[:test_numer]
-
-# for folder in folder_list:
-# for folder in ['simulations_700_subg30/sim_lens_ID_subg30_718']:   #Gamma strongly biased.
-# for folder in ['simulations_700_subg30/sim_lens_ID_subg30_724']:   #Chisq large
-for folder in ['simulations_700_subg30/sim_lens_ID_subg30_714']: 
-# for folder in ['simulations_700_subg30/sim_lens_noqso_ID_subg30_717']: 
-# for folder in ['simulations_700_subg30/sim_lens_ID_subg30_740']:  #larger gamma bias, but small H0 bias
-    ID = folder[-3:]
-    folder = folder + '/'
-    print(folder)
-    qso_folder = 'sim_lens_ID_{0}/'.format(ID)
-    model_lists, para_s, lens_info= pickle.load(open(folder+'sim_kwargs.pkl','rb'))
+for folder in ['AGN_result_folder/idx0_ID702_result_centerPSF001_PSFinter.pkl']: 
+    ID = folder.split('ID')[1][:3]
+    sim_folder = 'simulations_700_subg30/' + 'sim_lens_ID_subg30_' + ID +'/'
+    model_lists, para_s, lens_info= pickle.load(open(sim_folder+'sim_kwargs.pkl','rb'))
     lens_model_list, lens_light_model_list, source_model_list, point_source_list = model_lists
     # lens_model_list[0] = 'PEMD'
     z_l, z_s, TD_distance, TD_true, TD_obs, TD_err_l = lens_info
@@ -102,10 +75,10 @@ for folder in ['simulations_700_subg30/sim_lens_ID_subg30_714']:
                           'solver_type': solver_type,  # 'PROFILE', 'PROFILE_SHEAR', 'ELLIPSE', 'CENTER'
                           'Ddt_sampling': True,
                                   }
-    multi_band_list, kwargs_model, kwargs_result, chain_list, fix_setting, mcmc_new_list = pickle.load(open(folder+file_type,'rb'))
+    multi_band_list, kwargs_model, kwargs_result, chain_list, fix_setting, mcmc_new_list = pickle.load(open(folder,'rb'))
     # multi_band_list, kwargs_model, kwargs_result, chain_list, fix_setting, mcmc_new_list = pickle.load(open(folder+'model_result_use_drz_Noisemap_PSFnoisemapX0.1_subg3.pkl','rb'))
 
-    lens_data = pyfits.getdata(folder+'Drz_QSO_image.fits')
+    lens_data = pyfits.getdata(sim_folder+'Drz_QSO_image.fits')
     lens_mask = cr_mask(lens_data, 'normal_mask.reg')
     framesize = len(multi_band_list[0][0]['image_data'])  #81
     ct = int((len(lens_data) - framesize)/2)
@@ -126,6 +99,10 @@ for folder in ['simulations_700_subg30/sim_lens_ID_subg30_714']:
     #     chain_plot.plot_chain_list(chain_list, i)
     # plt.show()
     
+    kwargs_psf_updated = multi_band_list[0][1]
+    f, axes = chain_plot.psf_iteration_compare(kwargs_psf_updated)
+    f.show()
+
     truths=[para_s[0][0]['gamma'],TD_distance, 73.907]	
     plot = corner.corner(mcmc_new_list, labels=labels_new, show_titles=True, #range= [[0.8,1.5],[1,3],[0,1],[0, 1],[2000,5000],[20,100]], 
                           quantiles=[0.16, 0.5, 0.84], truths =truths,
@@ -168,7 +145,7 @@ for folder in ['simulations_700_subg30/sim_lens_ID_subg30_714']:
         x_image_infe, y_image_infe = kwargs_result['kwargs_ps'][0]['ra_image'], kwargs_result['kwargs_ps'][0]['dec_image']
     else:    
         ID = folder[-3:]
-        qso_folder = folder_type[:-16] + 'ID_subg30_{0}/'.format(ID)
+        qso_folder = 'AGN_result_folder/' + 'ID_subg30_{0}/'.format(ID)
         _, _, kwargs_result_withQSO, _, _, _ = pickle.load(open(qso_folder+'model_result_calNoiseMap_modNoisemap_boostPossionx3_subg3.pkl','rb'))
         x_image_infe, y_image_infe = kwargs_result_withQSO['kwargs_ps'][0]['ra_image'], kwargs_result_withQSO['kwargs_ps'][0]['dec_image']
    

@@ -48,19 +48,15 @@ def cal_h0(zl, zs, Ddt, om=0.27):
 folder_list = glob.glob('simulations_700_subg30/sim_lens_ID_subg30_7??')
 folder_list.sort()
 
-index = 1 #sys.argv[1]
-index = int(input("which index"))
-index = index -1
-savename = 'result_PSFinter_subg3.pkl'
+index = int(sys.argv[1])
+print("Which index:", index)
+# index = int(input("which index:\n"))
+savename = 'result_centerPSF001_PSFinter.pkl'
 
 #%%plot_spec_filter
-# savename = 'model_result_use_drz_Noisemap_subg2.pkl'
-# for folder in ['sim_lens_ID_subg30_702']:    
-save_pkl_folder = 'result_folder/'
+save_pkl_folder = 'AGN_result_folder/'
     
 for folder in [folder_list[index]]:
-# for folder in ['sim_lens_ID_subg30_718']:
-# for folder in folder_list:
     ID = folder[-3:]
     folder = folder + '/'
     print(folder)
@@ -76,7 +72,7 @@ for folder in [folder_list[index]]:
                           'solver_type': solver_type,  # 'PROFILE', 'PROFILE_SHEAR', 'ELLIPSE', 'CENTER'
                           'Ddt_sampling': True
                                   }
-    save_file = save_pkl_folder+'idx{0}_ID_'.format(index)+ID+'_'+savename
+    save_file = save_pkl_folder+'idx{0}_ID'.format(index)+ID+'_'+savename
     if glob.glob(save_file) == []:    
         lens_data = pyfits.getdata(folder+'Drz_QSO_image.fits')
         len_std = pyfits.getdata(folder+'noise_map.fits')
@@ -89,21 +85,10 @@ for folder in [folder_list[index]]:
         plt.imshow(lens_data * lens_mask, origin='lower',cmap='gist_heat', norm=LogNorm())
         plt.colorbar()
         exp_time = 599.* 2 * 8
-        # stdd =  0.0008  #Measurement from empty retion, 0.016*0.08**2/0.13**2/np.sqrt(8)
-        # vgrad = np.gradient(lens_data)
-        # fulgrad = np.sqrt(vgrad[0]**2 + vgrad[1]**2)
-        # len_std = (abs(lens_data/exp_time)+stdd**2)**0.5
-        
-        # len_std = len_std + fulgrad/fulgrad.max() * len_std.max()
-        # len_std = (abs(lens_data/exp_time)+stdd**2)**0.5
         deltaPix = 0.08
         
         x, y =find_loc_max(lens_data)
         center = (len(lens_data)-1)/2
-#        for i in range(len(x)):
-#            plt.plot(x[i], y[i], 'ro')
-#        plt.show()
-
         QSO_pos= []
         for i in range(len(x)):
             QSO_pos.append([float(x[i]-0.5), float(y[i]-0.5)])
@@ -120,15 +105,7 @@ for folder in [folder_list[index]]:
 #                print("shift: ", kwargs_ps['ra_image'][ds == ds.min()] - x0, kwargs_ps['dec_image'][ds == ds.min()]-y0)
                 kwargs_ps['ra_image'][ds == ds.min()] = x0
                 kwargs_ps['dec_image'][ds == ds.min()] = y0
-                # #Boost central noise
-                # if count == 0:
-                #     areas = (np.sqrt((QSO_pos[i][1]-xy_index[0])**2+(QSO_pos[i][0]-xy_index[1])**2) <3. )  # five piexls
-                # else:
-                #     areas += (np.sqrt((QSO_pos[i][1]-xy_index[0])**2+(QSO_pos[i][0]-xy_index[1])**2) <3. )  # five piexls
                 count += 1
-        # len_std = len_std * (areas == 0) + 10**6 * (areas != 0)
-        # plt.imshow(len_std, origin='low', norm=LogNorm(), vmax = 0.2)
-        # plt.show()                
                 
         if count!= len(kwargs_ps['ra_image']):
             raise ValueError("the PS positions is not assigned correctly")
@@ -148,7 +125,9 @@ for folder in [folder_list[index]]:
         kwargs_data['noise_map'] = len_std
         
         data_class = ImageData(**kwargs_data)
-        kwargs_psf = {'psf_type': 'PIXEL', 'kernel_point_source': psf, 'pixel_size': deltaPix} #, 'psf_error_map': np.ones_like(psf)*0.01}
+        psf_err_map = np.ones_like(psf)*0.01
+        psf_err_map[psf>0.003] = 0
+        kwargs_psf = {'psf_type': 'PIXEL', 'kernel_point_source': psf, 'pixel_size': deltaPix, 'psf_error_map': np.ones_like(psf)*0.01}
         psf_class = PSF(**kwargs_psf)
         
         #%%

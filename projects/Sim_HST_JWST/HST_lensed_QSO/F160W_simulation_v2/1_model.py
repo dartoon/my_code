@@ -50,13 +50,13 @@ def cal_h0(zl, zs, Ddt, om=0.27):
 folder_list = glob.glob('simulations_700_subg30/sim_lens_ID_subg30_7??')
 folder_list.sort()
 
-test_numer = 8
+test_numer = 48
 kernel = 4
 run_n = int(test_numer/kernel)
 
 kernel_i = 3  #, 1 ,2, 3 .. max = kernel-1
 folder_list = folder_list[:test_numer]
-savename = 'result_PSFerr001_PSFinter_subg3.pkl'
+savename = 'result_PSFnoerr_PSFinter_subg3.pkl'
 # folder_list = ['simulations_700_subg30/sim_lens_ID_subg30_724'] 
 # savename = 'model_result_calNoiseMap_modNoisemap_boostPossionx3_subg3.pkl'
 # savename = 'model_result_modNoisemap_useGrad_subg3.pkl'
@@ -174,7 +174,7 @@ for folder in folder_list[kernel_i*run_n:kernel_i*run_n+run_n]:
         kwargs_data['noise_map'] = len_std
         
         data_class = ImageData(**kwargs_data)
-        kwargs_psf = {'psf_type': 'PIXEL', 'kernel_point_source': psf, 'pixel_size': deltaPix, 'psf_error_map': np.ones_like(psf)*0.01}
+        kwargs_psf = {'psf_type': 'PIXEL', 'kernel_point_source': psf, 'pixel_size': deltaPix} #, 'psf_error_map': np.ones_like(psf)*0.01}
         psf_class = PSF(**kwargs_psf)
         
         #%%

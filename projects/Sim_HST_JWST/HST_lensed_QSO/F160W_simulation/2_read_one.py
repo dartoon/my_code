@@ -51,7 +51,7 @@ def cal_h0(zl, zs, Ddt, om=0.27):
 # # file_type = 'model_result_use_drz_Noisemap_subg3.pkl'
 # file_type = 'model_result_calNoiseMap_modNoisemap_boostPossionx3_subg3.pkl'
 # # file_type = 'model_result_calNoiseMap_modNoisemap_boostPossionx3_subg3.pkl'
-file_type = 'result_modNoisemap_boostPossionx3_subg3.pkl'
+file_type = 'result_modNoisemap_boostPossionx1_subg3_psferr001.pkl'
 folder_type = 'simulations_700_subg30/sim_lens_ID_subg30_'
 
 

@@ -400,9 +400,33 @@ yerr_highz = ((m_ml*np.ones_like(HSC_Mstar)*0.2)**2+0.4**2)**0.5
 HSC_x=np.log10(1+HSC_z)
 HSC_y=HSC_MBHs-(m_ml*HSC_Mstar+b_ml)
 HSC_x = HSC_x[HSC_y>-100]
+yerr_highz = yerr_highz[HSC_y>-100]
 HSC_y = HSC_y[HSC_y>-100]
 plt.scatter(HSC_x,HSC_y,c='gray',
             s=220, marker=".",zorder=-1, edgecolors='k', alpha = 0.4)
+
+result_HSC = op.minimize(nll, [1.8, 0.3], args=(HSC_x, HSC_y, yerr_highz))
+b_ml_HSC,_= result_HSC["x"]
+# plt.plot(xl, xl*0+xl*b_ml_HSC, color="black", linewidth=4.0,zorder=0)
+
+ndim, nwalkers = 2, 100
+pos_HSC = [result_HSC["x"] + 1e-4*np.random.randn(ndim) for i in range(nwalkers)]
+sampler_HSC = emcee.EnsembleSampler(nwalkers, ndim, lnprob, args=(HSC_x, HSC_y, yerr_highz))
+sampler_HSC.run_mcmc(pos_HSC, 500)
+sampler_HSC = sampler_HSC.chain[:, 50:, :].reshape((-1, ndim))
+
+b_ml_HSC, _ =np.percentile(sampler_HSC, 50,axis=0)
+#print "lnlike=",lnlike(theta=[b_ml_offset, sint_mid],x=x, y=y, yerr=yerr)
+plt.plot(xl, xl*0+xl*b_ml_HSC, color="black", linewidth=4.0,zorder=0)
+
+# HSC_b=np.percentile(sampler_HSC,50,axis=0)[0]
+#print samples[:,1][samples[:,0]==find_n(samples[:,0],m)]
+for i in range(100):
+    posi=np.random.uniform(16,84)
+    b_HSC=np.percentile(sampler_HSC,posi,axis=0)[0]    
+    #print b
+    plt.plot(xl, xl*0+xl*b_HSC, color="gray", alpha=0.1,linewidth=7.0,zorder=-1+np.random.normal(0,0.02))
+
 
 #%% Where loop ends
 plt.xlabel(r"log(1+z)",fontsize=45)
