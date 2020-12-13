@@ -38,7 +38,9 @@ result_dic = {}
 # outlier = [736, 728, 748, 710, 715]
 # folder_list = [folder_list[i] for i in range(len(folder_list)) if int(folder_list[i][-3:]) not in outlier]
 
-folder_type = 'AGN_result_folder/???_result_PSFinter_subg3.pkl'
+# folder_type = 'AGN_result_folder/???_result_PSFinter_subg3.pkl'
+folder_type = 'AGN_result_folder/idx*_ID*_centerPSF001_PSFinter.pkl'
+
 folder_list = glob.glob(folder_type)
 folder_list.sort()
 # test_numer = len(folder_list)
@@ -49,7 +51,7 @@ chisq_list = []
 for folder in folder_list:
     folder = folder+'/'
     read_file = folder[:-1]
-    ID = folder.split('/')[1][:3]
+    ID = folder.split('ID')[1][:3]
     sim_folder = 'simulations_700_subg30/' + 'sim_lens_ID_subg30_' + ID +'/'
     print(read_file)
     model_lists, para_s, lens_info= pickle.load(open(sim_folder+'sim_kwargs.pkl','rb'))
@@ -134,7 +136,7 @@ fig, ax = plt.subplots(figsize=(11,8))
 H0_list = []
 use_folder = []
 for folder in folder_list:
-    ID = folder.split('/')[1][:3]
+    ID = folder.split('ID')[1][:3]
     key = folder
     # if abs(result_dic[key][-1]) < 3.0 and result_dic[key][2][1] < 90 and result_dic[key][2][1] >61:      #Use folders meets this requirments
     if abs(result_dic[key][-1]) < chisq_thre and result_dic[key][2][1] < 100 and result_dic[key][2][1] >60:      #Use folders meets this requirments
@@ -142,15 +144,15 @@ for folder in folder_list:
         H0 = result_dic[key][2]
         plt.scatter(ID, H0[1],
                     c='darkred',s=280,marker=".",zorder=0, vmin=1.2, vmax=1.8, edgecolors='white',alpha=0.7)
-        # plt.errorbar(ID, H0[1], yerr = [[H0[2]-H0[1]], [H0[1]-H0[0]]],
-        #             ecolor='black', fmt='o', zorder=-500,markersize=1)  
+        plt.errorbar(ID, H0[1], yerr = [[H0[2]-H0[1]], [H0[1]-H0[0]]],
+                    ecolor='black', fmt='o', zorder=-500,markersize=1)  
         plt.text(ID, H0[1], repr(round(result_dic[key][-1], 3)),fontsize=15)
         H0_list.append([H0[1], (H0[2]-H0[1]+ H0[1]-H0[0])/2 ])
         use_folder.append(folder)
     else:
         print(ID)
 #        ax.set_xticks(range(id_range[0]-1, id_range[1]+1,3)) 
-plt.plot(np.linspace(id_range[0]-1, id_range[1]+1), np.linspace(id_range[0]-1, id_range[1]+1)*0 + H0_true)
+plt.plot(np.linspace(id_range[0]-1, id_range[1]+1), np.linspace(id_range[0]-1, id_range[1]+1)*0 + H0_true, 'blue')
 plt.xlabel("ID",fontsize=27)
 plt.ylabel("$H_0$",fontsize=27)
 plt.ylim(50,105)
@@ -168,8 +170,8 @@ print(np.mean(submit_sum[:,0]),'+-', np.std(submit_sum[:,0]))
 # goodness_sum = round(1/float(len(submit_sum))*np.sum(((submit_sum[:,0]-H0_true)/submit_sum[:,1])**2),3)
 # precision_sum = round(1/float(len(submit_sum))*np.sum(submit_sum[:,1]/H0_true)*100, 3)
 # print("precision_sum", precision_sum)
-accuracy_sum = round(1/float(len(submit_sum))*np.sum((submit_sum[:,0]-H0_true)/H0_true)*100, 3)
-print("accuracy_sum", accuracy_sum)
+# accuracy_sum = round(1/float(len(submit_sum))*np.sum((submit_sum[:,0]-H0_true)/H0_true)*100, 3)
+# print("accuracy_sum", accuracy_sum)
 
 
 #%%test parameter bias:
@@ -180,7 +182,7 @@ which = ['kwargs_lens', 'gamma']
 fig, ax = plt.subplots(figsize=(11,8))
 gamma_bias_list = []
 for folder in folder_list:
-    ID = folder.split('/')[1][:3]
+    ID = folder.split('ID')[1][:3]
     key = folder
     if abs(result_dic[key][-1]) < chisq_thre and result_dic[key][2][1] < 100 and result_dic[key][2][1] >60:      #Use folders meets this requirments
         gamma_bias = result_dic[key][1][which[0]][0][which[1]] - result_dic[key][0][which[0]][0][which[1]]
