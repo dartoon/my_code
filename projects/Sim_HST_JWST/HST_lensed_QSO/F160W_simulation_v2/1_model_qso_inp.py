@@ -51,7 +51,7 @@ folder_list.sort()
 index = int(sys.argv[1])
 print("Which index:", index)
 # index = int(input("which index:\n"))
-savename = 'centerPSF001_PSFinter.pkl'
+savename = 'PSFerr01_PSFinter.pkl'
 
 #%%plot_spec_filter
 save_pkl_folder = 'AGN_result_folder/'
@@ -125,8 +125,8 @@ for folder in [folder_list[index]]:
         kwargs_data['noise_map'] = len_std
         
         data_class = ImageData(**kwargs_data)
-        psf_err_map = np.ones_like(psf)*0.01
-        psf_err_map[psf<0.003] = 0
+        psf_err_map = np.ones_like(psf)*0.1
+        # psf_err_map[psf<0.003] = 0
         kwargs_psf = {'psf_type': 'PIXEL', 'kernel_point_source': psf, 'pixel_size': deltaPix, 'psf_error_map': psf_err_map}
         psf_class = PSF(**kwargs_psf)
         
