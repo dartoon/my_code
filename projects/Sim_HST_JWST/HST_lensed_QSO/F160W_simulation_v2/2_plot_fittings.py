@@ -45,7 +45,11 @@ def cal_h0(zl, zs, Ddt, om=0.27):
     ratio = Ddt_corr/Ddt
     return 100 * ratio
 
-folder_type = 'AGN_result_folder/idx*_ID*_centerPSF001_PSFinter.pkl'
+# folder_type = 'AGN_result_folder/idx*_ID*_centerPSF001_PSFinter.pkl'
+
+
+folder_type = 'AGN_result_folder/idx*_ID714_PSFerr001_PSFinter.pkl'
+
 
 folder_list = glob.glob(folder_type)
 folder_list.sort()
@@ -53,7 +57,7 @@ folder_list.sort()
 
 # index = int(sys.argv[1])
 # print("Which index:", index)
-savename = 'centerPSF001_PSFinter.pkl'
+# savename = 'centerPSF001_PSFinter.pkl'
 
 #%%plot_spec_filter
 save_pkl_folder = 'AGN_result_folder/'
@@ -70,17 +74,27 @@ for folder in folder_list:
     kwargs_lens_list, kwargs_lens_light_list, kwargs_source_list, kwargs_ps = para_s
     solver_type = 'PROFILE_SHEAR'
     
+    
     kwargs_constraints = {#'joint_source_with_point_source': [[0, 0]],
                           'num_point_source_list': [len(kwargs_ps['ra_image'])],
                           'solver_type': solver_type,  # 'PROFILE', 'PROFILE_SHEAR', 'ELLIPSE', 'CENTER'
                           'Ddt_sampling': True
                                   }
     index = folder.split('idx')[1].split('_')[0]
-    save_file = save_pkl_folder+'idx{0}_ID'.format(index)+ID+'_'+savename
+    # save_file = save_pkl_folder+'idx{0}_ID'.format(index)+ID+'_'+savename
+    save_file = folder[:-1]
     multi_band_list, kwargs_model, kwargs_result_best, chain_list, fix_setting, mcmc_new_list = pickle.load(open(save_file,'rb'))
     # fixed_lens, fixed_source, fixed_lens_light, fixed_ps, fixed_cosmo = fix_setting
+    
+    lens_data = np.ones([99,99])
+    lens_mask = cr_mask(lens_data, 'normal_mask.reg')    
+    framesize = len(multi_band_list[0][0]['image_data'])  #81
+    ct = int((len(lens_data) - framesize)/2)
+    lens_mask = (1-lens_mask)[ct:-ct,ct:-ct]    
+
     labels_new = [r"$\gamma$", r"$D_{\Delta t}$","H$_0$" ]
-    modelPlot = ModelPlot(multi_band_list, kwargs_model, kwargs_result_best, arrow_size=0.02, cmap_string="gist_heat")
+    modelPlot = ModelPlot(multi_band_list, kwargs_model, kwargs_result_best, arrow_size=0.02, cmap_string="gist_heat", 
+                          likelihood_mask_list= [lens_mask])
     f, axes = modelPlot.plot_main()
     plt.show()
     # f, axes = modelPlot.plot_separate()_
@@ -100,4 +114,4 @@ for folder in folder_list:
                           quantiles=[0.16, 0.5, 0.84], truths =truths,
                           title_kwargs={"fontsize": 15}, label_kwargs = {"fontsize": 25},
                           levels=1.0 - np.exp(-0.5 * np.array([1.,2.]) ** 2))
-    plt.close()
+    plt.show()

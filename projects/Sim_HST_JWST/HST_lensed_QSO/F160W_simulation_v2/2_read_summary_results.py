@@ -125,7 +125,7 @@ for folder in folder_list:
     chisq_list.append(chisq)
 
 #%%
-chisq_thre = np.percentile(chisq_list,80)
+chisq_thre = 100 # np.percentile(chisq_list,80)
 H0_true = 73.907
 fig, ax = plt.subplots(figsize=(11,8))
 H0_list = []
@@ -139,13 +139,13 @@ for folder in folder_list:
         H0 = result_dic[key][2]
         plt.scatter(ID, H0[1],
                     c='darkred',s=280,marker=".",zorder=0, vmin=1.2, vmax=1.8, edgecolors='white',alpha=0.7)
-        # plt.errorbar(ID, H0[1], yerr = [[H0[2]-H0[1]], [H0[1]-H0[0]]],
-        #             ecolor='black', fmt='o', zorder=-500,markersize=1)  
-        plt.text(ID, H0[1], repr(round(result_dic[key][-1], 3)),fontsize=15)
+        plt.errorbar(ID, H0[1], yerr = [[H0[2]-H0[1]], [H0[1]-H0[0]]],
+                    ecolor='black', fmt='o', zorder=-500,markersize=1)  
+        # plt.text(ID, H0[1], repr(round(result_dic[key][-1], 3)),fontsize=15)
         H0_list.append([H0[1], (H0[2]-H0[1]+ H0[1]-H0[0])/2 ])
         use_folder.append(folder)
 #        ax.set_xticks(range(id_range[0]-1, id_range[1]+1,3)) 
-plt.plot(np.linspace(id_range[0]-1, id_range[1]+1), np.linspace(id_range[0]-1, id_range[1]+1)*0 + H0_true)
+plt.plot(np.linspace(id_range[0]-1, id_range[1]+1), np.linspace(id_range[0]-1, id_range[1]+1)*0 + H0_true , 'red')
 plt.xlabel("ID",fontsize=27)
 plt.ylabel("$H_0$",fontsize=27)
 plt.ylim(50,105)
