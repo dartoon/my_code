@@ -94,11 +94,36 @@ zs =  np.array([3.7484e-03, 3.4930e-03, 2.4703e-03, 4.2822e-03, 7.3369e-03,
        2.7262e-03, 6.0195e-03, 5.3483e-03, 3.0748e-03, 2.3349e-05])
 hloc[:,0] = zs
 
-#############################################################
-###################fitting with MCMC#########################
+# =============================================================================
+# #Import Vardha' local
+# =============================================================================
+infers  = np.loadtxt('./local_Vardha_data.txt', dtype=str)
+z = infers[:, 3].astype(np.float)
+MBH = infers[:, 6].astype(np.float)
+Mstar = infers[:, 11]
+
+z = z[Mstar!= '...']
+MBH = MBH[Mstar!= '...']
+Mstar = Mstar[Mstar!= '...']
+
+Mstar = [Mstar[i].split('$\\pm$') for i in range(len(Mstar))]
+Mstar = np.array(Mstar)
+Mstar = Mstar.astype(np.float)
+
+# plt.errorbar(Mstar[:,0],MBH, xerr=Mstar[:,1] ,yerr=MBH*0 + 0.4,
+#               fmt='.',color='blue',markersize=15)
+
+# #############################################################
+# ###################fitting all togethera with MCMC#########################
 x=np.append(bloc[:,1], hloc[:,1])
 y=np.append(bloc[:,3], hloc[:,3])
+x=np.append(x, Mstar[:,0])
+y=np.append(y, MBH)
+
 yerr=(np.append(bloc[:,2], hloc[:,2])**2+np.append(bloc[:,4], hloc[:,4])**2)**0.5  # 0.2 is the uncertainty level for the L_R
+yerr= np.append(yerr, (Mstar[:,1]**2 + (MBH*0+0.4)**2 )**0.5 )
+
+
 def lnlike(theta, x, y, yerr):
     m, b, sint= theta
     model = m * x + b
@@ -145,6 +170,11 @@ elif style ==1:
                  hloc[:,3]-(m_ml*hloc[:,1]+b_ml),yerr=(hloc[:,2]**2 + hloc[:,4]**2)**0.5 ,fmt='.',color='black',markersize=10)
     plt.errorbar(np.log10(bloc[:,0]+1),
                  bloc[:,3]-(m_ml*bloc[:,1]+b_ml),yerr=(bloc[:,2]**2 + bloc[:,4]**2)**0.5 ,fmt='.',color='gray',markersize=10)
+    
+    plt.errorbar(np.log10(z+1),
+                 MBH-(m_ml*Mstar[:,0]+b_ml),yerr=(Mstar[:,1]**2 + (MBH*0+0.4)**2)**0.5 ,fmt='.',color='blue',markersize=10)
+    
+    
     ty=xl*0
     ty1=xl*0+np.std(y-(m_ml*x+b_ml))
     ty2=xl*0-np.std(y-(m_ml*x+b_ml))
@@ -380,53 +410,6 @@ for i in range(100):
 #####################
 value,sig=round(b_ml_offset,2),round((np.percentile(samples,84,axis=0)[0]-np.percentile(samples,16,axis=0)[0])/2,2)
 print(value,sig)
-
-#%%
-#Plot HSC data on top of Ding 2020
-line_means = ['id', 'z', 'ra', 'dec', 'fix_sersic_n', 'sersic_n_fitted', 'sersic_re_fitted', 'sersic_n_corrected',
-         'sersic_re_corrected', 'host_mag_g', 'host_mag_r', 'host_mag_i', 'host_mag_z', 'host_mag_y',
-         'ps_mag_g', 'ps_mag_r', 'ps_mag_i', 'ps_mag_z', 'ps_mag_y', 'decomposition_chisq', 'stellar_mass', 
-         'sed_chisq', 'logMBH', 'logMBH_err']
-infers  = np.loadtxt('./sdss_quasar_decomposition_v1.txt', dtype=str)
-HSC_z = infers[:,1].astype(np.float)
-HSC_Mstar = infers[:,20].astype(np.float)
-HSC_MBHs = infers[:,22].astype(np.float)
-HSC_MBHs_err = infers[:,23].astype(np.float)
-
-yerr_highz = ((m_ml*np.ones_like(HSC_Mstar)*0.2)**2+0.4**2)**0.5
-# plt.errorbar(np.log10(1+HSC_z),HSC_MBHs-(m_ml*HSC_Mstar+b_ml),
-#              yerr= yerr_highz,fmt='^',color='gray',markersize=4, )
-
-HSC_x=np.log10(1+HSC_z)
-HSC_y=HSC_MBHs-(m_ml*HSC_Mstar+b_ml)
-HSC_x = HSC_x[HSC_y>-100]
-yerr_highz = yerr_highz[HSC_y>-100]
-HSC_y = HSC_y[HSC_y>-100]
-plt.scatter(HSC_x,HSC_y,c='gray',
-            s=220, marker=".",zorder=-1, edgecolors='k', alpha = 0.4)
-
-result_HSC = op.minimize(nll, [1.8, 0.3], args=(HSC_x, HSC_y, yerr_highz))
-b_ml_HSC,_= result_HSC["x"]
-# plt.plot(xl, xl*0+xl*b_ml_HSC, color="black", linewidth=4.0,zorder=0)
-
-ndim, nwalkers = 2, 100
-pos_HSC = [result_HSC["x"] + 1e-4*np.random.randn(ndim) for i in range(nwalkers)]
-sampler_HSC = emcee.EnsembleSampler(nwalkers, ndim, lnprob, args=(HSC_x, HSC_y, yerr_highz))
-sampler_HSC.run_mcmc(pos_HSC, 500)
-sampler_HSC = sampler_HSC.chain[:, 50:, :].reshape((-1, ndim))
-
-b_ml_HSC, _ =np.percentile(sampler_HSC, 50,axis=0)
-#print "lnlike=",lnlike(theta=[b_ml_offset, sint_mid],x=x, y=y, yerr=yerr)
-plt.plot(xl, xl*0+xl*b_ml_HSC, color="black", linewidth=4.0,zorder=0)
-
-# HSC_b=np.percentile(sampler_HSC,50,axis=0)[0]
-#print samples[:,1][samples[:,0]==find_n(samples[:,0],m)]
-for i in range(100):
-    posi=np.random.uniform(16,84)
-    b_HSC=np.percentile(sampler_HSC,posi,axis=0)[0]    
-    #print b
-    plt.plot(xl, xl*0+xl*b_HSC, color="gray", alpha=0.1,linewidth=7.0,zorder=-1+np.random.normal(0,0.02))
-
 
 #%% Where loop ends
 plt.xlabel(r"log(1+z)",fontsize=45)

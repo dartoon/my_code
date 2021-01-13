@@ -303,11 +303,26 @@ line_means = ['id', 'z', 'ra', 'dec', 'fix_sersic_n', 'sersic_n_fitted', 'sersic
          'ps_mag_g', 'ps_mag_r', 'ps_mag_i', 'ps_mag_z', 'ps_mag_y', 'decomposition_chisq', 'stellar_mass', 
          'sed_chisq', 'logMBH', 'logMBH_err']
 infers  = np.loadtxt('./sdss_quasar_decomposition_v1.txt', dtype=str)
-HSC_z = infers[:,1].astype(np.float)
-HSC_Mstar = infers[:,20].astype(np.float)
-HSC_MBHs = infers[:,22].astype(np.float)
-HSC_MBHs_err = infers[:,23].astype(np.float)
-
+IDs_ = infers[:, 0]
+HSC_z_ = infers[:,1].astype(np.float)
+HSC_Mstar_ = infers[:,20].astype(np.float)
+HSC_MBHs_ = infers[:,22].astype(np.float)
+HSC_MBHs_err_ = infers[:,23].astype(np.float)
+flags_  = np.loadtxt('./sdss_quasar_decomposition_v1_catalog_flag.txt', dtype=str)
+flags = flags_[:,0]
+IDs, HSC_z, HSC_Mstar, HSC_MBHs, HSC_MBHs_err =[], [], [], [], []
+for i in range(len(IDs_)):
+    idx = np.where(IDs_[i] == flags)[0][0]
+    if flags_[idx][1] == 'y':
+        IDs.append(IDs_[i])
+        HSC_z.append(HSC_z_[i])
+        HSC_Mstar.append(HSC_Mstar_[i])
+        HSC_MBHs.append(HSC_MBHs_[i])
+        HSC_MBHs_err.append(HSC_MBHs_err_[i])
+HSC_z = np.array(HSC_z)
+HSC_Mstar = np.array(HSC_Mstar)
+HSC_MBHs = np.array(HSC_MBHs)
+HSC_MBHs_err = np.array(HSC_MBHs_err)
 yerr_highz = ((m_ml*np.ones_like(HSC_Mstar)*0.2)**2+0.4**2)**0.5
 # plt.errorbar(np.log10(1+HSC_z),HSC_MBHs-(m_ml*HSC_Mstar+b_ml),
 #              yerr= yerr_highz,fmt='^',color='gray',markersize=4, )
@@ -316,7 +331,7 @@ HSC_x=np.log10(1+HSC_z)
 HSC_y=HSC_MBHs-(m_ml*HSC_Mstar+b_ml)
 HSC_x = HSC_x[HSC_y>-100]
 HSC_y = HSC_y[HSC_y>-100]
-plt.scatter(HSC_Mstar,HSC_MBHs,c='gray',
+plt.scatter(HSC_Mstar,HSC_MBHs,c='blue',
             s=220, marker=".",zorder=-1, edgecolors='k', alpha = 0.4)
 
 #%%    
