@@ -79,3 +79,7 @@ projects/GSF_esti_stellar_mass/TDCOSMO_esti_temp/*
 *.asc
 package_code/decomprofile_example/000017.88+002612.6_result.txt
 package_code/decomprofile_example/run_batch_job.sh
+projects/2020_Fermi_HSC/model/model_image/model_result/*
+projects/2020_Fermi_HSC/model/model_image/SED_file/*
+projects/2020_Fermi_HSC/model/model_image/SED_templates/*
+projects/2020_Fermi_HSC/catalog/gll_psc_v27.fit
