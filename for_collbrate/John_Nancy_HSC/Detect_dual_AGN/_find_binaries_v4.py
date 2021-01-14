@@ -12,7 +12,6 @@ matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import glob
 
-
 from gen_fit_id_binary import gen_fit_id_binary
 from photutils import make_source_mask
 import os
