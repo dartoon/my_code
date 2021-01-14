@@ -18,6 +18,7 @@ from decomprofile.data_process import DataProcess
 from decomprofile.fitting_specify import FittingSpeficy
 from decomprofile.fitting_process import FittingProcess
 from astropy.wcs import WCS
+
 image_ID = sys.argv[1] #'141637.44+003352.2' 
 image_RA = float(sys.argv[2]) #214.15602111816406
 image_DEC = float(sys.argv[3]) #0.5645210146903992
@@ -58,12 +59,12 @@ if os.path.exists('fit_result_detect')==False:
 
 filename_ascii = 'RESULTS/' + image_ID + '_result.txt'
 
-# band_run_list = [2,0,1,3,4]  #run I band first
-# band_seq = ['G', 'R', 'I', 'Z', 'Y']
-# band_run_list = [0]  #run I band first
+#If only want to run I band
+# band_seq = ['I'] 
+# run_list = [0] 
 band_seq = ['I', 'G', 'R', 'Z', 'Y']
-filename_list = [image_ID+'_HSC-{0}.fits'.format(band_seq[i]) for i in range(len(band_seq))]
 run_list = [0, 1, 2, 3, 4]
+filename_list = [image_ID+'_HSC-{0}.fits'.format(band_seq[i]) for i in range(len(band_seq))]
 
 data_process_list, zp_list = [], []
 

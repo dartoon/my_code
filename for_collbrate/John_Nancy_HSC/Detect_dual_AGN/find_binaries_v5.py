@@ -18,9 +18,9 @@ from decomprofile.data_process import DataProcess
 from decomprofile.fitting_specify import FittingSpeficy
 from decomprofile.fitting_process import FittingProcess
 
-# image_ID = sys.argv[1] #'141637.44+003352.2' 
-# image_RA = float(sys.argv[2]) #214.15602111816406
-# image_DEC = float(sys.argv[3]) #0.5645210146903992
+image_ID = sys.argv[1] #'141637.44+003352.2' 
+image_RA = float(sys.argv[2]) #214.15602111816406
+image_DEC = float(sys.argv[3]) #0.5645210146903992
 
 # image_ID ='100043.13+020637.2' 
 # image_RA = 150.1797789
@@ -30,9 +30,9 @@ from decomprofile.fitting_process import FittingProcess
 # image_RA = 15.2033809 
 # image_DEC = 2.2677925
 
-image_ID ='141637.44+003352.2' 
-image_RA = 214.156021
-image_DEC = 0.564521
+# image_ID ='141637.44+003352.2' 
+# image_RA = 214.156021
+# image_DEC = 0.564521
 
 # # run_line = [5069, 5070, 5086, 5093, 5096, 5110][1]
 # run_line = 0
@@ -106,7 +106,8 @@ for i in range(len(band_seq)):
 #%%
 for k in run_list:  #['G', 'R', 'I', 'Z', 'Y']
     QSO_img = data_process_list[k].target_stamp
-    x, y = find_loc_max(QSO_img, neighborhood_size = 4, threshold = 4)
+    neighborhood_size, threshold = 4, 4
+    x, y = find_loc_max(QSO_img, neighborhood_size = neighborhood_size, threshold = threshold)
     arr_x, arr_y = np.asarray(x, dtype=float), np.asarray(y, dtype=float)
     center = len(QSO_img)/2
     bool_x, bool_y = (arr_x>(center-18))*(arr_x<(center+18)), (arr_y>(center-18))*(arr_y<(center+18))
@@ -239,7 +240,7 @@ for k in run_list:  #['G', 'R', 'I', 'Z', 'Y']
             fit_time = ft
             tag = 'fit_result_detect/{0}/fit_image2_PSPS+Sersic_fittime-{1}'.format(qsoid,fit_time+1)
             _fit_sepc_2 = FittingSpeficy(data_process_list[k])
-            _fit_sepc_2.prepare_fitting_seq(point_source_num = num_BHBH)
+            _fit_sepc_2.prepare_fitting_seq(point_source_num = num_BHBH, neighborhood_size = neighborhood_size, threshold = threshold)
             _fit_sepc_2.build_fitting_seq()
             _fit_run_2 = FittingProcess(_fit_sepc_2, savename = tag)
             _fit_run_2.run(algorithm_list = ['PSO'], setting_list= [None]) 
