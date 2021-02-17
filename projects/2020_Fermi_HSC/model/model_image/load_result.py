@@ -11,6 +11,7 @@ import matplotlib.pyplot as plt
 import astropy.io.fits as pyfits
 import glob
 import pickle
+from matplotlib.colors import LogNorm
 
 Bla_type = 'BL_Lac'
 # Bla_type = 'FSRQ'
@@ -23,7 +24,11 @@ results = string.split('\n')   # Split in to \n
 ids_file = glob.glob('../../data/{1}/*-{0}.fits'.format('I', Bla_type))
 ids = [ids_file[i].split('/')[-1].split('_')[0] for i in range(len(ids_file))]
 
-for k in range(len(ids)):
+# for k in range(len(ids)):
+#FSRQ
+# for k in [2, 8, 13, 16, 23]:
+#BL_Lac
+for k in [25, 27, 28, 31, 34, 35, 39, 40, 42, 44, 45, 46, 50, 52, 54, 55, 57]:
     bands = ['G', 'R', 'I' ,'Z' , 'Y']
     mags = []
     chisqs = []
