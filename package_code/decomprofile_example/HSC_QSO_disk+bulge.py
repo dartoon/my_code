@@ -69,7 +69,7 @@ from decomprofile.fitting_specify import FittingSpeficy
 fit_sepc = FittingSpeficy(data_process)
 
 
-fit_sepc.prepare_fitting_seq(point_source_num = 1, fix_n_list= [[0,4], [1,1]], fix_Re_list= [[0,0.2], [1,1.14]],  #First component fix n = 4 (bluge), second one fix to 1 (disk).
+fit_sepc.prepare_fitting_seq(point_source_num = 1, fix_n_list= [[0,4], [1,1]], #fix_Re_list= [[0,0.2], [1,1.14]],  #First component fix n = 4 (bluge), second one fix to 1 (disk).
                               fix_center_list = [[0,0]])
 
 fit_sepc.plot_fitting_sets()
