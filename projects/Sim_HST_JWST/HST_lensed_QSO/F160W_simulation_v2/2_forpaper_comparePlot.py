@@ -5,7 +5,7 @@ Created on Mon Nov 16 11:34:34 2020
 
 @author: Xuheng Ding
 """
-
+import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.colors import LogNorm
 import astropy.io.fits as pyfits
@@ -34,7 +34,6 @@ for ID in ID_list:
     for i in range(len(file_type_l)):
         file_type, folder_type = file_type_l[i], folder_type_l[i]
         folder = folder_type+ ID + '/'
-        qso_folder = 'sim_lens_ID_{0}/'.format(ID)
         model_lists, para_s, lens_info= pickle.load(open(folder+'sim_kwargs.pkl','rb'))
         lens_model_list, lens_light_model_list, source_model_list, point_source_list = model_lists
         
@@ -42,8 +41,13 @@ for ID in ID_list:
         # fixed_lens, fixed_source, fixed_lens_light, fixed_ps, fixed_cosmo = fix_setting
         # modelPlot = ModelPlot(multi_band_list, kwargs_model, kwargs_result_best,
         #                       arrow_size=0.02, cmap_string="gist_heat")
+        if i == 0:
+            run_file  = 'AGN_result_folder_run3times/idx11_ID714_PSFerr025_notPSFinter_morePSO_0.pkl'
+        if i == 1:
+            run_file = folder+file_type
+        qso_folder = 'sim_lens_ID_{0}/'.format(ID)
         
-        multi_band_list, kwargs_model, kwargs_result, chain_list, fix_setting, mcmc_new_list = pickle.load(open(folder+file_type,'rb'))
+        multi_band_list, kwargs_model, kwargs_result, chain_list, fix_setting, mcmc_new_list = pickle.load(open(run_file,'rb'))
         lens_data = pyfits.getdata(folder+'Drz_QSO_image.fits')
         len_std = pyfits.getdata(folder+'noise_map.fits')
         lens_mask = cr_mask(lens_data, 'normal_mask.reg')
@@ -54,8 +58,9 @@ for ID in ID_list:
         lens_mask = (1-lens_mask)[ct:-ct,ct:-ct]
         modelPlot = ModelPlot(multi_band_list, kwargs_model, kwargs_result,
                               arrow_size=0.02, cmap_string="gist_heat")
-        model, error_map, cov_param, param = modelPlot._imageModel.image_linear_solve(inv_bool=True, **kwargs_result)
+        model, error_map_, cov_param, param = modelPlot._imageModel.image_linear_solve(inv_bool=True, **kwargs_result)
         model = model[0]#[ct:-ct,ct:-ct]
+        # error_map  = np.sqrt(len_std**2+np.abs(error_map_[0]))
         # ct = 2
         # lens_data = lens_data[ct:-ct,ct:-ct]
         # len_std = len_std[ct:-ct,ct:-ct]
@@ -74,61 +79,79 @@ for ID in ID_list:
         model_arc_res = lens_data - model_noarc
 
         if i == 0:
-            lens_AGN_data, lens_AGN_std, lens_AGN_model, lens_AGN_arcres = lens_data, len_std, model, model_arc_res
+            lens_AGN_data, lens_AGN_std, lens_AGN_model, lens_AGN_arcres = lens_data, np.sqrt(len_std**2+np.abs(error_map_[0])), model, model_arc_res
         elif i ==1:
             lens_SN_data, lens_SN_std, lens_SN_model, lens_SN_arcres = lens_data, len_std, model, model_arc_res
-    fig, axs = plt.subplots(2, 3, figsize=(12, 9))
-    ((ax1, ax2, ax2_), (ax3, ax4, ax4_)) = axs
+    fig, axs = plt.subplots(2, 4, figsize=(15/3*3.5, 9/3*3.5))
+    ((ax11, ax12, ax13, ax14), (ax21, ax22, ax23, ax24)) = axs
     
-    f1 = ax1.imshow(lens_AGN_data, origin='lower', norm=LogNorm(), cmap = 'gist_heat', 
+    f11 = ax11.imshow(lens_AGN_data, origin='lower', norm=LogNorm(), cmap = 'gist_heat', 
                     vmin=lens_AGN_data.min(), vmax=lens_AGN_data.max()*0.8)
-    clb1 = fig.colorbar(f1, ax=ax1, shrink=0.7, pad=0.01, aspect=15) 
-    clb1.ax.tick_params(labelsize=15) 
-    ax1.set_title('Lensed AGN case', fontsize = 20)
-    ax1.set_xticks([])
-    ax1.set_yticks([])
+    clb11 = fig.colorbar(f11, ax=ax11, shrink=0.55, pad=0.01, aspect=15) 
+    clb11.ax.tick_params(labelsize=15) 
+    ax11.set_title('Mock lensed AGN', fontsize = 20)
+    ax11.set_xticks([])
+    ax11.set_yticks([])
     
-    f2 = ax2.imshow(lens_AGN_arcres, origin='lower', norm=LogNorm(), cmap = 'gist_heat', 
+    f12 = ax12.imshow(lens_AGN_model, origin='lower', norm=LogNorm(), cmap = 'gist_heat', 
                     vmin=lens_AGN_data.min(), vmax=lens_AGN_data.max()*0.8)
-    clb2 = fig.colorbar(f2, ax=ax2, shrink=0.7, pad=0.01, aspect=15) 
-    clb2.ax.tick_params(labelsize=15) 
-    ax2.set_title('Lensed arcs residual', fontsize = 20)
-    ax2.set_xticks([])
-    ax2.set_yticks([])
+    clb12 = fig.colorbar(f12, ax=ax12, shrink=0.55, pad=0.01, aspect=15) 
+    clb12.ax.tick_params(labelsize=15) 
+    ax12.set_title('Best-fit model', fontsize = 20)
+    ax12.set_xticks([])
+    ax12.set_yticks([])
     
-    f2_ = ax2_.imshow((lens_AGN_data-lens_AGN_model)/lens_AGN_std * lens_mask, origin='lower',
+    f13 = ax13.imshow(lens_AGN_arcres, origin='lower', norm=LogNorm(), cmap = 'gist_heat', 
+                    vmin=lens_AGN_data.min(), vmax=lens_AGN_data.max()*0.8)
+    clb13 = fig.colorbar(f13, ax=ax13, shrink=0.55, pad=0.01, aspect=15) 
+    clb13.ax.tick_params(labelsize=15) 
+    ax13.set_title('Deflector and AGNs subtracted', fontsize = 20)
+    ax13.set_xticks([])
+    ax13.set_yticks([])    
+    
+    f14 = ax14.imshow((lens_AGN_data-lens_AGN_model)/lens_AGN_std * lens_mask, origin='lower',
                     cmap = 'bwr', vmin=-6, vmax=6)
-    clb2_ = fig.colorbar(f2_, ax=ax2_, shrink=0.7, pad=0.01, aspect=15) 
-    clb2_.ax.tick_params(labelsize=15) 
-    ax2_.set_title('Residuals map', fontsize = 20)
-    ax2_.set_xticks([])
-    ax2_.set_yticks([])    
+    clb14 = fig.colorbar(f14, ax=ax14, shrink=0.55, pad=0.01, aspect=15) 
+    clb14.ax.tick_params(labelsize=15) 
+    ax14.set_title('Normalized residuals', fontsize = 20)
+    ax14.set_xticks([])
+    ax14.set_yticks([])     
     
-    f3 = ax3.imshow(lens_SN_data, origin='lower', norm=LogNorm(), cmap = 'gist_heat',
+    
+    f21 = ax21.imshow(lens_SN_data, origin='lower', norm=LogNorm(), cmap = 'gist_heat',
                     vmin=lens_AGN_data.min(), vmax=lens_AGN_data.max()*0.8)
-    clb3 = fig.colorbar(f3, ax=ax3, shrink=0.7, pad=0.01, aspect=15) 
-    clb3.ax.tick_params(labelsize=15) 
-    ax3.set_title('Lensed non-AGN case', fontsize = 20)
-    ax3.set_xticks([])
-    ax3.set_yticks([])
+    clb21 = fig.colorbar(f21, ax=ax21, shrink=0.55, pad=0.01, aspect=15) 
+    clb21.ax.tick_params(labelsize=15) 
+    ax21.set_title('Mock lensed transient', fontsize = 20)
+    ax21.set_xticks([])
+    ax21.set_yticks([])
     
-    f4 = ax4.imshow(lens_SN_arcres, origin='lower', norm=LogNorm(), cmap = 'gist_heat',
+    f22 = ax22.imshow(lens_SN_model, origin='lower', norm=LogNorm(), cmap = 'gist_heat',
                     vmin=lens_AGN_data.min(), vmax=lens_AGN_data.max()*0.8)
-    clb4 = fig.colorbar(f4, ax=ax4, shrink=0.7, pad=0.01, aspect=15) 
-    clb4.ax.tick_params(labelsize=15) 
-    ax4.set_title('Lensed arcs residual', fontsize = 20)
-    ax4.set_xticks([])
-    ax4.set_yticks([])
+    clb22 = fig.colorbar(f22, ax=ax22, shrink=0.55, pad=0.01, aspect=15) 
+    clb22.ax.tick_params(labelsize=15) 
+    ax22.set_title('Best-fit model', fontsize = 20)
+    ax22.set_xticks([])
+    ax22.set_yticks([])
     
-    f4_ = ax4_.imshow((lens_SN_data-lens_SN_model)/lens_SN_std * lens_mask, origin='lower',
+    f23 = ax23.imshow(lens_SN_arcres, origin='lower', norm=LogNorm(), cmap = 'gist_heat',
+                    vmin=lens_AGN_data.min(), vmax=lens_AGN_data.max()*0.8)
+    clb23 = fig.colorbar(f23, ax=ax23, shrink=0.55, pad=0.01, aspect=15) 
+    clb23.ax.tick_params(labelsize=15) 
+    ax23.set_title('Deflector subtracted', fontsize = 20)
+    ax23.set_xticks([])
+    ax23.set_yticks([])
+
+    f24 = ax24.imshow((lens_SN_data-lens_SN_model)/lens_SN_std * lens_mask, origin='lower',
                     cmap = 'bwr', vmin=-6, vmax=6)
-    clb4_ = fig.colorbar(f4_, ax=ax4_, shrink=0.7, pad=0.01, aspect=15) 
-    clb4_.ax.tick_params(labelsize=15) 
-    ax4_.set_title('Residuals map', fontsize = 20)
-    ax4_.set_xticks([])
-    ax4_.set_yticks([])       
+    clb24 = fig.colorbar(f24, ax=ax24, shrink=0.55, pad=0.01, aspect=15) 
+    clb24.ax.tick_params(labelsize=15) 
+    ax24.set_title('Normalized residuals', fontsize = 20)
+    ax24.set_xticks([])
+    ax24.set_yticks([])            
     
-    plt.tight_layout()
+    # plt.tight_layout()
+    plt.subplots_adjust(wspace=0.1, hspace=-0.3)
     plt.savefig('fitting_comparison.pdf')
     plt.show() 
 

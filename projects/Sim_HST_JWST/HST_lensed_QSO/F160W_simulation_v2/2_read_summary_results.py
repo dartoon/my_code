@@ -25,8 +25,8 @@ mat.rcParams['font.family'] = 'STIXGeneral'
 result_dic = {}
 
 
-file_type = 'result_PSFerr001_PSFinter_subg3.pkl'
-folder_type = 'simulations_700_subg30/sim_lens_ID_subg30_'
+# file_type = 'result_PSFerr001_PSFinter_subg3.pkl'
+# folder_type = 'simulations_700_subg30/sim_lens_ID_subg30_'
 
 
 file_type = 'result_PSFerr001_subg3.pkl'
@@ -35,8 +35,8 @@ folder_type = 'simulations_700_subg30/sim_lens_noqso_ID_subg30_'
 
 folder_list = glob.glob(folder_type+'*')
 folder_list.sort()
-outlier = [736, 728, 748, 710, 715]
-folder_list = [folder_list[i] for i in range(len(folder_list)) if int(folder_list[i][-3:]) not in outlier]
+# outlier = [736, 728, 748, 710, 715]
+# folder_list = [folder_list[i] for i in range(len(folder_list)) if int(folder_list[i][-3:]) not in outlier]
 
 
 test_numer = len(folder_list)
@@ -125,47 +125,56 @@ for folder in folder_list:
     chisq_list.append(chisq)
 
 #%%
-chisq_thre = 100 # np.percentile(chisq_list,80)
+chisq_thre = 100 #np.percentile(chisq_list,80)
 H0_true = 73.907
-fig, ax = plt.subplots(figsize=(11,8))
+fig, ax = plt.subplots(figsize=(11,3))
 H0_list = []
 use_folder = []
+count_i = 0
+
+if 'noqso' in folder_type:
+    name = 'no_qso'
+    
 for folder in folder_list:
-    ID = folder[-3:]
-    key = folder_type + '{0}'.format(ID)
-    # if abs(result_dic[key][-1]) < 3.0 and result_dic[key][2][1] < 90 and result_dic[key][2][1] >61:      #Use folders meets this requirments
-    if abs(result_dic[key][-1]) < chisq_thre and result_dic[key][2][1] < 100 and result_dic[key][2][1] >60:      #Use folders meets this requirments
-        ID = int(ID)
-        H0 = result_dic[key][2]
-        plt.scatter(ID, H0[1],
-                    c='darkred',s=280,marker=".",zorder=0, vmin=1.2, vmax=1.8, edgecolors='white',alpha=0.7)
-        plt.errorbar(ID, H0[1], yerr = [[H0[2]-H0[1]], [H0[1]-H0[0]]],
-                    ecolor='black', fmt='o', zorder=-500,markersize=1)  
-        # plt.text(ID, H0[1], repr(round(result_dic[key][-1], 3)),fontsize=15)
-        H0_list.append([H0[1], (H0[2]-H0[1]+ H0[1]-H0[0])/2 ])
-        use_folder.append(folder)
-#        ax.set_xticks(range(id_range[0]-1, id_range[1]+1,3)) 
-plt.plot(np.linspace(id_range[0]-1, id_range[1]+1), np.linspace(id_range[0]-1, id_range[1]+1)*0 + H0_true , 'red')
-plt.xlabel("ID",fontsize=27)
-plt.ylabel("$H_0$",fontsize=27)
-plt.ylim(50,105)
-plt.tick_params(labelsize=20)
-plt.show()
-
-H0_list = np.array(H0_list)
-plt.hist(H0_list[:, 0])
-plt.show()
-
+    ID = folder.split('subg30_')[1]
+    key = folder
+    # runs = glob.glob(key.split('/')[0] + '/' + '*ID{0}_*'.format(ID) + folder_type[-33:])
+    # chisqs = [result_dic[runs[i]][-1] for i in range(len(runs))]
+    # best_chisq = np.min(chisqs)
+    # # if abs(result_dic[key][-1]) < chisq_thre and result_dic[key][2][1] < 90 and result_dic[key][2][1] >60:      #Use folders meets this requirments    
+    # if abs(result_dic[key][-1])  == best_chisq:      #Use folders meets this requirments    
+    ID = int(ID)
+    H0 = result_dic[key][2]
+    plt.scatter(count_i, H0[1],
+                c='darkred',s=280,marker=".",zorder=0, vmin=1.2, vmax=1.8, edgecolors='white',alpha=0.7)
+    plt.errorbar(count_i, H0[1], yerr = [[H0[2]-H0[1]], [H0[1]-H0[0]]],
+                ecolor='black', fmt='o', zorder=-500,markersize=1)  
+    # plt.text(ID, H0[1], repr(round(result_dic[key][-1], 3)),fontsize=15)
+    H0_list.append([H0[1], (H0[2]-H0[1]+ H0[1]-H0[0])/2 ])
+    use_folder.append(folder)
+    count_i = count_i + 1
 
 submit_sum = np.array(H0_list)
 print(np.mean(submit_sum[:,0]),'+-', np.std(submit_sum[:,0]))
 
-# goodness_sum = round(1/float(len(submit_sum))*np.sum(((submit_sum[:,0]-H0_true)/submit_sum[:,1])**2),3)
-# precision_sum = round(1/float(len(submit_sum))*np.sum(submit_sum[:,1]/H0_true)*100, 3)
-# print("precision_sum", precision_sum)
-accuracy_sum = round(1/float(len(submit_sum))*np.sum((submit_sum[:,0]-H0_true)/H0_true)*100, 3)
-print("accuracy_sum", accuracy_sum)
+plt.plot(np.linspace(-1, count_i + 1), np.linspace(-1, count_i + 1)*0 + np.mean(submit_sum[:,0]), 'b--')     
+plt.fill_between(np.linspace(-1, count_i + 1), 
+                 np.linspace(-1, count_i + 1)*0 + np.mean(submit_sum[:,0]) + np.std(submit_sum[:,0]) , 
+                 np.linspace(-1, count_i + 1)*0 + np.mean(submit_sum[:,0]) - np.std(submit_sum[:,0]) , 
+                 color='blue', alpha=0.2)
+plt.plot(np.linspace(-1, count_i + 1), np.linspace(-1, count_i + 1)*0 + H0_true, 'r--')
+plt.xlabel("ID",fontsize=27)
+plt.ylabel("$H_0$ (km/s/Mpc)",fontsize=25)
+plt.ylim(55,95)
+plt.xlim(-0.9,48.9)
+plt.tick_params(labelsize=20)
+plt.title('$H_0$ by lensed transient systems'.format(name), fontsize=25)
+plt.savefig('H0_dis_nonAGNcase.pdf', bbox_inches = "tight")
+plt.show()
 
+# H0_list = np.array(H0_list)
+# plt.hist(H0_list[:, 0])
+# plt.show()
 
 #%%test parameter bias:
 #para = 'theta_E'  #'gamma'
@@ -211,8 +220,8 @@ for folder in folder_list:
     #    ax.set_xticks(range(id_range[0]-1, id_range[1]+1,3)) 
 plt.plot(np.linspace(-0.3,0.3), np.linspace(-0.3,0.3)*0, 'k', alpha = 0.5 )
 plt.title('Lensed {0} case'.format(text), fontsize=27)    
-plt.xlabel("$\gamma$ bias (inferred - truth)", fontsize=27)
-plt.ylabel("$H_0$ bias (inferred - truth)", fontsize=27)
+plt.xlabel("$\gamma$ offset (inferred $-$ truth)", fontsize=27)
+plt.ylabel("$H_0$ offset (inferred $-$ truth)", fontsize=27)
 plt.ylim(-20,20)
 plt.xlim(-0.2, 0.2)
 # plt.tick_params(labelsize=30)

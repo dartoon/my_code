@@ -115,9 +115,18 @@ for folder in folder_list:
 #%%
 chisq_thre = 100 #np.percentile(chisq_list,80)
 H0_true = 73.907
-fig, ax = plt.subplots(figsize=(11,8))
+fig, ax = plt.subplots(figsize=(11,3))
 H0_list = []
 use_folder = []
+count_i = 0
+
+if 'PSFerr025' in folder_type:
+    name = 50
+elif 'PSFerr01' in folder_type:
+    name = 30
+elif 'PSFerr001' in folder_type:
+    name = 10
+    
 for folder in folder_list:
     ID = folder.split('ID')[1][:3]
     key = folder
@@ -128,29 +137,38 @@ for folder in folder_list:
     if abs(result_dic[key][-1])  == best_chisq:      #Use folders meets this requirments    
         ID = int(ID)
         H0 = result_dic[key][2]
-        plt.scatter(ID, H0[1],
+        plt.scatter(count_i, H0[1],
                     c='darkred',s=280,marker=".",zorder=0, vmin=1.2, vmax=1.8, edgecolors='white',alpha=0.7)
-        plt.errorbar(ID, H0[1], yerr = [[H0[2]-H0[1]], [H0[1]-H0[0]]],
+        plt.errorbar(count_i, H0[1], yerr = [[H0[2]-H0[1]], [H0[1]-H0[0]]],
                     ecolor='black', fmt='o', zorder=-500,markersize=1)  
         # plt.text(ID, H0[1], repr(round(result_dic[key][-1], 3)),fontsize=15)
         H0_list.append([H0[1], (H0[2]-H0[1]+ H0[1]-H0[0])/2 ])
         use_folder.append(folder)
-        
-        
-plt.plot(np.linspace(id_range[0]-1, id_range[1]+1), np.linspace(id_range[0]-1, id_range[1]+1)*0 + H0_true, 'blue')
-plt.xlabel("ID",fontsize=27)
-plt.ylabel("$H_0$",fontsize=27)
-plt.ylim(50,105)
-plt.tick_params(labelsize=20)
-plt.show()
+        count_i = count_i + 1
 
-H0_list = np.array(H0_list)
-plt.hist(H0_list[:, 0])
-plt.show()
 
 submit_sum = np.array(H0_list)
 print(np.mean(submit_sum[:,0]),'+-', np.std(submit_sum[:,0]))
 
+plt.plot(np.linspace(-1, count_i + 1), np.linspace(-1, count_i + 1)*0 + np.mean(submit_sum[:,0]), 'b--')        
+plt.fill_between(np.linspace(-1, count_i + 1), 
+                 np.linspace(-1, count_i + 1)*0 + np.mean(submit_sum[:,0]) + np.std(submit_sum[:,0]) , 
+                 np.linspace(-1, count_i + 1)*0 + np.mean(submit_sum[:,0]) - np.std(submit_sum[:,0]) , 
+                 color='blue', alpha=0.2)
+plt.plot(np.linspace(-1, count_i + 1), np.linspace(-1, count_i + 1)*0 + H0_true, 'r--')
+plt.xlabel("ID",fontsize=27)
+plt.ylabel("$H_0$ (km/s/Mpc)",fontsize=25)
+plt.ylim(55,95)
+plt.xlim(-0.9,48.9)
+plt.tick_params(labelsize=20)
+plt.title('$H_0$ by lensed AGN systems (PSF uncertainty {0}%)'.format(name), fontsize=25)
+plt.savefig('H0_dis_AGNcase_PSF{0}.pdf'.format(name), bbox_inches = "tight")
+plt.show()
+
+# H0_list = np.array(H0_list)
+# plt.hist(H0_list[:, 0])
+# plt.show()
+#%%
 # goodness_sum = round(1/float(len(submit_sum))*np.sum(((submit_sum[:,0]-H0_true)/submit_sum[:,1])**2),3)
 # precision_sum = round(1/float(len(submit_sum))*np.sum(submit_sum[:,1]/H0_true)*100, 3)
 # print("precision_sum", precision_sum)
@@ -207,33 +225,38 @@ which = ['kwargs_lens', 'gamma']
 # plt.tick_params(labelsize=20)
 # plt.show()
 # print(which[1], np.mean(gamma_bias_list), np.std(gamma_bias_list))
-
+gamma_bias_list = []
 if 'noqso' in folder_type:
     text = 'non-AGN'
 else:
     text = 'AGN'
 fig, ax = plt.subplots(figsize=(8,8))
+folder_list_list = []  #The best model (best of 3) file
 for folder in folder_list:
     ID = folder.split('ID')[1][:3]
     key = folder
     runs = glob.glob(key.split('/')[0] + '/' + '*ID{0}*'.format(ID) + folder_type[-33:])
     chisqs = [result_dic[runs[i]][-1] for i in range(len(runs))]
     best_chisq = np.min(chisqs)
-    if abs(result_dic[key][-1])  == best_chisq:      #Use folders meets this requirments          H0 = result_dic[key][2]
+    if abs(result_dic[key][-1])  == best_chisq:
         H0 = result_dic[key][2]        
         gamma_bias = result_dic[key][1][which[0]][0][which[1]] - result_dic[key][0][which[0]][0][which[1]]
         plt.scatter(gamma_bias, H0[1] - H0_true,
                     c='darkred',s=280,marker=".",zorder=0, vmin=1.2, vmax=1.8, edgecolors='white',alpha=0.7)
+        gamma_bias_list.append(gamma_bias)
+        folder_list_list.append(folder)
 plt.plot(np.linspace(-0.3,0.3), np.linspace(-0.3,0.3)*0, 'k', alpha = 0.5 )
 plt.title('Lensed {0} case'.format(text), fontsize=27)    
-plt.xlabel("$\gamma$ bias (inferred - truth)", fontsize=27)
-plt.ylabel("$H_0$ bias (inferred - truth)", fontsize=27)
+plt.xlabel("$\gamma$ offset (inferred $-$ truth)", fontsize=27)
+plt.ylabel("$H_0$ offset (inferred $-$ truth)", fontsize=27)
 plt.ylim(-20,20)
 plt.xlim(-0.25, 0.25)
 # plt.tick_params(labelsize=30)
 plt.tick_params(which='both', width=2, length = 7, labelsize=30)
-# plt.savefig('bias_result_{0}.pdf'.format(text), bbox_inches = "tight")
+plt.savefig('bias_result_{0}.pdf'.format(text), bbox_inches = "tight")
 plt.show()
+# np.mean(gamma_bias_list), np.std(gamma_bias_list)
+#%%
 
 import lenstronomy.Util.param_util as param_util
 # #%%test parameter bias on q. #!!! Not right because the current kwarg_result is not the best answer yet...
@@ -287,8 +310,8 @@ for folder in folder_list:
                     c='darkred',s=280,marker=".",zorder=0, vmin=1.2, vmax=1.8, edgecolors='white',alpha=0.7)
 plt.plot(np.linspace(-0.3,0.3), np.linspace(-0.3,0.3)*0, 'k', alpha = 0.5 )
 plt.title('Lensed {0} case'.format(text), fontsize=27)    
-plt.xlabel("$q$ bias (inferred - truth)", fontsize=27)
-plt.ylabel("$H_0$ bias (inferred - truth)", fontsize=27)
+plt.xlabel("$q$ offset (inferred - truth)", fontsize=27)
+plt.ylabel("$H_0$ offset (inferred - truth)", fontsize=27)
 plt.ylim(-20,20)
 plt.xlim(-0.08, 0.08)
 # plt.tick_params(labelsize=30)
@@ -321,7 +344,7 @@ for folder in folder_list:
 plt.plot(np.linspace(-0.3,1), np.linspace(-0.3,0.3)*0, 'k', alpha = 0.5 )
 plt.title('Lensed {0} case'.format(text), fontsize=27)    
 plt.xlabel("$q$ value of mass", fontsize=27)
-plt.ylabel("$H_0$ bias (inferred - truth)", fontsize=27)
+plt.ylabel("$H_0$ offset (inferred - truth)", fontsize=27)
 plt.ylim(-20,20)
 plt.xlim(0.6, 1)
 # plt.tick_params(labelsize=30)

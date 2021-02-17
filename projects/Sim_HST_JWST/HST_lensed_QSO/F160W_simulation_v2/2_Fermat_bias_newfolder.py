@@ -27,8 +27,8 @@ geometry_mismatch_list = []
 
 folder_type = 'AGN_result_folder/idx*_ID*_PSFnoerr_PSFinter.pkl'
 folder_type = 'AGN_result_folder/idx*_ID*_PSFerr001_PSFinter.pkl'
-folder_type = 'AGN_result_folder/idx*_ID*_PSFerr01_PSFinter.pkl'
-folder_type = 'AGN_result_folder_run3times/idx*_ID*noPSFerr_noPSFinter_morePSO*.pkl'
+folder_type = 'AGN_result_folder/idx*_ID*_PSFerr025_PSFinter.pkl'
+# folder_type = 'AGN_result_folder_run3times/idx*_ID*noPSFerr_noPSFinter_morePSO*.pkl'
 
 # folder_type = 'AGN_result_folder/idx*_ID*_PSFerr025_PSFinter.pkl'
 
@@ -41,8 +41,56 @@ folder_list.sort()
 # outlier = [736, 728, 748, 710, 715]
 # folder_list = [folder_list[i] for i in range(len(folder_list)) if int(folder_list[i][-3:]) not in outlier]
 
+folder_list_list = ['AGN_result_folder_run3times/idx0_ID702_PSFerr025_notPSFinter_morePSO_0.pkl', #Best of 3 for PSF 50%
+ 'AGN_result_folder_run3times/idx10_ID713_PSFerr025_notPSFinter_morePSO_1.pkl',
+ 'AGN_result_folder_run3times/idx11_ID714_PSFerr025_notPSFinter_morePSO_0.pkl',
+ 'AGN_result_folder_run3times/idx12_ID715_PSFerr025_notPSFinter_morePSO_0.pkl',
+ 'AGN_result_folder_run3times/idx13_ID717_PSFerr025_notPSFinter_morePSO_1.pkl',
+ 'AGN_result_folder_run3times/idx14_ID718_PSFerr025_notPSFinter_morePSO_0.pkl',
+ 'AGN_result_folder_run3times/idx15_ID719_PSFerr025_notPSFinter_morePSO_2.pkl',
+ 'AGN_result_folder_run3times/idx16_ID720_PSFerr025_notPSFinter_morePSO_1.pkl',
+ 'AGN_result_folder_run3times/idx17_ID721_PSFerr025_notPSFinter_morePSO_0.pkl',
+ 'AGN_result_folder_run3times/idx18_ID724_PSFerr025_notPSFinter_morePSO_0.pkl',
+ 'AGN_result_folder_run3times/idx19_ID727_PSFerr025_notPSFinter_morePSO_0.pkl',
+ 'AGN_result_folder_run3times/idx1_ID703_PSFerr025_notPSFinter_morePSO_1.pkl',
+ 'AGN_result_folder_run3times/idx20_ID728_PSFerr025_notPSFinter_morePSO_1.pkl',
+ 'AGN_result_folder_run3times/idx21_ID729_PSFerr025_notPSFinter_morePSO_0.pkl',
+ 'AGN_result_folder_run3times/idx22_ID730_PSFerr025_notPSFinter_morePSO_0.pkl',
+ 'AGN_result_folder_run3times/idx23_ID731_PSFerr025_notPSFinter_morePSO_2.pkl',
+ 'AGN_result_folder_run3times/idx24_ID733_PSFerr025_notPSFinter_morePSO_0.pkl',
+ 'AGN_result_folder_run3times/idx25_ID734_PSFerr025_notPSFinter_morePSO_1.pkl',
+ 'AGN_result_folder_run3times/idx26_ID735_PSFerr025_notPSFinter_morePSO_2.pkl',
+ 'AGN_result_folder_run3times/idx27_ID736_PSFerr025_notPSFinter_morePSO_0.pkl',
+ 'AGN_result_folder_run3times/idx28_ID737_PSFerr025_notPSFinter_morePSO_1.pkl',
+ 'AGN_result_folder_run3times/idx29_ID738_PSFerr025_notPSFinter_morePSO_0.pkl',
+ 'AGN_result_folder_run3times/idx2_ID705_PSFerr025_notPSFinter_morePSO_0.pkl',
+ 'AGN_result_folder_run3times/idx30_ID739_PSFerr025_notPSFinter_morePSO_2.pkl',
+ 'AGN_result_folder_run3times/idx31_ID740_PSFerr025_notPSFinter_morePSO_1.pkl',
+ 'AGN_result_folder_run3times/idx32_ID741_PSFerr025_notPSFinter_morePSO_1.pkl',
+ 'AGN_result_folder_run3times/idx33_ID742_PSFerr025_notPSFinter_morePSO_1.pkl',
+ 'AGN_result_folder_run3times/idx34_ID743_PSFerr025_notPSFinter_morePSO_0.pkl',
+ 'AGN_result_folder_run3times/idx35_ID744_PSFerr025_notPSFinter_morePSO_1.pkl',
+ 'AGN_result_folder_run3times/idx36_ID745_PSFerr025_notPSFinter_morePSO_0.pkl',
+ 'AGN_result_folder_run3times/idx37_ID747_PSFerr025_notPSFinter_morePSO_1.pkl',
+ 'AGN_result_folder_run3times/idx38_ID748_PSFerr025_notPSFinter_morePSO_0.pkl',
+ 'AGN_result_folder_run3times/idx39_ID749_PSFerr025_notPSFinter_morePSO_1.pkl',
+ 'AGN_result_folder_run3times/idx3_ID706_PSFerr025_notPSFinter_morePSO_0.pkl',
+ 'AGN_result_folder_run3times/idx40_ID751_PSFerr025_notPSFinter_morePSO_2.pkl',
+ 'AGN_result_folder_run3times/idx41_ID752_PSFerr025_notPSFinter_morePSO_1.pkl',
+ 'AGN_result_folder_run3times/idx42_ID753_PSFerr025_notPSFinter_morePSO_1.pkl',
+ 'AGN_result_folder_run3times/idx43_ID754_PSFerr025_notPSFinter_morePSO_1.pkl',
+ 'AGN_result_folder_run3times/idx44_ID755_PSFerr025_notPSFinter_morePSO_0.pkl',
+ 'AGN_result_folder_run3times/idx45_ID757_PSFerr025_notPSFinter_morePSO_2.pkl',
+ 'AGN_result_folder_run3times/idx46_ID759_PSFerr025_notPSFinter_morePSO_1.pkl',
+ 'AGN_result_folder_run3times/idx47_ID760_PSFerr025_notPSFinter_morePSO_0.pkl',
+ 'AGN_result_folder_run3times/idx4_ID707_PSFerr025_notPSFinter_morePSO_1.pkl',
+ 'AGN_result_folder_run3times/idx5_ID708_PSFerr025_notPSFinter_morePSO_0.pkl',
+ 'AGN_result_folder_run3times/idx6_ID709_PSFerr025_notPSFinter_morePSO_0.pkl',
+ 'AGN_result_folder_run3times/idx7_ID710_PSFerr025_notPSFinter_morePSO_2.pkl',
+ 'AGN_result_folder_run3times/idx8_ID711_PSFerr025_notPSFinter_morePSO_2.pkl',
+ 'AGN_result_folder_run3times/idx9_ID712_PSFerr025_notPSFinter_morePSO_1.pkl']
 
-for folder in folder_list:    
+for folder in folder_list_list:    
     #==============================================================================
     # ##### lens mass model 
     #==============================================================================
