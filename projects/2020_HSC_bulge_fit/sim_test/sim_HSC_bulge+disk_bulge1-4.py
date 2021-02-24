@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Created on Thu Feb  4 18:11:44 2021
+Created on Sun Feb 21 23:19:01 2021
 
 @author: Dartoon
 """
@@ -24,6 +24,17 @@ import pickle
     
 zp = 27.0 #
 deltaPix = 0.167 #arcsec
+
+def condition_bulgedisk(kwargs_lens, kwargs_source, kwargs_lens_light, kwargs_ps, kwargs_special, kwargs_extinction):
+    logL = 0
+    phi0, q0 = param_util.ellipticity2phi_q(kwargs_source[0]['e1'], kwargs_source[0]['e2'])
+    phi1, q1 = param_util.ellipticity2phi_q(kwargs_source[1]['e1'], kwargs_source[1]['e2'])
+    cond_0 = (kwargs_source[0]['R_sersic'] > kwargs_source[1]['R_sersic'] * 0.9)
+    cond_1 = (kwargs_source[0]['R_sersic'] < kwargs_source[1]['R_sersic']*0.15)
+    cond_2 = (q0 < q1)
+    if cond_0 or cond_1 or cond_2:
+        logL -= 10**15
+    return logL
 
 array_l_means = ['id', 'z', 'ra', 'dec', 'fix_sersic_n', 'sersic_n_fitted', 'sersic_re_fitted', 'sersic_n_corrected',
          'sersic_re_corrected', 'host_mag_g', 'host_mag_r', 'host_mag_i', 'host_mag_z', 'host_mag_y',
@@ -53,9 +64,9 @@ HSC_AGN_mag = np.array(HSC_AGN_mag)
 HSC_re = np.array(HSC_re)
 
 #%%
-import glob
-filename = 'simulation_result.txt'
-for i in range(78):
+bulge_n = 4
+for j in range(78*4):
+    i = j%78
     host_mag = HSC_host_mag[i] 
     AGN_mag = HSC_AGN_mag[i]
     disk_reff =  HSC_re[i]*1.2 #1 # 
@@ -102,7 +113,7 @@ for i in range(78):
     e1_1, e2_1 = param_util.phi_q2_ellipticity(phi=phi1, q=q1)
     
     kwargs_numerics = {'supersampling_factor': 3, 'supersampling_convolution': False}
-    kwargs_bulge = {'amp': 1. , 'n_sersic': 4, 'R_sersic': bulge_reff, 'e1': e1_0, 'e2': e2_0,
+    kwargs_bulge = {'amp': 1. , 'n_sersic': bulge_n, 'R_sersic': bulge_reff, 'e1': e1_0, 'e2': e2_0,
                       'center_x': center_x + np.random.uniform(-0.1, 0.1)*deltaPix,
                       'center_y': center_y + np.random.uniform(-0.1, 0.1)*deltaPix} #!!!
     
@@ -160,18 +171,7 @@ for i in range(78):
     from decomprofile.fitting_specify import FittingSpeficy
     from decomprofile.fitting_process import FittingProcess
     
-    save_name = 'sim_result/round3_ID{0}_'.format(i)
-    
-    def condition_bulgedisk(kwargs_lens, kwargs_source, kwargs_lens_light, kwargs_ps, kwargs_special, kwargs_extinction):
-        logL = 0
-        phi0, q0 = param_util.ellipticity2phi_q(kwargs_source[0]['e1'], kwargs_source[0]['e2'])
-        phi1, q1 = param_util.ellipticity2phi_q(kwargs_source[1]['e1'], kwargs_source[1]['e2'])
-        cond_0 = (kwargs_source[0]['R_sersic'] > kwargs_source[1]['R_sersic'] * 0.9)
-        cond_1 = (kwargs_source[0]['R_sersic'] < kwargs_source[1]['R_sersic']*0.15)
-        cond_2 = (q0 < q1)
-        if cond_0 or cond_1 or cond_2:
-            logL -= 10**15
-        return logL
+    save_name = 'sim_result_bulge_n{1}/round0_ID{0}_'.format(j,bulge_n)
     data_process_0 = DataProcess(fov_image = sim_image_noise, fov_noise_map = rms, 
                                   target_pos = [len(sim_image_noise)/2, len(sim_image_noise)/2],
                                   pos_type = 'pixel', header = None,
@@ -214,7 +214,7 @@ for i in range(78):
     apertures = apertures[:comp_id] + [add_aperture0] + apertures[comp_id:]
     data_process_1.apertures = apertures #Pass apertures to the data
     fit_sepc_1 = FittingSpeficy(data_process_1)
-    fit_sepc_1.prepare_fitting_seq(point_source_num = 1, fix_n_list= [[0,4], [1,1]],  #First component fix n = 4 (bluge), second one fix to 1 (disk).
+    fit_sepc_1.prepare_fitting_seq(point_source_num = 1, fix_n_list= [[1,1]],  #First component fix n = 4 (bluge), second one fix to 1 (disk).
                                   fix_center_list = [[0,0]], condition = condition_bulgedisk)
     # fit_sepc_1.kwargs_params['source_model']
     use_true = 0
@@ -240,7 +240,6 @@ for i in range(78):
     bulge = fit_run_1.image_host_list[0]
     disk = fit_run_1.image_host_list[1]
     B2T_inf = np.sum(bulge)/np.sum(bulge+disk)
-    
     AGN = fit_run_1.image_ps_list[0]
     
     bulge_Re_inf = fit_run_1.final_result_galaxy[0]['R_sersic']
@@ -260,7 +259,6 @@ for i in range(78):
     print('True Reff: bulge, disk: ', round(bulge_reff,2), round(disk_reff,2) )
     print('Inf Reff: bulge, disk: ', round(bulge_Re_inf,2), round(disk_Re_inf,2) )
 
-        
     picklename = save_name + 'QuickResult.pkl'
     bic_result = ['bic_0 VS bic_1', bic_0, bic_1]
     chisq_result = ['Chisq0 VS Chisq1', fit_run_0.reduced_Chisq, fit_run_1.reduced_Chisq]
