@@ -145,8 +145,8 @@ def cutoutImage(butler, skymap, specObjID, ra, dec, bands, width=60.):
 
 if __name__ == '__main__':
 
-    butler = dafPersist.Butler('/gpfs02/HSC_DR/hsc_ssp/dr3/s19a/data/s19a_wide')
-    #butler = dafPersist.Butler('/gpfs02/HSC_DR/hsc_ssp/dr3/s20a/data/s20a_wide')
+    #butler = dafPersist.Butler('/gpfs02/HSC_DR/hsc_ssp/dr2/s18a/data/s18a_wide')
+    butler = dafPersist.Butler('/gpfs02/HSC_DR/hsc_ssp/dr3/s20a/data/s20a_wide')
     skymap = butler.get('deepCoadd_skyMap')
 
     """

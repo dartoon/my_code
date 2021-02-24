@@ -21,7 +21,6 @@ Reines_t1 = np.loadtxt('Reines_2015_table_1.txt', dtype=str)
 # [solMass] logM* Log stellar mass; corrected for AGN contribution (3)
 # [solMass] logMBH Log black hole mass (3)
 #%%
-
 # J012159.81-010224.3 20.49921333 -1.040074815
 # J084143.50+013149.8 130.4312678 1.530471828
 # J095540.47+050236.5 148.9187161 5.043512791
