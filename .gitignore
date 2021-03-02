@@ -65,6 +65,7 @@ sim_*ID*/
 */JWST_SED_abmag_esti/SED_files/*txt
 */JWST_SED_abmag_esti/SED_files/*PA00*
 .*/
+*.csv
 login.cl
 uparm/
 
@@ -85,3 +86,5 @@ projects/2020_Fermi_HSC/model/model_image/SED_templates/*
 projects/2020_Fermi_HSC/catalog/gll_psc_v27.fit
 projects/2021_dual_AGN/*/*/*.txt
 projects/2021_dual_AGN/*/*.txt
+projects/2021_dual_AGN/proofBHBH/model_Iband/*/*.txt
+projects/2021_dual_AGN/proofBHBH/model_Iband/*/*.py
