@@ -34,7 +34,7 @@ data_process.generate_target_materials(radius=55, create_mask = False, nsigma=2.
                                       exp_sz= 1.2, npixels = 15, if_plot=False)
 
 #%%PSF works.
-data_process.find_PSF(radius = 30, user_option = False)
+data_process.find_PSF(radius = 30, user_option = True)
 # data_process.find_PSF(radius = 50, PSF_pos_list = [[ 350., 1055.], [2078., 1910.]], user_option = False)
 data_process.plot_overview(label = 'Example', target_label = None)
 data_process.profiles_compare(norm_pix = 5, if_annuli=False, y_log = False,
@@ -61,10 +61,10 @@ fit_run.plot_all()
 fit_run.dump_result()
 print(fit_run.final_galaxy_result[0])
 
-##%%
-## Test load pkl
-#import pickle
-#picklename = 'result.pkl'
-#fitting_run_class = pickle.load(open(picklename,'rb'))
-#fitting_run_class.run_diag()
+#%%
+# Test load pkl
+import pickle
+picklename = 'result.pkl'
+fitting_run_class = pickle.load(open(picklename,'rb'))
+fitting_run_class.run_diag()
 
