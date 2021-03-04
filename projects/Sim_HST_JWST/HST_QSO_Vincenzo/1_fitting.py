@@ -30,32 +30,24 @@ deep_seed = False
 pltshow = 1 #Note that setting plt.ion() in line27, the plot won't show anymore if running in terminal.
 fixcenter = True
 run_MCMC = False
-use_true_PSF = 'same_drizzle' #'same_drizzle' #False
+use_true_PSF = False #'same_drizzle' #False
 save_SNR = True
 zp_dic = {'F160W':25.9463, 'F105W':26.2687} 
 
 # seed_l, seed_h = [[201, 208], [208,215], [215, 221]][0]
-seed_l, seed_h = [[0,1],[0, 25], [25, 50], [50, 75], [75, 99]][0]
+seed_l, seed_h = [[0, 25], [25, 50], [50, 75], [75, 99]][3]
 
 for seed in range(seed_l, seed_h):
     for ID in [0, 1]:#range(1, 7):
         for filt in ['F160W', 'F105W']:
             folder = filt + '/sim'+'_ID'+repr(ID)+'_'+filt+'_seed'+repr(seed)
             if use_true_PSF == True:
-                f = open(folder+"/sim_info.txt","r")
-                string = f.read()
-                lines = string.split('\n')   # Split in to \n            
-                psf_id = int([lines[i] for i in range(len(lines)) if 'PSF' in lines[i]][0].split('\t')[1])
-                save_name = 'fit_result_truePSF'
-                psf = pyfits.getdata('webPSF/drizzle_PSF_{0}/Drz_PSF_id{1}.fits'.format(filt, psf_id))
-            elif use_true_PSF == False:
-                psf_id = 0
-                save_name = 'fit_result_diffPSF'
-                psf = pyfits.getdata('webPSF/drizzle_PSF_{0}/Drz_PSF_id{1}.fits'.format(filt, psf_id))
-            elif use_true_PSF == 'same_drizzle':
                 psf = pyfits.getdata(folder+'/Drz_POINTclean_image.fits')
                 psf = psf/psf.sum()
                 save_name = 'fit_result_samedrz'
+            elif use_true_PSF == False:
+                save_name = 'fit_result_drzpsf'
+                psf = pyfits.getdata('PSF/Drz_{0}_PSF.fits'.format(filt))
             print("Fitting "+folder)                
             if glob.glob(folder+'/{0}.pkl'.format(save_name)) !=[]:
                 continue
