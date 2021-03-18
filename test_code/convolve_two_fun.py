@@ -25,7 +25,7 @@ def poss_ln_gaussian(m1, mu, sigma):
     return poss
 
 
-def mass_fun_i(m1, a=3.35, mbh_max=80, mbh_min=5):
+def mass_fun_i(m1, a=2.35, mbh_max=80, mbh_min=5):
     if m1>=mbh_min and m1<=mbh_max:
         N = (mbh_max)**(-a+1)/(1-a) - (mbh_min)**(-a+1)/(1-a)             # The intergral function of m**a for normalize the power law function
         return m1**(-a)/N

@@ -110,7 +110,7 @@ for ID in ID_list:
     ax13.set_yticks([])    
     
     f14 = ax14.imshow((lens_AGN_data-lens_AGN_model)/lens_AGN_std * lens_mask, origin='lower',
-                    cmap = 'bwr', vmin=-6, vmax=6)
+                    cmap = 'bwr', vmin=-3, vmax=3)
     clb14 = fig.colorbar(f14, ax=ax14, shrink=0.55, pad=0.01, aspect=15) 
     clb14.ax.tick_params(labelsize=15) 
     ax14.set_title('Normalized residuals', fontsize = 20)
@@ -143,7 +143,7 @@ for ID in ID_list:
     ax23.set_yticks([])
 
     f24 = ax24.imshow((lens_SN_data-lens_SN_model)/lens_SN_std * lens_mask, origin='lower',
-                    cmap = 'bwr', vmin=-6, vmax=6)
+                    cmap = 'bwr', vmin=-3, vmax=3)
     clb24 = fig.colorbar(f24, ax=ax24, shrink=0.55, pad=0.01, aspect=15) 
     clb24.ax.tick_params(labelsize=15) 
     ax24.set_title('Normalized residuals', fontsize = 20)

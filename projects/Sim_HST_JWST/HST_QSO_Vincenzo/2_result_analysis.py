@@ -45,8 +45,8 @@ zp_dic = {'F160W':25.9463, 'F105W':26.2687}
 # folder_suf = 'sim_seed301_1000s_reff13n14/'
 folder_suf = 'sim_seed301_5000s_reff13n14_ID246_noboost/'
 
-# save_name = 'fit_result_drzpsf'
-save_name = 'fit_result_samedrz'
+save_name = 'fit_result_drzpsf'
+# save_name = 'fit_result_samedrz'
 #if use_true_PSF == True:
 #    save_name = 'fit_result_truePSF'
 #elif use_true_PSF == False:
@@ -55,9 +55,8 @@ save_name = 'fit_result_samedrz'
 #    save_name = 'fit_result_samedrizzle'
 
 ID_range = [0,1]   
-seed_range = [301,321]
 #%%Mag bias
-
+name_list = ['X_N_81_44', 'CID_346']
 for ID in [0, 1]:
     fig, ax = plt.subplots(figsize=(11,8))
     filt_i = 0
@@ -65,7 +64,6 @@ for ID in [0, 1]:
     for filt in labels:    
         zp = zp_dic[filt]
         bias_list = []
-        filt_i = filt_i + 1
         for seed in range(0, 99):
             folder = filt + '/sim_ID{0}_{1}_seed{2}'.format(ID, filt, seed)
             f = open(folder+"/sim_info.txt","r")
@@ -95,15 +93,17 @@ for ID in [0, 1]:
         plt.text(filt_i-0.35, y_loc-0.05, '{0}\n$\pm${1}'.format(round(np.mean(bias_list),2),round(np.std(bias_list),2)), color='black',fontsize=14)
         plt.text(filt_i, -1.4+0.05, '{0}'.format(round(true_total_mag,2)), color='g',fontsize=14)
         plt.text(filt_i, -1.4-0.05, '{0}%'.format(round(float(true_host_ratio[:-1]),1)), color='crimson',fontsize=14)
+        print(true_host_ratio)
+        filt_i = filt_i + 1
     plt.plot(np.linspace(-1, 5), np.linspace(-1, 5)*0,'k')   
-    plt.title('Inferred mag bias for ID '+repr(ID), fontsize=27)
+    plt.title('Inferred mag bias for {0}'.format(name_list[ID]), fontsize=27)
     #legend:
     plt.text(-0.5, -1.1 + 0.05, 'Total magnitude', color='g',fontsize=14)
     plt.text(-0.5, -1.1 - 0.05, 'Host flux ratio', color='crimson',fontsize=14)
     ax.set_xticks(range(2))
     ax.set_xticklabels(labels)
     plt.ylabel("$\Delta$mag (inferred - truth)",fontsize=27)
-    plt.xlim(-0.5, 3.2)
+    plt.xlim(-0.8, 2.0)
     plt.ylim(-1.5, 1.)    
     plt.tick_params(labelsize=20)
     plt.savefig("host_mag_bias_ID{0}_5000.pdf".format(ID))

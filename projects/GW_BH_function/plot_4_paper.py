@@ -100,7 +100,7 @@ fig = corner.corner(samples, labels=["a0", "a1", "mbh_max", "mbh_min"],
 #                    plot_datapoints=True,smooth=1.0,smooth1d=1.0,
                     levels=1.0 - np.exp(-0.5 * np.arange(1, 2.1, 1) ** 2),
                     title_fmt='.2f')
-fig.savefig("fig_results_4para.pdf")
+#fig.savefig("fig_results_4para.pdf")
 #####
 plt.show()  
 
