@@ -19,29 +19,37 @@ from decomprofile.fitting_specify import FittingSpeficy
 from decomprofile.fitting_process import FittingProcess
 from astropy.wcs import WCS
 
-f = open("../cut_out.txt","r")
+# f = open("../cut_out.txt","r")
+# string = f.read()
+# lines = string.split('\n')   # Split in to \n
+
+# files = glob.glob('../z_over1/*')
+# files.sort()
+
+# run_i = 23
+# file = files[run_i]
+# image_ID = file.split('/')[-1]
+# line = [lines[i] for i in range(len(lines)) if image_ID in lines[i]]
+
+# _, image_RA, image_DEC = line[0].split(' ')
+# image_RA = float(image_RA)
+# image_DEC = float(image_DEC)
+# print("run_i = ", run_i)
+# print(image_ID, image_RA, image_DEC)
+
+image_ID = '144034.78+441520.5'
+f = open("../../_pdfs_2close/DR144.4_short.asc","r")
 string = f.read()
-lines = string.split('\n')   # Split in to \n
-
-files = glob.glob('../z_over1/*')
-files.sort()
-
-run_i = 91
-file = files[run_i]
-image_ID = file.split('/')[-1]
-line = [lines[i] for i in range(len(lines)) if image_ID in lines[i]]
-
-_, image_RA, image_DEC = line[0].split(' ')
-image_RA = float(image_RA)
-image_DEC = float(image_DEC)
-print("run_i = ", run_i)
-print(image_ID, image_RA, image_DEC)
+lines_ = string.split('\n')   # Split in to \n
+line= [lines_[i] for i in range(len(lines_)) if image_ID in lines_[i]]
+image_RA, image_DEC = float(line[0].split(' ')[1]), float(line[0].split(' ')[2]), 
+# 
 #%%
 deep_seed = True  #Set as True to put more seed and steps to fit,
 show_plot = 1
 fit_data = True  #If you simply want to do the search without fitting, set False
 
-image_folder = '../z_over1/' + image_ID + '/'
+image_folder = '../z_below1/' + image_ID + '/'
 fit_folder = image_folder + 'fit_result/'
 
 print(fit_folder)
@@ -79,8 +87,8 @@ for i in range(len(band_seq)):
                                      rm_bkglight = True, if_plot=False, zp = zp)
         data_process_i.noise_map = err_data
         data_process_i.generate_target_materials(radius=None, radius_list = [10, 20, 30, 40],
-                                                  create_mask = False, nsigma=1.2,
-                                                  exp_sz= 1.2, npixels = 9, if_plot=False)        
+                                                  create_mask = False, nsigma=1,
+                                              exp_sz= 1.2, npixels = 9, if_plot=False)        
         PSF = pyfits.getdata(image_folder+filename_list[i].split('.fits')[0]+'_psf.fits')
         if len(PSF) != 0 and PSF.shape[0] != PSF.shape[1]:
             cut = int((PSF.shape[0] - PSF.shape[1])/2)
@@ -99,8 +107,8 @@ for i in range(len(band_seq)):
 frame = np.max([len(data_process_list[i].target_stamp) for i in run_list])
 radius = int((frame-1)/2)
 for k in run_list:
-    data_process_list[k].generate_target_materials(radius=23,
-                                                   create_mask = False, nsigma=2,
+    data_process_list[k].generate_target_materials(radius=radius,
+                                                   create_mask = False, nsigma=2.,
                                                    exp_sz= 1.2, npixels = 15, if_plot=False)
     apertures_temp = data_process_list[k].apertures
     if k == run_list[0]:
@@ -114,19 +122,15 @@ for k in run_list:
                     count += 1
             if count == 0:
                 apertures.append(apertures_temp[i])
- 
-#!!!
 # del apertures[-1]
 for k in run_list:    
     data_process_list[k].apertures = apertures #Pass apertures to the data
 fix_n_list_0, fix_Re_list_0, fix_n_list_1, fix_Re_list_1, fix_n_list_2, fix_Re_list_2 = [None] * 6
 ps_param0, ps_param1, ps_param2 = None, None, None
 
-#!!!
 # from decomprofile.fitting_specify import ps_params_generator
-# ps_param1 = ps_params_generator([[0,0], [3,1]], [30,30], deltaPix = data_process_list[0].deltaPix)
+# ps_param1 = ps_params_generator([[0,0], [-1,-2]], [30,30], deltaPix = data_process_list[0].deltaPix)
 # ps_param2 = ps_param1
-
 
 #%%
 fig, (axs) = plt.subplots(1, 5, figsize=(15, 7))

@@ -1,17 +1,10 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-"""
-Created on Sun Feb 28 13:07:19 2021
-
-@author: Dartoon
-"""
-
 import numpy as np
 import astropy.io.fits as pyfits
 import matplotlib.pyplot as plt
 import glob
 import re
 import random
+
 folders = ['233718.07+002550.6', '230402.77-003855.4', '222929.45+010438.4', '221101.45+001449.0', 
           '220642.82+003016.2', '162501.98+430931.6', '153008.91+425634.8', '150216.66+025719.8', 
           '135944.20+012809.8', '134257.16-013912.9', '133222.62+034739.9', '132441.58-015401.8', 
@@ -23,15 +16,7 @@ folders = ['233718.07+002550.6', '230402.77-003855.4', '222929.45+010438.4', '22
           '011227.87-003151.6', '001401.62-002600.5']
 folders.sort()
 
-blue_line = np.loadtxt('Shenli_materials/stellar_blueline.txt')
-plt.figure(figsize=(11, 11))
-plt.plot(blue_line[:,0], blue_line[:,1],linewidth = 8)
-
-ID = '162501.98+430931.6'
-import os
-path = os.getcwd()
-fit_path = path.split('/analyze')[0] + '/HSC_images_5band/z_over1/' + ID + '/fit_result/'
-print(fit_path)
+ID_list, g_r_list, r_i_list = [], [], []
 
 for ID in folders:
     folder = '../proof2close_HSC_images_5band/z_over1/' + ID + '/fit_result/'
@@ -60,9 +45,7 @@ for ID in folders:
             y0 = float((pos_.split('y: ')[1][:10]).split(' ')[0])
             y1 = float((pos_.split('y: ')[2][:10]).split(' ')[0])        
             pos_list.append([[x0, y0], [x1, y1]])
-            # print('AGN mags', band[i]+'-band', AGN_mag[0], AGN_mag[1], '; pos offset:', offset)
         else:
-            # print(band[i]+'-band not fitting.')
             mag_list.append([-99, -99])
             pos_list.append([[-99, -99],[-99, -99]])
     mag_list = np.array(mag_list)
@@ -77,19 +60,50 @@ for ID in folders:
             elif dis_0[0] > dis_0[1]:
                 print("Position of AGN0 werid for", ID, band[i])
             elif dis_0[0] > dis_0[1]:
-                print("Position of AGN1 werid for", ID, band[i])
-    
+                print("Position of AGN1 werid for", ID, band[i])    
     g_r_0 = mag_list[0][order_list[0][0]] - mag_list[1][0]
     r_i_0 = mag_list[1][order_list[1][0]] - mag_list[2][0]
     g_r_1 = mag_list[0][order_list[0][1]] - mag_list[1][1]
     r_i_1 = mag_list[1][order_list[1][1]] - mag_list[2][1]
+
+    g_r_list.append([g_r_0,g_r_1])
+    r_i_list.append([r_i_0, r_i_1])
+    ID_list.append(ID)
+#%%
+from bokeh.models import ColumnDataSource, Select, RangeSlider, Slider
+
+from bokeh.plotting import figure, output_file, show
+output_file("line.html")
+blue_line = np.loadtxt('Shenli_materials/stellar_blueline.txt')
+
+p = figure(plot_width=400, plot_height=400)
+p.line(blue_line[:,0], blue_line[:,1], line_width=2)
+for i in range(len(g_r_list)):
     color = "#"+''.join([random.choice('0123456789ABCDEF') for j in range(6)])
-    plt.scatter([g_r_0,g_r_1], [r_i_0, r_i_1],color = color)
-    plt.plot([g_r_0,g_r_1], [r_i_0, r_i_1],color = color)
-plt.xlabel('HSC g-r',fontsize=27)
-plt.ylabel('HSC r-i',fontsize=27)
-plt.xlim([-0.5, 2.5])
-plt.ylim([-0.5, 3.0])
-plt.tick_params(labelsize=20)
-plt.show()
-    
+
+    qso_com = ColumnDataSource(data={
+        'g_r' : g_r_list[i],
+        'r_i' : r_i_list[i],
+        # 'ID' : ID_list[i]
+        # 'imgs' : ['/Users/Dartoon/Astro/Projects/my_code/projects/2021_dual_AGN/proof2close_HSC_images_5band/z_over1/000050.56-013055.2/fit_result/fitting2_used_aper.pdf']*2,
+        'imgs' : ['/Users/Dartoon/Downloads/SED_infernece.png']*2,
+    })    
+    p.circle('g_r', 'r_i', source=qso_com, size=7, color=color, alpha=0.5)
+from bokeh.models import HoverTool,Range1d
+p.x_range = Range1d(-0.4, 1.6)
+p.y_range = Range1d(-0.5, 3)
+hover = HoverTool(
+        tooltips="""
+        <div>
+            <div>
+                <img
+                    src="@imgs" height="150" width="150"
+                    style="float: left; margin: 0px 15px 15px 0px;"
+                    border="2"
+                ></img>
+            </div>
+        </div>
+        """
+    )
+p.add_tools(hover)
+show(p)
