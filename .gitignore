@@ -84,7 +84,7 @@ projects/2020_Fermi_HSC/model/model_image/model_result/*
 projects/2020_Fermi_HSC/model/model_image/SED_file/*
 projects/2020_Fermi_HSC/model/model_image/SED_templates/*
 projects/2020_Fermi_HSC/catalog/gll_psc_v27.fit
-projects/2021_dual_AGN/*/*/*.txt
+projects/2021_dual_AGN/*/*/fit_result.txt
 projects/2021_dual_AGN/*/*.txt
 projects/2021_dual_AGN/proofBHBH/model_Iband*/*/*.txt
 projects/2021_dual_AGN/proofBHBH/model_Iband*/*/*.py

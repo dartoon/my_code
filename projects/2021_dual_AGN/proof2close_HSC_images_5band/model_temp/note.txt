@@ -1,0 +1,490 @@
+run_i =  90
+233718.07+002550.6 354.3253174 0.430744
+../z_over1/233718.07+002550.6/fit_result/
+#!!! Intereing, left one Redder. Fitting not good.
+
+run_i =  89
+230402.77-003855.4 346.0115789 -0.6487432
+../z_over1/230402.77-003855.4/fit_result/
+#!!! Merging feature in I and Z band. Fitting not good though.
+
+run_i =  88
+224236.31-013121.1 340.651318 -1.5225461
+../z_over1/224236.31-013121.1/fit_result/
+#Too faint
+
+run_i =  87
+222929.45+010438.4 337.3727417 1.077335
+../z_over1/222929.45+010438.4/fit_result/
+#!!! Merging case. However, upper are like a galaxy. Truse 2.
+
+run_i =  86
+221101.45+001449.0 332.756073 0.246971
+../z_over1/221101.45+001449.0/fit_result/
+#!!!! Interesting merging case, upper right redder (G band not clear), a little sprial feature. Trust 2. Fitting not good yet.
+
+run_i =  85
+221011.62-001654.9 332.548426 -0.2819379
+../z_over1/221011.62-001654.9/fit_result/
+#Not strong evidence as dual. 
+
+run_i =  84
+220642.82+003016.2 331.6784363 0.504527
+../z_over1/220642.82+003016.2/fit_result/
+#!!! Sheard center, not very can be explaned by PS+PS.
+
+run_i =  83
+162501.98+430931.6 246.258255 43.1587791
+../z_over1/162501.98+430931.6/fit_result/
+#!!!! Very intereting case. Merger dual can be clear in R I Y. Trust 2.
+
+run_i =  82
+153008.91+425634.8 232.537131 42.9430023
+../z_over1/153008.91+425634.8/fit_result/
+#!!! Like two merging.
+#Bottom right red. Trust 1
+
+run_i =  81
+152445.62+440949.5 231.190094 44.1637611
+../z_over1/152445.62+440949.5/fit_result/
+# Lensing double. Clear lensing galaxy. Trust 2
+
+run_i =  80
+150216.66+025719.8 225.5694427 2.955502
+../z_over1/150216.66+025719.8/fit_result/
+#!!! Interesting, bottom left redder?
+#trust 2
+
+run_i =  79
+150200.03+444541.9 225.5001496 44.7616622
+../z_over1/150200.03+444541.9/fit_result/
+#Too faint.
+
+run_i =  78
+135944.20+012809.8 209.9342041 1.469391
+../z_over1/135944.20+012809.8/fit_result/
+#!!!! Very interesing case. Two merging like a lensing double. Truse 2
+
+run_i =  77
+134257.16-013912.9 205.738196 -1.6536095
+../z_over1/134257.16-013912.9/fit_result/
+#!!! some feature on the upper right.
+
+run_i =  76
+133630.21+030952.4 204.1258829 3.1645733
+../z_over1/133630.21+030952.4/fit_result/
+#Only R and I not very interesting. Bad PSF. 
+
+run_i =  75
+133222.62+034739.9 203.0942688 3.794435
+../z_over1/133222.62+034739.9/fit_result/
+#!!! Only R and I, but look very interesting like a dual merging.
+
+
+run_i =  74
+132441.58-015401.8 201.1732788 -1.90052
+../z_over1/132441.58-015401.8/fit_result/
+#!!!! Interesting, like a merging dual. Bottom right look redder. Trust 1 or 2. Fitting result not good.
+
+run_i =  73
+131628.32+045316.2 199.1180335 4.887848
+../z_over1/131628.32+045316.2/fit_result/
+#Not interesting. Only R and I have data. 
+
+run_i =  72
+131618.38+045401.0 199.0766091 4.9002807
+../z_over1/131618.38+045401.0/fit_result/
+#Only I and R band have imaging data. Only I band have merging feature.
+
+run_i =  71
+131512.46+015021.6 198.8019257 1.839345
+../z_over1/131512.46+015021.6/fit_result/
+#Like a merging dual, fitting result not good though.
+
+run_i =  70
+130239.56+042821.8 195.6648704 4.4727319
+../z_over1/130239.56+042821.8/fit_result/
+#Too faint, no feature.
+
+run_i =  69
+124618.51-001750.2 191.577132 -0.2972815
+../z_over1/124618.51-001750.2/fit_result/
+#!!!! Intersting a merging pair that is close. Trust 1.
+
+run_i =  68
+123255.17-020234.6 188.229885 -2.0429472
+../z_over1/123255.17-020234.6/fit_result/
+#Too faint, no feature. 
+
+run_i =  67
+122634.31+051024.0 186.6429693 5.1733374
+../z_over1/122634.31+051024.0/fit_result/
+# No strong feature. Little elli in R and I band.
+
+run_i =  66
+122144.31-004144.1 185.4346378 -0.6955942
+../z_over1/122144.31-004144.1/fit_result/
+#Like merging galaxy, trust 0.
+
+run_i =  65
+113803.73+031457.8 174.5155792 3.249393
+../z_over1/113803.73+031457.8/fit_result/
+#!!! lensed quads. Remove PSFs and can see the lensing galaxy. trust 2.
+
+run_i =  64
+105458.01+043310.6 163.7417298 4.5529476
+../z_over1/105458.01+043310.6/fit_result/
+#!!! ell shape Bottom like a QSO? Truse 1
+
+run_i =  63
+104644.31+000329.7 161.6846594 0.0582705
+../z_over1/104644.31+000329.7/fit_result/
+#!!! Two clumps merging? right one is more redder. But profile sharp.
+
+run_i =  62
+101138.50+012344.6 152.910428 1.3957429
+../z_over1/101138.50+012344.6/fit_result/
+#!!! Bottom left like a galaxy or QSO? trust 2.
+
+run_i =  61
+095218.04-000459.1 148.0751941 -0.0830984
+../z_over1/095218.04-000459.1/fit_result/
+#Not so interesting. A little shear feature in I band.
+
+run_i =  60
+094922.95+003059.6 147.3456514 0.5165637
+../z_over1/094922.95+003059.6/fit_result/
+#Dense field, no dual feature. No fit.
+
+run_i =  59
+093903.41+022957.3 144.7642365 2.4992771
+../z_over1/093903.41+022957.3/fit_result/
+#No special (bad PSF model) , Trust 0
+
+run_i =  58
+093622.07-004555.4 144.0919647 -0.765395
+../z_over1/093622.07-004555.4/fit_result/
+#No feature. Truse 0. (PSF model looks bad.)
+
+run_i =  57
+092532.13-020806.1 141.3839093 -2.1350531
+../z_over1/092532.13-020806.1/fit_result/
+#Bottom right like galaxy. Trust 0.
+
+run_i =  56
+090654.53+021315.2 136.7272339 2.2208979
+../z_over1/090654.53+021315.2/fit_result/
+#!!! Two different color clump merging, difficult to model.
+#Trust 1
+
+run_i =  55
+090559.70+022408.2 136.4987623 2.402298
+../z_over1/090559.70+022408.2/fit_result/
+#Could be a dual case, but not clear signal. Bottom more like a galaxy. Trust 2
+
+run_i =  54
+023951.04+004648.2 39.962688 0.7800779
+../z_over1/023951.04+004648.2/fit_result/
+#Too faint
+
+run_i =  53
+023855.74-041838.6 39.7322531 -4.3107275
+../z_over1/023855.74-041838.6/fit_result/
+#Too faint
+
+run_i =  52
+023855.60-000750.1 39.7317008 -0.130591
+../z_over1/023855.60-000750.1/fit_result/
+#Two faint as ell.
+
+run_i =  51
+023829.90-011224.2 39.6246026 -1.2067437
+../z_over1/023829.90-011224.2/fit_result/
+#An elliptical QSO? Can be merging. But, the fitting looks not interesting.
+#Fitting 0
+
+run_i =  50
+023600.28-010432.3 39.0011883 -1.0756482
+../z_over1/023600.28-010432.3/fit_result/
+#QSO with a small galaxy on the bottom? Trust 0.
+
+run_i =  49
+022906.04-051428.9 37.2751989 -5.2413844
+../z_over1/022906.04-051428.9/fit_result/
+#!!!! Could be two merger QSOs, trust 1?
+# The data-pointsource for fitting 0 shows a left-over is another QSO.
+
+run_i =  48
+022657.63-033335.4 36.740163 -3.559845
+../z_over1/022657.63-033335.4/fit_result/
+#PS merger a galaxy? Trust 0
+
+run_i =  47
+022509.04-001346.4 36.2876879 -0.2295723
+../z_over1/022509.04-001346.4/fit_result/
+#A sheard center, but evidence not strong.
+#Trust 0
+
+run_i =  46
+022404.85+014941.9 36.0202094 1.8283253
+../z_over1/022404.85+014941.9/fit_result/
+#!!! Interesting, like a two close pair in redder band.
+# Couldn't get good fit. Because they are too close?
+
+run_i =  45
+022345.34+001459.8 35.9389257 0.2499709
+../z_over1/022345.34+001459.8/fit_result/
+#No strong evidence 
+#Trust 0
+
+run_i =  44
+021926.49-045844.4 34.8603989 -4.9790159
+../z_over1/021926.49-045844.4/fit_result/
+#Interesting case (one sheard galaxy with duals on top), but not a merger dual.
+#Trust 2
+
+
+run_i =  43
+021425.07-051540.0 33.6044753 -5.2611133
+../z_over1/021425.07-051540.0/fit_result/
+#Not interesting, no feature
+#Trust 0
+
+run_i =  42
+020732.82-043915.9 31.8867902 -4.6544441
+../z_over1/020732.82-043915.9/fit_result/
+#No strong feature
+#Trust 0
+
+run_i =  41
+020721.92-005826.1 31.841336 -0.9739355
+../z_over1/020721.92-005826.1/fit_result/
+#Not like a dual, a merger galaxy on the bottom?
+#Trust bottom 0.
+
+run_i =  40
+020318.87-062321.3 30.828645 -6.3892674
+../z_over1/020318.87-062321.3/fit_result/
+#!!! Interesting case, like a mergering together.
+#Trust 1
+
+run_i =  39
+020231.14-042246.8 30.6297849 -4.3796789
+../z_over1/020231.14-042246.8/fit_result/
+#!!! A lens? Trust 2
+
+run_i =  38
+020053.43-042721.8 30.2226349 -4.4560711
+../z_over1/020053.43-042721.8/fit_result/
+#!!! Like a faint feature. But, upper too faint.
+#Trust 0 or 1
+
+run_i =  37
+015741.34+023911.8 29.4222551 2.6532792
+../z_over1/015741.34+023911.8/fit_result/
+#No feature trust 0
+
+run_i =  36
+015141.69-000646.8 27.9237238 -0.1130093
+../z_over1/015141.69-000646.8/fit_result/
+#!!! Like to mergering
+#Trust 1 
+
+run_i =  35
+014937.28-005251.1 27.4053736 -0.8808754
+../z_over1/014937.28-005251.1/fit_result/
+#No strong feature, trust 0
+
+run_i =  34
+014843.41+010049.7 27.1808952 1.0138259
+../z_over1/014843.41+010049.7/fit_result/
+#Too faint, trust 0
+
+run_i =  33
+014235.36+012334.0 25.6473419 1.3927863
+../z_over1/014235.36+012334.0/fit_result/
+#!!! Interesting, like to mergering clumps. Bottom profile flat should be a galaxy.
+#Trust 2, (galaxy move to the bottom)
+
+run_i =  32
+014129.75+004900.1 25.3739664 0.8167061
+../z_over1/014129.75+004900.1/fit_result/
+#Not like a pair of dual
+#Trust 0
+
+run_i =  31
+014012.11-001902.4 25.0504759 -0.3173561
+../z_over1/014012.11-001902.4/fit_result/
+#Too faint
+#Trust 0
+
+run_i =  30
+013930.80-002131.6 24.8783414 -0.3588003
+../z_over1/013930.80-002131.6/fit_result/
+#Two faint to claim a pair.
+
+run_i =  29
+013834.18-000509.3 24.6424428 -0.0859209
+../z_over1/013834.18-000509.3/fit_result/
+#!!! Merging, like two close dual systems
+#Fitting 1 or 2?
+
+run_i =  28
+013736.57+005742.3 24.4024037 0.9617766
+../z_over1/013736.57+005742.3/fit_result/
+#!!! Two merging ting, but, left not like PSF. But, fitting2 show no galaxy single after removing two PS. G band weak singel.
+#fitting 0, 1, 2 both OK... ?
+
+run_i =  27
+013526.15+004135.8 23.8589786 0.693303
+../z_over1/013526.15+004135.8/fit_result/
+#!!! Two thing merging, upper one like a galaxy.
+#Trust 1 or 2 (but upper PS are actually faint.)
+
+run_i =  26
+013327.34-003612.7 23.3639388 -0.603529
+../z_over1/013327.34-003612.7/fit_result/
+#Not clear feature. Truse 0
+
+run_i =  25
+012740.16+023526.5 21.9173573 2.5907003
+../z_over1/012740.16+023526.5/fit_result/
+#Very faint, not interesting.
+
+run_i =  24
+012453.90+021829.2 21.2246026 2.3081301
+../z_over1/012453.90+021829.2/fit_result/
+#two merging, bottom like a galaxy. Truse 2
+
+run_i =  23
+012110.93+010703.3 20.2955492 1.1175916
+../z_over1/012110.93+010703.3/fit_result/
+#Not clear feature, trust 0
+
+run_i =  22
+011855.84+000316.1 19.7327038 0.0544733
+../z_over1/011855.84+000316.1/fit_result/
+#Not clear feature, trust 0
+
+run_i =  21
+011748.20+024850.6 19.4508691 2.8140562
+../z_over1/011748.20+024850.6/fit_result/
+#I band image split into two. Not fit.
+
+run_i =  20
+011227.87-003151.6 18.1161555 -0.5310069
+../z_over1/011227.87-003151.6/fit_result/
+#!!! Interesing like to merging pair. Color of two looks different. Bottom-left more extended.
+#Trust 1 or 2
+
+run_i =  19
+011116.81-012209.8 17.8200518 -1.369404
+../z_over1/011116.81-012209.8/fit_result/
+#Too faint.
+#Trust 0
+
+run_i =  18
+010701.94+005543.8 16.7581128 0.9288414
+../z_over1/010701.94+005543.8/fit_result/
+#Dense field, but no feature.
+#Truse 0
+
+run_i =  17
+010553.76+000232.1 16.4740139 0.0422639
+../z_over1/010553.76+000232.1/fit_result/
+#Like two Galaxy merging, trust 0
+
+run_i =  16
+010307.97+011407.0 15.7832235 1.2352902
+../z_over1/010307.97+011407.0/fit_result/
+#Like galaxy merging, but not QSO merging.
+#No good fitting...
+
+run_i =  15
+010114.94-001154.6 15.3122654 -0.198506
+../z_over1/010114.94-001154.6/fit_result/
+#No feature
+#Trust 0
+
+run_i =  14
+003828.78+001000.1 9.6199415 0.1667026
+../z_over1/003828.78+001000.1/fit_result/
+#Dense region, but no AGN mergring feature, Truse 0
+
+run_i =  13
+003802.77+003247.1 9.5115832 0.5464437
+../z_over1/003802.77+003247.1/fit_result/
+#Too faint, not interesting
+#Trust 0
+
+run_i =  12
+003659.43-001850.2 9.2476463 -0.313971
+../z_over1/003659.43-001850.2/fit_result/
+#Not like a ell to me
+#Trust 0
+
+
+run_i =  11
+003659.26-001922.7 9.2469211 -0.3229954
+../z_over1/003659.26-001922.7/fit_result/
+#Like QSO merging a Galaxy...
+#Trust fitting 0
+
+run_i =  10
+003649.19+023750.8 9.2049895 2.6307801
+../z_over1/003649.19+023750.8/fit_result/
+#Too faint.
+
+run_i =  9
+003410.74-003335.2 8.5447914 -0.5597937
+../z_over1/003410.74-003335.2/fit_result/
+#Not like a dual, a little elli in I band only.
+#Fitting 0
+
+run_i =  8
+003238.43+010237.9 8.160145 1.0438888
+../z_over1/003238.43+010237.9/fit_result/
+#No dual feature...
+#Trust fitting0?
+
+run_i =  7
+002938.47+002039.7 7.4103049 0.3443744
+../z_over1/002938.47+002039.7/fit_result/
+#Too faint, not interesting.
+
+run_i =  6
+002912.41-002445.3 7.3017173 -0.4126023
+../z_over1/002912.41-002445.3/fit_result/
+#Faint image... Not interesting
+
+run_i =  5
+002611.83+000935.8 6.5493244 0.1599504
+../z_over1/002611.83+000935.8/fit_result/
+#Nothing found...
+
+run_i =  4
+001459.72+002319.2 3.7488726 0.3886687
+../z_over1/001459.72+002319.2/fit_result/
+#The upper partten seems to be a faint PS? But, it is not clear.
+Trust fitting 1
+
+run_i =  3
+001401.62-002600.5 3.506772 -0.4334848
+../z_over1/001401.62-002600.5/fit_result/
+#!!! Looking like two merging pair,
+Trust fitting 1
+
+run_i =  2
+001223.37+012659.4 3.0973907 1.4498555
+../z_over1/001223.37+012659.4/fit_result/
+#Looks Normal
+
+
+run_i = 1:
+000257.94+024837.7 0.7414341 2.8104955
+I band has weird feature only
+
+run_i = 0:
+000050.56-013055.2 0.2107058 -1.5153439
+only I band have elliptical feature.
+Trust fit 1

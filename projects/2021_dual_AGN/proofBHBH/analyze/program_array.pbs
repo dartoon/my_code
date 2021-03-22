@@ -1,0 +1,17 @@
+#!/bin/bash
+#PBS -N fit_duals_proofBHBH
+#PBS -o /home/xuheng.ding/Astronomy/project/my_code/projects/2021_dual_AGN/proofBHBH/analyze
+#PBS -e /home/xuheng.ding/Astronomy/project/my_code/projects/2021_dual_AGN/proofBHBH/analyze
+#PBS -l nodes=1:ppn=1
+#PBS -l walltime=200:00:00
+#PBS -l mem=600mb
+#PBS -t 0-10%9
+#PBS -u xuheng.ding
+#PBS -M xuheng.ding@ipmu.jp
+#PBS -m ae
+#PBS -V
+source ~/.bashrc
+conda activate astroconda
+
+cd /home/xuheng.ding/Astronomy/project/my_code/projects/2021_dual_AGN/proofBHBH/analyze
+python fit_dual_allband.py ${PBS_ARRAYID}
