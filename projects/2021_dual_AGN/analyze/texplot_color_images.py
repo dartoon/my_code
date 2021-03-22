@@ -153,5 +153,5 @@ for k in range(len(ID_list)):
     axs[_i][_j].axes.yaxis.set_visible(False)
 # plt.tight_layout()    
 plt.subplots_adjust(wspace=-0.02, hspace=0.04)
-plt.savefig('show_material/color_plot.pdf')
+# plt.savefig('show_material/color_plot.pdf')
 plt.show()

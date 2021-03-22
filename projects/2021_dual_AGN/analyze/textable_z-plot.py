@@ -37,6 +37,36 @@ zlines = string.split('\n')   # Split in to \n
     # else:
     #     z = -99
     # return z
+    
+CIV, MgII, Hb, OIII = 1549, 2798, 4861, 5007
+G102range = [8000, 11500]
+G141range = [10750, 17000]
+def av_filter(z):
+    lines = np.array([CIV, MgII, Hb, OIII])
+    redshift_lines = (1+z) * lines
+    G102_bool =  (redshift_lines>G102range[0]+100) * (redshift_lines<G102range[1]-100)
+    G141_bool =  (redshift_lines>G141range[0]+100) * (redshift_lines<G141range[1]-100)
+    # return G102_bool, G141_bool
+    s1 = np.array(['CIV', 'MgII', 'H$beta$', '[OIII]'])[G102_bool] 
+    s2 = np.array(['CIV', 'MgII', 'H$beta$', '[OIII]'])[G141_bool] 
+    s1 = [s1[i] for i in range(len(s1))]
+    s2 = [s2[i] for i in range(len(s2))]
+    # str1 = "G102: " + repr(s1)
+    # str2 = " G141: " + repr(s2)    
+    # s = str1 + str2
+    if s2 != []:
+        try:
+            s = "G141 & " + s2[0] + '+' + s2[1]
+        except:
+            s = "G141 & " + s2[0]
+    elif s2 == [] and s1 != []:
+        try: 
+            s = "G102 & " + s1[0] + '+' +  s1[1]
+        except:
+            s = "G102 & " + s1[0]
+    else:
+        s = "No fileter!!! & "
+    return s
 
 from astropy.cosmology import FlatLambdaCDM
 # cosmo = FlatLambdaCDM(H0=70, Om0=0.3, Tcmb0=2.725)
@@ -46,7 +76,7 @@ print("ID & RA & DEC & z & Separ.& Mag.& Grism & Lines & PA\\\\")
 print("&&&&($''$, kpc)&(pair)&&&(deg)\\\\")
 offset_kpc_h0_list, z_list = [], []
 for ID in ID_list:
-    show_ID = ID[:4] + ID[9:14]
+    show_ID = ID[:4] + '$' + ID[9] + '$' + ID[10:14]
     line = [zlines[i] for i in range(len(zlines)) if ID in zlines[i]]
     line[0] = line[0].replace('  ', ' ')
     z = float(line[0].split(' ')[-1])
@@ -68,9 +98,9 @@ for ID in ID_list:
     scale_relation = cosmo.angular_diameter_distance(z).value * 10**3 * (1/3600./180.*np.pi)  #Kpc/arc
     offset_kpc = offset * scale_relation   #In kpc
     Mags = [AGN_dic[0]['magnitude'], AGN_dic[1]['magnitude']]
-    print(show_ID, RA, Dec, z, '{0:.2f}, {1:.2f}'.format(offset, offset_kpc), 
-          '{0:.2f}, {1:.2f}'.format(np.min(Mags), np.max(Mags))  
-          )
+    print(show_ID, '&' , RA, '&' , Dec, '&' , '{0:.3f}'.format(z), '&' , '{0:.2f},{1:.1f}'.format(offset, offset_kpc), '&', 
+          '{0:.1f},{1:.1f}'.format(np.min(Mags), np.max(Mags)), '&', 
+          av_filter(z), '& TBD \\\\' )
     offset_kpc_h0_list.append(offset_kpc * 70 / 100)
     z_list.append(z)
     
@@ -78,6 +108,11 @@ for ID in ID_list:
 import sys
 sys.path.insert(0,'Shenli_materials/shenli_figure1/')
 import separation
+import matplotlib as mat
+mat.rcParams['font.family'] = 'STIXGeneral'
+
 plt.scatter(np.array(offset_kpc_h0_list), np.array(z_list),c = 'red', marker = '*', s = 25, alpha = 0.9, label = 'Our sample')
 plt.legend(loc='upper left', prop={'size': 7},ncol=1)
+# plt.savefig('offset_vs_z.png')
 plt.show()
+# mv offset_vs_z.png ../../../../../../../../Astro/proposal/2021_HST_Grism/

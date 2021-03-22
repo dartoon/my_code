@@ -24,11 +24,10 @@ if pick == True:
     IDs = list(dict.fromkeys(IDs))
     z_thre = 0
 else:
-    folders = glob.glob('../_John_fitted/*')
+    folders = glob.glob('../_John_fitted/*')  #All John's detected source.
     IDs = [folders[i].split('/')[-1].split('_HSC')[0] for i in range(len(folders))]
     z_thre = 0
 
-#%%
 # f = open("../_pdfs_2close/DR144.4_short.asc","r")
 f = open("material/ID_RA_DEC_z.txt","r")
 string = f.read()
@@ -53,7 +52,7 @@ for ID in IDs:
             folder = folder_1[0] + 'fit_result/'
             file = folder + 'fit_result_I-band.txt'
         elif folder_1 != [] and 'z_below1' in folder_1[0]:
-            folder = '../_John_fitted/'+ID+'_HSC-I/'
+            folder = '../_John_fitted/'+ID+'_HSC-I/'   #For these z below 1(or z unkonwn), not fitted and use John's fit.
             file = folder + 'fit_result.txt'
         else:
             folder_2 = glob.glob('../proofBHBH/model_Iband/'+ ID + '*/') 
@@ -75,22 +74,30 @@ for ID in IDs:
         z = read_z(ID)
         mags = lines[l1[-1]].split(' ')[2:4]
         mags = [float(mags[i]) for i in range(2)]
-        if z > z_thre: # and np.max(mags)<23:
+        if z > z_thre: #and offset>0.4:
             offset_list.append(offset)
             z_list.append(z)
             ID_list.append(ID)
             mags_list.append(mags)
+    # z = read_z(ID)
+    # if z>0:
+    #     z_list.append(z)
 # write_file.close()
 
 #%%    
 from ID_list import ID_list as run_ID_list
+import matplotlib as mat
+mat.rcParams['font.family'] = 'STIXGeneral'
+
 offset_list = np.array(offset_list)
 z_list = np.array(z_list)
 ID_list = np.array(ID_list)
 mags_list = np.array(mags_list)
 
 plt.figure(figsize=(11, 9))
-plt.scatter(z_list[np.max(mags_list,axis=1)<23], offset_list[np.max(mags_list,axis=1)<23],
+# plt.scatter(z_list[np.max(mags_list,axis=1)<23], offset_list[np.max(mags_list,axis=1)<23],
+#             c='black',s=280,marker=".",zorder=-10, edgecolors='white',alpha=0.7)
+plt.scatter(z_list, offset_list,
             c='black',s=280,marker=".",zorder=-10, edgecolors='white',alpha=0.7)
 if pick == True:
     ct = 0
@@ -99,7 +106,7 @@ if pick == True:
         if k != []:
             k = k[0]
             plt.scatter(z_list[k], offset_list[k],
-                    c='red',s=280,marker=".",zorder=0, edgecolors='white',alpha=1)
+                    c='red',s=380,marker=".",zorder=0, edgecolors='white',alpha=1)
             # if offset_list[k]<0.5:
             #     print(ID, offset_list[k])
             ct = ct + 1
@@ -107,10 +114,20 @@ plt.xlabel("Redshift",fontsize=27)
 plt.ylabel("Projected separation (arcsec)",fontsize=27)
 plt.tick_params(labelsize=20)
 plt.plot(np.linspace(0,5),np.linspace(0,5)*0+1, c = 'blue'  )
-plt.plot(np.linspace(0,1)*0 + 1.3 ,np.linspace(0,1), c = 'orange'  )
-plt.ylim(0, 6)
-plt.xlim(0.8, 4.7)
-
+plt.plot(np.linspace(0,1)*0 + 1.3 ,np.linspace(-0.2,1), c = 'orange'  )
+plt.plot(np.linspace(0,1)*0 + 2.35 ,np.linspace(-0.2,1), c = 'orange'  )
+plt.plot(np.linspace(0,1)*0 + 3.1 ,np.linspace(-0.2,1), c = 'orange'  )
+plt.text(0.6, 0.15, r"G102",fontsize=20, color='orange')
+plt.text(0.6, -0.05, r"H$\beta$+[OIII]",fontsize=20, color='orange')
+plt.text(1.5, 0.15, r"G141",fontsize=20, color='orange')
+plt.text(1.5, -0.05, r"H$\beta$+[OIII]",fontsize=20, color='orange')
+plt.text(2.4, 0.15, r"G102",fontsize=20, color='orange')
+plt.text(2.4, -0.05, r"MgII",fontsize=20, color='orange')
+plt.text(3.2, 0.15, r"G141",fontsize=20, color='orange')
+plt.text(3.2, -0.05, r"MgII",fontsize=20, color='orange')
+plt.ylim(-0.2, 5)
+plt.xlim(0., 4.7)
+# plt.savefig('show_material/sample_select.png')
 plt.show()
 
 #%%
