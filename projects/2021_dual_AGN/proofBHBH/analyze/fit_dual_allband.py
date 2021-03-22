@@ -7,8 +7,8 @@ Created on Fri Nov 16 11:19:14 2018
 """
 import numpy as np
 import astropy.io.fits as pyfits
-# import matplotlib
-# matplotlib.use('Agg')
+import matplotlib
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import sys, os, copy, glob
 from subprocess import call
