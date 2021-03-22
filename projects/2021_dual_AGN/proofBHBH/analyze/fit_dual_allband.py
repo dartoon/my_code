@@ -29,7 +29,7 @@ files = glob.glob(image_folder+'*I.fits')
 files.sort()
 
 #%%
-run_idx = 0 #int(sys.argv[1])
+run_idx = int(sys.argv[1])
 for run_i in range(run_idx, run_idx+1):
     file = files[run_i]
     image_ID = file.split('/')[-1].split('_HSC')[0]
@@ -42,7 +42,7 @@ for run_i in range(run_idx, run_idx+1):
     print(image_ID, image_RA, image_DEC)
     #%%
     deep_seed = True  #Set as True to put more seed and steps to fit,
-    show_plot = 1
+    show_plot = 0
     fit_data = True  #If you simply want to do the search without fitting, set False
     
     fit_folder = image_folder + 'fit_result/' + image_ID + '/'
@@ -142,7 +142,7 @@ for run_i in range(run_idx, run_idx+1):
             axs[i].imshow(data_process_list[0].target_stamp * 0)
         axs[i].set_title('{0} band'.format(band_seq[p_i]))
     plt.savefig(fit_folder + 'images_5_band.pdf')
-    plt.show()   
+    plt.close()   
     
     #%%
     if deep_seed ==True:
