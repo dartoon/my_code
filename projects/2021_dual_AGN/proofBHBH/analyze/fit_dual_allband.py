@@ -76,11 +76,11 @@ for run_i in range(run_idx, run_idx+1):
                                          rm_bkglight = True, if_plot=False, zp = zp)
             data_process_i.noise_map = err_data
             try:
-                data_process_i.generate_target_materials(radius=None, radius_list = [20, 30, 35, 40, 45],
+                data_process_i.generate_target_materials(radius=None, radius_list = [20, 30, 35],
                                                           create_mask = False, nsigma=1.2,
                                                           exp_sz= 1.2, npixels = 9, if_plot=False)        
             except:
-                data_process_i.generate_target_materials(radius=40,
+                data_process_i.generate_target_materials(radius=35,
                                                           create_mask = False, nsigma=1.2,
                                                           exp_sz= 1.2, npixels = 9, if_plot=False)                    
             PSF = pyfits.getdata(image_folder+filename_list[i].split('.fits')[0]+'_psf.fits')
