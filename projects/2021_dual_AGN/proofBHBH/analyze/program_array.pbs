@@ -1,5 +1,5 @@
 #!/bin/bash
-#PBS -N fit_duals_proofBHBH
+#PBS -N fit_duals_500
 #PBS -o /home/xuheng.ding/Astronomy/project/my_code/projects/2021_dual_AGN/proofBHBH/analyze
 #PBS -e /home/xuheng.ding/Astronomy/project/my_code/projects/2021_dual_AGN/proofBHBH/analyze
 #PBS -l nodes=1:ppn=1
