@@ -13,21 +13,9 @@ import matplotlib.pyplot as plt
 from ID_list import ID_list
 import glob
 
-from ast import literal_eval
-def read_string_list(string):
-    """
-    Translate a string-list-dict to a list-dict. 
-    Not allow array inside the dict...
-    """
-    string = ''.join(string.split('array(['))
-    string = ''.join(string.split('])'))    
-    string = string.replace('nan', '-99')
-    string = string.replace('inf', '-99')
-    string_list = string.split('{')[1:]
-    string_list = [literal_eval("{"+string_list[i].split('}')[0]+"}") for i in range(len(string_list))]
-    return string_list
+from tools import read_string_list, read_info, cal_oreination
 
-f = open("../_pdfs_2close/DR144.4_short.asc","r")
+f = open("material/ID_RA_DEC_z.txt","r")
 string = f.read()
 zlines = string.split('\n')   # Split in to \n
 # def read_info(ID):
@@ -81,6 +69,7 @@ for ID in ID_list:
     line[0] = line[0].replace('  ', ' ')
     z = float(line[0].split(' ')[-1])
     RA, Dec = line[0].split(' ')[1], line[0].split(' ')[2]
+    # RA, Dec, z = read_info(ID)
     
     files_1 = glob.glob('../proof2close_HSC_images_5band/*/' + ID + '/fit_result/')
     files_2 = glob.glob('../extra/*/fit_result*/' + ID + '/')
@@ -100,7 +89,7 @@ for ID in ID_list:
     Mags = [AGN_dic[0]['magnitude'], AGN_dic[1]['magnitude']]
     print(show_ID, '&' , RA, '&' , Dec, '&' , '{0:.3f}'.format(z), '&' , '{0:.2f},{1:.1f}'.format(offset, offset_kpc), '&', 
           '{0:.1f},{1:.1f}'.format(np.min(Mags), np.max(Mags)), '&', 
-          av_filter(z), '& TBD \\\\' )
+          av_filter(z), '& {0:.1f} \\\\'.format(cal_oreination(ID)) )
     offset_kpc_h0_list.append(offset_kpc * 70 / 100)
     z_list.append(z)
     
@@ -111,8 +100,49 @@ import separation
 import matplotlib as mat
 mat.rcParams['font.family'] = 'STIXGeneral'
 
-plt.scatter(np.array(offset_kpc_h0_list), np.array(z_list),c = 'red', marker = '*', s = 25, alpha = 0.9, label = 'Our sample')
-plt.legend(loc='upper left', prop={'size': 7},ncol=1)
-# plt.savefig('offset_vs_z.png')
+plt.scatter(np.array(z_list), np.array(offset_kpc_h0_list), c = 'red', marker = '*', edgecolors='black', s = 305, alpha = 0.9, label = 'Proposed Sample')
+
+import pandas as pd
+shenli_sample = pd.read_csv('../whole_sample_new.csv', index_col = 0)
+shenli_sep = shenli_sample['Sep(")']
+shenli_z = shenli_sample['Redshift']
+shenli_tel = shenli_sample['telescope']
+shenli_stat = shenli_sample['status']
+shenli_sep_l, shenli_z_l = [], []
+for i in range(len(shenli_sample)):
+    if shenli_stat[i] == 'QSO': 
+        scale_relation = cosmo.angular_diameter_distance(shenli_z[i]).value * 10**3 * (1/3600./180.*np.pi)  #Kpc/arc
+        shenli_sep_l.append(shenli_sep[i]* scale_relation )
+        shenli_z_l.append(shenli_z[i])
+shenli_sep_l = np.array(shenli_sep_l)
+shenli_z_l = np.array(shenli_z_l)
+
+DeRosa = np.array([[0.0749, 30], [0.0551, 43], [0.0482, 51], [0.0446, 59] ]) #De Rosa MNRAS 2018
+
+plt.scatter(0.2, 0.430* 70 / 100,c = 'blue', marker = 'o', edgecolors='black', s = 50, alpha = 0.9, label = 'Goulding+21')
+
+plt.scatter(shenli_z_l, shenli_sep_l * 70 / 100, marker="h",edgecolors='black',
+            c='m', s=220,zorder=10,alpha=1, label = 'Tang+21 in prep')
+
+
+plt.scatter(DeRosa[:,0], DeRosa[:,1] * 70 / 100, marker="v",  edgecolors='black',
+    c='green', s=55,zorder=10,alpha=1, label = 'De Rosa+18')
+
+plt.plot(np.linspace(0,1000)*0+1,np.linspace(0,1000), '--', c = 'black', linewidth = 1.5)
+
+plt.text(0.2, 400, r"Confirmed dual QSOs in the literatures",fontsize=25, color='black', bbox = {'facecolor':'white','alpha': 0.5} )
+
+# 233713.66+005610.8: pos1 = np.array([0.139, -0.064]) pos2 = np.array([0.474, 1.227]) np.sum((pos1 - pos2)**2)**0.5 
+handles, labels = plt.gca().get_legend_handles_labels()
+order = [5,7,0,1,2,3,6,8,4]
+plt.legend([handles[idx] for idx in order],[labels[idx] for idx in order], loc=4, prop={'size': 17}, ncol=3, frameon=True)
+plt.tick_params(labelsize=20)
+ax = plt.axes()
+ax.set_xticks(np.arange(0, 5, 0.5))
+
+plt.tick_params(which='both', width=1)
+plt.tick_params(which='major', length=7)
+plt.tick_params(which='minor', length=4)#, color='r’)
+plt.savefig('offset_vs_z.png')
 plt.show()
 # mv offset_vs_z.png ../../../../../../../../Astro/proposal/2021_HST_Grism/

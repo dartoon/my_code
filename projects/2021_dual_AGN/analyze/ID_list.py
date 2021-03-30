@@ -17,9 +17,9 @@ ID_list = [
     '013834.18-000509.3',  #similar color PS1 fainter
     '090654.53+021315.2',  #!!! Gaia detect parallax, PS0 redder. Probably not select it  #!!! In John's propsal
     #Close to star line:
-    '144308.16-004913.4', #!!! pick it, PS1 slight red.
+    # '144308.16-004913.4', #!!! pick it, PS1 slight red.  Shenli is running on Gemini
     '150216.66+025719.8',         #No R band data but looks interesting.
-    '145347.46+003927.0', #!!! pick it 
+    # '145347.46+003927.0', #!!! pick it , Shenli is running on Gemini
     '001459.72+002319.2', #interesting, but PS1 too close to star line.
     '105458.01+043310.6',  #!!! pick it, PS0 slightly redder. PS1 too faint
     '230402.77-003855.4', #Very close, PS1 redder

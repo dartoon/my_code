@@ -18,7 +18,7 @@ from photutils import EllipticalAperture
 
 from ast import literal_eval
 
-from decomprofile.tools.plot_tools import scale_bar
+from decomprofile.tools.plot_tools import scale_bar, coordinate_arrows
 def read_string_list(string):
     """
     Translate a string-list-dict to a list-dict. 
@@ -44,12 +44,13 @@ def read_z(ID):
     return z
 
 from ID_list import ID_list
+ID_list.append('011227.87-003151.6')
 import pandas as pd
 sample = pd.read_csv('material/Gaia_catalog.csv')
 
 import matplotlib as mat
 mat.rcParams['font.family'] = 'STIXGeneral'
-fig, (axs) = plt.subplots(4, 4, figsize=(12, 12))
+fig, (axs) = plt.subplots(3, 5, figsize=(15, 9))
 
 for k in range(len(ID_list)):
     string = ID_list[k]
@@ -139,19 +140,22 @@ for k in range(len(ID_list)):
     # plt.text(sz/20,sz/20*1, Band[0]+Band[1]+Band[2]+'-band Used',color='white',fontsize=15)
     # print(ID, "z=",read_z(ID))
     # plt.imshow(rgb_default, origin='lower')
-    _i = int(k / 4)
-    _j = int(k % 4)
+    _i = int(k / 5)
+    _j = int(k % 5)
     axs[_i][_j].imshow(rgb_default, origin='lower')
     sz = len(rgb_default)
     show_ID = ID[:4] + ID[9:14] 
     bands = Band[0]+Band[1]+Band[2]
     plttext = axs[_i][_j].text(sz/30,sz/20*17.5,show_ID,color='white',fontsize=18)
     plttext = axs[_i][_j].text(sz/30,sz/20*15,"z={0:.3f}".format(read_z(ID)),fontsize=18,color='white')
-    plttext = axs[_i][_j].text(sz*9/20,sz/20*1, bands+'-bands',color='white',fontsize=18)
+    plttext = axs[_i][_j].text(sz*15/20,sz/20*17, bands,color='white',fontsize=15)
     scale_bar(axs[_i][_j], sz, dist=1/0.168, text='1"', color='white', fontsize=18)
+    if ID == '011227.87-003151.6':
+        plttext = axs[_i][_j].text(sz/30,sz/20*13,'not selected',color='white',fontsize=18)        
+    coordinate_arrows(axs[_i][_j], sz, arrow_size=0.03, color = 'white')
     axs[_i][_j].axes.xaxis.set_visible(False)
     axs[_i][_j].axes.yaxis.set_visible(False)
 # plt.tight_layout()    
 plt.subplots_adjust(wspace=-0.02, hspace=0.04)
-# plt.savefig('show_material/color_plot.pdf')
+plt.savefig('show_material/color_plot.pdf')
 plt.show()
