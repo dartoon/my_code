@@ -74,6 +74,7 @@ p_ID_list = []
 legend = 'Proposed sample'
 # if pick == True:
 ct = 0
+special_ID = []
 for ID in run_ID_list:
     k = [i for i in range(len(ID_list)) if ID == ID_list[i]]
     if k != []:
@@ -83,6 +84,7 @@ for ID in run_ID_list:
         legend = None
         ct = ct + 1
         p_ID_list.append(ID)
+        special_ID.append(ID)
             
 import pandas as pd
 shenli_sample = pd.read_csv('Shenli_materials/whole_sample_new.csv', index_col = 0)
@@ -131,7 +133,7 @@ file_all_cand_0 = glob.glob('../proofBHBH/allband_data/fit_result/*/')
 file_all_cand_1 = glob.glob('../proof2close_HSC_images_5band/z_over1/*/')
 file_all_cand =  file_all_cand_0 + file_all_cand_1
 legend = 'All Candidates'
-special_ID = []
+
 for i in range(len(file_all_cand)):
 # for i in range(2):    
     folder = file_all_cand[i]
@@ -163,10 +165,10 @@ for i in range(len(file_all_cand)):
                 if ID_z<4:
                     plt.scatter(ID_z, offset, marker="o",edgecolors='black',
                         c='lightsalmon',s=80, zorder=-10,alpha=0.5, label = legend)
+                    if ID_z>1. and offset<0.7:
+                        special_ID.append(ID)
                 # if ID_z>4:
                 #     print(ID) #result: 022657.63-033335.4
-                if ID_z>1 and offset<1:
-                    special_ID.append(ID)
                 legend = None
                 p_ID_list.append(ID)
                 
@@ -178,16 +180,16 @@ plt.plot(np.linspace(-0.2,6)*0 + 1 ,np.linspace(-0.2,6), '--' , c ='black', line
 plt.xlabel("Redshift",fontsize=27)
 plt.ylabel("Projected separation (arcsec)",fontsize=27)
 plt.tick_params(labelsize=20)
-plt.plot(np.linspace(0,5),np.linspace(0,5)*0+1, '--' ,c = 'black', linewidth = 1.5   )
-plt.plot(np.linspace(0,1)*0 + 1.3 ,np.linspace(-0.2,1), '--', c = 'black', linewidth = 1.5   )
-plt.plot(np.linspace(0,1)*0 + 2.35 ,np.linspace(-0.2,1), '--', c = 'black' , linewidth = 1.5  )
-plt.plot(np.linspace(0,1)*0 + 3.1 ,np.linspace(-0.2,1), '--', c = 'black' , linewidth = 1.5  )
+plt.plot(np.linspace(0,5),np.linspace(0,5)*0+0.7, '--' ,c = 'black', linewidth = 1.5   )
+# plt.plot(np.linspace(0,1)*0 + 1.3 ,np.linspace(-0.2,0.7), '--', c = 'black', linewidth = 1.5   )
+plt.plot(np.linspace(0,1)*0 + 2.35 ,np.linspace(-0.2,0.7), '--', c = 'black' , linewidth = 1.5  )
+plt.plot(np.linspace(0,1)*0 + 3.1 ,np.linspace(-0.2,0.7), '--', c = 'black' , linewidth = 1.5  )
 # plt.text(0.1, -0.08, r"G102 H$\beta$+[OIII]",fontsize=19, color='orange')
 plt.text(1.3, -0.09, r"G141 H$\beta$+[OIII]",fontsize=19, color='blue')
 plt.text(2.4, -0.09, r"G102 MgII",fontsize=19, color='blue')
 plt.text(3.2, -0.09, r"G141 MgII",fontsize=19, color='blue')
-plt.text(4.0, 0.7, r"HST",fontsize=29, color='green')
-plt.text(3.3, 1.2, r"Ground-based telescope",fontsize=19, color='green')
+plt.text(4.0, 0.4, r"HST",fontsize=29, color='green')
+plt.text(3.3, 0.9, r"Ground-based telescope",fontsize=19, color='green')
 plt.text(0.2, 4.4, r"HSC dual QSO Candidates",fontsize=25, color='black', bbox = {'facecolor':'white','alpha': 0.5} )
 plt.ylim(-0.2, 5)
 plt.xlim(0., 4.7)
@@ -200,11 +202,12 @@ plt.tick_params(axis="y",which = 'both', direction="in", top = True)
 plt.tick_params(which='both', width=1)
 plt.tick_params(which='major', length=7)
 ax.set_xticks(np.arange(0, 5, 0.5))
-
-
+ax.set_yticks([0,0.7,1,2,3,4,5])
 plt.legend([handles[idx] for idx in order],[labels[idx] for idx in order], loc='upper right', prop={'size': 20},ncol=1)
-plt.savefig('sample_select.png')
+# plt.savefig('sample_select.png')
 plt.show()
+
+special_ID = list(dict.fromkeys(special_ID))
 
 #%%
 # plt_ID_list = ID_list[(np.max(mags_list,axis=1)<23)*(offset_list<1)] 

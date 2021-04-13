@@ -97,7 +97,7 @@ def cal_oreination(ID):
     return PA
 
 # ID = '222057.44+000329.8'
-ID = '020053.43-042721.8'
+# ID = '020053.43-042721.8'
 def cal_offset(ID):
     trust = 2
     offset = None

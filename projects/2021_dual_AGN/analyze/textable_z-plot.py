@@ -25,7 +25,8 @@ zlines = string.split('\n')   # Split in to \n
     # else:
     #     z = -99
     # return z
-    
+# Halpha = 6562.8
+
 CIV, MgII, Hb, OIII = 1549, 2798, 4861, 5007
 G102range = [8000, 11500]
 G141range = [10750, 17000]
@@ -87,9 +88,16 @@ for ID in ID_list:
     scale_relation = cosmo.angular_diameter_distance(z).value * 10**3 * (1/3600./180.*np.pi)  #Kpc/arc
     offset_kpc = offset * scale_relation   #In kpc
     Mags = [AGN_dic[0]['magnitude'], AGN_dic[1]['magnitude']]
+    APT_orie_1 = cal_oreination(ID)+135
+    if APT_orie_1 >360:
+        APT_orie_1 = APT_orie_1-360
+    if APT_orie_1< 180:
+        APT_orie_2 = APT_orie_1 + 180
+    elif APT_orie_1> 180:
+        APT_orie_2 = APT_orie_1 - 180
     print(show_ID, '&' , RA, '&' , Dec, '&' , '{0:.3f}'.format(z), '&' , '{0:.2f},{1:.1f}'.format(offset, offset_kpc), '&', 
           '{0:.1f},{1:.1f}'.format(np.min(Mags), np.max(Mags)), '&', 
-          av_filter(z), '& {0:.1f} \\\\'.format(cal_oreination(ID)) )
+          av_filter(z), '& {0:.1f} \\\\'.format(cal_oreination(ID)), '%{0:.0f} {1:.0f}degree'.format(APT_orie_1, APT_orie_2) )
     offset_kpc_h0_list.append(offset_kpc * 70 / 100)
     z_list.append(z)
     
@@ -117,25 +125,29 @@ for i in range(len(shenli_sample)):
 shenli_sep_l = np.array(shenli_sep_l)
 shenli_z_l = np.array(shenli_z_l)
 
-DeRosa = np.array([[0.0749, 30], [0.0551, 43], [0.0482, 51], [0.0446, 59] ]) #De Rosa MNRAS 2018
 
-plt.scatter(0.2, 0.430* 70 / 100,c = 'blue', marker = 'o', edgecolors='black', s = 50, alpha = 0.9, label = 'Goulding+21')
+plt.scatter(0.2, 0.430* 70 / 100,c = 'blue', marker = 'o', edgecolors='black', s = 50, alpha = 0.9, label = 'Goulding+19')
 
 plt.scatter(shenli_z_l, shenli_sep_l * 70 / 100, marker="h",edgecolors='black',
-            c='m', s=220,zorder=10,alpha=1, label = 'Tang+21 in prep')
+            c='m', s=220,zorder=10,alpha=1, label = 'Our paper')
 
 
+DeRosa = np.array([[0.0749, 30], [0.0551, 43], [0.0482, 51], [0.0446, 59] ]) #De Rosa MNRAS 2018
 plt.scatter(DeRosa[:,0], DeRosa[:,1] * 70 / 100, marker="v",  edgecolors='black',
     c='green', s=55,zorder=10,alpha=1, label = 'De Rosa+18')
 
+plt.scatter(0.858, 2 * 70 / 100, marker="^",  edgecolors='black',
+    c='blue', s=55,zorder=10,alpha=1, label = 'Shields+2012')
+
 plt.plot(np.linspace(0,1000)*0+1,np.linspace(0,1000), '--', c = 'black', linewidth = 1.5)
 
-plt.text(0.2, 400, r"Confirmed dual QSOs in the literatures",fontsize=25, color='black', bbox = {'facecolor':'white','alpha': 0.5} )
+plt.text(0.2, 400, r"Confirmed dual QSOs in the literature",fontsize=25, color='black', bbox = {'facecolor':'white','alpha': 0.5} )
 
 # 233713.66+005610.8: pos1 = np.array([0.139, -0.064]) pos2 = np.array([0.474, 1.227]) np.sum((pos1 - pos2)**2)**0.5 
 handles, labels = plt.gca().get_legend_handles_labels()
-order = [5,7,0,1,2,3,6,8,4]
-plt.legend([handles[idx] for idx in order],[labels[idx] for idx in order], loc=4, prop={'size': 17}, ncol=3, frameon=True)
+order = [5,7,0,1,2,3,6,8,4,9]
+plt.legend([handles[idx] for idx in order],[labels[idx] for idx in order], loc=4, prop={'size': 16}, ncol=2, frameon=True,  
+           bbox_to_anchor=(1, -0.01))
 plt.tick_params(labelsize=20)
 ax = plt.axes()
 ax.set_xticks(np.arange(0, 5, 0.5))
@@ -143,6 +155,6 @@ ax.set_xticks(np.arange(0, 5, 0.5))
 plt.tick_params(which='both', width=1)
 plt.tick_params(which='major', length=7)
 plt.tick_params(which='minor', length=4)#, color='r’)
-plt.savefig('offset_vs_z.png')
+# plt.savefig('offset_vs_z.png')
 plt.show()
 # mv offset_vs_z.png ../../../../../../../../Astro/proposal/2021_HST_Grism/

@@ -18,6 +18,7 @@ from photutils import EllipticalAperture
 
 from ast import literal_eval
 
+
 from decomprofile.tools.plot_tools import scale_bar, coordinate_arrows
 def read_string_list(string):
     """
@@ -44,13 +45,14 @@ def read_z(ID):
     return z
 
 from ID_list import ID_list
-ID_list.append('011227.87-003151.6')
+
+# ID_list.append('011227.87-003151.6')
 import pandas as pd
 sample = pd.read_csv('material/Gaia_catalog.csv')
 
 import matplotlib as mat
 mat.rcParams['font.family'] = 'STIXGeneral'
-fig, (axs) = plt.subplots(3, 5, figsize=(15, 9))
+fig, (axs) = plt.subplots(2, 6, figsize=(18, 6))
 
 for k in range(len(ID_list)):
     string = ID_list[k]
@@ -63,6 +65,7 @@ for k in range(len(ID_list)):
     RA, Dec = pos.ra.degree, pos.dec.degree
     image_RA = float(RA)
     image_DEC = float(Dec)
+    # print(image_RA, image_DEC)
     
     files_1 = glob.glob('../proof2close_HSC_images_5band/*/' + ID + '/fit_result/')
     files_2 = glob.glob('../extra/*/fit_result*/' + ID + '/')
@@ -140,8 +143,8 @@ for k in range(len(ID_list)):
     # plt.text(sz/20,sz/20*1, Band[0]+Band[1]+Band[2]+'-band Used',color='white',fontsize=15)
     # print(ID, "z=",read_z(ID))
     # plt.imshow(rgb_default, origin='lower')
-    _i = int(k / 5)
-    _j = int(k % 5)
+    _i = int(k / len(axs.T))
+    _j = int(k % len(axs.T))
     axs[_i][_j].imshow(rgb_default, origin='lower')
     sz = len(rgb_default)
     show_ID = ID[:4] + ID[9:14] 
@@ -155,7 +158,11 @@ for k in range(len(ID_list)):
     coordinate_arrows(axs[_i][_j], sz, arrow_size=0.03, color = 'white')
     axs[_i][_j].axes.xaxis.set_visible(False)
     axs[_i][_j].axes.yaxis.set_visible(False)
+
+# axs[1][4].axes.xaxis.set_visible(False)
+# axs[1][4].axes.yaxis.set_visible(False)    
+axs[1][5].axis("off")
 # plt.tight_layout()    
 plt.subplots_adjust(wspace=-0.02, hspace=0.04)
-plt.savefig('show_material/color_plot.pdf')
+# plt.savefig('show_material/color_plot.pdf')
 plt.show()

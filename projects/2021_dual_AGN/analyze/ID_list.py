@@ -7,23 +7,26 @@ Created on Wed Mar 17 15:03:07 2021
 """
 
 ID_list = [
+    '122144.31-004144.1', #SAVED
+    '095218.04-000459.1', #SAVED
+#    '090559.70+022408.2', #SAVED However, too faint
     '162501.98+430931.6', #!!! Pick it 
     '022404.85+014941.9',  #!!! pick it
     '022906.04-051428.9',  #!!! pick it
     '092532.13-020806.1',  #!!! pick it, PS0 fainter but similar color
     '124618.51-001750.2',  #!!! pick it, very similar and bright color
     '220642.82+003016.2', #!!! pick it, close and color similar.
-    '141911.59+520545.2', #!!! John's proposal, But missed I band in S20a, but have I band in S19a  
-    '013834.18-000509.3',  #similar color PS1 fainter
-    '090654.53+021315.2',  #!!! Gaia detect parallax, PS0 redder. Probably not select it  #!!! In John's propsal
+#    '141911.59+520545.2', #!!! John's proposal, But missed I band in S20a, but have I band in S19a  
+#    '013834.18-000509.3',  #similar color PS1 fainter
+#    '090654.53+021315.2',  #!!! Gaia detect parallax, PS0 redder. Probably not select it  #!!! In John's propsal
     #Close to star line:
     # '144308.16-004913.4', #!!! pick it, PS1 slight red.  Shenli is running on Gemini
     '150216.66+025719.8',         #No R band data but looks interesting.
     # '145347.46+003927.0', #!!! pick it , Shenli is running on Gemini
-    '001459.72+002319.2', #interesting, but PS1 too close to star line.
+#    '001459.72+002319.2', #interesting, but PS1 too close to star line.
     '105458.01+043310.6',  #!!! pick it, PS0 slightly redder. PS1 too faint
     '230402.77-003855.4', #Very close, PS1 redder
-    '013736.57+005742.3',  #G band almost no detection for PS1,  ##### Too close to star line
+#    '013736.57+005742.3',  #G band almost no detection for PS1,  ##### Too close to star line
     #Too red or faint:
     # '023829.90-011224.2',  #Dual feature not clear. Too close? Also very faint.
     # '104644.31+000329.7',     #Too faint for both. but Similr color
@@ -52,3 +55,30 @@ ID_list = [
     ##### '003659.43-001850.2',     ##Only in I band, see also a similar feature on the bottom star.
   ]
 ID_list.sort()
+
+#All the ones with z>1.3 and sep < 0.7"
+# ID_list = ['022404.85+014941.9',
+#  '022906.04-051428.9',
+#  '092532.13-020806.1',
+#  '105458.01+043310.6',
+#  '124618.51-001750.2',
+#  '150216.66+025719.8',
+#  '162501.98+430931.6',
+#  '220642.82+003016.2',
+#  '230402.77-003855.4',
+#  '022509.04-001346.4',
+#  '013930.80-002131.6',
+#  '010553.76+000232.1',
+#  '023855.60-000750.1',
+#  '013526.15+004135.8',
+#  '003828.78+001000.1',
+#  '095218.04-000459.1',
+#  '122144.31-004144.1',
+#  '003659.43-001850.2',
+#  '015741.34+023911.8',
+#  '003659.26-001922.7',
+#  '002938.47+002039.7',
+#  '152445.62+440949.5',
+#  '023829.90-011224.2',
+#  '013327.34-003612.7',
+#  '090559.70+022408.2']
