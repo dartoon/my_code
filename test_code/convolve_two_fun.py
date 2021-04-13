@@ -31,6 +31,7 @@ def mass_fun_i(m1, a=2.35, mbh_max=80, mbh_min=5):
         return m1**(-a)/N
     else:
         return 0.
+    
 poss_mass_fun=np.vectorize(mass_fun_i)    
 
 def joint_twofun(tau, t, a=2.35, mbh_max=80, mbh_min=5, sigma =0.2):

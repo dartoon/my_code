@@ -47,6 +47,7 @@ def cal_h0(zl, zs, Ddt, om=0.27):
     ratio = Ddt_corr/Ddt
     return 100 * ratio
 
+# for folder in ['AGN_result_folder_run3times/idx11_ID714_PSFerr025_notPSFinter_morePSO_0.pkl']: 
 for folder in ['AGN_result_folder/idx0_ID702_PSFerr001_PSFinter.pkl']: 
     ID = folder.split('ID')[1][:3]
     sim_folder = 'simulations_700_subg30/' + 'sim_lens_ID_subg30_' + ID +'/'
