@@ -9,13 +9,13 @@ Created on Wed Jan 13 18:52:07 2021
 import numpy as np
 import matplotlib.pyplot as plt
 import astropy.io.fits as pyfits
-from galight.fitting_process import FittingProcess
+from decomprofile.fitting_process import FittingProcess
 import pickle, glob
 import copy, matplotlib
 my_cmap = copy.copy(matplotlib.cm.get_cmap('gist_heat')) # copy the default cmap
 my_cmap.set_bad('black')
 from matplotlib.colors import LogNorm
-from galight.tools.plot_tools import profile_plots
+from decomprofile.tools.plot_tools import profile_plots
 import lenstronomy.Util.param_util as param_util
 
 fitsFile_ = glob.glob('SDSS_0.2-0.3/*_HSC-I.fits')
@@ -24,28 +24,24 @@ fitsFile_ = glob.glob('SDSS_0.2-0.3/*_HSC-I.fits')
 # for NO in range(21,42):
 # for NO in range(42,63):
 # for NO in range(55):    
-# for NO in range(len(fitsFile_)): 
-for NO in [13]:    
+for NO in range(len(fitsFile_)):  
 # for NO in [66]:
     fitsFile  = fitsFile_[NO]
     ID = fitsFile.split('/')[1].split('_')[0]
     PSF_filename = fitsFile.split('.fits')[0]+ '_psf.fits'
-    save_name = 'fit_result1/' + fitsFile.split('.fits')[0].split('/')[1]
+    save_name = 'fit_result/' + fitsFile.split('.fits')[0].split('/')[1]
     ## Test load pkl
     
     picklename = save_name+'single_Sersic.pkl'
     fitting_run_class_0 = pickle.load(open(picklename,'rb'))
 
-    picklename = save_name+'bulge+disk.pkl'
-    fitting_run_class_1 = pickle.load(open(picklename,'rb'))
     
-    picklename = save_name+'bar+bulge+disk.pkl'
-    fitting_run_class_2 = pickle.load(open(picklename,'rb'))
+    picklename = save_name+'bulge+disk_2nd.pkl'
+    fitting_run_class_1 = pickle.load(open(picklename,'rb'))
 
     
     bic_0 = fitting_run_class_0.fitting_seq.bic
     bic_1 = fitting_run_class_1.fitting_seq.bic
-    bic_2 = fitting_run_class_2.fitting_seq.bic
     if bic_0 < bic_1:
         print(ID+" is a singel Sersic model; "+"glob Number: " + str(NO))
     else:
@@ -53,51 +49,34 @@ for NO in [13]:
 
         print(ID+"Single Sersic fit:")
         fitting_run_class_0.plot_final_qso_fit(target_ID =  ID)
-
-        #%%Disk+bulge
         print(ID+"Disk + Bulge fit:")    
         fitting_run_class_1.plot_final_qso_fit(target_ID =  ID)
-        bulge1 = fitting_run_class_1.image_host_list[0]
-        disk1 = fitting_run_class_1.image_host_list[1]
-        B2T = np.sum(bulge1)/np.sum(bulge1+disk1)
-        AGN1 = fitting_run_class_1.image_ps_list[0]
-        bulge_Re1 = fitting_run_class_1.final_result_galaxy[0]['R_sersic']
-        disk_Re1 = fitting_run_class_1.final_result_galaxy[1]['R_sersic']
-        flux_list_2d = [bulge1, disk1, AGN1]
-        label_list_2d = ['Bulge', 'Disk', 'nuclei']
-        flux_list_1d = [bulge1, disk1, AGN1] 
-        label_list_1d = ['Bulge', 'Disk', 'nuclei']
-        profile_plots(flux_list_2d, label_list_2d, flux_list_1d, label_list_1d,
-                      deltaPix = fitting_run_class_1.fitting_specify_class.deltaPix,
-                      target_ID =  ID, if_annuli=True)        
+        
+        print("BIC compare:", round(bic_0,1), round(bic_1,1))
+        print("Chisq:", round(fitting_run_class_0.reduced_Chisq,1), round(fitting_run_class_1.reduced_Chisq,1))
 
-        #%%Disk+bulge+bar
-        print("Fitting as Bar + Bulge + Disk")  
-        fitting_run_class_2.plot_final_qso_fit(target_ID =  ID)
-        bar2 = fitting_run_class_2.image_host_list[0]
-        bulge2 = fitting_run_class_2.image_host_list[1]
-        disk2 = fitting_run_class_2.image_host_list[2]
-        B2T = np.sum(bulge2)/np.sum(bulge2+disk2+bar2)
-        AGN2 = fitting_run_class_2.image_ps_list[0]
-        bar_Re2 = fitting_run_class_2.final_result_galaxy[0]['R_sersic']
-        bulge_Re2 = fitting_run_class_2.final_result_galaxy[1]['R_sersic']
-        disk_Re2 = fitting_run_class_2.final_result_galaxy[2]['R_sersic']
-        # bar2_resi = fitting_run_class_2.fitting_specify_class.kwargs_data['image_data'] -AGN2
-        flux_list_2d = [bulge2, disk2, bar2, AGN2]
-        label_list_2d = ['Bulge', 'Disk', 'Bar', 'nuclei']
-        flux_list_1d = [bulge2, disk2, bar2, AGN2] 
-        label_list_1d = ['Bulge', 'Disk', 'Bar', 'nuclei']      
+        bulge = fitting_run_class_1.image_host_list[0]
+        disk = fitting_run_class_1.image_host_list[1]
+        B2T = np.sum(bulge)/np.sum(bulge+disk)
+        
+        AGN = fitting_run_class_1.image_ps_list[0]
+        
+        bulge_Re = fitting_run_class_1.final_result_galaxy[0]['R_sersic']
+        disk_Re = fitting_run_class_1.final_result_galaxy[1]['R_sersic']
+        
+        flux_list_2d = [bulge, disk, AGN]
+        label_list_2d = ['Bulge', 'Disk', 'nuclei']
+        flux_list_1d = [bulge, disk, AGN] 
+        label_list_1d = ['Bulge', 'Disk', 'nuclei']
+        
         profile_plots(flux_list_2d, label_list_2d, flux_list_1d, label_list_1d,
                       deltaPix = fitting_run_class_1.fitting_specify_class.deltaPix,
                       target_ID =  ID, if_annuli=True)
         
         print("B/T:", round(B2T,2))
-        print('Reff: bulge, disk, bar: ', round(bulge_Re2,2), round(disk_Re2,2), round(bar_Re2) )
-        # hold = input("hold:")
+        print('Reff: bulge, disk: ', round(bulge_Re,2), round(disk_Re,2) )
+        hold = input("hold:")
 
-        print("BIC compare:", round(bic_0,1), round(bic_1,1), round(bic_2,1) )
-        print("Chisq:", round(fitting_run_class_0.reduced_Chisq,1), round(fitting_run_class_1.reduced_Chisq,1),
-               round(fitting_run_class_2.reduced_Chisq,1))
 
 # =============================================================================
 # Sec with better prior

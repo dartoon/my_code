@@ -55,7 +55,7 @@ HSC_re = np.array(HSC_re)
 #%%
 import glob
 filename = 'simulation_result.txt'
-for i in range(78):
+for i in range(1):
     host_mag = HSC_host_mag[i] 
     AGN_mag = HSC_AGN_mag[i]
     disk_reff =  HSC_re[i]*1.2 #1 # 
@@ -164,10 +164,10 @@ for i in range(78):
     
     def condition_bulgedisk(kwargs_lens, kwargs_source, kwargs_lens_light, kwargs_ps, kwargs_special, kwargs_extinction):
         logL = 0
-        phi0, q0 = param_util.ellipticity2phi_q(kwargs_source[0]['e1'], kwargs_source[0]['e2'])
-        phi1, q1 = param_util.ellipticity2phi_q(kwargs_source[1]['e1'], kwargs_source[1]['e2'])
-        cond_0 = (kwargs_source[0]['R_sersic'] > kwargs_source[1]['R_sersic'] * 0.9)
-        cond_1 = (kwargs_source[0]['R_sersic'] < kwargs_source[1]['R_sersic']*0.15)
+        phi0, q0 = param_util.ellipticity2phi_q(kwargs_lens_light[0]['e1'], kwargs_lens_light[0]['e2'])
+        phi1, q1 = param_util.ellipticity2phi_q(kwargs_lens_light[1]['e1'], kwargs_lens_light[1]['e2'])
+        cond_0 = (kwargs_lens_light[0]['R_sersic'] > kwargs_lens_light[1]['R_sersic'] * 0.9)
+        cond_1 = (kwargs_lens_light[0]['R_sersic'] < kwargs_lens_light[1]['R_sersic']*0.15)
         cond_2 = (q0 < q1)
         if cond_0 or cond_1 or cond_2:
             logL -= 10**15
@@ -221,9 +221,9 @@ for i in range(78):
     if use_true == 0:
         fit_sepc_1.plot_fitting_sets()
         fit_sepc_1.build_fitting_seq()
-        fit_sepc_1.kwargs_params['source_model'][0][1] = fit_run_0.final_result_galaxy[0]
-        fit_sepc_1.kwargs_params['source_model'][4][0]['R_sersic'] = fit_run_0.final_result_galaxy[0]['R_sersic']
-        fit_sepc_1.kwargs_params['source_model'][4][1]['R_sersic'] = fit_run_0.final_result_galaxy[0]['R_sersic']*2
+        fit_sepc_1.kwargs_params['lens_light_model'][0][1] = fit_run_0.final_result_galaxy[0]
+        fit_sepc_1.kwargs_params['lens_light_model'][4][0]['R_sersic'] = fit_run_0.final_result_galaxy[0]['R_sersic']
+        fit_sepc_1.kwargs_params['lens_light_model'][4][1]['R_sersic'] = fit_run_0.final_result_galaxy[0]['R_sersic']*2
     elif use_true == 1:
         fit_sepc_1.source_params = [kwargs_bulge, kwargs_disk] #!!!
         

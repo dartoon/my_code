@@ -13,7 +13,7 @@ import glob
 import pickle
 
 # sim_files = glob.glob("sim_result/*_QuickResult.pkl")
-sim_files = glob.glob("sim_result_bulge_n2/*_QuickResult.pkl")
+sim_files = glob.glob("sim_result_bulge_n4/*_QuickResult.pkl")
 
 B2T_result_list, chisq_list, n_list, bulge_re_list, disk_re_list, flux_single_list = [], [], [], [],[], []
 for i in range(len(sim_files)):
