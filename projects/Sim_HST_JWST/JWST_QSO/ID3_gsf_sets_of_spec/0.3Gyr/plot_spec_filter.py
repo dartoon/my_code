@@ -28,6 +28,9 @@ mel = str(round(10**table[1][mel_idx],2)) # 'Mel:' Z*/Z_sun
 Mstel_id = [i for i in range(len(name)) if 'Mstel' in str(name[i])][0]
 Mstel = str(round(table[1][Mstel_id],2)) # 'Mel:' Z*/Z_sun
 
+SFR_id = [i for i in range(len(name)) if 'SFR' in str(name[i])][0]
+SFR = str(round(table[1][SFR_id],2)) # 'Mel:' Z*/Z_sun
+
 #%%This is the spectra template
 spec_file = "./gsf_spec_*.fits"
 spec_file = glob.glob(spec_file)[0]

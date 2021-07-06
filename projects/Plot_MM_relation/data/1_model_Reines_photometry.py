@@ -79,14 +79,15 @@ for i in range(len(IDs)):
     QSO_RA = RA
     QSO_DEC = Dec
     data_process = DataProcess(fov_image = fov_image, fov_noise_map = err_data, target_pos = [QSO_RA, QSO_DEC],
-                                pos_type = 'wcs', header = header,
+                                pos_type = 'wcs', header = header, target_ID = ID,
                               rm_bkglight = False, if_plot=True, zp = zp)
     
     data_process.noise_map = err_data
     
     data_process.generate_target_materials(radius=None, create_mask = False, nsigma=3,
                                            radius_list = [120, 140, 160,180],
-                                          exp_sz= 1.2, npixels = 55, if_plot=True)
+                                          exp_sz= 1.2, npixels = 55, if_plot=True,
+                                          save_plot = True)
     
     data_process.PSF_list = [PSF]
     

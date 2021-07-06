@@ -9,7 +9,7 @@ Created on Tue Feb 25 10:13:22 2020
 import numpy as np
 import astropy.io.fits as pyfits
 import matplotlib.pyplot as plt
-from specutils import Spectrum1D
+# from specutils import Spectrum1D
 import glob
 
 filename_p  = 'SFH_0859_PA00_param.fits'
@@ -25,6 +25,9 @@ mel = str(round(10**table[1][mel_idx],3)) # 'Mel:' Z*/Z_sun
 
 Mstel_id = [i for i in range(len(name)) if 'Mstel' in str(name[i])][0]
 Mstel = table[1][Mstel_id] # The scaled stellar mass in the template
+
+SFR_id = [i for i in range(len(name)) if 'SFR' in str(name[i])][0]
+SFR = str(round(table[1][SFR_id],2)) # unit = 'Msun/yr'
 
 M_dyn = 56. #For ID 3
 s_mass = np.log10(M_dyn * 10 **9) 

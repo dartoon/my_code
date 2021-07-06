@@ -9,7 +9,7 @@ Created on Tue Feb 25 10:13:22 2020
 import numpy as np
 import astropy.io.fits as pyfits
 import matplotlib.pyplot as plt
-from specutils import Spectrum1D
+# from specutils import Spectrum1D
 import glob
 
 import matplotlib as mat

@@ -75,7 +75,7 @@ for folder in [folder_list[index]]:
                           'Ddt_sampling': True
                                   }
     save_file = save_pkl_folder+'idx{0}_ID'.format(index)+ID+'_'+savename
-    if glob.glob(save_file) == []:    
+    if glob.glob(save_file) != []:    
         lens_data = pyfits.getdata(folder+'Drz_QSO_image.fits')
         len_std = pyfits.getdata(folder+'noise_map.fits')
         lens_mask = cr_mask(lens_data, 'normal_mask.reg')
@@ -127,9 +127,9 @@ for folder in [folder_list[index]]:
         kwargs_data['noise_map'] = len_std
         
         data_class = ImageData(**kwargs_data)
-        psf_err_map = np.ones_like(psf)*0.25
+        # psf_err_map = np.ones_like(psf)*0.25
         # psf_err_map[psf<0.003] = 0
-        kwargs_psf = {'psf_type': 'PIXEL', 'kernel_point_source': psf, 'pixel_size': deltaPix, 'psf_error_map': psf_err_map}
+        kwargs_psf = {'psf_type': 'PIXEL', 'kernel_point_source': psf, 'pixel_size': deltaPix}#, 'psf_error_map': psf_err_map}
         psf_class = PSF(**kwargs_psf)
         
         #%%

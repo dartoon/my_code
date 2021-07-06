@@ -21,18 +21,21 @@ from astropy.wcs import WCS
 
 folder = 'NTT_candidates/'
 # folder = 'extra_interesting/'
-f = open(folder+"cut_out.txt","r")
-string = f.read()
-lines = string.split('\n')   # Split in to \n
+# f = open(folder+"cut_out.txt","r")
+# string = f.read()
+# lines = string.split('\n')   # Split in to \n
 
-files = glob.glob(folder+'*I.fits')
-files.sort()
+lines = ['232853.40+011221.8 352.222499 1.20605555']
+
+files = glob.glob(folder+'*232853.40+011221.8_HSC-I.fits')
+# files.sort()
 
 # ID = '145347.46+003927.0'
 # run_i = [i for i in range(len(files)) if ID in files[i]][0] 
 # run_list = [[0, 102], [102, 205], [205, 309], [309, 413]][0]
-run_list = [[0, 69], [69, 138], [138,207], [207,276], [276,345],[395, 400], [400, 404], [404, 408], [408, 413]][9]
-for run_i in range(run_list[0], run_list[1]):
+# run_list = [[0, 69], [69, 138], [138,207], [207,276], [276,345],[395, 400], [400, 404], [404, 408], [408, 413]][9]
+# for run_i in range(run_list[0], run_list[1]):
+for run_i in [0]:    
     file = files[run_i]
     image_ID = file.split('/')[-1].split('_HSC')[0]
     line = [lines[i] for i in range(len(lines)) if image_ID in lines[i]]
@@ -62,6 +65,7 @@ for run_i in range(run_list[0], run_list[1]):
     filename_list = [image_ID+'_HSC-{0}.fits'.format(band_seq[i]) for i in range(len(band_seq))]
     
     data_process_list, zp_list = [], []
+    mins = [0.45, 0.3, 0.5, 0.75, 1.3]
     for i in range(len(band_seq)):
         # The pixel scale is all 0.168
         if len(glob.glob(image_folder+filename_list[i])) == 0:
@@ -77,7 +81,7 @@ for run_i in range(run_list[0], run_list[1]):
             err_data= fitsFile[3].data ** 0.5
             file_header0 = fitsFile[0].header
             zp =  27.0 
-            data_process_i = DataProcess(fov_image = fov_image, fov_noise_map = err_data,
+            data_process_i = DataProcess(fov_image = fov_image - mins[i], fov_noise_map = err_data,
                                          target_pos = [image_RA, image_DEC],
                                          pos_type = 'wcs', header = header,
                                          rm_bkglight = True, if_plot=False, zp = zp)
@@ -106,7 +110,7 @@ for run_i in range(run_list[0], run_list[1]):
     
     #%%
     frame = np.min([len(data_process_list[i].target_stamp) for i in run_list])
-    radius = int((frame-1)/2)
+    radius = 20 #int((frame-1)/2)
     for k in run_list:
         data_process_list[k].generate_target_materials(radius=radius,
                                                        create_mask = False, nsigma=2,
@@ -160,7 +164,7 @@ for run_i in range(run_list[0], run_list[1]):
         pso_setting = {'sigma_scale': 0.8, 'n_particles': 60, 'n_iterations': 60}
     num_BHBH = 2
     neighborhood_size, threshold = 4, 4
-    for k in run_list:  #Search for Dual Based on I band.
+    for k in [0]:  #Search for Dual Based on I band.
         print("Fiting the: "+ filename_list[k])
         # print("Comparing the fitting Chisq:")
         qso_center = data_process_list[k].target_pos
