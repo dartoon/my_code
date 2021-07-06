@@ -52,8 +52,11 @@ elif if_file is not []:
 #target_v = len(lines)
 #for QSO_i in range(target_v):  # run the rest sample
 image_folder = '../images_directory/'
-band_run_list = [2,0,1,3,4]  #run I band first
-band_seq = ['G', 'R', 'I', 'Z', 'Y']
+# band_run_list = [2,0,1,3,4]  #run I band first
+# band_seq = ['G', 'R', 'I', 'Z', 'Y']
+band_run_list = [0]  #run I band first
+band_seq = ['I']
+
 
 # band_run_list = [0]  #run I band first
 # band_seq = ['I']
