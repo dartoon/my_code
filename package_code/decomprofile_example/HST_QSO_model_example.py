@@ -30,12 +30,12 @@ exp_map = exp * wht/mean_wht
 from galight.data_process import DataProcess
 data_process = DataProcess(fov_image = fov_image, target_pos = [1142., 637.], pos_type = 'pixel', header = header,
                           rm_bkglight = False, exptime = exp_map, if_plot=False, zp = 27.0)
-data_process.generate_target_materials(radius=60, create_mask = True, nsigma=2.8,
+data_process.generate_target_materials(radius=65, create_mask = True, nsigma=2.8,
                                       exp_sz= 1.2, npixels = 15, if_plot=True)
 
 
 #%%PSF works.
-data_process.find_PSF(radius = 30, user_option = False)
+data_process.find_PSF(radius = 30, user_option = True)
 # data_process.find_PSF(radius = 50, PSF_pos_list = [[ 350., 1055.], [2078., 1910.]], user_option = False)
 data_process.plot_overview(label = 'Example', target_label = None)
 data_process.profiles_compare(norm_pix = 5, if_annuli=False, y_log = False,

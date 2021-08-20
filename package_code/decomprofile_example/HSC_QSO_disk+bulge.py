@@ -63,8 +63,8 @@ from galight.tools.measure_tools import plot_data_apertures
 plot_data_apertures(data_process.target_stamp, apertures)
 
 #%%Start to produce the class and params for lens fitting.
-from galight.fitting_specify import FittingSpeficy
-fit_sepc = FittingSpeficy(data_process)
+from galight.fitting_specify import FittingSpecify
+fit_sepc = FittingSpecify(data_process)
 
 
 fit_sepc.prepare_fitting_seq(point_source_num = 1, fix_n_list= [[0,4], [1,1]], #fix_Re_list= [[0,0.2], [1,1.14]],  #First component fix n = 4 (bluge), second one fix to 1 (disk).
@@ -75,7 +75,7 @@ fit_sepc.plot_fitting_sets()
 fit_sepc.build_fitting_seq()
 
 
-#%%Setting the fitting method and run.
+# #%%Setting the fitting method and run.
 from galight.fitting_process import FittingProcess
 fit_run = FittingProcess(fit_sepc, savename = 'test_bulge_disk.pkl')
 fit_run.run()

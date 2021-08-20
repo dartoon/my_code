@@ -51,8 +51,8 @@ fit_sepc.build_fitting_seq()
 
 #%%Setting the fitting method and run.
 from galight.fitting_process import FittingProcess
-fit_run = FittingProcess(fit_sepc, savename = 'test_fix_n_4_HSC')
-fit_run.run()
+fit_run = FittingProcess(fit_sepc, savename = 'HSC_QSO')
+fit_run.run(algorithm_list = ['PSO'], setting_list=[None])
 fit_run.plot_all()
 fit_run.dump_result()
 # # print(fit_run.final_result_galaxy[0])

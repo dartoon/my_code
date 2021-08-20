@@ -13,7 +13,7 @@ import astropy.io.fits as pyfits
 
 # Test load pkl
 import pickle
-picklename = 'HSC_dualAGN_PSPS.pkl'
+picklename = 'savename.pkl'
 fitting_run_class = pickle.load(open(picklename,'rb'))
 fitting_run_class.plot_all()
 fitting_run_class.run_diag()
