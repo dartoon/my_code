@@ -22,9 +22,11 @@ mat.rcParams['font.family'] = 'STIXGeneral'
 # from load_result import load_MBH, load_host_p, load_err, load_Lbol
 import matplotlib as mpl
 h=0.7
+
 ifplot = True
+
 import glob
-filenames = glob.glob('MBII_data/*') 
+filenames = glob.glob('Illustris_data/*') 
 filenames.sort()
 # for i in range(len(filenames)):
 # for i in [1]:     #!!! 
@@ -32,14 +34,11 @@ for i in [-1]:
     text  = np.load(filenames[i])
     zs = float(filenames[i].split("_z")[1][:4])
     filename  = filenames[i]
-    print(text.shape)
-    # Stellar_Mass, BH_Mass, sdss_i_galaxy, sdss_g_galaxy, sdss_r_galaxy, sdss_i_pointsource, sdss_g_pointsource = np.load('TNG100/data_z0.70.npy')
     # Stellar_Mass, BH_Mass, sdss_i_galaxy, sdss_g_galaxy, sdss_r_galaxy, sdss_i_pointsource, sdss_g_pointsource, Eddington_ratio = np.load(filename)
     BH_Mass, Stellar_Mass, StellarMass_30kpc, sdss_i_stellar, sdss_g_stellar, sdss_r_stellar, sdss_i_pointsource, sdss_g_pointsource, BH_Lbol, Eddington_ratio = np.load(filename)
 BH_Mass = np.log10(BH_Mass)
 Stellar_Mass = np.log10(StellarMass_30kpc)
 
-#%%
 
 bhmass_overall=BH_Mass
 #bhmass_selected=np.loadtxt('../Aklant/new_sample/log10_bh_mass_selected_population.txt') - np.log10(h) 
@@ -51,16 +50,16 @@ mstar_overall=Stellar_Mass
 magr_overall=sdss_r_stellar
 #r_band_magnitudes_selected=np.loadtxt('../Aklant/new_sample/log10_host_r_mag_selected_population.txt')
 
+logLedd_overall = 38. + np.log10(1.2) + bhmass_overall
+Eddr_overall = Eddington_ratio
+Lbol_overall = logLedd_overall + np.log10(Eddington_ratio)
+
+###Add noise to the data: 
+#Noise level: MBH 0.4dex, mag_R 0.3mag, M* 0.17dex, Lbol 0.03dex
+dMBH, dmag, dMstar, dLbol= 0.4, 0.3, 0.17, 0.1
+#dMBH, dmag, dMstar, dLbol= 0.00004, 0.00003, 0.000017, 0.000003
+
 for ii in range(1):
-    logLedd_overall = 38. + np.log10(1.2) + bhmass_overall
-    Eddr_overall = Eddington_ratio
-    Lbol_overall = logLedd_overall + np.log10(Eddington_ratio)
-    
-    ###Add noise to the data: 
-    #Noise level: MBH 0.4dex, mag_R 0.3mag, M* 0.17dex, Lbol 0.03dex
-    dMBH, dmag, dMstar, dLbol= 0.4, 0.3, 0.17, 0.1
-    #dMBH, dmag, dMstar, dLbol= 0.00004, 0.00003, 0.000017, 0.000003
-    
     bhmass_overall_noi = bhmass_overall + np.random.normal(0, dMBH, size=bhmass_overall.shape)
     mstar_overall_noi = mstar_overall + np.random.normal(0, dMstar, size=mstar_overall.shape)
     magr_overall_noi = magr_overall + np.random.normal(0, dmag, size=magr_overall.shape)
@@ -83,7 +82,7 @@ for ii in range(1):
     plt.hist2d(bhmass_overall,np.log10(Eddr_overall),norm=mpl.colors.LogNorm(),cmap='copper',bins=50,zorder=0,alpha=0.5)
     cbar = plt.colorbar()
     cbar.ax.tick_params(labelsize=30) 
-    plt.errorbar(bhmass_select_noi, Eddr_select_noi, c='steelblue',linestyle=' ',marker='o',ms=10,mec='k', label='selected TNG100 sample')
+    plt.errorbar(bhmass_select_noi, Eddr_select_noi, c='steelblue',linestyle=' ',marker='o',ms=10,mec='k', label='selected Illustris sample')
     xspace = np.linspace(6,10)
     plt.plot(xspace, 0*xspace,'k--',linewidth=3)
     plt.plot(xspace, 0*xspace-1.5,'k--',linewidth=3)
@@ -118,7 +117,7 @@ for ii in range(1):
     Lr, M_star, M_r, M_r_obs_err, bh_mass_obs, stellar_mass_obs_err, logLbol_obs = HST_results
     
     M_r_obs= M_r
-    stellar_mass_obs=  np.log10(10**M_star / 0.54 * 0.91) #+np.log10(h)  #!!! activate *1.7 Change from Chabrier to Salpeter
+    stellar_mass_obs=  np.log10(10**M_star) # / 0.54 * 0.91) #+np.log10(h)  #!!! activate *1.7 Change from Chabrier to Salpeter
     
     logLedd_obs = 38. + np.log10(1.2) + bh_mass_obs
     logEddR_obs = logLbol_obs - logLedd_obs
@@ -139,26 +138,23 @@ for ii in range(1):
     plt.tick_params(which='both', width=2, top=True, right=True,direction='in')
     plt.tick_params(which='major', length=10)
     plt.tick_params(which='minor', length=6)#, color='r’)
-    
     plt.ylabel(r"log(L$_{\rm bol}$/L$_{\rm Edd}$)",fontsize=30)
     plt.xlabel(r'log(M$_{\rm BH}$/M$_{\odot}$)',fontsize=30)
     plt.legend(loc='upper right',fontsize=21,numpoints=1)
-    # plt.savefig('TNG100_selectfunc.pdf')
+    # plt.savefig('Illustris_selectfunc.pdf')
     if ifplot == True:
         plt.show()
     else:
-        plt.close()
-        
-    
+        plt.close()    
     
     #%%Plot MM data
     def lfit(x,m,c):
-        m = 1
+        m=1         
         return m*x+c
     
     import scipy.optimize
     
-    # redshift=1.5
+    redshift=1.5
     
     #panel2=obj.scatter(mstar_overall,bhmass_overall,c='gray',alpha=0.5,label='Simulated population')
     
@@ -194,14 +190,14 @@ for ii in range(1):
     x_obs, y_obs = stellar_mass_obs, bh_mass_obs
     fit_fixm=scipy.optimize.curve_fit(lfit_fixm, y_obs, x_obs)
     x_obs_space=lfit_fixm(y_space,fit_fixm[0])
-    print("mismatch:", fit_fixm[0]- fit[0][1])  #In BH mass offset space
+    # print("mismatch:", fit_fixm[0]- fit[0][1])  #In BH mass offset space
     
     #Plot the 1-D scatter for MM.
     fig, ax = plt.subplots(figsize=(8,7))
     plt.hist(stellar_mass_obs - lfit_fixm(bh_mass_obs,fit_fixm[0]), histtype=u'step',density=True,
              label='HST sample', linewidth = 2, color='orange')
     plt.hist(mstar_selected - lfit(bhmass_selected,fit[0][0],fit[0][1]),histtype=u'step',density=True,
-             label='TNG100 sample', linewidth = 2, color='green')
+             label='Illustris sample', linewidth = 2, color='c')
     plt.title(r"The offset comparison for the M$_{\rm BH}$-M$_{*}$ relation", fontsize = 20)
     plt.tick_params(labelsize=20)
     plt.legend(prop={'size':20})
@@ -213,12 +209,11 @@ for ii in range(1):
     plt.tick_params(which='minor', length=6)#, color='r’)
     
     plt.xlabel('$\Delta$log(M$_{*}$/M$_{\odot}$)',fontsize=30)
+    #plt.savefig('comp_scatter_MM_Illustris_only.pdf')
     if ifplot == True:
         plt.show()
     else:
-        plt.close()
-        
-    
+        plt.close()    
     
     sim_scatter = np.std(mstar_selected - lfit(bhmass_selected,fit[0][0],fit[0][1]))
     obs_scatter = np.std(stellar_mass_obs - lfit_fixm(bh_mass_obs,fit_fixm[0]))
@@ -238,24 +233,24 @@ for ii in range(1):
     cbar.ax.tick_params(labelsize=30) 
     
     obj.errorbar(mstar_selected,bhmass_selected,zorder=1,
-                 color='steelblue',label='MBII population',linestyle=' ',marker='o',ms=10,mec='k')
+                 color='c',label='Illustris population',linestyle=' ',marker='o',ms=10,mec='k')
     obj.errorbar(stellar_mass_obs,bh_mass_obs, 
     #             xerr = [abs(M_r_obs_err[:,0]),abs(M_r_obs_err[:,1])], yerr=np.ones(len(bh_mass_obs))*0.4, 
                  zorder=100,color='orange',label='Observed population',
                  linestyle=' ',marker='o',ms=10,mec='k')
-    plt.plot(x_space, y_space, color='steelblue',linewidth=3, zorder = 101)
+    plt.plot(x_space, y_space, color='c',linewidth=3, zorder = 101)
     plt.plot(x_obs_space,y_space,color='orange',linewidth=3, zorder = 101)
     x_space_ub=lfit(y_space,fit[0][0],fit[0][1]+sim_scatter)
     x_space_lb=lfit(y_space,fit[0][0],fit[0][1]-sim_scatter)
-    plt.fill_betweenx(y_space,x_space_lb,x_space_ub,color='steelblue',alpha=0.35,zorder =1)
+    plt.fill_betweenx(y_space,x_space_lb,x_space_ub,color='c',alpha=0.35,zorder =1)
     x_space_ub=lfit_fixm(y_space,fit_fixm[0]+obs_scatter)
     x_space_lb=lfit_fixm(y_space,fit_fixm[0]-obs_scatter)                                    
     plt.fill_betweenx(y_space,x_space_lb,x_space_ub,color='orange',alpha=0.35,zorder =1)
     obj.set_yticks([7.5,8.0,8.5,9.0])
     obj.set_xticks([10,10.5,11,11.5,12])
     #obj.set_xticklabels(['-18','-20','-22','-24','-26'])
-    ax.set_xlim(9.7,11.9)  #
-    ax.set_ylim(7.2, 9.4)  #
+    # ax.set_xlim(9.5,11.5)  #
+    # ax.set_ylim(7.2, 9.4)  #
     obj.tick_params(labelsize=30)
     
     ax.xaxis.set_minor_locator(AutoMinorLocator())
@@ -268,14 +263,11 @@ for ii in range(1):
     obj.set_ylabel(r'log(M$_{\rm BH}$/M$_{\odot}$)',fontsize=35)
     obj.set_xlabel('log(M$_{*}$/M$_{\odot}$)',fontsize=35)
     obj.legend(loc='upper left',fontsize=21,numpoints=1)
-    # plt.savefig("TNG100_MM.png")
-    plt.savefig('MM_MBII_zs_{0}.png'.format(zs))
+    plt.savefig('MM_Illustris_zs_{0}.png'.format(zs))
     if ifplot == True:
         plt.show()
     else:
-        plt.close()
-        
-    
+        plt.close()  
                                         
     #%%Study the slope uncertainty and the relation to the scatter:
     def slope_scatter_obs(slope):
@@ -295,18 +287,18 @@ for ii in range(1):
     # print(slope_scatter_obs(fit[0][0]+fit_err[0])   )
     # print(slope_scatter_sim(fit[0][0]+fit_err[0])          )
     
-    # print("TNG100 compare to Obs:")
-    # # print("({0:.2f}, {1:.2f})".format( -(lfit(8,fit[0][0],fit[0][1]) - lfit_fixm(8,fit_fixm[0]))[0], sim_scatter - obs_scatter ))
-    # print("({0:.2f}, {1:.2f})".format( -(lfit(8,fit[0][0],fit[0][1]) - lfit_fixm(8,fit_fixm[0]))[0], sim_scatter ))
-    
-    rfilename = 'MC_result/' + 'MBII_zs{0}_fixm1.txt'.format(zs)
+    # print("Illustris compare to Obs:")
+    # print("({0:.2f}, {1:.2f})".format( -(lfit(8,fit[0][0],fit[0][1]) - lfit_fixm(8,fit_fixm[0]))[0], sim_scatter - obs_scatter ))
+    # print("({0:.3f}, {1:.3f})".format( -(lfit(8,fit[0][0],fit[0][1]) - lfit_fixm(8,fit_fixm[0]))[0], sim_scatter ))
+
+    rfilename = 'MC_result/' + 'Illustris_zs{0}_fixm1.txt'.format(zs)
     if_file = glob.glob(rfilename)
     if if_file == []:
         write_file =  open(rfilename,'w') 
     else:
         write_file =  open(rfilename,'r+') 
         write_file.read()
-    write_file.write( "{0:.3f} {1:.3f}".format( -(lfit(8,fit[0][0],fit[0][1]) - lfit_fixm(8,fit_fixm[0]))[0], sim_scatter ))
+    write_file.write( "{0:.3f} {1:.3f}".format( -(lfit(8,fit[0][0],fit[0][1]) - lfit_fixm(8,fit_fixm[0]))[0], sim_scatter )) 
     write_file.write("\n")
     write_file.close()
     if ii%50 == 0:
@@ -327,7 +319,7 @@ for ii in range(1):
 # #fit_fixm_1=scipy.optimize.curve_fit(lfit_fixm_1,M_r_obs, bh_mass_obs)
 # ##fit_err_1=np.sqrt(np.diag(fit_1[1]))
 # #lmbh_space=lfit_fixm_1(x_space,fit_fixm_1[0])
-# #plt.plot(x_space,lmbh_space,color='green',linewidth=3)
+# #plt.plot(x_space,lmbh_space,color='c',linewidth=3)
 # #print("mismatch:", fit_fixm_1[0]- fit_1[0][1])
 
 # #Fit x as function of y
@@ -347,7 +339,7 @@ for ii in range(1):
 # plt.hist(M_r_obs - lfit_fixm_1(bh_mass_obs,fit_fixm_1[0]), histtype=u'step',density=True,
 #          label=('HST sample'), linewidth = 2, color='orange')
 # plt.hist(r_band_magnitudes_selected - lfit(bhmass_selected,fit_1[0][0],fit_1[0][1]),histtype=u'step',density=True,
-#          label=('TNG100 sample'), linewidth = 2, color='green')
+#          label=('Illustris sample'), linewidth = 2, color='c')
 # plt.title(r"The offset comparison for the M$_{\rm BH}$-mag relation", fontsize = 20)
 # plt.tick_params(labelsize=20)
 
@@ -360,13 +352,8 @@ for ii in range(1):
 # plt.legend(prop={'size':20})
 # plt.yticks([])
 # plt.xlabel(r"$\Delta$magnitude",fontsize=30)
-# #plt.savefig('comp_scatter_ML_TNG100only.pdf')
-# if ifplot == True:
-#     plt.show()
-# else:
-#     plt.close()
-    
-
+# #plt.savefig('comp_scatter_ML_Illustris_only.pdf')
+# plt.show()
 
 
 # sim_scatter_1 = np.std(r_band_magnitudes_selected - lfit(bhmass_selected,fit_1[0][0],fit_1[0][1]))
@@ -391,7 +378,7 @@ for ii in range(1):
 # cbar.ax.tick_params(labelsize=30) 
 
 # obj.errorbar(r_band_magnitudes_selected,bhmass_selected,zorder=1,
-#              color='steelblue',label='TNG100 population',linestyle=' ',marker='o',ms=10,mec='k')
+#              color='steelblue',label='Illustris population',linestyle=' ',marker='o',ms=10,mec='k')
 # obj.errorbar(M_r_obs,bh_mass_obs, 
 # #             xerr = [abs(M_r_obs_err[:,0]),abs(M_r_obs_err[:,1])], yerr=np.ones(len(bh_mass_obs))*0.4, 
 #              zorder=100,color='orange',label='Observed population',
@@ -428,13 +415,8 @@ for ii in range(1):
 
 
 # obj.legend(loc='upper left',fontsize=21,numpoints=1)
-# # plt.savefig("TNG100_ML.png")
-# if ifplot == True:
-#     plt.show()
-# else:
-#     plt.close()
-    
-
+# # plt.savefig("Illustris_ML.png")
+# plt.show()
 
 # #%%Study the slope uncertainty and the relation to the scatter:
 # def slope_scatter_obs(slope):
@@ -459,50 +441,35 @@ for ii in range(1):
 # #
 # #plt.figure(figsize=(8,6))
 # #plt.hist(bhmass_selected ,histtype=u'step',normed=True,
-# #         label=('TNG100 BH sample'), linewidth = 2, color='steelblue')
+# #         label=('Illustris BH sample'), linewidth = 2, color='steelblue')
 # #plt.hist(bh_mass_obs , histtype=u'step',normed=True,
 # #         label=('HST BH sample'), linewidth = 2, color='orange')
 # #plt.tick_params(labelsize=20)
 # #plt.legend(prop={'size':20})
 # #plt.yticks([])
-# #if ifplot == True:
-#     plt.show()
-# else:
-#     plt.close()
-    
-
+# #plt.show()
 # #print(stats.ks_2samp(bhmass_selected, bh_mass_obs).pvalue)
 # #
 # #plt.figure(figsize=(8,6))
 # #plt.hist(mstar_selected ,histtype=u'step',normed=True,
-# #         label=('TNG100 M* sample'), linewidth = 2, color='steelblue')
+# #         label=('Illustris M* sample'), linewidth = 2, color='steelblue')
 # #plt.hist(stellar_mass_obs , histtype=u'step',normed=True,
 # #         label=('HST M* sample'), linewidth = 2, color='orange')
 # #plt.tick_params(labelsize=20)
 # #plt.legend(prop={'size':20})
 # #plt.yticks([])
-# #if ifplot == True:
-#     plt.show()
-# else:
-#     plt.close()
-    
-
+# #plt.show()
 # #print(stats.ks_2samp(mstar_selected, stellar_mass_obs).pvalue)
 # #
 # #plt.figure(figsize=(8,6))
 # #plt.hist(r_band_magnitudes_selected ,histtype=u'step',normed=True,
-# #         label=('TNG100 MagR sample'), linewidth = 2, color='steelblue')
+# #         label=('Illustris MagR sample'), linewidth = 2, color='steelblue')
 # #plt.hist(M_r_obs , histtype=u'step',normed=True,
 # #         label=('HST MagR sample'), linewidth = 2, color='orange')
 # #plt.tick_params(labelsize=20)
 # #plt.legend(prop={'size':20})
 # #plt.yticks([])
-# #if ifplot == True:
-#     plt.show()
-# else:
-#     plt.close()
-    
-
+# #plt.show()
 # #print(stats.ks_2samp(r_band_magnitudes_selected, M_r_obs).pvalue)
 
 
@@ -524,7 +491,7 @@ for ii in range(1):
 # #
 # #                                    
 # ##%%To save the data and plot together with SAM                                    
-# TNG100_scatter_ML = r_band_magnitudes_selected - lfit(bhmass_selected,fit_1[0][0],fit_1[0][1])
-# TNG100_scatter_MM = mstar_selected - lfit(bhmass_selected,fit[0][0],fit[0][1])
+# Illustris_scatter_ML = r_band_magnitudes_selected - lfit(bhmass_selected,fit_1[0][0],fit_1[0][1])
+# Illustris_scatter_MM = mstar_selected - lfit(bhmass_selected,fit[0][0],fit[0][1])
 
 #%%

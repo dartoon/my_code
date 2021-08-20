@@ -13,9 +13,10 @@ import glob
 import scipy.stats as st
 
 #%%
-from prep_comparison import HSC_set, TNG_set, comp_plot
+from prep_comparison import HSC_set, comp_plot
+from prep_comparison import TNG_set as Illustris_set
 
-filenames = glob.glob('TNG100/*.npy') 
+filenames = glob.glob('Illustris_data/*.npy') 
 filenames.sort()
 idx = 2
 filename = filenames[idx]
@@ -32,21 +33,21 @@ if zs > 0.5:
     I_mag_break = 22.0    #z~0.7
 
 for i in range(1):
-    TNG = TNG_set(filename, HSC_Lbol_overall=HSC['HSC_Lbol_overall'], HSC_MBHs_overall=HSC['HSC_MBHs_overall'],
+    Illustris = Illustris_set(filename, HSC_Lbol_overall=HSC['HSC_Lbol_overall'], HSC_MBHs_overall=HSC['HSC_MBHs_overall'],
                   I_mag_break = I_mag_break)
     m_ml, b_ml = (0.981139684856507, -2.545890295477823)
-    TNG_scatter = (TNG['BH_Mass_nois_sl'] - ( m_ml*TNG['Stellar_Mass_nois_sl']+b_ml ) )
-    TNG_scatter_nosl = (TNG['BH_Mass_nois'] - ( m_ml*TNG['Stellar_Mass_nois']+b_ml ) )
+    Illustris_scatter = (Illustris['BH_Mass_nois_sl'] - ( m_ml*Illustris['Stellar_Mass_nois_sl']+b_ml ) )
+    Illustris_scatter_nosl = (Illustris['BH_Mass_nois'] - ( m_ml*Illustris['Stellar_Mass_nois']+b_ml ) )
     HSC_scatter = (HSC['HSC_MBHs'] - ( m_ml*HSC['HSC_Mstar']+b_ml ) )
     
-    rfilename = 'MC_result/' + 'TNG100_zs{0}.txt'.format(zs)
+    rfilename = 'MC_result/' + 'Illustris_zs{0}.txt'.format(zs)
     if_file = glob.glob(rfilename)
     if if_file == []:
         write_file =  open(rfilename,'w') 
     else:
         write_file =  open(rfilename,'r+') 
         write_file.read()
-    write_file.write('{0:.3f} {1:.3f}'.format(np.mean(TNG_scatter), np.std(TNG_scatter)))
+    write_file.write('{0:.3f} {1:.3f}'.format(np.mean(Illustris_scatter), np.std(Illustris_scatter)))
     write_file.write("\n")
     write_file.close()
     if i%50 == 0:
@@ -74,22 +75,22 @@ cbar.ax.set_ylabel('Redshift', rotation=270, fontsize = 25, labelpad=25)
 plt.show()
 
 #%%
-comp_plot(TNG['BH_Mass'], TNG['sdss_g_pointsource'], 'BH_Mass', 'sdss_g_pointsource')
+comp_plot(Illustris['BH_Mass'], Illustris['sdss_g_pointsource'], 'BH_Mass', 'sdss_g_pointsource')
 # plt.xlabel(r'log(M$_{\rm BH}$/M$_{\odot}$)',fontsize=30)
 # plt.ylabel('AGN abs magnitude rest-frame g band', fontsize=25)
 plt.xlim(5,10)
 plt.ylim(-26, -14)
 plt.show()
 
-comp_plot(TNG['BH_Mass'], TNG['Eddington_ratio'], 'BH_Mass', 'Eddington_ratio')
+comp_plot(Illustris['BH_Mass'], Illustris['Eddington_ratio'], 'BH_Mass', 'Eddington_ratio')
 # plt.xlabel(r'log(M$_{\rm BH}$/M$_{\odot}$)',fontsize=30)
 # plt.ylabel('AGN Eddington ratio', fontsize=25)
 plt.tick_params(labelsize=25)
 plt.xlim(5,10)
 plt.show()
 
-# comp_plot(TNG['logLbol'], TNG['BH_Mass'], 'logLbol', 'BH_Mass')
-comp_plot(TNG['logLbol_nois'], TNG['BH_Mass_nois'], 'logLbol', 'BH_Mass')
+# comp_plot(Illustris['logLbol'], Illustris['BH_Mass'], 'logLbol', 'BH_Mass')
+comp_plot(Illustris['logLbol_nois'], Illustris['BH_Mass_nois'], 'logLbol', 'BH_Mass')
 plt.scatter(HSC['HSC_Lbol_overall'], HSC['HSC_MBHs_overall'], alpha = 0.1, color = 'orange')
 # plt.xlabel('AGN logLbol', fontsize=25)
 # plt.ylabel(r'log(M$_{\rm BH}$/M$_{\odot}$)',fontsize=30)
@@ -99,8 +100,8 @@ plt.ylim(5.8,10)
 plt.show()
 
 #%% 
-comp_plot(TNG['logLbol_nois'], TNG['BH_Mass_nois'], 'logLbol_nois', 'BH_Mass_nois', alpha = 0.2)
-plt.scatter(TNG['logLbol_nois_sl'], TNG['BH_Mass_nois_sl'], color = 'green',alpha=0.2, zorder = 1)
+comp_plot(Illustris['logLbol_nois'], Illustris['BH_Mass_nois'], 'logLbol_nois', 'BH_Mass_nois', alpha = 0.2)
+plt.scatter(Illustris['logLbol_nois_sl'], Illustris['BH_Mass_nois_sl'], color = 'green',alpha=0.2, zorder = 1)
 plt.scatter(HSC['HSC_Lbol_overall'], HSC['HSC_MBHs_overall'],c='orange',alpha=0.2,zorder = 0.5)
 plt.xlabel('AGN logLbol', fontsize=25)
 plt.ylabel(r'log(M$_{\rm BH}$/M$_{\odot}$)',fontsize=30)
@@ -111,17 +112,38 @@ plt.show()
 
 
 #%%
-f,ax=plt.subplots(1,1,figsize=(14,12))   
-# plt.scatter(TNG['Stellar_Mass_nois'], TNG['BH_Mass_nois'],c='gray',
+# plt.figure(figsize=(11.5,12))      
+# plt.scatter(Illustris['Stellar_Mass_nois'], Illustris['BH_Mass_nois'],c='gray',
 #             s=220, marker=".",zorder=-10, edgecolors='k', alpha = 0.2)
+# plt.scatter(Illustris['Stellar_Mass_nois_sl'], Illustris['BH_Mass_nois_sl'],c='c',
+#             s=220, marker=".",zorder=0, edgecolors='k', alpha = 0.7, label='Illustris sample z={0}'.format(zs))
+# # plt.scatter(HSC['HSC_Mstar'],HSC['HSC_MBHs'],c='orange',
+# #             s=220, marker=".",zorder=-1, edgecolors='k', alpha = 0.7, label='HSC sample')
+# plt.scatter(HSC['HSC_Mstar'][HSC['HSC_ps_mag']<I_mag_break],HSC['HSC_MBHs'][HSC['HSC_ps_mag']<I_mag_break],c='orange',
+#             s=220, marker=".",zorder=-1, edgecolors='k', alpha = 0.7, label='HSC sample')
+
+# xl = np.linspace(5, 13, 100)
+# plt.plot(xl, m_ml*xl+b_ml, color="k", linewidth=4.0,zorder=-0.5)
+# plt.title(r"M$_{\rm BH}-$M$_*$ relation",fontsize=35)
+# plt.xlabel(r"log(M$_*$/M$_{\odot})$",fontsize=35)
+# plt.ylabel(r'log(M$_{\rm BH}$/M$_{\odot}$)',fontsize=35)
+# plt.xlim(9,12.5)
+# plt.ylim(6.0,10.3)
+# plt.grid(linestyle='--')
+# plt.tick_params(labelsize=25)
+# plt.legend(scatterpoints=1,numpoints=1,loc=2,prop={'size':28},ncol=2,handletextpad=0)
+# plt.savefig('MM_Illustris_zs_{0}.pdf'.format(zs))
+# plt.show()
+
+f,ax=plt.subplots(1,1,figsize=(14,12))   
 import matplotlib as mpl
 obj=ax
-panel2=obj.hist2d(TNG['Stellar_Mass_nois'], TNG['BH_Mass_nois'],
+panel2=obj.hist2d(Illustris['Stellar_Mass_nois'], Illustris['BH_Mass_nois'],
                   norm=mpl.colors.LogNorm(), density = True, cmap='copper',bins=50,zorder=-1,
                       alpha=0.5, cmin = 0.001 , cmax = 1.1)
 
-plt.scatter(TNG['Stellar_Mass_nois_sl'], TNG['BH_Mass_nois_sl'],c='deeppink',
-            s=420, marker=".",zorder=0, edgecolors='k', alpha = 0.7, label='TNG100 sample z={0}'.format(zs))
+plt.scatter(Illustris['Stellar_Mass_nois_sl'], Illustris['BH_Mass_nois_sl'],c='c',
+            s=420, marker=".",zorder=0, edgecolors='k', alpha = 0.7, label='Illustris sample z={0}'.format(zs))
 # plt.scatter(HSC['HSC_Mstar'],HSC['HSC_MBHs'],c='orange',
 #             s=220, marker=".",zorder=-1, edgecolors='k', alpha = 0.7, label='HSC sample')
 plt.scatter(HSC['HSC_Mstar'][HSC['HSC_ps_mag']<I_mag_break],HSC['HSC_MBHs'][HSC['HSC_ps_mag']<I_mag_break],c='orange',
@@ -145,19 +167,20 @@ ax.xaxis.set_minor_locator(AutoMinorLocator())
 ax.yaxis.set_minor_locator(AutoMinorLocator())
 cbar=f.colorbar(panel2[3],ax=obj)
 cbar.ax.tick_params(labelsize=30) 
-plt.savefig('MM_TNG_zs_{0}.png'.format(zs))
+plt.savefig('MM_Illustris_zs_{0}.png'.format(zs))
 plt.show()
+
 #%%
 #Plot the 1-D scatter for MM.
 fig, ax = plt.subplots(figsize=(8,7))
-plt.hist(TNG_scatter_nosl, histtype=u'step',density=True,
-          label=('TNG sample scatter nosl'), linewidth = 2, color='gray')
-plt.hist(TNG_scatter,histtype=u'step',density=True,
-          label=('TNG sample scatter'), linewidth = 2, color='deeppink')
+plt.hist(Illustris_scatter_nosl, histtype=u'step',density=True,
+          label=('Illustris sample scatter nosl'), linewidth = 2, color='gray')
+plt.hist(Illustris_scatter,histtype=u'step',density=True,
+          label=('Illustris sample scatter'), linewidth = 2, color='c')
 plt.hist(HSC_scatter, histtype=u'step',density=True,
           label=('HSC sample scatter'), linewidth = 2, color='orange')
-# plt.hist(TNG_scatter_noselect,histtype=u'step',density=True,
-#           label=('TNG sample scatter, no selection'), linewidth = 2, color='gray')
+# plt.hist(Illustris_scatter_noselect,histtype=u'step',density=True,
+#           label=('Illustris sample scatter, no selection'), linewidth = 2, color='gray')
 plt.title(r"The offset comparison for the M$_{\rm BH}$-M$_{*}$ relation", fontsize = 25)
 plt.tick_params(labelsize=20)
 plt.legend(prop={'size':10})
@@ -170,22 +193,22 @@ plt.xlabel(r'$\Delta$log(M$_{\rm BH}$/M$_{\odot}$)',fontsize=30)
 #plt.savefig('comp_scatter_MM_MBIIonly.pdf')
 plt.show()
 from scipy import stats
-sim_scatter_std = np.std(TNG_scatter)
+sim_scatter_std = np.std(Illustris_scatter)
 obs_scatter_std = np.std(HSC_scatter)
 print("obs scatter:", obs_scatter_std)
 print("sim scatter:", sim_scatter_std)
-print("KS p-value:", stats.ks_2samp(TNG_scatter, HSC_scatter).pvalue)
-print(np.mean(TNG_scatter_nosl), np.mean(TNG_scatter) )
+print("KS p-value:", stats.ks_2samp(Illustris_scatter, HSC_scatter).pvalue)
+print(np.mean(Illustris_scatter_nosl), np.mean(Illustris_scatter) )
 
 print("for paper Observation", 'zs=', zs)
 print('{0:.2f}, {1:.2f}'.format(np.mean(HSC_scatter), np.std(HSC_scatter)))
-print("for paper TNG100", 'zs=', zs)
-print('{0:.2f}, {1:.2f}'.format(np.mean(TNG_scatter), np.std(TNG_scatter)))
+print("for paper Illustris", 'zs=', zs)
+print('{0:.2f}, {1:.2f}'.format(np.mean(Illustris_scatter), np.std(Illustris_scatter)))
 
 
 
 #%% simulation
-comp_plot(TNG['Stellar_Mass_nois_sl'], TNG['sdss_g_galaxy_sl'],alpha=0.2)
+comp_plot(Illustris['Stellar_Mass_nois_sl'], Illustris['sdss_g_galaxy_sl'],alpha=0.2)
 plt.scatter(HSC['HSC_Mstar'], HSC['HSC_galaxy_abs_iMags'], c = 'orange',alpha=0.2) #The correlation between M* and g_band_mag
 plt.xlabel('M*')
 plt.ylabel('host galaxy g magnitude')
@@ -194,9 +217,9 @@ plt.ylim(-26, -19)
 plt.show()
 
 #%%
-comp_plot(TNG['BH_Mass_nois'], TNG['sdss_g_pointsource'])
-plt.scatter(TNG['BH_Mass_nois_sl'], TNG['sdss_g_pointsource_sl'])
-plt.plot(np.linspace(5,10), np.linspace(5,10)*0 + TNG['select_abs_Mags'])
+comp_plot(Illustris['BH_Mass_nois'], Illustris['sdss_g_pointsource'])
+plt.scatter(Illustris['BH_Mass_nois_sl'], Illustris['sdss_g_pointsource_sl'])
+plt.plot(np.linspace(5,10), np.linspace(5,10)*0 + Illustris['select_abs_Mags'])
 plt.xlabel(r'log(M$_{\rm BH}$/M$_{\odot}$)',fontsize=30)
 plt.ylabel('AGN abs magnitude rest-frame g band', fontsize=25)
 plt.tick_params(labelsize=25)
@@ -205,9 +228,9 @@ plt.tick_params(labelsize=25)
 plt.show()
 
 # plt.figure(figsize=(8,7))      
-comp_plot(TNG['Stellar_Mass_nois'], TNG['sdss_g_pointsource'])
-plt.scatter(TNG['Stellar_Mass_nois_sl'], TNG['sdss_g_pointsource_sl'])
-plt.plot(np.linspace(5,15), np.linspace(5,10)*0 + TNG['select_abs_Mags'])
+comp_plot(Illustris['Stellar_Mass_nois'], Illustris['sdss_g_pointsource'])
+plt.scatter(Illustris['Stellar_Mass_nois_sl'], Illustris['sdss_g_pointsource_sl'])
+plt.plot(np.linspace(5,15), np.linspace(5,10)*0 + Illustris['select_abs_Mags'])
 plt.xlabel(r'log(M$_{*}$/M$_{\odot}$)',fontsize=30)
 plt.ylabel('AGN abs magnitude rest-frame g band', fontsize=25)
 plt.tick_params(labelsize=25)

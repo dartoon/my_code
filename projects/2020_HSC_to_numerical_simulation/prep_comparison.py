@@ -362,7 +362,7 @@ def quasar_filter(group_list, HSC_Lbol_overall, HSC_MBHs_overall):
     from matplotlib import cm 
     t = [kernel.pdf([HSC_Lbol_overall[i] , HSC_MBHs_overall[i]]) for i in range(len(HSC_Lbol_overall))]
     min_pdf = np.min(t)
-    print(np.mean(min_pdf))
+    # print(np.mean(min_pdf))
     bools = [ (kernel.pdf([group_list[0][i] , group_list[1][i]]) > min_pdf/2)[0] for i in range(len(group_list[0]))]  
     # plt.scatter(HSC_Lbol_overall, HSC_MBHs_overall,c='blue')
     # plt.contourf(xx, yy, f, cmap=cm.Blues, alpha=0.5)

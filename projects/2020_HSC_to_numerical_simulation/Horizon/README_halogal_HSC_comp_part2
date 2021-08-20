@@ -1,0 +1,15 @@
+z=0.3     outt00638_halo_gal_centralBHs_2reff
+z=0.7     outt00439_halo_gal_centralBHs_2reff
+
+mhalo (1e11 Msun)
+mgal (1e11 msun)
+mbh (1e8 msun)
+edd ratio
+logLbol (erg/s)
+halo level
+galaxy level
+id halo
+id gal
+id BH
+
+
