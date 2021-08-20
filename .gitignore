@@ -92,3 +92,6 @@ projects/2021_dual_AGN/proofBHBH/model_Iband*/*/*.py
 
 *.npy
 projects/2020_HSC_to_numerical_simulation/Horizon/*_2reff
+projects/2020_HSC_to_numerical_simulation/MC_result/*
+for_collbrate/Kohei_SFR_template/0.0*Gyr
+*asdf
