@@ -51,6 +51,12 @@ wave = table_spec['wave_model']/10000.
 plt.figure(figsize=(8, 6))
 plt.plot(wave, f)
 
+# write_file =  open('wave_f.txt','w') 
+# for i in range(len(wave)):
+#     write_file.write('{0} {1}'.format(wave[i], f[i] ))
+#     write_file.write("\n")
+# write_file.close()
+
 hsc_y_fil = np.loadtxt('hsc_y.fil')
 hsc_y_fil[:,2] = hsc_y_fil[:,2]/hsc_y_fil[:,2].max()* f.max()/6
 plt.plot(hsc_y_fil[:,1]/10000., hsc_y_fil[:,2], label='HSC-Y response')
