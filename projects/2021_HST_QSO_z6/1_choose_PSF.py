@@ -95,12 +95,11 @@ for i in range(len(info)):
                                            if_plot=False)
     
     #Lines used to find PSF and set the PSF_loc_dic.
-    # data_process.find_PSF(radius = 30, user_option = True, if_filter=True, psf_edge =60)
-    # data_process.plot_overview(label = ID, target_label = None)
+    data_process.find_PSF(radius = 30, user_option = True, if_filter=True, psf_edge =30)
     # data_process.profiles_compare(norm_pix = 5, if_annuli=False, y_log = False,
     #               prf_name_list = (['target'] + ['PSF{0}'.format(i) for i in range(len(data_process.PSF_list))]) )
-    PSF_loc = PSF_loc_dic[str(i)]
-    # data_process.find_PSF(radius = 30, user_option = False, if_filter=True, psf_edge =30)
+    # PSF_loc = PSF_loc_dic[str(i)]
+    data_process.plot_overview(label = ID, target_label = None)
     # data_process.find_PSF(radius = 30, PSF_pos_list = [PSF_loc])
     data_process.checkout()
     #Start to produce the class and params for lens fitting.
@@ -114,12 +113,12 @@ for i in range(len(info)):
     #Plot the initial settings for fittings. 
     fit_sepc.plot_fitting_sets()
 
-    fit_run = FittingProcess(fit_sepc, savename = 'pkl_files/'+ ID+'_'+str(i), fitting_level='deep')
-    fit_run.run(algorithm_list = ['PSO'], setting_list=[None])
-                # setting_list = [{'sigma_scale': 1., 'n_particles': 100, 'n_iterations': 100}, {'n_burn': 100, 'n_run': 100, 'walkerRatio': 10,'sigma_scale': .1}])
-    # fit_run.plot_all()
-    fit_run.plot_final_qso_fit()
-    fit_run.dump_result()
+    # fit_run = FittingProcess(fit_sepc, savename = 'pkl_files/'+ ID+'_'+str(i), fitting_level='deep')
+    # fit_run.run(algorithm_list = ['PSO'], setting_list=[None])
+    #             # setting_list = [{'sigma_scale': 1., 'n_particles': 100, 'n_iterations': 100}, {'n_burn': 100, 'n_run': 100, 'walkerRatio': 10,'sigma_scale': .1}])
+    # # fit_run.plot_all()
+    # fit_run.plot_final_qso_fit()
+    # fit_run.dump_result()
     # print(fit_run.final_result_galaxy[0])
 
 #%% Co-add residual
@@ -127,9 +126,9 @@ import glob
 import pickle
 from galight.tools.astro_tools import plt_fits
 tot_residual = None
-for i in range(len(info)):
+for i in range(len(info)-1):
     ID, filename, _ = info[i]
-    picklename = 'pkl_files/'+ID+'_'+str(i)+'.pkl'
+    picklename = 'first_pkl_files/'+ID+'_'+str(i)+'.pkl'
     picklename = glob.glob(picklename)
     if picklename  != []:
         fitting_run_class = pickle.load(open(picklename[0],'rb'))
@@ -137,8 +136,10 @@ for i in range(len(info)):
         psf = fitting_run_class.image_ps_list[0]
         nearby = fitting_run_class.image_host_list[1:]
         host_resi = data - psf
-        for i in range(len(nearby)):
-            host_resi = host_resi - nearby[i]
+        # if i == 10:
+        #     fitting_run_class.plot_final_qso_fit()
+        for j in range(len(nearby)):
+            host_resi = host_resi - nearby[j]
         # plt_fits(host_resi)
         if tot_residual is None:
             tot_residual = host_resi

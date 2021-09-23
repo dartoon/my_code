@@ -75,7 +75,7 @@ for ID in ids[:-1]:
                     filt = fitsFile[0].header['FILTER']
                 imgs.append(target_stamp-target_stamp.min())
                 info.append([ID, filt, fitsfile[0]])
-del imgs[4]
+del imgs[4] #Remove the repeated one.
 del info[4]
 
 #%%
@@ -101,8 +101,8 @@ for i in range( 4 - len(imgs)%4 ):
     axs[-1][-(i+1)].axis('off')
 plt.show()
 
-#%%
-write_file = open('fit_files_info.txt','w') 
-for i in range(len(info)):
-    write_file.write("{0} {1} {2}\n".format(info[i][0], info[i][2], info[i][1]) )
-write_file.close()
+# #%%
+# write_file = open('fit_files_info.txt','w') 
+# for i in range(len(info)):
+#     write_file.write("{0} {1} {2}\n".format(info[i][0], info[i][2], info[i][1]) )
+# write_file.close()
