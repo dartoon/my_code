@@ -12,6 +12,9 @@ import astropy.io.fits as pyfits
 import glob
 import scipy.stats as st
 
+import matplotlib as mat
+mat.rcParams['font.family'] = 'STIXGeneral'
+
 #%%
 from prep_comparison import HSC_set, comp_plot
 from prep_comparison import TNG_set as Illustris_set
@@ -139,7 +142,7 @@ f,ax=plt.subplots(1,1,figsize=(14,12))
 import matplotlib as mpl
 obj=ax
 panel2=obj.hist2d(Illustris['Stellar_Mass_nois'], Illustris['BH_Mass_nois'],
-                  norm=mpl.colors.LogNorm(), density = True, cmap='copper',bins=50,zorder=-1,
+                  norm=mpl.colors.LogNorm(), density = True, cmap='summer',bins=50,zorder=-1,
                       alpha=0.5, cmin = 0.001 , cmax = 1.1)
 
 plt.scatter(Illustris['Stellar_Mass_nois_sl'], Illustris['BH_Mass_nois_sl'],c='c',

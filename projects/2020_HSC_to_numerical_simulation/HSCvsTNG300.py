@@ -13,9 +13,10 @@ import glob
 import scipy.stats as st
 
 #%%
-from prep_comparison import HSC_set, TNG_set, comp_plot
+from prep_comparison import HSC_set, comp_plot
+from prep_comparison import TNG_set as TNG300_set
 
-filenames = glob.glob('TNG100/*.npy') 
+filenames = glob.glob('TNG300_data/*.npy') 
 filenames.sort()
 idx = 2
 filename = filenames[idx]
@@ -32,23 +33,23 @@ if zs > 0.5:
     I_mag_break = 22.0    #z~0.7
 
 for i in range(1):
-    TNG = TNG_set(filename, HSC_Lbol_overall=HSC['HSC_Lbol_overall'], HSC_MBHs_overall=HSC['HSC_MBHs_overall'],
+    TNG300 = TNG300_set(filename, HSC_Lbol_overall=HSC['HSC_Lbol_overall'], HSC_MBHs_overall=HSC['HSC_MBHs_overall'],
                   I_mag_break = I_mag_break)
     m_ml, b_ml = (0.981139684856507, -2.545890295477823)
-    TNG_scatter = (TNG['BH_Mass_nois_sl'] - ( m_ml*TNG['Stellar_Mass_nois_sl']+b_ml ) )
-    TNG_scatter_nosl = (TNG['BH_Mass_nois'] - ( m_ml*TNG['Stellar_Mass_nois']+b_ml ) )
+    TNG300_scatter = (TNG300['BH_Mass_nois_sl'] - ( m_ml*TNG300['Stellar_Mass_nois_sl']+b_ml ) )
+    TNG300_scatter_nosl = (TNG300['BH_Mass_nois'] - ( m_ml*TNG300['Stellar_Mass_nois']+b_ml ) )
     HSC_scatter = (HSC['HSC_MBHs'] - ( m_ml*HSC['HSC_Mstar']+b_ml ) )
     
-    # rfilename = 'MC_result/' + 'TNG100_zs{0}.txt'.format(zs)
-    # if_file = glob.glob(rfilename)
-    # if if_file == []:
-    #     write_file =  open(rfilename,'w') 
-    # else:
-    #     write_file =  open(rfilename,'r+') 
-    #     write_file.read()
-    # write_file.write('{0:.3f} {1:.3f}'.format(np.mean(TNG_scatter), np.std(TNG_scatter)))
-    # write_file.write("\n")
-    # write_file.close()
+    rfilename = 'MC_result/' + 'TNG300_zs{0}.txt'.format(zs)
+    if_file = glob.glob(rfilename)
+    if if_file == []:
+        write_file =  open(rfilename,'w') 
+    else:
+        write_file =  open(rfilename,'r+') 
+        write_file.read()
+    write_file.write('{0:.3f} {1:.3f}'.format(np.mean(TNG300_scatter), np.std(TNG300_scatter)))
+    write_file.write("\n")
+    write_file.close()
     if i%50 == 0:
         print(i)
 
@@ -74,22 +75,22 @@ cbar.ax.set_ylabel('Redshift', rotation=270, fontsize = 25, labelpad=25)
 plt.show()
 
 #%%
-comp_plot(TNG['BH_Mass'], TNG['sdss_g_pointsource'], 'BH_Mass', 'sdss_g_pointsource')
+comp_plot(TNG300['BH_Mass'], TNG300['sdss_g_pointsource'], 'BH_Mass', 'sdss_g_pointsource')
 # plt.xlabel(r'log(M$_{\rm BH}$/M$_{\odot}$)',fontsize=30)
 # plt.ylabel('AGN abs magnitude rest-frame g band', fontsize=25)
 plt.xlim(5,10)
 plt.ylim(-26, -14)
 plt.show()
 
-comp_plot(TNG['BH_Mass'], TNG['Eddington_ratio'], 'BH_Mass', 'Eddington_ratio')
+comp_plot(TNG300['BH_Mass'], TNG300['Eddington_ratio'], 'BH_Mass', 'Eddington_ratio')
 # plt.xlabel(r'log(M$_{\rm BH}$/M$_{\odot}$)',fontsize=30)
 # plt.ylabel('AGN Eddington ratio', fontsize=25)
 plt.tick_params(labelsize=25)
 plt.xlim(5,10)
 plt.show()
 
-# comp_plot(TNG['logLbol'], TNG['BH_Mass'], 'logLbol', 'BH_Mass')
-comp_plot(TNG['logLbol_nois'], TNG['BH_Mass_nois'], 'logLbol', 'BH_Mass')
+# comp_plot(TNG300['logLbol'], TNG300['BH_Mass'], 'logLbol', 'BH_Mass')
+comp_plot(TNG300['logLbol_nois'], TNG300['BH_Mass_nois'], 'logLbol', 'BH_Mass')
 plt.scatter(HSC['HSC_Lbol_overall'], HSC['HSC_MBHs_overall'], alpha = 0.1, color = 'orange')
 # plt.xlabel('AGN logLbol', fontsize=25)
 # plt.ylabel(r'log(M$_{\rm BH}$/M$_{\odot}$)',fontsize=30)
@@ -99,8 +100,8 @@ plt.ylim(5.8,10)
 plt.show()
 
 #%% 
-comp_plot(TNG['logLbol_nois'], TNG['BH_Mass_nois'], 'logLbol_nois', 'BH_Mass_nois', alpha = 0.2)
-plt.scatter(TNG['logLbol_nois_sl'], TNG['BH_Mass_nois_sl'], color = 'green',alpha=0.2, zorder = 1)
+comp_plot(TNG300['logLbol_nois'], TNG300['BH_Mass_nois'], 'logLbol_nois', 'BH_Mass_nois', alpha = 0.2)
+plt.scatter(TNG300['logLbol_nois_sl'], TNG300['BH_Mass_nois_sl'], color = 'green',alpha=0.2, zorder = 1)
 plt.scatter(HSC['HSC_Lbol_overall'], HSC['HSC_MBHs_overall'],c='orange',alpha=0.2,zorder = 0.5)
 plt.xlabel('AGN logLbol', fontsize=25)
 plt.ylabel(r'log(M$_{\rm BH}$/M$_{\odot}$)',fontsize=30)
@@ -112,16 +113,16 @@ plt.show()
 
 #%%
 f,ax=plt.subplots(1,1,figsize=(14,12))   
-# plt.scatter(TNG['Stellar_Mass_nois'], TNG['BH_Mass_nois'],c='gray',
+# plt.scatter(TNG300['Stellar_Mass_nois'], TNG300['BH_Mass_nois'],c='gray',
 #             s=220, marker=".",zorder=-10, edgecolors='k', alpha = 0.2)
 import matplotlib as mpl
 obj=ax
-panel2=obj.hist2d(TNG['Stellar_Mass_nois'], TNG['BH_Mass_nois'],
+panel2=obj.hist2d(TNG300['Stellar_Mass_nois'], TNG300['BH_Mass_nois'],
                   norm=mpl.colors.LogNorm(), density = True, cmap='summer',bins=50,zorder=-1,
                       alpha=0.5, cmin = 0.001 , cmax = 1.1)
 
-plt.scatter(TNG['Stellar_Mass_nois_sl'], TNG['BH_Mass_nois_sl'],c='deeppink',
-            s=420, marker=".",zorder=0, edgecolors='k', alpha = 0.7, label='TNG100 sample z={0}'.format(zs))
+plt.scatter(TNG300['Stellar_Mass_nois_sl'][:1000], TNG300['BH_Mass_nois_sl'][:1000],c='plum',
+            s=420, marker=".",zorder=0, edgecolors='k', alpha = 0.7, label='TNG300 sample z={0}'.format(zs))
 # plt.scatter(HSC['HSC_Mstar'],HSC['HSC_MBHs'],c='orange',
 #             s=220, marker=".",zorder=-1, edgecolors='k', alpha = 0.7, label='HSC sample')
 plt.scatter(HSC['HSC_Mstar'][HSC['HSC_ps_mag']<I_mag_break],HSC['HSC_MBHs'][HSC['HSC_ps_mag']<I_mag_break],c='orange',
@@ -145,19 +146,19 @@ ax.xaxis.set_minor_locator(AutoMinorLocator())
 ax.yaxis.set_minor_locator(AutoMinorLocator())
 cbar=f.colorbar(panel2[3],ax=obj)
 cbar.ax.tick_params(labelsize=30) 
-plt.savefig('MM_TNG_zs_{0}.png'.format(zs))
+plt.savefig('MM_TNG300_zs_{0}.png'.format(zs))
 plt.show()
 #%%
 #Plot the 1-D scatter for MM.
 fig, ax = plt.subplots(figsize=(8,7))
-plt.hist(TNG_scatter_nosl, histtype=u'step',density=True,
-          label=('TNG sample scatter nosl'), linewidth = 2, color='gray')
-plt.hist(TNG_scatter,histtype=u'step',density=True,
-          label=('TNG sample scatter'), linewidth = 2, color='deeppink')
+plt.hist(TNG300_scatter_nosl, histtype=u'step',density=True,
+          label=('TNG300 sample scatter nosl'), linewidth = 2, color='gray')
+plt.hist(TNG300_scatter,histtype=u'step',density=True,
+          label=('TNG300 sample scatter'), linewidth = 2, color='deeppink')
 plt.hist(HSC_scatter, histtype=u'step',density=True,
           label=('HSC sample scatter'), linewidth = 2, color='orange')
-# plt.hist(TNG_scatter_noselect,histtype=u'step',density=True,
-#           label=('TNG sample scatter, no selection'), linewidth = 2, color='gray')
+# plt.hist(TNG300_scatter_noselect,histtype=u'step',density=True,
+#           label=('TNG300 sample scatter, no selection'), linewidth = 2, color='gray')
 plt.title(r"The offset comparison for the M$_{\rm BH}$-M$_{*}$ relation", fontsize = 25)
 plt.tick_params(labelsize=20)
 plt.legend(prop={'size':10})
@@ -170,22 +171,32 @@ plt.xlabel(r'$\Delta$log(M$_{\rm BH}$/M$_{\odot}$)',fontsize=30)
 #plt.savefig('comp_scatter_MM_MBIIonly.pdf')
 plt.show()
 from scipy import stats
-sim_scatter_std = np.std(TNG_scatter)
+sim_scatter_std = np.std(TNG300_scatter)
 obs_scatter_std = np.std(HSC_scatter)
 print("obs scatter:", obs_scatter_std)
 print("sim scatter:", sim_scatter_std)
-print("KS p-value:", stats.ks_2samp(TNG_scatter, HSC_scatter).pvalue)
-print(np.mean(TNG_scatter_nosl), np.mean(TNG_scatter) )
+print("KS p-value:", stats.ks_2samp(TNG300_scatter, HSC_scatter).pvalue)
+print(np.mean(TNG300_scatter_nosl), np.mean(TNG300_scatter) )
 
 print("for paper Observation", 'zs=', zs)
 print('{0:.2f}, {1:.2f}'.format(np.mean(HSC_scatter), np.std(HSC_scatter)))
-print("for paper TNG100", 'zs=', zs)
-print('{0:.2f}, {1:.2f}'.format(np.mean(TNG_scatter), np.std(TNG_scatter)))
+print("for paper TNG300", 'zs=', zs)
+print('{0:.2f}, {1:.2f}'.format(np.mean(TNG300_scatter), np.std(TNG300_scatter)))
 
+rfilename = 'offset_result/' + 'TNG300_zs{0}.txt'.format(zs)
+if_file = glob.glob(rfilename)
+write_file =  open(rfilename,'w') 
+for i in range(len(TNG300_scatter)):
+    try:
+        write_file.write('{0} {1} {2}'.format(TNG300_scatter_nosl[i], TNG300_scatter[i], HSC_scatter[i]))
+    except:
+        write_file.write('{0} {1} -99'.format(TNG300_scatter_nosl[i], TNG300_scatter[i]))
+    write_file.write("\n")
+write_file.close()
 
 
 #%% simulation
-comp_plot(TNG['Stellar_Mass_nois_sl'], TNG['sdss_g_galaxy_sl'],alpha=0.2)
+comp_plot(TNG300['Stellar_Mass_nois_sl'], TNG300['sdss_g_galaxy_sl'],alpha=0.2)
 plt.scatter(HSC['HSC_Mstar'], HSC['HSC_galaxy_abs_iMags'], c = 'orange',alpha=0.2) #The correlation between M* and g_band_mag
 plt.xlabel('M*')
 plt.ylabel('host galaxy g magnitude')
@@ -194,9 +205,9 @@ plt.ylim(-26, -19)
 plt.show()
 
 #%%
-comp_plot(TNG['BH_Mass_nois'], TNG['sdss_g_pointsource'])
-plt.scatter(TNG['BH_Mass_nois_sl'], TNG['sdss_g_pointsource_sl'])
-plt.plot(np.linspace(5,10), np.linspace(5,10)*0 + TNG['select_abs_Mags'])
+comp_plot(TNG300['BH_Mass_nois'], TNG300['sdss_g_pointsource'])
+plt.scatter(TNG300['BH_Mass_nois_sl'], TNG300['sdss_g_pointsource_sl'])
+plt.plot(np.linspace(5,10), np.linspace(5,10)*0 + TNG300['select_abs_Mags'])
 plt.xlabel(r'log(M$_{\rm BH}$/M$_{\odot}$)',fontsize=30)
 plt.ylabel('AGN abs magnitude rest-frame g band', fontsize=25)
 plt.tick_params(labelsize=25)
@@ -205,9 +216,9 @@ plt.tick_params(labelsize=25)
 plt.show()
 
 # plt.figure(figsize=(8,7))      
-comp_plot(TNG['Stellar_Mass_nois'], TNG['sdss_g_pointsource'])
-plt.scatter(TNG['Stellar_Mass_nois_sl'], TNG['sdss_g_pointsource_sl'])
-plt.plot(np.linspace(5,15), np.linspace(5,10)*0 + TNG['select_abs_Mags'])
+comp_plot(TNG300['Stellar_Mass_nois'], TNG300['sdss_g_pointsource'])
+plt.scatter(TNG300['Stellar_Mass_nois_sl'], TNG300['sdss_g_pointsource_sl'])
+plt.plot(np.linspace(5,15), np.linspace(5,10)*0 + TNG300['select_abs_Mags'])
 plt.xlabel(r'log(M$_{*}$/M$_{\odot}$)',fontsize=30)
 plt.ylabel('AGN abs magnitude rest-frame g band', fontsize=25)
 plt.tick_params(labelsize=25)

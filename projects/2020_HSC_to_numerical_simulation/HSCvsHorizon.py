@@ -10,14 +10,16 @@ import matplotlib.pyplot as plt
 import astropy.io.fits as pyfits
 import glob
 import scipy.stats as st
+import matplotlib as mat
+mat.rcParams['font.family'] = 'STIXGeneral'
 
 #%%
 from prep_comparison import HSC_set, Horizon_set, comp_plot
 
 # filenames = glob.glob('Horizon/*') 
 # filenames.sort()
-filename = 'Horizon/outt00638_halo_gal_centralBHs_2reff'
-zs = 0.3   #Actually from z = 1.0 #!!!
+filename = 'Horizon/outt00552_halo_gal_centralBHs_2reff'
+zs = 0.7   #Actually from z = 1.0 #!!!
 
 # z=0.       outt00761_halo_gal_centralBHs_2reff
 # z=0.3     outt00638_halo_gal_centralBHs_2reff
@@ -46,11 +48,11 @@ imf = 'Sal'
 if imf == 'Sal':
     detlaM = 0.23
 
-ifplot = False
+ifplot = True
 
     #%%
 
-for ii in range(500):
+for ii in range(1):
     HSC = HSC_set(zs, core = False,imf = imf)
     Horizon = Horizon_set(filename, HSC_Lbol_overall=HSC['HSC_Lbol_overall'], HSC_MBHs_overall=HSC['HSC_MBHs_overall'],
                   zs = zs, I_mag_break = I_mag_break, imf =  imf)
@@ -126,7 +128,7 @@ for ii in range(500):
     obj=ax
     # panel2=obj.hist2d(Horizon['Stellar_Mass_reali'], Horizon['BH_Mass_reali'], #!!!
     panel2=obj.hist2d(Horizon['Stellar_Mass_nois'], Horizon['BH_Mass_nois'],
-                      norm=mpl.colors.LogNorm(), density = True, cmap='copper',bins=50,zorder=-1,
+                      norm=mpl.colors.LogNorm(), density = True, cmap='summer',bins=50,zorder=-1,
                       alpha=0.5, cmin = 0.001 , cmax = 1.1)
     
     plt.scatter(Horizon['Stellar_Mass_nois_sl'][:500], Horizon['BH_Mass_nois_sl'][:500],c='m',
@@ -138,7 +140,7 @@ for ii in range(500):
     
     xl = np.linspace(5, 13, 100)
     m_ml, b_ml = (0.981139684856507, -2.545890295477823)
-    plt.plot(xl, m_ml*xl+b_ml, color="k", linewidth=4.0,zorder=-0.5)
+    plt.plot(xl+detlaM, m_ml*xl+b_ml, color="k", linewidth=4.0,zorder=-0.5)
     # plt.title(r"M$_{\rm BH}-$M$_*$ relation",fontsize=35)
     plt.xlabel(r"log(M$_*$/M$_{\odot})$",fontsize=35)
     plt.ylabel(r'log(M$_{\rm BH}$/M$_{\odot}$)',fontsize=35)
@@ -201,16 +203,16 @@ for ii in range(500):
     
     # print("for paper Horizon", 'zs=', zs)
     # print('{0:.2f}, {1:.2f}'.format(np.mean(Horizon_scatter), np.std(Horizon_scatter)))
-    rfilename = 'MC_result/' + 'Horizon_zs{0}.txt'.format(zs)
-    if_file = glob.glob(rfilename)
-    if if_file == []:
-        write_file =  open(rfilename,'w') 
-    else:
-        write_file =  open(rfilename,'r+') 
-        write_file.read()   
+    # rfilename = 'MC_result/' + 'Horizon_zs{0}.txt'.format(zs)
+    # if_file = glob.glob(rfilename)
+    # if if_file == []:
+    #     write_file =  open(rfilename,'w') 
+    # else:
+    #     write_file =  open(rfilename,'r+') 
+    #     write_file.read()   
         
-    write_file.write( "{0:.3f} {1:.3f}".format(np.mean(Horizon_scatter), np.std(Horizon_scatter)))
-    write_file.write("\n")
-    write_file.close()
+    # write_file.write( "{0:.3f} {1:.3f}".format(np.mean(Horizon_scatter), np.std(Horizon_scatter)))
+    # write_file.write("\n")
+    # write_file.close()
     if ii%50 == 0:
         print(ii)    

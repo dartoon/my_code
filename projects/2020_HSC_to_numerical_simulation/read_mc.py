@@ -11,7 +11,7 @@ import astropy.io.fits as pyfits
 import matplotlib.pyplot as plt
 
 import glob
-files = glob.glob('MC_result/Hor*')
+files = glob.glob('MC_result/Ill*')
 for i in range(len(files)):
     print(i, files[i])
     

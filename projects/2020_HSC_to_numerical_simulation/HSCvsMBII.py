@@ -103,14 +103,32 @@ for ii in range(1):
         plt.close()
     
     #%% 
-    comp_plot(MBII['logLbol_nois'], MBII['BH_Mass_nois'], 'logLbol_nois', 'BH_Mass_nois', alpha = 0.2)
-    plt.scatter(MBII['logLbol_nois_sl'], MBII['BH_Mass_nois_sl'], color = 'green',alpha=0.2, zorder = 1)
-    plt.scatter(HSC['HSC_Lbol_overall'], HSC['HSC_MBHs_overall'],c='orange',alpha=0.2,zorder = 0.5)
-    plt.xlabel('AGN logLbol', fontsize=25)
-    plt.ylabel(r'log(M$_{\rm BH}$/M$_{\odot}$)',fontsize=30)
+    fig, ax = plt.subplots(figsize=(11,9))
+    from prep_comparison import quasar_filter
+    # plt.scatter( MBII['BH_Mass_nois'], MBII['logLbol_nois'],
+    #           color = 'steelblue', edgecolors=None, alpha = 0.2)
+    import matplotlib as mpl
+    BH_overall, logLbol_overall = MBII['BH_Mass_nois'][MBII['logLbol_nois']>0], MBII['logLbol_nois'][MBII['logLbol_nois']>0]
+    plt.hist2d(BH_overall, logLbol_overall,norm=mpl.colors.LogNorm(),
+               cmap='summer',bins=50,zorder=0,alpha=0.5)
+    cbar = plt.colorbar()
+    cbar.ax.tick_params(labelsize=30) 
+    type1_bools = quasar_filter([logLbol_overall, BH_overall], HSC['HSC_Lbol_overall'], HSC['HSC_MBHs_overall'])
+    plt.scatter(BH_overall[type1_bools][:500], logLbol_overall[type1_bools][:500], 
+                color = 'steelblue',edgecolors='black',alpha=0.8, zorder = 1, label= 'selected MBII sample')
+    plt.scatter( HSC['HSC_MBHs_overall'], HSC['HSC_Lbol_overall'], c='orange', 
+                edgecolors='gray', alpha=0.8,zorder = 0.5, label= 'HSC observed sample')
+    plt.xlabel(r'log(M$_{\rm BH}$/M$_{\odot}$)',fontsize=30)
+    plt.ylabel(r'log(L$_{\rm bol}$)', fontsize=30)
+    plt.ylim(38, 48)
+    plt.xlim(5.8,10)
     plt.tick_params(labelsize=25)
-    plt.xlim(30, 46.5)
-    plt.ylim(5.8,10)
+    from matplotlib.ticker import AutoMinorLocator
+    ax.xaxis.set_minor_locator(AutoMinorLocator())
+    plt.tick_params(which='both', width=2, top=True, right=True,direction='in')
+    plt.tick_params(which='major', length=12)
+    plt.tick_params(which='minor', length=6)#, color='gray')
+    plt.legend(loc='lower right',fontsize=21,numpoints=1)
     if ifplot == True:
         plt.show()
     else:
@@ -122,7 +140,7 @@ for ii in range(1):
     import matplotlib as mpl
     obj=ax
     panel2=obj.hist2d(MBII['Stellar_Mass_nois'], MBII['BH_Mass_nois'],
-                      norm=mpl.colors.LogNorm(), density = True, cmap='copper',bins=50,zorder=-1,
+                      norm=mpl.colors.LogNorm(), density = True, cmap='summer',bins=50,zorder=-1,
                       alpha=0.5, cmin = 0.001 , cmax = 1.1)
     
     plt.scatter(MBII['Stellar_Mass_nois_sl'], MBII['BH_Mass_nois_sl'],c='steelblue',
@@ -134,7 +152,7 @@ for ii in range(1):
     
     xl = np.linspace(5, 13, 100)
     m_ml, b_ml = (0.981139684856507, -2.545890295477823)
-    plt.plot(xl, m_ml*xl+b_ml, color="k", linewidth=4.0,zorder=-0.5)
+    plt.plot(xl+detlaM, m_ml*xl+b_ml, color="k", linewidth=4.0,zorder=-0.5)
     # plt.title(r"M$_{\rm BH}-$M$_*$ relation",fontsize=35)
     plt.xlabel(r"log(M$_*$/M$_{\odot})$",fontsize=35)
     plt.ylabel(r'log(M$_{\rm BH}$/M$_{\odot}$)',fontsize=35)
@@ -149,7 +167,7 @@ for ii in range(1):
     from matplotlib.ticker import AutoMinorLocator
     ax.xaxis.set_minor_locator(AutoMinorLocator())
     ax.yaxis.set_minor_locator(AutoMinorLocator())
-    cbar=f.colorbar(panel2[3],ax=obj)
+    cbar=f.colorbar(panel2[3],ax=obj, ticks=[])
     cbar.ax.tick_params(labelsize=30) 
     plt.savefig('MM_MBII_zs_{0}.png'.format(zs))
     plt.show()    
@@ -200,16 +218,16 @@ for ii in range(1):
     # print("for paper MBII100", 'zs=', zs)
     # print('{0:.2f}, {1:.2f}'.format(np.mean(MBII_scatter), np.std(MBII_scatter)))
     
-    rfilename = 'MC_result/' + 'MBII_zs{0}.txt'.format(zs)
-    if_file = glob.glob(rfilename)
-    if if_file == []:
-        write_file =  open(rfilename,'w') 
-    else:
-        write_file =  open(rfilename,'r+') 
-        write_file.read()
-    write_file.write('{0:.3f} {1:.3f}'.format(np.mean(MBII_scatter), np.std(MBII_scatter)))
-    write_file.write("\n")
-    write_file.close()
+    # rfilename = 'MC_result/' + 'MBII_zs{0}.txt'.format(zs)
+    # if_file = glob.glob(rfilename)
+    # if if_file == []:
+    #     write_file =  open(rfilename,'w') 
+    # else:
+    #     write_file =  open(rfilename,'r+') 
+    #     write_file.read()
+    # write_file.write('{0:.3f} {1:.3f}'.format(np.mean(MBII_scatter), np.std(MBII_scatter)))
+    # write_file.write("\n")
+    # write_file.close()
     if ii%50 == 0:
         print(ii)
 

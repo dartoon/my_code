@@ -151,9 +151,11 @@ for ii in range(1):
     
     
     #%%Plot MM data
-    def lfit(x,m,c):
-        m = 1
-        return m*x+c
+    def lfit(x,m = 1/0.9811,c = 2.545/0.9811):
+        # m = 1
+        # m = 1/0.9811
+        # c = 2.545/0.9811
+        return m*x+c+0.23
     
     import scipy.optimize
     
@@ -179,25 +181,25 @@ for ii in range(1):
     
     #Fit x as function of y
     x, y = mstar_selected, bhmass_selected
-    fit=scipy.optimize.curve_fit(lfit, y, x)
-    fit_err=np.sqrt(np.diag(fit[1]))
+    # fit=scipy.optimize.curve_fit(lfit, y, x)
+    # fit_err=np.sqrt(np.diag(fit[1]))
     y_space=np.linspace(-50,50,100)
-    x_space=lfit(y_space,fit[0][0],fit[0][1])   #y_space become to x_space
+    x_space=lfit(y_space)   #y_space become to x_space
     
     #plt.fill_betweenx(y_space,x_space_lb,x_space_ub,color='steelblue',alpha=0.35)
-    def lfit_fixm(y,c):
-        m_0 = fit[0][0]
-        return m_0*y+c
+    # def lfit_fixm(y,c):
+    #     m_0 = fit[0][0]
+    #     return m_0*y+c
     x_obs, y_obs = stellar_mass_obs, bh_mass_obs
-    fit_fixm=scipy.optimize.curve_fit(lfit_fixm, y_obs, x_obs)
-    x_obs_space=lfit_fixm(y_space,fit_fixm[0])
+    # fit_fixm=scipy.optimize.curve_fit(lfit_fixm, y_obs, x_obs)
+    # x_obs_space=lfit_fixm(y_space,fit_fixm[0])
     # print("mismatch:", fit_fixm[0]- fit[0][1])  #In BH mass offset space
     
     #Plot the 1-D scatter for MM.
     fig, ax = plt.subplots(figsize=(8,7))
-    plt.hist(stellar_mass_obs - lfit_fixm(bh_mass_obs,fit_fixm[0]), histtype=u'step',density=True,
+    plt.hist(stellar_mass_obs - lfit(bh_mass_obs), histtype=u'step',density=True,
              label='HST sample', linewidth = 2, color='orange')
-    plt.hist(mstar_selected - lfit(bhmass_selected,fit[0][0],fit[0][1]),histtype=u'step',density=True,
+    plt.hist(mstar_selected - lfit(bhmass_selected),histtype=u'step',density=True,
              label='Horizon sample', linewidth = 2, color='steelblue')
     plt.title(r"The offset comparison for the M$_{\rm BH}$-M$_{*}$ relation", fontsize = 20)
     plt.tick_params(labelsize=20)
@@ -217,9 +219,24 @@ for ii in range(1):
         plt.close()
         
     
+    sim_mis = np.mean(mstar_selected - lfit(bhmass_selected))
+    sim_scatter = np.std(mstar_selected - lfit(bhmass_selected))
+    obs_scatter = np.std(stellar_mass_obs - lfit(bh_mass_obs))
     
-    sim_scatter = np.std(mstar_selected - lfit(bhmass_selected,fit[0][0],fit[0][1]))
-    obs_scatter = np.std(stellar_mass_obs - lfit_fixm(bh_mass_obs,fit_fixm[0]))
+    sim_offset_nosl = mstar_overall_noi - lfit(bhmass_overall_noi)
+    sim_offset = mstar_selected - lfit(bhmass_selected)
+    obs_offset = stellar_mass_obs - lfit(bh_mass_obs)
+    leng = max(len(sim_offset),len(obs_offset))
+    rfilename = 'offset_result/' + 'Horizon_zs{0}.txt'.format(zs)
+    if_file = glob.glob(rfilename)
+    write_file =  open(rfilename,'w') 
+    for i in range(leng):
+        try:
+            write_file.write('{0} {1} {2}'.format(sim_offset_nosl[i], sim_offset[i], obs_offset[i]))
+        except:
+            write_file.write('{0} {1} -99'.format(sim_offset_nosl[i], sim_offset[i]))
+        write_file.write("\n")
+    write_file.close()        
     # print("obs scatter:", obs_scatter)
     # print("sim scatter:", sim_scatter)
     # print("KS scatter:", stats.ks_2samp((mstar_selected - lfit(bhmass_selected,fit[0][0],fit[0][1])),
@@ -230,29 +247,29 @@ for ii in range(1):
     f,ax=plt.subplots(1,1,figsize=(14,12))
     obj=ax
     panel2=obj.hist2d(mstar_overall_noi,bhmass_overall_noi,
-                      norm=mpl.colors.LogNorm(), density = True, cmap='copper',bins=50,zorder=0,
-                      alpha=0.5)
-    cbar=f.colorbar(panel2[3],ax=obj)
+                      norm=mpl.colors.LogNorm(), density = True, cmap='summer',bins=50,zorder=0,
+                      alpha=0.5, cmin = 0.001 , cmax = 1.1)
+    cbar=f.colorbar(panel2[3],ax=obj, ticks=[])
     cbar.ax.tick_params(labelsize=30) 
     
     obj.errorbar(mstar_selected,bhmass_selected,zorder=1,
-                 color='m',label='Horizon population',linestyle=' ',marker='o',ms=10,mec='k')
+                 color='m',label='Horizon sample z=1.5',linestyle=' ',marker='o',ms=10,mec='k')
     obj.errorbar(stellar_mass_obs,bh_mass_obs, 
     #             xerr = [abs(M_r_obs_err[:,0]),abs(M_r_obs_err[:,1])], yerr=np.ones(len(bh_mass_obs))*0.4, 
-                 zorder=100,color='orange',label='Observed population',
-                 linestyle=' ',marker='o',ms=10,mec='k')
-    plt.plot(x_space, y_space, color='m',linewidth=3, zorder = 101)
-    plt.plot(x_obs_space,y_space,color='orange',linewidth=3, zorder = 101)
-    x_space_ub=lfit(y_space,fit[0][0],fit[0][1]+sim_scatter)
-    x_space_lb=lfit(y_space,fit[0][0],fit[0][1]-sim_scatter)
-    plt.fill_betweenx(y_space,x_space_lb,x_space_ub,color='m',alpha=0.35,zorder =1)
-    x_space_ub=lfit_fixm(y_space,fit_fixm[0]+obs_scatter)
-    x_space_lb=lfit_fixm(y_space,fit_fixm[0]-obs_scatter)                                    
-    plt.fill_betweenx(y_space,x_space_lb,x_space_ub,color='orange',alpha=0.35,zorder =1)
+                 zorder=100,color='orange',label='HST sample',
+                 linestyle=' ',marker='o',ms=15,mec='k')
+    plt.plot(x_space, y_space, color='black',linewidth=3, zorder = 101)
+    # plt.plot(x_obs_space,y_space,color='orange',linewidth=3, zorder = 101)
+    # x_space_ub=lfit(y_space,fit[0][0],fit[0][1]+sim_scatter)
+    # x_space_lb=lfit(y_space,fit[0][0],fit[0][1]-sim_scatter)
+    # plt.fill_betweenx(y_space,x_space_lb,x_space_ub,color='m',alpha=0.35,zorder =1)
+    # x_space_ub=lfit_fixm(y_space,fit_fixm[0]+obs_scatter)
+    # x_space_lb=lfit_fixm(y_space,fit_fixm[0]-obs_scatter)                                    
+    # plt.fill_betweenx(y_space,x_space_lb,x_space_ub,color='orange',alpha=0.35,zorder =1)
     obj.set_yticks([7.5,8.0,8.5,9.0])
     obj.set_xticks([10,10.5,11,11.5,12])
     #obj.set_xticklabels(['-18','-20','-22','-24','-26'])
-    ax.set_xlim(9.5,11.5)  #
+    ax.set_xlim(9.7,11.9)  #
     ax.set_ylim(7.2, 9.4)  #
     obj.tick_params(labelsize=30)
     
@@ -265,7 +282,7 @@ for ii in range(1):
     #ax.set_rasterized(True)
     obj.set_ylabel(r'log(M$_{\rm BH}$/M$_{\odot}$)',fontsize=35)
     obj.set_xlabel('log(M$_{*}$/M$_{\odot}$)',fontsize=35)
-    obj.legend(loc='upper left',fontsize=21,numpoints=1)
+    obj.legend(loc='upper left',fontsize=30,numpoints=1)
     plt.savefig('MM_Horizon_zs_{0}.png'.format(zs))
     if ifplot == True:
         plt.show()
@@ -293,14 +310,14 @@ for ii in range(1):
     # print("Horizon compare to Obs:")
     # print("({0:.2f}, {1:.2f})".format( -(lfit(8,fit[0][0],fit[0][1]) - lfit_fixm(8,fit_fixm[0]))[0], sim_scatter ))
     
-    rfilename = 'MC_result/' + 'Horizion_zs{0}_fixm1.txt'.format(zs)
+    rfilename = 'MC_result/' + 'Horizion_zs{0}_uselocal.txt'.format(zs)
     if_file = glob.glob(rfilename)
     if if_file == []:
         write_file =  open(rfilename,'w') 
     else:
         write_file =  open(rfilename,'r+') 
         write_file.read()
-    write_file.write( "{0:.3f} {1:.3f}".format( -(lfit(8,fit[0][0],fit[0][1]) - lfit_fixm(8,fit_fixm[0]))[0], sim_scatter ))
+    write_file.write( "{0:.3f} {1:.3f}".format( -sim_mis, sim_scatter ))
     write_file.write("\n")
     write_file.close()
     if ii%50 == 0:

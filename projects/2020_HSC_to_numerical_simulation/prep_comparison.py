@@ -370,9 +370,9 @@ def quasar_filter(group_list, HSC_Lbol_overall, HSC_MBHs_overall):
     # plt.scatter(group_list[0][bools], group_list[1][bools],c='green',alpha=0.4)
     return np.array(bools)
 
-def comp_plot(x, y, label_x='', label_y='',  alpha=1, label = '', c = 'blue'):
+def comp_plot(x, y, label_x='', label_y='',  alpha=1, label = '', c = 'blue', edgecolors=None):
     plt.figure(figsize=(11.5,10))      
-    plt.scatter(x, y, alpha=alpha,label=label,c=c)
+    plt.scatter(x, y, alpha=alpha,label=label,c=c, edgecolors=edgecolors)
     plt.xlabel(label_x,fontsize=30)
     plt.ylabel(label_y, fontsize=25)
     plt.tick_params(labelsize=25)
