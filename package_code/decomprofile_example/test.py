@@ -113,36 +113,36 @@ from galight.fitting_process import FittingProcess
 fit_run = FittingProcess(fit_sepc, savename = 'savename', fitting_level='norm')
 fit_run.run(algorithm_list = ['PSO', 'MCMC'], setting_list=[None,{'n_burn': 100, 'n_run': 100, 'walkerRatio': 10,'sigma_scale': .1}])
             # setting_list = [{'sigma_scale': 1., 'n_particles': 100, 'n_iterations': 100}, {'n_burn': 100, 'n_run': 100, 'walkerRatio': 10,'sigma_scale': .1}])
-# fit_run.plot_all()
+fit_run.plot_all()
 
-# fit_run.dump_result()
-# print(fit_run.final_result_galaxy[0])
+fit_run.dump_result()
+print(fit_run.final_result_galaxy[0])
 
-#%%
-# # Test load pkl
-# import pickle
-# picklename = 'savename.pkl'
-# fitting_run_class = pickle.load(open(picklename,'rb'))
-# fitting_run_class.plot_final_qso_fit()
-# from galight.tools.plot_tools import profile_plots
+# %%
+# Test load pkl
+import pickle
+picklename = 'savename.pkl'
+fitting_run_class = pickle.load(open(picklename,'rb'))
+fitting_run_class.plot_final_qso_fit()
+from galight.tools.plot_tools import profile_plots
 
-# data = fitting_run_class.fitting_specify_class.kwargs_data['image_data']
+data = fitting_run_class.fitting_specify_class.kwargs_data['image_data']
 
-# ps_list = fitting_run_class.image_ps_list
-# galaxy_list = fitting_run_class.image_host_list
-# ps_image = np.zeros_like(ps_list[0])
-# for i in range(len(ps_list)):
-#     ps_image = ps_image+ps_list[i]
-# galaxy_image = np.zeros_like(data)
-# for i in range(len(galaxy_list)):
-#     galaxy_image = galaxy_image+galaxy_list[i]
-# model = ps_image + galaxy_image
+ps_list = fitting_run_class.image_ps_list
+galaxy_list = fitting_run_class.image_host_list
+ps_image = np.zeros_like(ps_list[0])
+for i in range(len(ps_list)):
+    ps_image = ps_image+ps_list[i]
+galaxy_image = np.zeros_like(data)
+for i in range(len(galaxy_list)):
+    galaxy_image = galaxy_image+galaxy_list[i]
+model = ps_image + galaxy_image
 
-# flux_list_2d = [data, model, (data-model)/data]
-# label_list_2d = ['data', 'model', '(data-model)/model']
-# flux_list_1d = [data, model]
-# label_list_1d = ['data', 'model']      
-# profile_plots(flux_list_2d, label_list_2d, flux_list_1d, label_list_1d,
-#               deltaPix = fitting_run_class.fitting_specify_class.deltaPix,
-#               target_ID =  'ID', if_annuli=True)
+flux_list_2d = [data, model, (data-model)/data]
+label_list_2d = ['data', 'model', '(data-model)/model']
+flux_list_1d = [data, model]
+label_list_1d = ['data', 'model']      
+profile_plots(flux_list_2d, label_list_2d, flux_list_1d, label_list_1d,
+              deltaPix = fitting_run_class.fitting_specify_class.deltaPix,
+              target_ID =  'ID', if_annuli=True)
 

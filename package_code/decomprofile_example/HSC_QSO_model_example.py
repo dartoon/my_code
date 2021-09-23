@@ -44,15 +44,15 @@ data_process.checkout() #Check if all the materials is known.
 #%%Start to produce the class and params for lens fitting.
 from galight.fitting_specify import FittingSpecify
 fit_sepc = FittingSpecify(data_process)
-fit_sepc.prepare_fitting_seq(point_source_num = 1)#, fix_n_list= [[0,4]], fix_center_list = [[0,0]])
+fit_sepc.prepare_fitting_seq(point_source_num = 1, supersampling_factor=3)#, fix_n_list= [[0,4]], fix_center_list = [[0,0]])
 # fit_sepc.plot_fitting_sets()
 fit_sepc.build_fitting_seq()
 
 
 #%%Setting the fitting method and run.
 from galight.fitting_process import FittingProcess
-fit_run = FittingProcess(fit_sepc, savename = 'HSC_QSO')
+fit_run = FittingProcess(fit_sepc, savename = 'HSC_QSO', fitting_level='deep')
 fit_run.run(algorithm_list = ['PSO'], setting_list=[None])
-fit_run.plot_all()
-fit_run.dump_result()
-# # print(fit_run.final_result_galaxy[0])
+# fit_run.plot_all()
+# fit_run.dump_result()
+print(fit_run.final_result_galaxy[0])
