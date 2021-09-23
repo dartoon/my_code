@@ -209,6 +209,7 @@ plt.show()
 
 special_ID = list(dict.fromkeys(special_ID))
 
+
 #%%
 # plt_ID_list = ID_list[(np.max(mags_list,axis=1)<23)*(offset_list<1)] 
 # for i in range( len(plt_ID_list ) ):

@@ -61,6 +61,33 @@ from astropy.cosmology import FlatLambdaCDM
 # cosmo = FlatLambdaCDM(H0=70, Om0=0.3, Tcmb0=2.725)
 cosmo = FlatLambdaCDM(H0=70, Om0=0.3)
 
+def deg2HMS(ra='', dec='', round=False):
+  RA, DEC, rs, ds = '', '', '', ''
+  if dec:
+    if str(dec)[0] == '-':
+      ds, dec = '-', abs(dec)
+    deg = int(dec)
+    decM = abs(int((dec-deg)*60))
+    if round:
+      decS = int((abs((dec-deg)*60)-decM)*60)
+    else:
+      decS = (abs((dec-deg)*60)-decM)*60
+    DEC = '{0}{1} {2} {3}'.format(ds, deg, decM, decS)
+  if ra:
+    if str(ra)[0] == '-':
+      rs, ra = '-', abs(ra)
+    raH = int(ra/15)
+    raM = int(((ra/15)-raH)*60)
+    if round:
+      raS = int(((((ra/15)-raH)*60)-raM)*60)
+    else:
+      raS = ((((ra/15)-raH)*60)-raM)*60
+    RA = '{0}{1} {2} {3}'.format(rs, raH, raM, raS)
+  if ra and dec:
+    return (RA, DEC)
+  else:
+    return RA or DEC
+
 print("ID & RA & DEC & z & Separ.& Mag.& Grism & Lines & PA\\\\")
 print("&&&&($''$, kpc)&(pair)&&&(deg)\\\\")
 offset_kpc_h0_list, z_list = [], []
@@ -98,17 +125,19 @@ for ID in ID_list:
     print(show_ID, '&' , RA, '&' , Dec, '&' , '{0:.3f}'.format(z), '&' , '{0:.2f},{1:.1f}'.format(offset, offset_kpc), '&', 
           '{0:.1f},{1:.1f}'.format(np.min(Mags), np.max(Mags)), '&', 
           av_filter(z), '& {0:.1f} \\\\'.format(cal_oreination(ID)), '%{0:.0f} {1:.0f}degree'.format(APT_orie_1, APT_orie_2) )
+    print(deg2HMS(ra=float(RA), dec = float(Dec)) )
     offset_kpc_h0_list.append(offset_kpc * 70 / 100)
     z_list.append(z)
     
 #%%
 import sys
 sys.path.insert(0,'Shenli_materials/shenli_figure1/')
-import separation
+
+import separation  #Import Shenli's data
 import matplotlib as mat
 mat.rcParams['font.family'] = 'STIXGeneral'
 
-plt.scatter(np.array(z_list), np.array(offset_kpc_h0_list), c = 'red', marker = '*', edgecolors='black', s = 305, alpha = 0.9, label = 'Proposed Sample')
+plt.scatter(np.array(z_list), np.array(offset_kpc_h0_list), c = 'red', marker = '*', edgecolors='black', s = 605, alpha = 0.9, label = 'Proposed Sample')
 
 import pandas as pd
 shenli_sample = pd.read_csv('../whole_sample_new.csv', index_col = 0)
@@ -117,19 +146,44 @@ shenli_z = shenli_sample['Redshift']
 shenli_tel = shenli_sample['telescope']
 shenli_stat = shenli_sample['status']
 shenli_sep_l, shenli_z_l = [], []
+shenli_tele = []
 for i in range(len(shenli_sample)):
     if shenli_stat[i] == 'QSO': 
         scale_relation = cosmo.angular_diameter_distance(shenli_z[i]).value * 10**3 * (1/3600./180.*np.pi)  #Kpc/arc
         shenli_sep_l.append(shenli_sep[i]* scale_relation )
         shenli_z_l.append(shenli_z[i])
+        if shenli_tel[i] == 'Gemini':
+            shenli_tele.append(1)
+        else:
+            shenli_tele.append(0)
+
+#ID  z  sep(")
+# 123939.06+003439.8 2.138 2.139
+# 145201.59-011945.3 1.8709 2.61
+add_z = [2.138, 1.8709 ]
+add_sep = [2.139, 2.61]
+for i in range(len(add_sep)):
+    scale_relation = cosmo.angular_diameter_distance(add_z[i]).value * 10**3 * (1/3600./180.*np.pi)  #Kpc/arc
+    shenli_sep_l.append(add_sep[i]* scale_relation )  
+    shenli_z_l.append(add_z[i])
+            
 shenli_sep_l = np.array(shenli_sep_l)
 shenli_z_l = np.array(shenli_z_l)
-
 
 plt.scatter(0.2, 0.430* 70 / 100,c = 'blue', marker = 'o', edgecolors='black', s = 50, alpha = 0.9, label = 'Goulding+19')
 
 plt.scatter(shenli_z_l, shenli_sep_l * 70 / 100, marker="h",edgecolors='black',
             c='m', s=220,zorder=10,alpha=1, label = 'Our paper')
+
+# plt.scatter(shenli_z_l[2], shenli_sep_l[2] * 70 / 100, marker="s",edgecolors='red',
+#              facecolors='none', s=520,zorder=0,alpha=1, linewidth = 2.5)
+# plt.scatter(shenli_z_l[5], shenli_sep_l[5] * 70 / 100, marker="s",edgecolors='red',
+#              facecolors='none', s=520,zorder=0,alpha=1, linewidth = 2.5)
+# plt.scatter(shenli_z_l[6], shenli_sep_l[6] * 70 / 100, marker="s",edgecolors='red',
+#              facecolors='none', s=520,zorder=0,alpha=1, linewidth = 2.5)
+# plt.scatter(shenli_z_l[7], shenli_sep_l[7] * 70 / 100, marker="s",edgecolors='red',
+#              facecolors='none', s=520,zorder=0,alpha=1, linewidth = 2.5)
+
 
 
 DeRosa = np.array([[0.0749, 30], [0.0551, 43], [0.0482, 51], [0.0446, 59] ]) #De Rosa MNRAS 2018

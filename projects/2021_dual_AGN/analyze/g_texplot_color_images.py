@@ -52,8 +52,8 @@ sample = pd.read_csv('material/Gaia_catalog.csv')
 
 import matplotlib as mat
 mat.rcParams['font.family'] = 'STIXGeneral'
-row_ = int(len(ID_list)/6 -0.1) + 1
-fig, (axs) = plt.subplots(row_, 6, figsize=(18, row_*3))
+# row_ = int(len(ID_list)/6 -0.1) + 1
+fig, (axs) = plt.subplots(1, 3, figsize=(9, 4))
 
 for k in range(len(ID_list)):
     string = ID_list[k]
@@ -139,32 +139,61 @@ for k in range(len(ID_list)):
     
     # sz = len(rgb_default)
     # plt.text(sz/20,sz/20*18,ID,color='white',fontsize=15)
-    # # plt.text(sz/20,sz/20*16.5,"I-band offset: {0:.2f} arcsec".format(offset_list[2]),fontsize=15,color='white')
+    # plt.text(sz/20,sz/20*16.5,"I-band offset: {0:.2f} arcsec".format(offset_list[2]),fontsize=15,color='white')
     # plt.text(sz/20,sz/20*16.5,"z={0:.3f}".format(read_z(ID)),fontsize=15,color='white')
     # plt.text(sz/20,sz/20*1, Band[0]+Band[1]+Band[2]+'-band Used',color='white',fontsize=15)
     # print(ID, "z=",read_z(ID))
     # plt.imshow(rgb_default, origin='lower')
-    _i = int(k / len(axs.T))
-    _j = int(k % len(axs.T))
-    axs[_i][_j].imshow(rgb_default, origin='lower')
+    # _i = int(k / len(axs.T))
+    _j = k
+    axs[_j].imshow(rgb_default, origin='lower')
     sz = len(rgb_default)
     show_ID = ID[:4] + ID[9:14] 
     bands = Band[0]+Band[1]+Band[2]
-    plttext = axs[_i][_j].text(sz/30,sz/20*17.5,show_ID,color='white',fontsize=18)
-    plttext = axs[_i][_j].text(sz/30,sz/20*15,"z={0:.3f}".format(read_z(ID)),fontsize=18,color='white')
-    plttext = axs[_i][_j].text(sz*15/20,sz/20*17, bands,color='white',fontsize=15)
-    scale_bar(axs[_i][_j], sz, dist=1/0.168, text='1"', color='white', fontsize=18)
+    
+    file = glob.glob(files[0]+'fit_result_{0}-band.txt'.format('I'))
+    if file != []:
+        f = open(file[0],"r")    
+    string = f.read()    
+    lines = string.split('\n')   # Split in to \n
+    trust = 2    
+    l1 = [i for i in range(len(lines)) if 'model_PS_result:' in lines[i]]
+    AGN_dic = read_string_list(string = lines[l1[trust]].split('model_PS_result: ')[1])    
+    AGN_pos = np.array([[-1*AGN_dic[i]['ra_image'], AGN_dic[i]['dec_image']] for i in range(len(AGN_dic))])    
+    offset = np.sum( (AGN_pos[0] -  AGN_pos[1])**2)**0.5 
+    
+    plttext = axs[_j].text(sz*5/20,sz/20*3,"offset: {0:.2f}'""'  ".format(offset),fontsize=15,color='white')
+    plttext = axs[_j].text(sz/30,sz/20*17.5,show_ID,color='white',fontsize=18)
+    plttext = axs[_j].text(sz/30,sz/20*15,"z={0:.3f}".format(read_z(ID)),fontsize=18,color='white')
+    plttext = axs[_j].text(sz*15/20,sz/20*17, bands,color='white',fontsize=15)
+    
+    cent = rgb_default.shape[0]/2
+    
+    if _j in [10]:
+        offs = 1.5
+    elif _j in [1]:
+        offs = 1
+    else:
+        offs = 0.5
+    plttext = axs[_j].scatter(AGN_pos[0][0]/0.168 + cent -offs, AGN_pos[0][1]/0.168+ cent -offs, 
+                              marker="x",c='red',  s = 100, 
+                              zorder=100 ,alpha=1)
+    plttext = axs[_j].scatter(AGN_pos[1][0]/0.168 + cent -offs, AGN_pos[1][1]/0.168+ cent -offs,
+                              marker="x",c='red',  s = 100, 
+                              zorder=100 ,alpha=1)
+    
+    scale_bar(axs[_j], sz, dist=1/0.168, text='1"', color='white', fontsize=18)
     # if ID == '011227.87-003151.6':
     #     plttext = axs[_i][_j].text(sz/30,sz/20*13,'not selected',color='white',fontsize=18)        
-    coordinate_arrows(axs[_i][_j], sz, arrow_size=0.03, color = 'white')
-    axs[_i][_j].axes.xaxis.set_visible(False)
-    axs[_i][_j].axes.yaxis.set_visible(False)
+    coordinate_arrows(axs[_j], sz, arrow_size=0.03, color = 'white')
+    axs[_j].axes.xaxis.set_visible(False)
+    axs[_j].axes.yaxis.set_visible(False)
 
 # axs[1][4].axes.xaxis.set_visible(False)
 # axs[1][4].axes.yaxis.set_visible(False)    
-axs[1][5].axis("off")
-# plt.tight_layout()    
-plt.subplots_adjust(wspace=-0.02, hspace=0.04)
+# axs[4].axis("off")
+plt.tight_layout()    
+# plt.subplots_adjust(wspace=-0.005)
 plt.savefig('show_material/color_plot.pdf')
 plt.show()
 

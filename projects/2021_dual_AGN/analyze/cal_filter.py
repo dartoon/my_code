@@ -13,10 +13,12 @@ import matplotlib.pyplot as plt
 CIV = 1549
 MgII = 2798
 Hb = 4861
+Ha = 6563
 OIII = 5007
+
+#Cal HST filter
 G102range = [8000, 11500]
 G141range = [10750, 17000]
-
 z = 1.4444
 def av_filter(z):
     lines = np.array([CIV, MgII, Hb, OIII])
@@ -37,4 +39,5 @@ def av_filter(z):
     else:
         s = "No fileter!!! & "
     return s
+
 print(av_filter(1.4444))

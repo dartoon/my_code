@@ -43,7 +43,7 @@ More_data['R'] = More_data.apply(lambda x: ang_to_d(x['Sep(")'], x['z']), axis=1
 #plt.rcParams['figure.dpi'] = 150 #分辨率
 import matplotlib as mat
 mat.rcParams['font.family'] = 'STIXGeneral'
-plt.figure(figsize=(11, 9))
+plt.figure(figsize=(14, 9))
 plt.scatter(He2006_data['zspec'],He2006_data['R'],c = 'blue', marker = 'v', s = 50, alpha = 0.8, label = 'Hennawi+06')
 plt.scatter(He2010_data['zspec'], He2010_data['R'],c = 'green', marker = '^', s = 50, alpha = 0.8, label = 'Hennawi+10')
 #plt.scatter(seren['Sep(kpc)']/0.7, seren['Redshift'],c = 'grey', marker = 's', s = 5, alpha = 0.8, label = 'serendipitous')
