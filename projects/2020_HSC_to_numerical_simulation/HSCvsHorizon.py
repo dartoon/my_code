@@ -18,15 +18,15 @@ from prep_comparison import HSC_set, Horizon_set, comp_plot
 
 # filenames = glob.glob('Horizon/*') 
 # filenames.sort()
-filename = 'Horizon/outt00552_halo_gal_centralBHs_2reff'
-zs = 0.7   #Actually from z = 1.0 #!!!
+# filename = 'Horizon/outt00638_halo_gal_centralBHs_2reff'
+# zs = 0.7   #Actually from z = 1.0 #!!!
 
-# z=0.       outt00761_halo_gal_centralBHs_2reff
-# z=0.3     outt00638_halo_gal_centralBHs_2reff
-# z=0.5     outt00552_halo_gal_centralBHs_2reff
-# z=0.7     outt00439_halo_gal_centralBHs_2reff
-# z=1.      outt00343_halo_gal_centralBHs_2reff
-# z=1.5     outt00266_halo_gal_centralBHs_2reff
+# zs, filename=0. ,      'Horizon/outt00761_halo_gal_centralBHs_2reff'
+# zs, filename=0.3,     'Horizon/outt00638_halo_gal_centralBHs_2reff'
+# zs, filename=0.5,     'Horizon/outt00552_halo_gal_centralBHs_2reff'
+zs, filename=0.7, 'Horizon/outt00439_halo_gal_centralBHs_2reff'
+# zs, filename=1. ,     'Horizon/outt00343_halo_gal_centralBHs_2reff'
+# zs, filename=1.5,     'Horizon/outt00266_halo_gal_centralBHs_2reff'
 
 # filename = filenames[3]
 # zs = 0.5
@@ -188,8 +188,25 @@ for ii in range(1):
         plt.show()
     else:
         plt.close()
+
+    sim_offset_nosl = Horizon_scatter_nosl 
+    sim_offset = Horizon_scatter
+    obs_offset = HSC_scatter
+    rfilename = 'offset_result/' + 'Horizon_zs{0}.txt'.format(zs)
+    if_file = glob.glob(rfilename)
+    if ii == 0:
+        write_file =  open(rfilename,'w') 
+    for i in range(max(len(sim_offset), len(obs_offset))):
+        try:
+            write_file.write('{0} {1} {2}'.format(sim_offset_nosl[i], sim_offset[i], obs_offset[i]))
+        except:
+            try:
+                write_file.write('{0} {1} -99'.format(sim_offset_nosl[i], sim_offset[i]))
+            except:            
+                write_file.write('{0} -99 {1}'.format(sim_offset_nosl[i], obs_offset[i]))
+        write_file.write("\n")
         
-    from scipy import stats
+    # from scipy import stats
     sim_scatter_std = np.std(Horizon_scatter)
     obs_scatter_std = np.std(HSC_scatter)
     # print("obs scatter:", obs_scatter_std)
@@ -216,3 +233,4 @@ for ii in range(1):
     # write_file.close()
     if ii%50 == 0:
         print(ii)    
+write_file.close()

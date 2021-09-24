@@ -17,16 +17,18 @@ from prep_comparison import HSC_set, TNG_set, comp_plot
 
 filenames = glob.glob('TNG100/*.npy') 
 filenames.sort()
-idx = 2
+idx = 1
 filename = filenames[idx]
 zs = float(filename.split("_z")[1][:4])
 
 HSC = HSC_set(zs, core = False)
-if zs <= 0.5:
+if zs < 0.5:
     # HSC_Mstar = HSC_Mstar_overall[HSC_z<0.5]
     # HSC_MBHs = HSC_MBHs_overall[HSC_z<0.5]
     I_mag_break = 20.5  #z~0.3
-if zs > 0.5:    
+if zs == 0.5:    
+    I_mag_break = (20.5+22.0)/2  #z~0.3
+if zs >= 0.5:    
     # HSC_Mstar = HSC_Mstar_overall[HSC_z>0.5]
     # HSC_MBHs = HSC_MBHs_overall[HSC_z>0.5]
     I_mag_break = 22.0    #z~0.7
@@ -182,6 +184,23 @@ print('{0:.2f}, {1:.2f}'.format(np.mean(HSC_scatter), np.std(HSC_scatter)))
 print("for paper TNG100", 'zs=', zs)
 print('{0:.2f}, {1:.2f}'.format(np.mean(TNG_scatter), np.std(TNG_scatter)))
 
+sim_offset_nosl = TNG_scatter_nosl 
+sim_offset = TNG_scatter
+obs_offset = HSC_scatter
+rfilename = 'offset_result/' + 'TNG100_zs{0}.txt'.format(zs)
+if_file = glob.glob(rfilename)
+write_file =  open(rfilename,'w') 
+
+for i in range(max(len(sim_offset), len(obs_offset))):
+    try:
+        write_file.write('{0} {1} {2}'.format(sim_offset_nosl[i], sim_offset[i], obs_offset[i]))
+    except:
+        try:
+            write_file.write('{0} {1} -99'.format(sim_offset_nosl[i], sim_offset[i]))
+        except:            
+            write_file.write('{0} -99 {1}'.format(sim_offset_nosl[i], obs_offset[i]))
+    write_file.write("\n")
+write_file.close()
 
 
 #%% simulation

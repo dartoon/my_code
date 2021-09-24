@@ -170,6 +170,26 @@ for ii in range(1):
     else:
         plt.close()
         
+
+    sim_offset_nosl = SAM_scatter_overall 
+    sim_offset = SAM_scatter
+    obs_offset = HSC_scatter
+    rfilename = 'offset_result/' + 'SAM_zs{0}.txt'.format(zs)
+    if_file = glob.glob(rfilename)
+    write_file =  open(rfilename,'w') 
+    
+    for i in range(max(len(sim_offset), len(obs_offset))):
+        try:
+            write_file.write('{0} {1} {2}'.format(sim_offset_nosl[i], sim_offset[i], obs_offset[i]))
+        except:
+            try:
+                write_file.write('{0} {1} -99'.format(sim_offset_nosl[i], sim_offset[i]))
+            except:            
+                write_file.write('{0} -99 {1}'.format(sim_offset_nosl[i], obs_offset[i]))
+        write_file.write("\n")
+    write_file.close()
+        
+        
     from scipy import stats
     sim_scatter_std = np.std(SAM_scatter)
     obs_scatter_std = np.std(HSC_scatter)

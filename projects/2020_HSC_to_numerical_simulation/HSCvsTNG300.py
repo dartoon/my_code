@@ -18,7 +18,7 @@ from prep_comparison import TNG_set as TNG300_set
 
 filenames = glob.glob('TNG300_data/*.npy') 
 filenames.sort()
-idx = 2
+idx = 1
 filename = filenames[idx]
 zs = float(filename.split("_z")[1][:4])
 
@@ -183,14 +183,18 @@ print('{0:.2f}, {1:.2f}'.format(np.mean(HSC_scatter), np.std(HSC_scatter)))
 print("for paper TNG300", 'zs=', zs)
 print('{0:.2f}, {1:.2f}'.format(np.mean(TNG300_scatter), np.std(TNG300_scatter)))
 
+
+sim_offset_nosl = TNG300_scatter_nosl 
+sim_offset = TNG300_scatter
+obs_offset = HSC_scatter
 rfilename = 'offset_result/' + 'TNG300_zs{0}.txt'.format(zs)
 if_file = glob.glob(rfilename)
 write_file =  open(rfilename,'w') 
-for i in range(len(TNG300_scatter)):
+for i in range(max(len(sim_offset), len(obs_offset))):
     try:
-        write_file.write('{0} {1} {2}'.format(TNG300_scatter_nosl[i], TNG300_scatter[i], HSC_scatter[i]))
+        write_file.write('{0} {1} {2}'.format(sim_offset_nosl[i], sim_offset[i], obs_offset[i]))
     except:
-        write_file.write('{0} {1} -99'.format(TNG300_scatter_nosl[i], TNG300_scatter[i]))
+        write_file.write('{0} {1} -99'.format(sim_offset_nosl[i], sim_offset[i]))
     write_file.write("\n")
 write_file.close()
 

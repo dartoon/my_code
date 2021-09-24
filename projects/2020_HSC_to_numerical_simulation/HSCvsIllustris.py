@@ -209,6 +209,24 @@ print("for paper Illustris", 'zs=', zs)
 print('{0:.2f}, {1:.2f}'.format(np.mean(Illustris_scatter), np.std(Illustris_scatter)))
 
 
+sim_offset_nosl = Illustris_scatter_nosl 
+sim_offset = Illustris_scatter
+obs_offset = HSC_scatter
+rfilename = 'offset_result/' + 'Illustris_zs{0}.txt'.format(zs)
+if_file = glob.glob(rfilename)
+write_file =  open(rfilename,'w') 
+
+for i in range(max(len(sim_offset), len(obs_offset))):
+    try:
+        write_file.write('{0} {1} {2}'.format(sim_offset_nosl[i], sim_offset[i], obs_offset[i]))
+    except:
+        try:
+            write_file.write('{0} {1} -99'.format(sim_offset_nosl[i], sim_offset[i]))
+        except:            
+            write_file.write('{0} -99 {1}'.format(sim_offset_nosl[i], obs_offset[i]))
+    write_file.write("\n")
+write_file.close()
+
 
 #%% simulation
 comp_plot(Illustris['Stellar_Mass_nois_sl'], Illustris['sdss_g_galaxy_sl'],alpha=0.2)
