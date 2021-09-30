@@ -40,12 +40,13 @@ for i in [-1]:
     # Stellar_Mass, BH_Mass, sdss_i_galaxy, sdss_g_galaxy, sdss_r_galaxy, sdss_i_pointsource, sdss_g_pointsource, Eddington_ratio = np.load(filename)
     BH_Mass, Stellar_Mass, StellarMass_30kpc, sdss_i_stellar, sdss_g_stellar, sdss_r_stellar, sdss_i_pointsource, sdss_g_pointsource, BH_Lbol, Eddington_ratio = np.load(filename)
     
-outl_bool = (lfit(BH_Mass) - 2.5 < Stellar_Mass)
-
-BH_Mass, Stellar_Mass, StellarMass_30kpc, sdss_i_stellar, sdss_g_stellar, sdss_r_stellar, sdss_i_pointsource, sdss_g_pointsource, BH_Lbol, Eddington_ratio = BH_Mass[outl_bool], Stellar_Mass[outl_bool], StellarMass_30kpc[outl_bool], sdss_i_stellar[outl_bool], sdss_g_stellar[outl_bool], sdss_r_stellar[outl_bool], sdss_i_pointsource[outl_bool], sdss_g_pointsource[outl_bool], BH_Lbol[outl_bool], Eddington_ratio[outl_bool]
-
 BH_Mass = np.log10(BH_Mass)
 Stellar_Mass = np.log10(StellarMass_30kpc)
+
+
+outl_bool = (lfit(BH_Mass) - 0.5 < Stellar_Mass)
+BH_Mass, Stellar_Mass, StellarMass_30kpc, sdss_i_stellar, sdss_g_stellar, sdss_r_stellar, sdss_i_pointsource, sdss_g_pointsource, BH_Lbol, Eddington_ratio = BH_Mass[outl_bool], Stellar_Mass[outl_bool], StellarMass_30kpc[outl_bool], sdss_i_stellar[outl_bool], sdss_g_stellar[outl_bool], sdss_r_stellar[outl_bool], sdss_i_pointsource[outl_bool], sdss_g_pointsource[outl_bool], BH_Lbol[outl_bool], Eddington_ratio[outl_bool]
+
 
 
 bhmass_overall=BH_Mass
@@ -233,9 +234,10 @@ for ii in range(1):
     write_file =  open(rfilename,'w') 
     for i in range(leng):
         try:
-            write_file.write('{0} {1} {2}'.format(sim_offset_nosl[i], sim_offset[i], obs_offset[i]))
+            write_file.write('{0} {1} {2} {3} {4} {5} {6}'.format(sim_offset_nosl[i], sim_offset[i], obs_offset[i], 
+                                                                  mstar_selected[i], bhmass_selected[i], stellar_mass_obs[i], bh_mass_obs[i] ))
         except:
-            write_file.write('{0} {1} -99'.format(sim_offset_nosl[i], sim_offset[i]))
+            write_file.write('{0} {1} -99 {2} {3} -99 -99'.format(sim_offset_nosl[i], sim_offset[i], mstar_selected[i], bhmass_selected[i]))
         write_file.write("\n")
     write_file.close()        
     # print("obs scatter:", obs_scatter)
@@ -284,7 +286,7 @@ for ii in range(1):
     obj.set_ylabel(r'log(M$_{\rm BH}$/M$_{\odot}$)',fontsize=35)
     obj.set_xlabel('log(M$_{*}$/M$_{\odot}$)',fontsize=35)
     obj.legend(loc='upper left',fontsize=30,numpoints=1)
-    plt.savefig('MM_Illustris_zs_{0}.png'.format(zs))
+    # plt.savefig('MM_Illustris_zs_{0}.png'.format(zs))
     if ifplot == True:
         plt.show()
     else:
@@ -312,16 +314,16 @@ for ii in range(1):
     # print("({0:.2f}, {1:.2f})".format( -(lfit(8,fit[0][0],fit[0][1]) - lfit_fixm(8,fit_fixm[0]))[0], sim_scatter - obs_scatter ))
     # print("({0:.3f}, {1:.3f})".format( -(lfit(8,fit[0][0],fit[0][1]) - lfit_fixm(8,fit_fixm[0]))[0], sim_scatter ))
 
-    # rfilename = 'MC_result/' + 'Illustris_zs{0}_uselocal.txt'.format(zs)
-    # if_file = glob.glob(rfilename)
-    # if if_file == []:
-    #     write_file =  open(rfilename,'w') 
-    # else:
-    #     write_file =  open(rfilename,'r+') 
-    #     write_file.read()
-    # write_file.write( "{0:.3f} {1:.3f}".format( -sim_mis, sim_scatter )) 
-    # write_file.write("\n")
-    # write_file.close()
+    rfilename = 'MC_result/' + 'Illustris_zs{0}_uselocal.txt'.format(zs)
+    if_file = glob.glob(rfilename)
+    if if_file == []:
+        write_file =  open(rfilename,'w') 
+    else:
+        write_file =  open(rfilename,'r+') 
+        write_file.read()
+    write_file.write( "{0:.3f} {1:.3f}".format( -sim_mis, sim_scatter )) 
+    write_file.write("\n")
+    write_file.close()
     if ii%50 == 0:
         print(ii)
 

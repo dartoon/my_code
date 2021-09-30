@@ -231,15 +231,15 @@ for ii in range(1):
     write_file =  open(rfilename,'w') 
     for i in range(leng):
         try:
-            write_file.write('{0} {1} {2}'.format(sim_offset_nosl[i], sim_offset[i], obs_offset[i]))
+            write_file.write('{0} {1} {2} {3} {4} {5} {6}'.format(sim_offset_nosl[i], sim_offset[i], obs_offset[i], 
+                                                                  mstar_selected[i], bhmass_selected[i], stellar_mass_obs[i], bh_mass_obs[i] ))
         except:
-            write_file.write('{0} {1} -99'.format(sim_offset_nosl[i], sim_offset[i]))
+            write_file.write('{0} {1} -99 {2} {3} -99 -99'.format(sim_offset_nosl[i], sim_offset[i], mstar_selected[i], bhmass_selected[i]))
         write_file.write("\n")
     write_file.close()    
     # print("obs scatter:", obs_scatter)
     # print("sim scatter:", sim_scatter)
-    # print("KS scatter:", stats.ks_2samp((mstar_selected - lfit(bhmass_selected,fit[0][0],fit[0][1])),
-    #                                     (stellar_mass_obs - lfit_fixm(bh_mass_obs,fit_fixm[0]))).pvalue)
+
     #%%
     # Plot the fitting with scatter 
     f,ax=plt.subplots(1,1,figsize=(14,12))
@@ -281,7 +281,7 @@ for ii in range(1):
     obj.set_ylabel(r'log(M$_{\rm BH}$/M$_{\odot}$)',fontsize=35)
     obj.set_xlabel('log(M$_{*}$/M$_{\odot}$)',fontsize=35)
     obj.legend(loc='upper left',fontsize=30,numpoints=1)
-    plt.savefig('MM_TNG_zs_{0}.png'.format(zs))
+    # plt.savefig('MM_TNG_zs_{0}.png'.format(zs))
     if ifplot == True:
         plt.show()
     else:
@@ -309,16 +309,16 @@ for ii in range(1):
     # print("({0:.2f}, {1:.2f})".format( -(lfit(8,fit[0][0],fit[0][1]) - lfit_fixm(8,fit_fixm[0]))[0], sim_scatter - obs_scatter ))
     # print("({0:.3f}, {1:.3f})".format( -(lfit(8,fit[0][0],fit[0][1]) - lfit_fixm(8,fit_fixm[0]))[0], sim_scatter ))
 
-    rfilename = 'MC_result/' + 'TNG100_zs{0}_uselocal.txt'.format(zs)
-    if_file = glob.glob(rfilename)
-    if if_file == []:
-        write_file =  open(rfilename,'w') 
-    else:
-        write_file =  open(rfilename,'r+') 
-        write_file.read()
-    write_file.write( "{0:.3f} {1:.3f}".format( -sim_mis, sim_scatter )) 
-    write_file.write("\n")
-    write_file.close()
+    # rfilename = 'MC_result/' + 'TNG100_zs{0}_uselocal.txt'.format(zs)
+    # if_file = glob.glob(rfilename)
+    # if if_file == []:
+    #     write_file =  open(rfilename,'w') 
+    # else:
+    #     write_file =  open(rfilename,'r+') 
+    #     write_file.read()
+    # write_file.write( "{0:.3f} {1:.3f}".format( -sim_mis, sim_scatter )) 
+    # write_file.write("\n")
+    # write_file.close()
     if ii%50 == 0:
         print(ii)
 

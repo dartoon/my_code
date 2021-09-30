@@ -139,7 +139,7 @@ for ii in range(1):
     ax.yaxis.set_minor_locator(AutoMinorLocator())
     cbar=f.colorbar(panel2[3],ax=obj, ticks=[])
     cbar.ax.tick_params(labelsize=30) 
-    plt.savefig('MM_SAM_zs_{0}.png'.format(zs))
+    # plt.savefig('MM_SAM_zs_{0}.png'.format(zs))
     plt.show()        
     
     #%%
@@ -180,17 +180,17 @@ for ii in range(1):
     
     for i in range(max(len(sim_offset), len(obs_offset))):
         try:
-            write_file.write('{0} {1} {2}'.format(sim_offset_nosl[i], sim_offset[i], obs_offset[i]))
+            write_file.write('{0} {1} {2} {3} {4} {5} {6}'.format(sim_offset_nosl[i], sim_offset[i], obs_offset[i], 
+                                                                  SAM['Stellar_Mass_nois_sl'][i], SAM['BH_Mass_nois_sl'][i], HSC['HSC_Mstar'][i], HSC['HSC_MBHs'][i] ))
         except:
             try:
-                write_file.write('{0} {1} -99'.format(sim_offset_nosl[i], sim_offset[i]))
+                write_file.write('{0} {1} -99 {2} {3} -99 -99'.format(sim_offset_nosl[i], sim_offset[i], SAM['Stellar_Mass_nois_sl'][i], SAM['BH_Mass_nois_sl'][i]))
             except:            
-                write_file.write('{0} -99 {1}'.format(sim_offset_nosl[i], obs_offset[i]))
+                write_file.write('{0} -99 {1} -99 -99 {2} {3}'.format(sim_offset_nosl[i], obs_offset[i],HSC['HSC_Mstar'][i], HSC['HSC_MBHs'][i]))
         write_file.write("\n")
     write_file.close()
         
-        
-    from scipy import stats
+    # from scipy import stats
     sim_scatter_std = np.std(SAM_scatter)
     obs_scatter_std = np.std(HSC_scatter)
     # print("obs scatter:", obs_scatter_std)

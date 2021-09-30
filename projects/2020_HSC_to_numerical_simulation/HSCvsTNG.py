@@ -17,7 +17,7 @@ from prep_comparison import HSC_set, TNG_set, comp_plot
 
 filenames = glob.glob('TNG100/*.npy') 
 filenames.sort()
-idx = 1
+idx = 2
 filename = filenames[idx]
 zs = float(filename.split("_z")[1][:4])
 
@@ -122,6 +122,9 @@ panel2=obj.hist2d(TNG['Stellar_Mass_nois'], TNG['BH_Mass_nois'],
                   norm=mpl.colors.LogNorm(), density = True, cmap='summer',bins=50,zorder=-1,
                       alpha=0.5, cmin = 0.001 , cmax = 1.1)
 
+# plt.scatter(TNG['Stellar_Mass'], TNG['BH_Mass'],c='g',
+#             s=420, marker=".",zorder=0, edgecolors='g', alpha = 0.05, label='TNG100 sample z={0}'.format(zs))
+
 plt.scatter(TNG['Stellar_Mass_nois_sl'], TNG['BH_Mass_nois_sl'],c='deeppink',
             s=420, marker=".",zorder=0, edgecolors='k', alpha = 0.7, label='TNG100 sample z={0}'.format(zs))
 # plt.scatter(HSC['HSC_Mstar'],HSC['HSC_MBHs'],c='orange',
@@ -147,11 +150,16 @@ ax.xaxis.set_minor_locator(AutoMinorLocator())
 ax.yaxis.set_minor_locator(AutoMinorLocator())
 cbar=f.colorbar(panel2[3],ax=obj)
 cbar.ax.tick_params(labelsize=30) 
-plt.savefig('MM_TNG_zs_{0}.png'.format(zs))
+# plt.savefig('MM_TNG_zs_{0}.png'.format(zs))
 plt.show()
 #%%
 #Plot the 1-D scatter for MM.
 fig, ax = plt.subplots(figsize=(8,7))
+TNG_scatter_clean_nosl = (TNG['BH_Mass'] - ( m_ml*TNG['Stellar_Mass']+b_ml ) )
+TNG_scatter_noise_nosl = (TNG['BH_Mass_nois'] - ( m_ml*TNG['Stellar_Mass_nois']+b_ml ) )
+
+plt.hist((TNG['BH_Mass_nois'] - ( m_ml*TNG['Stellar_Mass_nois']+b_ml ) ),histtype=u'step', density=True,
+          label=('TNG sample scatter nosl'), linewidth = 2, color='green')
 plt.hist(TNG_scatter_nosl, histtype=u'step',density=True,
           label=('TNG sample scatter nosl'), linewidth = 2, color='gray')
 plt.hist(TNG_scatter,histtype=u'step',density=True,
@@ -193,12 +201,13 @@ write_file =  open(rfilename,'w')
 
 for i in range(max(len(sim_offset), len(obs_offset))):
     try:
-        write_file.write('{0} {1} {2}'.format(sim_offset_nosl[i], sim_offset[i], obs_offset[i]))
+        write_file.write('{0} {1} {2} {3} {4} {5} {6}'.format(sim_offset_nosl[i], sim_offset[i], obs_offset[i], 
+                                                              TNG['Stellar_Mass_nois_sl'][i], TNG['BH_Mass_nois_sl'][i], HSC['HSC_Mstar'][i], HSC['HSC_MBHs'][i] ))
     except:
         try:
-            write_file.write('{0} {1} -99'.format(sim_offset_nosl[i], sim_offset[i]))
+            write_file.write('{0} {1} -99 {2} {3} -99 -99'.format(sim_offset_nosl[i], sim_offset[i], TNG['Stellar_Mass_nois_sl'][i], TNG['BH_Mass_nois_sl'][i]))
         except:            
-            write_file.write('{0} -99 {1}'.format(sim_offset_nosl[i], obs_offset[i]))
+            write_file.write('{0} -99 {1} -99 -99 {2} {3}'.format(sim_offset_nosl[i], obs_offset[i],HSC['HSC_Mstar'][i], HSC['HSC_MBHs'][i]))
     write_file.write("\n")
 write_file.close()
 

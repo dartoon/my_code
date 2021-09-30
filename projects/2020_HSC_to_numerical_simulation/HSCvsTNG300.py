@@ -18,7 +18,7 @@ from prep_comparison import TNG_set as TNG300_set
 
 filenames = glob.glob('TNG300_data/*.npy') 
 filenames.sort()
-idx = 1
+idx = 2
 filename = filenames[idx]
 zs = float(filename.split("_z")[1][:4])
 
@@ -40,16 +40,16 @@ for i in range(1):
     TNG300_scatter_nosl = (TNG300['BH_Mass_nois'] - ( m_ml*TNG300['Stellar_Mass_nois']+b_ml ) )
     HSC_scatter = (HSC['HSC_MBHs'] - ( m_ml*HSC['HSC_Mstar']+b_ml ) )
     
-    rfilename = 'MC_result/' + 'TNG300_zs{0}.txt'.format(zs)
-    if_file = glob.glob(rfilename)
-    if if_file == []:
-        write_file =  open(rfilename,'w') 
-    else:
-        write_file =  open(rfilename,'r+') 
-        write_file.read()
-    write_file.write('{0:.3f} {1:.3f}'.format(np.mean(TNG300_scatter), np.std(TNG300_scatter)))
-    write_file.write("\n")
-    write_file.close()
+    # rfilename = 'MC_result/' + 'TNG300_zs{0}.txt'.format(zs)
+    # if_file = glob.glob(rfilename)
+    # if if_file == []:
+    #     write_file =  open(rfilename,'w') 
+    # else:
+    #     write_file =  open(rfilename,'r+') 
+    #     write_file.read()
+    # write_file.write('{0:.3f} {1:.3f}'.format(np.mean(TNG300_scatter), np.std(TNG300_scatter)))
+    # write_file.write("\n")
+    # write_file.close()
     if i%50 == 0:
         print(i)
 
@@ -146,7 +146,7 @@ ax.xaxis.set_minor_locator(AutoMinorLocator())
 ax.yaxis.set_minor_locator(AutoMinorLocator())
 cbar=f.colorbar(panel2[3],ax=obj)
 cbar.ax.tick_params(labelsize=30) 
-plt.savefig('MM_TNG300_zs_{0}.png'.format(zs))
+# plt.savefig('MM_TNG300_zs_{0}.png'.format(zs))
 plt.show()
 #%%
 #Plot the 1-D scatter for MM.
@@ -192,9 +192,13 @@ if_file = glob.glob(rfilename)
 write_file =  open(rfilename,'w') 
 for i in range(max(len(sim_offset), len(obs_offset))):
     try:
-        write_file.write('{0} {1} {2}'.format(sim_offset_nosl[i], sim_offset[i], obs_offset[i]))
+        write_file.write('{0} {1} {2} {3} {4} {5} {6}'.format(sim_offset_nosl[i], sim_offset[i], obs_offset[i], 
+                                                              TNG300['Stellar_Mass_nois_sl'][i], TNG300['BH_Mass_nois_sl'][i], HSC['HSC_Mstar'][i], HSC['HSC_MBHs'][i] ))
     except:
-        write_file.write('{0} {1} -99'.format(sim_offset_nosl[i], sim_offset[i]))
+        try:
+            write_file.write('{0} {1} -99 {2} {3} -99 -99'.format(sim_offset_nosl[i], sim_offset[i], TNG300['Stellar_Mass_nois_sl'][i], TNG300['BH_Mass_nois_sl'][i]))
+        except:            
+            write_file.write('{0} -99 {1} -99 -99 {2} {3}'.format(sim_offset_nosl[i], obs_offset[i],HSC['HSC_Mstar'][i], HSC['HSC_MBHs'][i]))
     write_file.write("\n")
 write_file.close()
 

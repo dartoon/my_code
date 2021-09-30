@@ -291,6 +291,7 @@ def SAM_set(filename, zs, HSC_Lbol_overall, HSC_MBHs_overall, I_mag_break = [20.
     agn_mag = agn_mag[redshift_bool]
     redshift = redshift[redshift_bool]
     dMBH, dmag, dMstar,dLbol= 0.4, 0.3, 0.2, 0.1 #dmag is for host magnitude. 
+    # dMBH, dmag, dMstar, dLbol= 0.001, 0.001, 0.001, 0.001  #dmag is for host magnitude. 
 
     z_range = np.arange(0.2, 1.0, 0.05)
     mstar_cut_range = np.array([8.9, 9.1, 9.3, 9.4, 9.6, 9.7, 9.8, 9.9, 10.0, 10.1, 10.3, 10.5, 10.5, 10.6, 10.7, 10.8])

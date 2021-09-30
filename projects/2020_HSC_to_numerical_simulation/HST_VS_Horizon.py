@@ -232,9 +232,10 @@ for ii in range(1):
     write_file =  open(rfilename,'w') 
     for i in range(leng):
         try:
-            write_file.write('{0} {1} {2}'.format(sim_offset_nosl[i], sim_offset[i], obs_offset[i]))
+            write_file.write('{0} {1} {2} {3} {4} {5} {6}'.format(sim_offset_nosl[i], sim_offset[i], obs_offset[i], 
+                                                                  mstar_selected[i], bhmass_selected[i], stellar_mass_obs[i], bh_mass_obs[i] ))
         except:
-            write_file.write('{0} {1} -99'.format(sim_offset_nosl[i], sim_offset[i]))
+            write_file.write('{0} {1} -99 {2} {3} -99 -99'.format(sim_offset_nosl[i], sim_offset[i], mstar_selected[i], bhmass_selected[i]))
         write_file.write("\n")
     write_file.close()        
     # print("obs scatter:", obs_scatter)

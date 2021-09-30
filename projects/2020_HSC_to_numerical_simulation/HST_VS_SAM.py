@@ -61,7 +61,7 @@ for ii in range(1):
     ###Add noise to the data: 
     #Noise level: MBH 0.4dex, mag_R 0.3mag, M* 0.17dex, Lbol 0.03dex
     dMBH, dmag, dMstar, dLbol= 0.4, 0.3, 0.17, 0.1
-    #dMBH, dmag, dMstar, dLbol= 0.00004, 0.00003, 0.000017, 0.000003
+    # dMBH, dmag, dMstar, dLbol= 0.00004, 0.00003, 0.000017, 0.000003
     
     bhmass_overall_noi = bhmass_overall + np.random.normal(0, dMBH, size=bhmass_overall.shape)
     mstar_overall_noi = mstar_overall + np.random.normal(0, dMstar, size=mstar_overall.shape)
@@ -236,9 +236,10 @@ for ii in range(1):
     write_file =  open(rfilename,'w') 
     for i in range(leng):
         try:
-            write_file.write('{0} {1} {2}'.format(sim_offset_nosl[i], sim_offset[i], obs_offset[i]))
+            write_file.write('{0} {1} {2} {3} {4} {5} {6}'.format(sim_offset_nosl[i], sim_offset[i], obs_offset[i], 
+                                                                  mstar_selected[i], bhmass_selected[i], stellar_mass_obs[i], bh_mass_obs[i] ))
         except:
-            write_file.write('{0} {1} -99'.format(sim_offset_nosl[i], sim_offset[i]))
+            write_file.write('{0} {1} -99 {2} {3} -99 -99'.format(sim_offset_nosl[i], sim_offset[i], mstar_selected[i], bhmass_selected[i]))
         write_file.write("\n")
     write_file.close()    
     # print("obs scatter:", round(obs_scatter,2))

@@ -43,18 +43,18 @@ for i in range(1):
     Illustris_scatter_nosl = (Illustris['BH_Mass_nois'] - ( m_ml*Illustris['Stellar_Mass_nois']+b_ml ) )
     HSC_scatter = (HSC['HSC_MBHs'] - ( m_ml*HSC['HSC_Mstar']+b_ml ) )
     
-    rfilename = 'MC_result/' + 'Illustris_zs{0}.txt'.format(zs)
-    if_file = glob.glob(rfilename)
-    if if_file == []:
-        write_file =  open(rfilename,'w') 
-    else:
-        write_file =  open(rfilename,'r+') 
-        write_file.read()
-    write_file.write('{0:.3f} {1:.3f}'.format(np.mean(Illustris_scatter), np.std(Illustris_scatter)))
-    write_file.write("\n")
-    write_file.close()
-    if i%50 == 0:
-        print(i)
+    # rfilename = 'MC_result/' + 'Illustris_zs{0}.txt'.format(zs)
+    # if_file = glob.glob(rfilename)
+    # if if_file == []:
+    #     write_file =  open(rfilename,'w') 
+    # else:
+    #     write_file =  open(rfilename,'r+') 
+    #     write_file.read()
+    # write_file.write('{0:.3f} {1:.3f}'.format(np.mean(Illustris_scatter), np.std(Illustris_scatter)))
+    # write_file.write("\n")
+    # write_file.close()
+    # if i%50 == 0:
+    #     print(i)
 
 #%%
 import matplotlib
@@ -170,7 +170,7 @@ ax.xaxis.set_minor_locator(AutoMinorLocator())
 ax.yaxis.set_minor_locator(AutoMinorLocator())
 cbar=f.colorbar(panel2[3],ax=obj)
 cbar.ax.tick_params(labelsize=30) 
-plt.savefig('MM_Illustris_zs_{0}.png'.format(zs))
+# plt.savefig('MM_Illustris_zs_{0}.png'.format(zs))
 plt.show()
 
 #%%
@@ -218,12 +218,13 @@ write_file =  open(rfilename,'w')
 
 for i in range(max(len(sim_offset), len(obs_offset))):
     try:
-        write_file.write('{0} {1} {2}'.format(sim_offset_nosl[i], sim_offset[i], obs_offset[i]))
+        write_file.write('{0} {1} {2} {3} {4} {5} {6}'.format(sim_offset_nosl[i], sim_offset[i], obs_offset[i], 
+                                                              Illustris['Stellar_Mass_nois_sl'][i], Illustris['BH_Mass_nois_sl'][i], HSC['HSC_Mstar'][i], HSC['HSC_MBHs'][i] ))
     except:
         try:
-            write_file.write('{0} {1} -99'.format(sim_offset_nosl[i], sim_offset[i]))
+            write_file.write('{0} {1} -99 {2} {3} -99 -99'.format(sim_offset_nosl[i], sim_offset[i], Illustris['Stellar_Mass_nois_sl'][i], Illustris['BH_Mass_nois_sl'][i]))
         except:            
-            write_file.write('{0} -99 {1}'.format(sim_offset_nosl[i], obs_offset[i]))
+            write_file.write('{0} -99 {1} -99 -99 {2} {3}'.format(sim_offset_nosl[i], obs_offset[i],HSC['HSC_Mstar'][i], HSC['HSC_MBHs'][i]))
     write_file.write("\n")
 write_file.close()
 
