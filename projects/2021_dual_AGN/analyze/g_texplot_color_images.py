@@ -53,7 +53,7 @@ sample = pd.read_csv('material/Gaia_catalog.csv')
 import matplotlib as mat
 mat.rcParams['font.family'] = 'STIXGeneral'
 # row_ = int(len(ID_list)/6 -0.1) + 1
-fig, (axs) = plt.subplots(1, 3, figsize=(9, 4))
+fig, (axs) = plt.subplots(1, 4, figsize=(9, 4))
 
 for k in range(len(ID_list)):
     string = ID_list[k]

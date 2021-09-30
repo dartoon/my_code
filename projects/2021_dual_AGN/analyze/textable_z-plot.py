@@ -175,14 +175,14 @@ plt.scatter(0.2, 0.430* 70 / 100,c = 'blue', marker = 'o', edgecolors='black', s
 plt.scatter(shenli_z_l, shenli_sep_l * 70 / 100, marker="h",edgecolors='black',
             c='m', s=220,zorder=10,alpha=1, label = 'Our paper')
 
-# plt.scatter(shenli_z_l[2], shenli_sep_l[2] * 70 / 100, marker="s",edgecolors='red',
-#              facecolors='none', s=520,zorder=0,alpha=1, linewidth = 2.5)
-# plt.scatter(shenli_z_l[5], shenli_sep_l[5] * 70 / 100, marker="s",edgecolors='red',
-#              facecolors='none', s=520,zorder=0,alpha=1, linewidth = 2.5)
-# plt.scatter(shenli_z_l[6], shenli_sep_l[6] * 70 / 100, marker="s",edgecolors='red',
-#              facecolors='none', s=520,zorder=0,alpha=1, linewidth = 2.5)
-# plt.scatter(shenli_z_l[7], shenli_sep_l[7] * 70 / 100, marker="s",edgecolors='red',
-#              facecolors='none', s=520,zorder=0,alpha=1, linewidth = 2.5)
+plt.scatter(shenli_z_l[2], shenli_sep_l[2] * 70 / 100, marker="s",edgecolors='red',
+              facecolors='none', s=520,zorder=0,alpha=1, linewidth = 2.5)
+plt.scatter(shenli_z_l[5], shenli_sep_l[5] * 70 / 100, marker="s",edgecolors='red',
+              facecolors='none', s=520,zorder=0,alpha=1, linewidth = 2.5)
+plt.scatter(shenli_z_l[6], shenli_sep_l[6] * 70 / 100, marker="s",edgecolors='red',
+              facecolors='none', s=520,zorder=0,alpha=1, linewidth = 2.5)
+plt.scatter(shenli_z_l[7], shenli_sep_l[7] * 70 / 100, marker="s",edgecolors='red',
+              facecolors='none', s=520,zorder=0,alpha=1, linewidth = 2.5)
 
 
 
@@ -193,7 +193,7 @@ plt.scatter(DeRosa[:,0], DeRosa[:,1] * 70 / 100, marker="v",  edgecolors='black'
 plt.scatter(0.858, 2 * 70 / 100, marker="^",  edgecolors='black',
     c='blue', s=55,zorder=10,alpha=1, label = 'Shields+2012')
 
-plt.plot(np.linspace(0,1000)*0+1,np.linspace(0,1000), '--', c = 'black', linewidth = 1.5)
+# plt.plot(np.linspace(0,1000)*0+1,np.linspace(0,1000), '--', c = 'black', linewidth = 1.5)
 
 plt.text(0.2, 400, r"Confirmed dual QSOs in the literature",fontsize=25, color='black', bbox = {'facecolor':'white','alpha': 0.5} )
 
