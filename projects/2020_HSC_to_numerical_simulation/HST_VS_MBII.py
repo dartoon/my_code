@@ -230,17 +230,17 @@ for ii in range(1):
     sim_offset = mstar_selected - lfit(bhmass_selected)
     obs_offset = stellar_mass_obs - lfit(bh_mass_obs)
     leng = max(len(sim_offset),len(obs_offset))
-    rfilename = 'offset_result/' + 'MBII_zs{0}.txt'.format(zs)
-    if_file = glob.glob(rfilename)
-    write_file =  open(rfilename,'w') 
-    for i in range(leng):
-        try:
-            write_file.write('{0} {1} {2} {3} {4} {5} {6}'.format(sim_offset_nosl[i], sim_offset[i], obs_offset[i], 
-                                                                  mstar_selected[i], bhmass_selected[i], stellar_mass_obs[i], bh_mass_obs[i] ))
-        except:
-            write_file.write('{0} {1} -99 {2} {3} -99 -99'.format(sim_offset_nosl[i], sim_offset[i], mstar_selected[i], bhmass_selected[i]))
-        write_file.write("\n")
-    write_file.close()        
+    # rfilename = 'offset_result/' + 'MBII_zs{0}.txt'.format(zs)
+    # if_file = glob.glob(rfilename)
+    # write_file =  open(rfilename,'w') 
+    # for i in range(leng):
+    #     try:
+    #         write_file.write('{0} {1} {2} {3} {4} {5} {6}'.format(sim_offset_nosl[i], sim_offset[i], obs_offset[i], 
+    #                                                               mstar_selected[i], bhmass_selected[i], stellar_mass_obs[i], bh_mass_obs[i] ))
+    #     except:
+    #         write_file.write('{0} {1} -99 {2} {3} -99 -99'.format(sim_offset_nosl[i], sim_offset[i], mstar_selected[i], bhmass_selected[i]))
+    #     write_file.write("\n")
+    # write_file.close()        
     # print("obs scatter:", obs_scatter)
     # print("sim scatter:", sim_scatter)
     # print("KS scatter:", stats.ks_2samp((mstar_selected - lfit(bhmass_selected,fit[0][0],fit[0][1])),
@@ -250,7 +250,7 @@ for ii in range(1):
     # Plot the fitting with scatter 
     f,ax=plt.subplots(1,1,figsize=(14,12))
     obj=ax
-    panel2=obj.hist2d(mstar_overall_noi,bhmass_overall_noi,
+    panel2=obj.hist2d(mstar_overall,bhmass_overall,
                       norm=mpl.colors.LogNorm(), density = True, cmap='summer',bins=50,zorder=0,
                       alpha=0.5)#, cmin = 0.001 , cmax = 1.1)
     cbar=f.colorbar(panel2[3],ax=obj, ticks=[])
@@ -293,7 +293,70 @@ for ii in range(1):
         plt.show()
     else:
         plt.close()
-        
+
+    #%%Plot offset        
+    # import matplotlib as mpl
+    # from matplotlib.ticker import AutoMinorLocator
+    f,ax=plt.subplots(1,2,figsize=(12,10),gridspec_kw={'width_ratios': [7, 1]}, sharey = True)
+    # f.suptitle(r"Offset VS M*, z={0}".format(zs), fontsize = 20)
+    obj=ax[0]
+    sm_int, bh_int = mstar_overall-0.23,bhmass_overall
+    sm_sim, bh_sim = mstar_selected-0.23,bhmass_selected
+    sm_obs, bh_obs = stellar_mass_obs-0.23,bh_mass_obs
+    m_ml, b_ml = (0.981139684856507, -2.545890295477823)
+    
+    off_int = sm_int, bh_int - (m_ml*sm_int+b_ml)
+    off_sim = sm_sim, bh_sim - (m_ml*sm_sim+b_ml),
+    off_obs = sm_obs, bh_obs - (m_ml*sm_obs+b_ml),
+    panel2=obj.hist2d(off_int[0], off_int[1],
+                      norm=mpl.colors.LogNorm(), density = True, cmap='summer',bins=50,zorder=-1,
+                          alpha=0.5, cmin = 0.001)# , cmax = 1.1)
+    ax[0].scatter(off_sim[0], off_sim[1],
+                c='steelblue',
+                s=420, marker=".",zorder=0, edgecolors='k', alpha = 0.7, label='TNG100 sample z={0}'.format(zs))
+    ax[0].scatter(off_obs[0], off_obs[1],
+                c='orange',
+                s=420, marker=".",zorder=1, edgecolors='k', alpha = 0.7, label='HST sample')
+    # xl = np.linspace(5, 13, 100)
+    # plt.plot(xl, m_ml*xl+b_ml, color="k", linewidth=4.0,zorder=-0.5)
+    # plt.title(r"M$_{\rm BH}-$M$_*$ relation",fontsize=35)
+    ax[0].set_xlabel(r"log(M$_*$/M$_{\odot})$",fontsize=35)
+    ax[0].set_ylabel(r"$\Delta$logM$_{\rm BH}$ (vs M$_*$)",fontsize=35)
+    ax[0].set_xlim(9.5,11.7)
+    ax[0].set_ylim(-1.5, 1.7)
+    ax[0].grid(linestyle='--')
+    ax[0].tick_params(labelsize=25)
+    ax[0].tick_params(which='both', width=2, top=True, right=True,direction='in')
+    ax[0].tick_params(which='major', length=10)
+    ax[0].tick_params(which='minor', length=6)#, color='r’)
+    ax[0].legend(scatterpoints=1,numpoints=1,loc=2,prop={'size':25},ncol=2,handletextpad=0)
+    ax[0].xaxis.set_minor_locator(AutoMinorLocator())
+    ax[0].yaxis.set_minor_locator(AutoMinorLocator())
+    
+    his_xy0_ =  ax[1].hist(off_int[1], orientation='horizontal'
+               , histtype=u'step',density=True, color = 'green', linewidth = 4)
+    his_xy1_ = ax[1].hist(off_sim[1], orientation='horizontal'
+               , histtype=u'step',density=True, color = 'steelblue', linewidth = 4)
+    his_xy2_ = ax[1].hist(off_obs[1], orientation='horizontal'
+               , histtype=u'step',density=True, color = 'orange', linewidth = 4)
+    his_max = np.max([his_xy0_[0].max(), his_xy1_[0].max(), his_xy2_[0].max()])
+    # ax[1].set_yticks([])
+    sim_mean = np.mean(off_sim[1])
+    obs_mean = np.mean(off_obs[1])
+    ax[1].plot([0, 10], [sim_mean,sim_mean], linewidth = 3,color = 'steelblue')
+    ax[1].plot([0, 10], [obs_mean,obs_mean], linewidth = 3,color = 'orange')
+    ax[1].set_xlim(0, his_max*1.2)
+    ax[1].set_xticks([])
+    f.tight_layout()
+    plt.subplots_adjust(wspace=0.01)
+    # from matplotlib.ticker import AutoMinorLocator
+    # cbar=f.colorbar(panel2[3],ax=obj)
+    # cbar.ax.tick_params(labelsize=30) 
+    plt.savefig('DeltaMM_MBII_zs_{0}.png'.format(zs))
+    plt.show()
+    
+    cals = off_int[1]#[(off_int[0]<off_obs[0].max())*(off_int[0]>off_obs[0].min())]
+    print('{0:.2f}, {1:.2f}'.format(np.mean(cals), np.std(cals)))             
     
                                         
     #%%Study the slope uncertainty and the relation to the scatter:

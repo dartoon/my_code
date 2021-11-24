@@ -1,4 +1,0 @@
-Fitting with a 61x61 Frame size.
-
-Result:
-{'n_sersic': 0.911, 'host_mag': 21.78, 'R_sersic': 0.39, 'qso_y': -0.03, 'qso_x': -0.013, 'QSO_amp': 158.279, 'q': 0.929, 'redu_Chisq': 2.521191, 'center_x': -0.005, 'center_y': -0.034, 'host_amp': 73.967, 'phi_G': 0.394, 'amp': 45.727, 'host_flux_ratio_percent': 31.848}

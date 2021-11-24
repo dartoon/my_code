@@ -109,11 +109,11 @@ for ii in range(1):
     import matplotlib as mpl
     obj=ax
     # panel2=obj.hist2d(SAM['Stellar_Mass_reali'], SAM['BH_Mass_reali'], #!!!
-    panel2=obj.hist2d(SAM['Stellar_Mass_nois'], SAM['BH_Mass_nois'],
-                      norm=mpl.colors.LogNorm(), density = True, cmap='summer',bins=50,zorder=-1,
+    panel2=obj.hist2d(SAM['Stellar_Mass_reali'], SAM['BH_Mass_reali'],
+                      norm=mpl.colors.LogNorm(), density = True, cmap='summer',bins=50,zorder=10,
                       alpha=0.5, cmin = 0.001 , cmax = 1.1)
     
-    plt.scatter(SAM['Stellar_Mass_nois_sl'][:500], SAM['BH_Mass_nois_sl'][:500],c='green',
+    plt.scatter(SAM['Stellar_Mass_nois_sl'][:500], SAM['BH_Mass_nois_sl'][:500],c='pink',
                 s=420, marker=".",zorder=1.2, edgecolors='k', alpha = 0.7, label='SAM sample z={0}'.format(zs))
     # plt.scatter(HSC['HSC_Mstar'],HSC['HSC_MBHs'],c='orange',
     #             s=220, marker=".",zorder=-1, edgecolors='k', alpha = 0.7, label='HSC sample')
@@ -133,142 +133,208 @@ for ii in range(1):
     plt.tick_params(which='both', width=2, top=True, right=True,direction='in')
     plt.tick_params(which='major', length=10)
     plt.tick_params(which='minor', length=6)#, color='r’)
-    plt.legend(scatterpoints=1,numpoints=1,loc=2,prop={'size':28},ncol=2,handletextpad=0)
+    plt.legend(scatterpoints=1,numpoints=1,loc=2,prop={'size':32},ncol=1,handletextpad=0)
     from matplotlib.ticker import AutoMinorLocator
     ax.xaxis.set_minor_locator(AutoMinorLocator())
     ax.yaxis.set_minor_locator(AutoMinorLocator())
     cbar=f.colorbar(panel2[3],ax=obj, ticks=[])
     cbar.ax.tick_params(labelsize=30) 
-    # plt.savefig('MM_SAM_zs_{0}.png'.format(zs))
+    plt.savefig('MM_SAM_zs_{0}.png'.format(zs))
     plt.show()        
     
-    #%%
-    HSC_scatter = (HSC['HSC_MBHs'] - ( m_ml*(HSC['HSC_Mstar']-detlaM)+b_ml ) )
+    #%%    
+    import matplotlib as mpl
+    from matplotlib.ticker import AutoMinorLocator
+    f,ax=plt.subplots(1,2,figsize=(12,10),gridspec_kw={'width_ratios': [7, 1]}, sharey = True)
+    # f.suptitle(r"Offset VS M*, z={0}".format(zs), fontsize = 20)
+    obj=ax[0]
     
-    #Plot the 1-D scatter for MM.
-    fig, ax = plt.subplots(figsize=(8,7))
-    plt.hist(SAM_scatter_overall, histtype=u'step',density=True,
-              label=('SAM sample scatter nosl'), linewidth = 2, color='gray')
-    plt.hist(HSC_scatter, histtype=u'step',density=True,
-              label=('HSC sample scatter'), linewidth = 2, color='orange')
-    plt.hist(SAM_scatter,histtype=u'step',density=True,
-              label=('SAM sample scatter'), linewidth = 2, color='green')
-    plt.title(r"The offset comparison for the M$_{\rm BH}$-M$_{*}$ relation", fontsize = 20)
-    plt.tick_params(labelsize=20)
-    plt.legend(prop={'size':10})
-    plt.yticks([])
+    sm_int, bh_int = SAM['Stellar_Mass_reali']- detlaM, SAM['BH_Mass_reali']
+    sm_sim, bh_sim = SAM['Stellar_Mass_nois_sl'][:500]- detlaM, SAM['BH_Mass_nois_sl'][:500]
+    sm_obs, bh_obs = HSC['HSC_Mstar'][HSC['HSC_ps_mag']<I_mag_break][:500]- detlaM,HSC['HSC_MBHs'][HSC['HSC_ps_mag']<I_mag_break][:500]
     
-    # ax.xaxis.set_minor_locator(AutoMinorLocator())
-    plt.tick_params(which='both', width=2, top=True,direction='in')
-    plt.tick_params(which='major', length=10)
-    plt.tick_params(which='minor', length=6)#, color='r’)
+    off_int = sm_int, bh_int - (m_ml*sm_int+b_ml)
+    off_sim = sm_sim, bh_sim - (m_ml*sm_sim+b_ml),
+    off_obs = sm_obs, bh_obs - (m_ml*sm_obs+b_ml),
+    panel2=obj.hist2d(off_int[0], off_int[1],
+                      norm=mpl.colors.LogNorm(), density = True, cmap='summer',bins=50,zorder=-1,
+                          alpha=0.5, cmin = 0.001)# , cmax = 1.1)
+    ax[0].scatter(off_sim[0], off_sim[1],
+                c='pink',
+                s=420, marker=".",zorder=0, edgecolors='k', alpha = 0.7, label='TNG100 sample z={0}'.format(zs))
+    ax[0].scatter(off_obs[0], off_obs[1],
+                c='orange',
+                s=420, marker=".",zorder=-1, edgecolors='k', alpha = 0.7, label='HSC sample')
+    # xl = np.linspace(5, 13, 100)
+    # plt.plot(xl, m_ml*xl+b_ml, color="k", linewidth=4.0,zorder=-0.5)
+    # plt.title(r"M$_{\rm BH}-$M$_*$ relation",fontsize=35)
+    ax[0].set_xlabel(r"log(M$_*$/M$_{\odot})$",fontsize=35)
+    ax[0].set_ylabel(r"$\Delta$logM$_{\rm BH}$ (vs M$_*$)",fontsize=35)
+    ax[0].set_xlim(9,12.5)
+    ax[0].set_ylim(-1.7, 2.5)
+    ax[0].grid(linestyle='--')
+    ax[0].tick_params(labelsize=25)
+    ax[0].tick_params(which='both', width=2, top=True, right=True,direction='in')
+    ax[0].tick_params(which='major', length=10)
+    ax[0].tick_params(which='minor', length=6)#, color='r’)
+    ax[0].legend(scatterpoints=1,numpoints=1,loc=2,prop={'size':25},ncol=2,handletextpad=0)
+    ax[0].xaxis.set_minor_locator(AutoMinorLocator())
+    ax[0].yaxis.set_minor_locator(AutoMinorLocator())
     
-    plt.xlabel(r'$\Delta$log(M$_{\rm BH}$/M$_{\odot}$)',fontsize=30)
-    #plt.savefig('comp_scatter_MM_SAMonly.pdf')
-    if ifplot == True:
-        plt.show()
-    else:
-        plt.close()
-        
-
-    sim_offset_nosl = SAM_scatter_overall 
-    sim_offset = SAM_scatter
-    obs_offset = HSC_scatter
-    rfilename = 'offset_result/' + 'SAM_zs{0}.txt'.format(zs)
-    if_file = glob.glob(rfilename)
-    write_file =  open(rfilename,'w') 
+    his_xy0_ =  ax[1].hist(off_int[1], orientation='horizontal'
+               , histtype=u'step',density=True, color = 'green', linewidth = 4)
+    his_xy1_ = ax[1].hist(off_sim[1], orientation='horizontal'
+               , histtype=u'step',density=True, color = 'pink', linewidth = 4)
+    his_xy2_ = ax[1].hist(off_obs[1], orientation='horizontal'
+               , histtype=u'step',density=True, color = 'orange', linewidth = 4)
+    his_max = np.max([his_xy0_[0].max(), his_xy1_[0].max(), his_xy2_[0].max()])
+    # ax[1].set_yticks([])
+    sim_mean = np.mean(off_sim[1])
+    obs_mean = np.mean(off_obs[1])
+    ax[1].plot([0, 10], [sim_mean,sim_mean], linewidth = 3,color = 'pink')
+    ax[1].plot([0, 10], [obs_mean,obs_mean], linewidth = 3,color = 'orange')
+    ax[1].set_xlim(0, his_max*1.2)
+    ax[1].set_xticks([])
     
-    for i in range(max(len(sim_offset), len(obs_offset))):
-        try:
-            write_file.write('{0} {1} {2} {3} {4} {5} {6}'.format(sim_offset_nosl[i], sim_offset[i], obs_offset[i], 
-                                                                  SAM['Stellar_Mass_nois_sl'][i], SAM['BH_Mass_nois_sl'][i], HSC['HSC_Mstar'][i], HSC['HSC_MBHs'][i] ))
-        except:
-            try:
-                write_file.write('{0} {1} -99 {2} {3} -99 -99'.format(sim_offset_nosl[i], sim_offset[i], SAM['Stellar_Mass_nois_sl'][i], SAM['BH_Mass_nois_sl'][i]))
-            except:            
-                write_file.write('{0} -99 {1} -99 -99 {2} {3}'.format(sim_offset_nosl[i], obs_offset[i],HSC['HSC_Mstar'][i], HSC['HSC_MBHs'][i]))
-        write_file.write("\n")
-    write_file.close()
-        
-    # from scipy import stats
-    sim_scatter_std = np.std(SAM_scatter)
-    obs_scatter_std = np.std(HSC_scatter)
-    # print("obs scatter:", obs_scatter_std)
-    # print("sim scatter:", sim_scatter_std)
-    # print("KS p-value:", stats.ks_2samp(SAM_scatter, HSC_scatter).pvalue)
+    f.tight_layout()
+    plt.subplots_adjust(wspace=0.01)
+    from matplotlib.ticker import AutoMinorLocator
+    # cbar=f.colorbar(panel2[3],ax=obj)
+    # cbar.ax.tick_params(labelsize=30) 
+    plt.savefig('DeltaMM_SAM_zs_{0}.png'.format(zs))
+    plt.show()
     
-    # print("({0:.2f}, {1:.2f})".format( np.mean(SAM_scatter) - np.mean(HSC_scatter), np.std(SAM_scatter) - np.std(HSC_scatter) ))
+    cals = off_int[1]#[(off_int[0]<off_obs[0].max())*(off_int[0]>off_obs[0].min())]
+    print('{0:.2f}, {1:.2f}'.format(np.mean(cals), np.std(cals)))    
     
-    # print("for paper Observation", 'zs=', zs)
-    # print('{0:.2f}, {1:.2f}'.format(np.mean(HSC_scatter), np.std(HSC_scatter)))
     
-    # print("for paper SAM", 'zs=', zs)
-    # print('{0:.2f}, {1:.2f}'.format(np.mean(SAM_scatter), np.std(SAM_scatter)))
-
-    # rfilename = 'MC_result/' + 'SAM_zs{0}.txt'.format(zs)
-    # if_file = glob.glob(rfilename)
-    # if if_file == []:
-    #     write_file =  open(rfilename,'w') 
+    # #%%
+    # HSC_scatter = (HSC['HSC_MBHs'] - ( m_ml*(HSC['HSC_Mstar']-detlaM)+b_ml ) )
+    
+    # #Plot the 1-D scatter for MM.
+    # fig, ax = plt.subplots(figsize=(8,7))
+    # plt.hist(SAM_scatter_overall, histtype=u'step',density=True,
+    #           label=('SAM sample scatter nosl'), linewidth = 2, color='gray')
+    # plt.hist(HSC_scatter, histtype=u'step',density=True,
+    #           label=('HSC sample scatter'), linewidth = 2, color='orange')
+    # plt.hist(SAM_scatter,histtype=u'step',density=True,
+    #           label=('SAM sample scatter'), linewidth = 2, color='green')
+    # plt.title(r"The offset comparison for the M$_{\rm BH}$-M$_{*}$ relation", fontsize = 20)
+    # plt.tick_params(labelsize=20)
+    # plt.legend(prop={'size':10})
+    # plt.yticks([])
+    
+    # # ax.xaxis.set_minor_locator(AutoMinorLocator())
+    # plt.tick_params(which='both', width=2, top=True,direction='in')
+    # plt.tick_params(which='major', length=10)
+    # plt.tick_params(which='minor', length=6)#, color='r’)
+    
+    # plt.xlabel(r'$\Delta$log(M$_{\rm BH}$/M$_{\odot}$)',fontsize=30)
+    # #plt.savefig('comp_scatter_MM_SAMonly.pdf')
+    # if ifplot == True:
+    #     plt.show()
     # else:
-    #     write_file =  open(rfilename,'r+') 
-    #     write_file.read()   
+    #     plt.close()
         
-    # write_file.write( "{0:.3f} {1:.3f}".format(np.mean(SAM_scatter), np.std(SAM_scatter)))
-    # write_file.write("\n")
+
+    # sim_offset_nosl = SAM_scatter_overall 
+    # sim_offset = SAM_scatter
+    # obs_offset = HSC_scatter
+    # rfilename = 'offset_result/' + 'SAM_zs{0}.txt'.format(zs)
+    # if_file = glob.glob(rfilename)
+    # write_file =  open(rfilename,'w') 
+    
+    # for i in range(max(len(sim_offset), len(obs_offset))):
+    #     try:
+    #         write_file.write('{0} {1} {2} {3} {4} {5} {6}'.format(sim_offset_nosl[i], sim_offset[i], obs_offset[i], 
+    #                                                               SAM['Stellar_Mass_nois_sl'][i], SAM['BH_Mass_nois_sl'][i], HSC['HSC_Mstar'][i], HSC['HSC_MBHs'][i] ))
+    #     except:
+    #         try:
+    #             write_file.write('{0} {1} -99 {2} {3} -99 -99'.format(sim_offset_nosl[i], sim_offset[i], SAM['Stellar_Mass_nois_sl'][i], SAM['BH_Mass_nois_sl'][i]))
+    #         except:            
+    #             write_file.write('{0} -99 {1} -99 -99 {2} {3}'.format(sim_offset_nosl[i], obs_offset[i],HSC['HSC_Mstar'][i], HSC['HSC_MBHs'][i]))
+    #     write_file.write("\n")
     # write_file.close()
-    if ii%50 == 0:
-        print(ii)
+        
+    # # from scipy import stats
+    # sim_scatter_std = np.std(SAM_scatter)
+    # obs_scatter_std = np.std(HSC_scatter)
+    # # print("obs scatter:", obs_scatter_std)
+    # # print("sim scatter:", sim_scatter_std)
+    # # print("KS p-value:", stats.ks_2samp(SAM_scatter, HSC_scatter).pvalue)
+    
+    # # print("({0:.2f}, {1:.2f})".format( np.mean(SAM_scatter) - np.mean(HSC_scatter), np.std(SAM_scatter) - np.std(HSC_scatter) ))
+    
+    # # print("for paper Observation", 'zs=', zs)
+    # # print('{0:.2f}, {1:.2f}'.format(np.mean(HSC_scatter), np.std(HSC_scatter)))
+    
+    # # print("for paper SAM", 'zs=', zs)
+    # # print('{0:.2f}, {1:.2f}'.format(np.mean(SAM_scatter), np.std(SAM_scatter)))
+
+    # # rfilename = 'MC_result/' + 'SAM_zs{0}.txt'.format(zs)
+    # # if_file = glob.glob(rfilename)
+    # # if if_file == []:
+    # #     write_file =  open(rfilename,'w') 
+    # # else:
+    # #     write_file =  open(rfilename,'r+') 
+    # #     write_file.read()   
+        
+    # # write_file.write( "{0:.3f} {1:.3f}".format(np.mean(SAM_scatter), np.std(SAM_scatter)))
+    # # write_file.write("\n")
+    # # write_file.close()
+    # if ii%50 == 0:
+    #     print(ii)
         
     
-    #%%
-    comp_plot(HSC['HSC_Mstar'],HSC['HSC_galaxy_abs_iMags'],c = 'orange', alpha=0.2)
-    plt.scatter(SAM['Stellar_Mass_nois_sl'], SAM['sdss_mag_galaxy_sl'], c = 'green',alpha=0.2)
-    plt.xlim(9,11.8)
-    plt.ylim(-25, -17.5)
-    plt.xlabel('M*')
-    plt.ylabel('host galaxy g magnitude')
-    plt.title("Stellar mass VS galaxy magnitude")
-    if ifplot == True:
-        plt.show()
-    else:
-        plt.close()
+    # #%%
+    # comp_plot(HSC['HSC_Mstar'],HSC['HSC_galaxy_abs_iMags'],c = 'orange', alpha=0.2)
+    # plt.scatter(SAM['Stellar_Mass_nois_sl'], SAM['sdss_mag_galaxy_sl'], c = 'green',alpha=0.2)
+    # plt.xlim(9,11.8)
+    # plt.ylim(-25, -17.5)
+    # plt.xlabel('M*')
+    # plt.ylabel('host galaxy g magnitude')
+    # plt.title("Stellar mass VS galaxy magnitude")
+    # if ifplot == True:
+    #     plt.show()
+    # else:
+    #     plt.close()
         
-    comp_plot(HSC['HSC_MBHs'],HSC['HSC_ps_abs_iMags'],c = 'orange', alpha=0.2)
-    plt.scatter(SAM['BH_Mass_nois_sl'], SAM['sdss_mag_pointsource_sl'], c='green',alpha=0.1)
-    plt.plot(np.linspace(5,10), np.linspace(5,10)*0 + np.mean(SAM['abs_Mags_break_reali']) )
-    plt.xlabel(r'log(M$_{\rm BH}$/M$_{\odot}$)',fontsize=30)
-    plt.ylabel('AGN abs magnitude rest-frame g band', fontsize=25)
-    plt.title("SAM simulation",fontsize=25)
-    plt.tick_params(labelsize=25)
-    plt.xlim(5,10)
-    plt.ylim(-28, -14)
-    if ifplot == True:
-        plt.show()
-    else:
-        plt.close()
+    # comp_plot(HSC['HSC_MBHs'],HSC['HSC_ps_abs_iMags'],c = 'orange', alpha=0.2)
+    # plt.scatter(SAM['BH_Mass_nois_sl'], SAM['sdss_mag_pointsource_sl'], c='green',alpha=0.1)
+    # plt.plot(np.linspace(5,10), np.linspace(5,10)*0 + np.mean(SAM['abs_Mags_break_reali']) )
+    # plt.xlabel(r'log(M$_{\rm BH}$/M$_{\odot}$)',fontsize=30)
+    # plt.ylabel('AGN abs magnitude rest-frame g band', fontsize=25)
+    # plt.title("SAM simulation",fontsize=25)
+    # plt.tick_params(labelsize=25)
+    # plt.xlim(5,10)
+    # plt.ylim(-28, -14)
+    # if ifplot == True:
+    #     plt.show()
+    # else:
+    #     plt.close()
     
-    #%%
-    comp_plot(HSC['HSC_Lbol_overall'],HSC['HSC_MBHs_overall'],c = 'orange', alpha=0.6)
-    plt.scatter(SAM['logLbol_nois_sl'], SAM['BH_Mass_nois_sl'], c='green',alpha=0.2)
-    plt.scatter(SAM['logLbol_nois'], SAM['BH_Mass_nois'], c='gray',alpha=0.2)
-    plt.ylabel(r'log(M$_{\rm BH}$/M$_{\odot}$)',fontsize=30)
-    plt.xlabel('Lbol', fontsize=25)
-    plt.title("SAM simulation", fontsize=25)
-    plt.tick_params(labelsize=25)
-    if ifplot == True:
-        plt.show()
-    else:
-        plt.close()
+    # #%%
+    # comp_plot(HSC['HSC_Lbol_overall'],HSC['HSC_MBHs_overall'],c = 'orange', alpha=0.6)
+    # plt.scatter(SAM['logLbol_nois_sl'], SAM['BH_Mass_nois_sl'], c='green',alpha=0.2)
+    # plt.scatter(SAM['logLbol_nois'], SAM['BH_Mass_nois'], c='gray',alpha=0.2)
+    # plt.ylabel(r'log(M$_{\rm BH}$/M$_{\odot}$)',fontsize=30)
+    # plt.xlabel('Lbol', fontsize=25)
+    # plt.title("SAM simulation", fontsize=25)
+    # plt.tick_params(labelsize=25)
+    # if ifplot == True:
+    #     plt.show()
+    # else:
+    #     plt.close()
         
-    #%%
+    # #%%
     
-    comp_plot(HSC['HSC_Lbol_overall'],HSC['HSC_Mstar_overall'],c = 'orange', alpha=0.6)
-    plt.scatter(SAM['logLbol_nois'], SAM['Stellar_Mass_nois'], c='green',alpha=0.2)
-    plt.ylabel(r'log(M$_{*}$/M$_{\odot}$)',fontsize=30)
-    plt.xlabel('Lbol', fontsize=25)
-    plt.title("SAM simulation", fontsize=25)
-    plt.tick_params(labelsize=25)
-    if ifplot == True:
-        plt.show()
-    else:
-        plt.close()
+    # comp_plot(HSC['HSC_Lbol_overall'],HSC['HSC_Mstar_overall'],c = 'orange', alpha=0.6)
+    # plt.scatter(SAM['logLbol_nois'], SAM['Stellar_Mass_nois'], c='green',alpha=0.2)
+    # plt.ylabel(r'log(M$_{*}$/M$_{\odot}$)',fontsize=30)
+    # plt.xlabel('Lbol', fontsize=25)
+    # plt.title("SAM simulation", fontsize=25)
+    # plt.tick_params(labelsize=25)
+    # if ifplot == True:
+    #     plt.show()
+    # else:
+    #     plt.close()

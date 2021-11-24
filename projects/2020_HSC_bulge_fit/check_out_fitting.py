@@ -26,11 +26,10 @@ fitsFile_ = glob.glob('SDSS_0.2-0.3/*_HSC-I.fits')
 # for NO in range(55):    
 # for NO in range(len(fitsFile_)): 
 for NO in [13]:    
-# for NO in [66]:
     fitsFile  = fitsFile_[NO]
     ID = fitsFile.split('/')[1].split('_')[0]
     PSF_filename = fitsFile.split('.fits')[0]+ '_psf.fits'
-    save_name = 'fit_result1/' + fitsFile.split('.fits')[0].split('/')[1]
+    save_name = 'fit_result_202110/' + fitsFile.split('.fits')[0].split('/')[1]
     ## Test load pkl
     
     picklename = save_name+'single_Sersic.pkl'
@@ -39,14 +38,18 @@ for NO in [13]:
     picklename = save_name+'bulge+disk.pkl'
     fitting_run_class_1 = pickle.load(open(picklename,'rb'))
     
+    picklename = save_name+'bar+disk.pkl'
+    fitting_run_class_1b = pickle.load(open(picklename,'rb'))
+    
     picklename = save_name+'bar+bulge+disk.pkl'
     fitting_run_class_2 = pickle.load(open(picklename,'rb'))
 
     
     bic_0 = fitting_run_class_0.fitting_seq.bic
     bic_1 = fitting_run_class_1.fitting_seq.bic
+    bic_1b = fitting_run_class_1b.fitting_seq.bic
     bic_2 = fitting_run_class_2.fitting_seq.bic
-    if bic_0 < bic_1:
+    if 10 < 2:
         print(ID+" is a singel Sersic model; "+"glob Number: " + str(NO))
     else:
         print(ID+" is a disk+bulge!!! "+"glob Number: " + str(NO))
@@ -57,47 +60,67 @@ for NO in [13]:
         #%%Disk+bulge
         print(ID+"Disk + Bulge fit:")    
         fitting_run_class_1.plot_final_qso_fit(target_ID =  ID)
-        bulge1 = fitting_run_class_1.image_host_list[0]
-        disk1 = fitting_run_class_1.image_host_list[1]
+        disk1 = fitting_run_class_1.image_host_list[0]
+        bulge1 = fitting_run_class_1.image_host_list[1]
         B2T = np.sum(bulge1)/np.sum(bulge1+disk1)
         AGN1 = fitting_run_class_1.image_ps_list[0]
         bulge_Re1 = fitting_run_class_1.final_result_galaxy[0]['R_sersic']
         disk_Re1 = fitting_run_class_1.final_result_galaxy[1]['R_sersic']
-        flux_list_2d = [bulge1, disk1, AGN1]
-        label_list_2d = ['Bulge', 'Disk', 'nuclei']
-        flux_list_1d = [bulge1, disk1, AGN1] 
-        label_list_1d = ['Bulge', 'Disk', 'nuclei']
+        flux_list_2d = [disk1, bulge1, AGN1]
+        label_list_2d = ['Disk', 'Bulge', 'nuclei']
+        flux_list_1d = [disk1, bulge1, AGN1] 
+        label_list_1d = ['Disk', 'Bulge', 'nuclei']
         profile_plots(flux_list_2d, label_list_2d, flux_list_1d, label_list_1d,
                       deltaPix = fitting_run_class_1.fitting_specify_class.deltaPix,
-                      target_ID =  ID, if_annuli=True)        
+                      target_ID =  ID, if_annuli=True)   
+        print("B/T:", round(B2T,2))
+
+        #%%bar+bulge
+        print(ID+"Disk + Bar fit:")    
+        fitting_run_class_1b.plot_final_qso_fit(target_ID =  ID)
+        disk1b = fitting_run_class_1b.image_host_list[0]
+        bar1b = fitting_run_class_1b.image_host_list[1]
+        # B2T = np.sum(bulge1)/np.sum(bulge1+disk1)
+        AGN1v = fitting_run_class_1.image_ps_list[0]
+        # bar_Re1 = fitting_run_class_1.final_result_galaxy[0]['R_sersic']
+        # disk_Re1 = fitting_run_class_1.final_result_galaxy[1]['R_sersic']
+        flux_list_2d = [disk1b, bar1b, AGN1]
+        label_list_2d = ['Disk', 'Bar', 'nuclei']
+        flux_list_1d = [disk1b, bar1b, AGN1] 
+        label_list_1d = ['Disk', 'Bar', 'nuclei']
+        profile_plots(flux_list_2d, label_list_2d, flux_list_1d, label_list_1d,
+                      deltaPix = fitting_run_class_1.fitting_specify_class.deltaPix,
+                      target_ID =  ID, if_annuli=True)   
+        print("B/T:", round(B2T,2))
+
 
         #%%Disk+bulge+bar
         print("Fitting as Bar + Bulge + Disk")  
         fitting_run_class_2.plot_final_qso_fit(target_ID =  ID)
-        bar2 = fitting_run_class_2.image_host_list[0]
+        disk2 = fitting_run_class_2.image_host_list[0]
         bulge2 = fitting_run_class_2.image_host_list[1]
-        disk2 = fitting_run_class_2.image_host_list[2]
+        bar2 = fitting_run_class_2.image_host_list[2]
         B2T = np.sum(bulge2)/np.sum(bulge2+disk2+bar2)
         AGN2 = fitting_run_class_2.image_ps_list[0]
-        bar_Re2 = fitting_run_class_2.final_result_galaxy[0]['R_sersic']
+        disk_Re2 = fitting_run_class_2.final_result_galaxy[0]['R_sersic']
         bulge_Re2 = fitting_run_class_2.final_result_galaxy[1]['R_sersic']
-        disk_Re2 = fitting_run_class_2.final_result_galaxy[2]['R_sersic']
+        bar_Re2 = fitting_run_class_2.final_result_galaxy[2]['R_sersic']
         # bar2_resi = fitting_run_class_2.fitting_specify_class.kwargs_data['image_data'] -AGN2
-        flux_list_2d = [bulge2, disk2, bar2, AGN2]
-        label_list_2d = ['Bulge', 'Disk', 'Bar', 'nuclei']
-        flux_list_1d = [bulge2, disk2, bar2, AGN2] 
-        label_list_1d = ['Bulge', 'Disk', 'Bar', 'nuclei']      
+        flux_list_2d = [disk2, bulge2, bar2, AGN2]
+        label_list_2d = ['Disk', 'Bulge', 'Bar', 'nuclei']
+        flux_list_1d = [disk2, bulge2, bar2, AGN2] 
+        label_list_1d = ['Disk', 'Bulge', 'Bar', 'nuclei']      
         profile_plots(flux_list_2d, label_list_2d, flux_list_1d, label_list_1d,
-                      deltaPix = fitting_run_class_1.fitting_specify_class.deltaPix,
+                      deltaPix = fitting_run_class_0.fitting_specify_class.deltaPix,
                       target_ID =  ID, if_annuli=True)
         
         print("B/T:", round(B2T,2))
         print('Reff: bulge, disk, bar: ', round(bulge_Re2,2), round(disk_Re2,2), round(bar_Re2) )
         # hold = input("hold:")
-
-        print("BIC compare:", round(bic_0,1), round(bic_1,1), round(bic_2,1) )
+    
+        print("BIC compare:", round(bic_0,1), round(bic_1,1), round(bic_1b,1), round(bic_2,1) )
         print("Chisq:", round(fitting_run_class_0.reduced_Chisq,1), round(fitting_run_class_1.reduced_Chisq,1),
-               round(fitting_run_class_2.reduced_Chisq,1))
+                round(fitting_run_class_1b.reduced_Chisq,1), round(fitting_run_class_2.reduced_Chisq,1))
 
 # =============================================================================
 # Sec with better prior

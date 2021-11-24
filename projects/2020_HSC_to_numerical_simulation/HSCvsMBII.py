@@ -26,7 +26,7 @@ ifplot = True
 
 detlaM  = 0
 imf = 'Sal'
-if imf == 'Sal':
+if imf == 'Sal': 
     detlaM = 0.23
     
 #%%
@@ -102,7 +102,7 @@ for ii in range(1):
     else:
         plt.close()
     
-    #%% 
+    #%% Plot the selection
     fig, ax = plt.subplots(figsize=(11,9))
     from prep_comparison import quasar_filter
     # plt.scatter( MBII['BH_Mass_nois'], MBII['logLbol_nois'],
@@ -110,7 +110,7 @@ for ii in range(1):
     import matplotlib as mpl
     BH_overall, logLbol_overall = MBII['BH_Mass_nois'][MBII['logLbol_nois']>0], MBII['logLbol_nois'][MBII['logLbol_nois']>0]
     plt.hist2d(BH_overall, logLbol_overall,norm=mpl.colors.LogNorm(),
-               cmap='summer',bins=50,zorder=0,alpha=0.5)
+                cmap='summer',bins=50,zorder=0,alpha=0.5)
     cbar = plt.colorbar()
     cbar.ax.tick_params(labelsize=30) 
     type1_bools = quasar_filter([logLbol_overall, BH_overall], HSC['HSC_Lbol_overall'], HSC['HSC_MBHs_overall'])
@@ -120,7 +120,7 @@ for ii in range(1):
                 edgecolors='gray', alpha=0.8,zorder = 0.5, label= 'HSC observed sample')
     plt.xlabel(r'log(M$_{\rm BH}$/M$_{\odot}$)',fontsize=30)
     plt.ylabel(r'log(L$_{\rm bol}$)', fontsize=30)
-    plt.ylim(38, 48)
+    plt.ylim(40, 48)
     plt.xlim(5.8,10)
     plt.tick_params(labelsize=25)
     from matplotlib.ticker import AutoMinorLocator
@@ -129,19 +129,105 @@ for ii in range(1):
     plt.tick_params(which='major', length=12)
     plt.tick_params(which='minor', length=6)#, color='gray')
     plt.legend(loc='lower right',fontsize=21,numpoints=1)
+    plt.savefig('HSC_selection_MBII.png')
     if ifplot == True:
         plt.show()
     else:
         plt.close()
         
+    # #%% Test to see if use the HST selection window
+    # fig, ax = plt.subplots(figsize=(11,9))
+    # BH_overall, logLbol_overall = MBII['BH_Mass_nois'][MBII['logLbol_nois']>0], MBII['logLbol_nois'][MBII['logLbol_nois']>0]
+    # plt.hist2d(BH_overall, logLbol_overall - (38. + np.log10(1.2) + BH_overall),
+    #            norm=mpl.colors.LogNorm(),
+    #             cmap='summer',bins=50,zorder=0,alpha=0.5)
+    # cbar = plt.colorbar()
+    # cbar.ax.tick_params(labelsize=30) 
+    # # type1_bools = quasar_filter([logLbol_overall, BH_overall], HSC['HSC_Lbol_overall'], HSC['HSC_MBHs_overall'])
+    # plt.scatter(BH_overall[type1_bools][:500], logLbol_overall[type1_bools][:500] - (38. + np.log10(1.2) + BH_overall[type1_bools][:500]), 
+    #             color = 'steelblue',edgecolors='black',alpha=0.8, zorder = 1, label= 'selected MBII sample')
+    # plt.scatter(HSC['HSC_MBHs_overall'], HSC['HSC_Lbol_overall'] - (38. + np.log10(1.2) + HSC['HSC_MBHs_overall']),
+    #             c='orange', 
+    #             edgecolors='gray', alpha=0.8,zorder = 0.5, label= 'HSC observed sample')
+    # xspace = np.linspace(6,10)
+    # plt.plot(xspace, 0*xspace,'k--',linewidth=2)
+    # plt.plot(xspace, 0*xspace-1.5,'k--',linewidth=2)
+    # y_line3 = -1.1*(xspace-7.5) -0.5
+    # plt.plot(xspace, y_line3,'k--',linewidth=2)
+    # yspace = np.linspace(-5,2)
+    # plt.plot(yspace*0+7.7, yspace,'k--',linewidth=2)
+    # plt.plot(xspace*0+8.6, yspace,'k--',linewidth=2)
+    # xfill = np.linspace(7.7, 8.6)
+    # yfill_sline = -1.1*(xfill-7.5) -0.5
+    # y_sline1 = xfill*0
+    # y_sline2 = xfill*0-1.5
+    # y4 = np.maximum(yfill_sline, y_sline2)
+    # plt.fill_between(xfill, y4, y2=0, color='steelblue', alpha=0.5, zorder=10)
+    # plt.tick_params(labelsize=30)
+    # plt.xlabel(r'log(M$_{\rm BH}$/M$_{\odot}$)',fontsize=30)
+    # plt.ylabel(r'log(L$_{\rm bol}$/L$_{\rm Edd}$)', fontsize=30)
+    # plt.ylim(-3.0, 1)
+    # plt.xlim(5.8,10)
+    # plt.tick_params(labelsize=25)
+    # ax.xaxis.set_minor_locator(AutoMinorLocator())
+    # plt.tick_params(which='both', width=2, top=True, right=True,direction='in')
+    # plt.tick_params(which='major', length=12)
+    # plt.tick_params(which='minor', length=6)#, color='gray')
+    # plt.legend(loc='upper right',fontsize=21,numpoints=1)
+    # # plt.savefig('HSC_selection_MBII.png')
+    # if ifplot == True:
+    #     plt.show()
+    # else:
+    #     plt.close()
+    # HSC['Eddratio'] = HSC['HSC_Lbol'] - (38. + np.log10(1.2) + HSC['HSC_MBHs'])
+    # ###HSC selection:
+    # HSC_bool = (HSC['HSC_MBHs']>xfill.min()) *  (HSC['HSC_MBHs']<xfill.max()) * (HSC['Eddratio']<0) * (HSC['Eddratio'] > -1.1*(HSC['HSC_MBHs']-7.5) -0.5) * (HSC['HSC_ps_mag']<I_mag_break)
+    # MBII_ = {}
+    # MBII_['MBHs'] = BH_overall[type1_bools]
+    # MBII_['Eddratio'] = logLbol_overall[type1_bools] - (38. + np.log10(1.2) + BH_overall[type1_bools])
+    # MBII_['Mstar'] = MBII['Stellar_Mass_nois'][MBII['logLbol_nois']>0]
+    # MBII_['Mstar'] = MBII_['Mstar'][type1_bools]
+    # MBII_bool = (MBII_['MBHs']>xfill.min()) *  (MBII_['MBHs']<xfill.max()) * (MBII_['Eddratio']<0) * (MBII_['Eddratio'] > -1.1*(MBII_['MBHs']-7.5) -0.5)
+    # f,ax=plt.subplots(1,1,figsize=(14,12))   
+
+    # obj=ax
+    # panel2=obj.hist2d(MBII['Stellar_Mass'], MBII['BH_Mass'],
+    #                   norm=mpl.colors.LogNorm(), density = True, cmap='summer',bins=50,zorder=-1,
+    #                   alpha=0.5, cmin = 0.001)
     
+    # plt.scatter(MBII_['Mstar'][MBII_bool], MBII_['MBHs'][MBII_bool],c='steelblue',
+    #             s=420, marker=".",zorder=0, edgecolors='k', alpha = 0.7, label='MBII sample z={0}'.format(zs))
+    # # plt.scatter(HSC['HSC_Mstar'],HSC['HSC_MBHs'],c='orange',
+    # #             s=220, marker=".",zorder=-1, edgecolors='k', alpha = 0.7, label='HSC sample')
+    # plt.scatter(HSC['HSC_Mstar'][HSC_bool],HSC['HSC_MBHs'][HSC_bool],c='orange',
+    #             s=420, marker=".",zorder=-1, edgecolors='k', alpha = 0.7, label='HSC sample')
+    
+    # xl = np.linspace(5, 13, 100)
+    # m_ml, b_ml = (0.981139684856507, -2.545890295477823)
+    # plt.plot(xl+detlaM, m_ml*xl+b_ml, color="k", linewidth=4.0,zorder=-0.5)
+    # # plt.title(r"M$_{\rm BH}-$M$_*$ relation",fontsize=35)
+    # plt.xlabel(r"log(M$_*$/M$_{\odot})$",fontsize=35)
+    # plt.ylabel(r'log(M$_{\rm BH}$/M$_{\odot}$)',fontsize=35)
+    # plt.xlim(9,12.5)
+    # plt.ylim(6.0,10.3)
+    # plt.grid(linestyle='--')
+    # plt.tick_params(labelsize=25)
+    # plt.tick_params(which='both', width=2, top=True, right=True,direction='in')
+    # plt.tick_params(which='major', length=10)
+    # plt.tick_params(which='minor', length=6)#, color='r’)
+    # plt.legend(scatterpoints=1,numpoints=1,loc=2,prop={'size':32},ncol=1,handletextpad=0)
+    # ax.xaxis.set_minor_locator(AutoMinorLocator())
+    # ax.yaxis.set_minor_locator(AutoMinorLocator())
+    # cbar=f.colorbar(panel2[3],ax=obj, ticks=[])
+    # cbar.ax.tick_params(labelsize=30) 
+    # plt.show()         
+        
     #%%
     f,ax=plt.subplots(1,1,figsize=(14,12))   
-    import matplotlib as mpl
     obj=ax
-    panel2=obj.hist2d(MBII['Stellar_Mass_nois'], MBII['BH_Mass_nois'],
+    panel2=obj.hist2d(MBII['Stellar_Mass'], MBII['BH_Mass'],
                       norm=mpl.colors.LogNorm(), density = True, cmap='summer',bins=50,zorder=-1,
-                      alpha=0.5, cmin = 0.001 , cmax = 1.1)
+                      alpha=0.5, cmin = 0.001)
     
     plt.scatter(MBII['Stellar_Mass_nois_sl'], MBII['BH_Mass_nois_sl'],c='steelblue',
                 s=420, marker=".",zorder=0, edgecolors='k', alpha = 0.7, label='MBII sample z={0}'.format(zs))
@@ -163,7 +249,7 @@ for ii in range(1):
     plt.tick_params(which='both', width=2, top=True, right=True,direction='in')
     plt.tick_params(which='major', length=10)
     plt.tick_params(which='minor', length=6)#, color='r’)
-    plt.legend(scatterpoints=1,numpoints=1,loc=2,prop={'size':28},ncol=2,handletextpad=0)
+    plt.legend(scatterpoints=1,numpoints=1,loc=2,prop={'size':32},ncol=1,handletextpad=0)
     from matplotlib.ticker import AutoMinorLocator
     ax.xaxis.set_minor_locator(AutoMinorLocator())
     ax.yaxis.set_minor_locator(AutoMinorLocator())
@@ -171,60 +257,122 @@ for ii in range(1):
     cbar.ax.tick_params(labelsize=30) 
     # plt.savefig('MM_MBII_zs_{0}.png'.format(zs))
     plt.show()    
+
+    #%%Plot offset        
+    f,ax=plt.subplots(1,2,figsize=(12,10),gridspec_kw={'width_ratios': [7, 1]}, sharey = True)
+    # f.suptitle(r"Offset VS M*, z={0}".format(zs), fontsize = 20)
+    obj=ax[0]
     
+    sm_int, bh_int = MBII['Stellar_Mass']- detlaM, MBII['BH_Mass']
+    sm_sim, bh_sim = MBII['Stellar_Mass_nois_sl']- detlaM, MBII['BH_Mass_nois_sl']
+    sm_obs, bh_obs = HSC['HSC_Mstar'][HSC['HSC_ps_mag']<I_mag_break]- detlaM, HSC['HSC_MBHs'][HSC['HSC_ps_mag']<I_mag_break]
     
+    off_int = sm_int, bh_int - (m_ml*sm_int+b_ml)
+    off_sim = sm_sim, bh_sim - (m_ml*sm_sim+b_ml),
+    off_obs = sm_obs, bh_obs - (m_ml*sm_obs+b_ml),
+    panel2=obj.hist2d(off_int[0], off_int[1],
+                      norm=mpl.colors.LogNorm(), density = True, cmap='summer',bins=50,zorder=-1,
+                          alpha=0.5, cmin = 0.001)# , cmax = 1.1)
+    ax[0].scatter(off_sim[0], off_sim[1],
+                c='steelblue',
+                s=420, marker=".",zorder=0, edgecolors='k', alpha = 0.7, label='MBII sample z={0}'.format(zs))
+    ax[0].scatter(off_obs[0], off_obs[1],
+                c='orange',
+                s=420, marker=".",zorder=-1, edgecolors='k', alpha = 0.7, label='HSC sample')
+    # xl = np.linspace(5, 13, 100)
+    # plt.plot(xl, m_ml*xl+b_ml, color="k", linewidth=4.0,zorder=-0.5)
+    # plt.title(r"M$_{\rm BH}-$M$_*$ relation",fontsize=35)
+    ax[0].set_xlabel(r"log(M$_*$/M$_{\odot})$",fontsize=35)
+    ax[0].set_ylabel(r"$\Delta$logM$_{\rm BH}$ (vs M$_*$)",fontsize=35)
+    ax[0].set_xlim(9,12.5)
+    ax[0].set_ylim(-2., 2.0)
+    ax[0].grid(linestyle='--')
+    ax[0].tick_params(labelsize=25)
+    ax[0].tick_params(which='both', width=2, top=True, right=True,direction='in')
+    ax[0].tick_params(which='major', length=10)
+    ax[0].tick_params(which='minor', length=6)#, color='r’)
+    ax[0].legend(scatterpoints=1,numpoints=1,loc=2,prop={'size':25},ncol=2,handletextpad=0)
+    ax[0].xaxis.set_minor_locator(AutoMinorLocator())
+    ax[0].yaxis.set_minor_locator(AutoMinorLocator())
+    
+    his_xy0_ =  ax[1].hist(off_int[1], orientation='horizontal'
+               , histtype=u'step',density=True, color = 'green', linewidth = 4)
+    his_xy1_ = ax[1].hist(off_sim[1], orientation='horizontal'
+               , histtype=u'step',density=True, color = 'steelblue', linewidth = 4)
+    his_xy2_ = ax[1].hist(off_obs[1], orientation='horizontal'
+               , histtype=u'step',density=True, color = 'orange', linewidth = 4)
+    his_max = np.max([his_xy0_[0].max(), his_xy1_[0].max(), his_xy2_[0].max()])
+    # ax[1].set_yticks([])
+    sim_mean = np.mean(off_sim[1])
+    obs_mean = np.mean(off_obs[1])
+    ax[1].plot([0, 10], [sim_mean,sim_mean], linewidth = 3,color = 'steelblue')
+    ax[1].plot([0, 10], [obs_mean,obs_mean], linewidth = 3,color = 'orange')
+    ax[1].set_xlim(0, his_max*1.2)
+    ax[1].set_xticks([])
+    
+    f.tight_layout()
+    plt.subplots_adjust(wspace=0.01)
+    # from matplotlib.ticker import AutoMinorLocator
+    # cbar=f.colorbar(panel2[3],ax=obj)
+    # cbar.ax.tick_params(labelsize=30) 
+    plt.savefig('DeltaMM_MBII_zs_{0}.png'.format(zs))
+    plt.show()
+    
+    cals = off_int[1]#[(off_int[0]<off_obs[0].max())*(off_int[0]>off_obs[0].min())]
+    print('{0:.2f}, {1:.2f}'.format(np.mean(cals), np.std(cals)))
+
     #%%
-    MBII_scatter = (MBII['BH_Mass_nois_sl'] - ( m_ml*(MBII['Stellar_Mass_nois_sl']- detlaM)+b_ml ) )
-    MBII_scatter_nosl = (MBII['BH_Mass_nois'] - ( m_ml*(MBII['Stellar_Mass_nois']- detlaM)+b_ml ) )
-    HSC_scatter = (HSC['HSC_MBHs'] - ( m_ml*(HSC['HSC_Mstar']- detlaM)+b_ml ) )
-    #Plot the 1-D scatter for MM.
-    fig, ax = plt.subplots(figsize=(8,7))
-    plt.hist(MBII_scatter_nosl, histtype=u'step',density=True,
-              label=('MBII sample scatter nosl'), linewidth = 2, color='gray')
-    plt.hist(MBII_scatter,histtype=u'step',density=True,
-              label=('MBII sample scatter'), linewidth = 2, color='steelblue')
-    plt.hist(HSC_scatter, histtype=u'step',density=True,
-              label=('HSC sample scatter'), linewidth = 2, color='orange')
-    # plt.hist(MBII_scatter_noselect,histtype=u'step',density=True,
-    #           label=('MBII sample scatter, no selection'), linewidth = 2, color='gray')
-    plt.title(r"The offset comparison for the M$_{\rm BH}$-M$_{*}$ relation", fontsize = 25)
-    plt.tick_params(labelsize=20)
-    plt.legend(prop={'size':10})
-    plt.yticks([])
-    # ax.xaxis.set_minor_locator(AutoMinorLocator())
-    plt.tick_params(which='both', width=2, top=True,direction='in')
-    plt.tick_params(which='major', length=10)
-    plt.tick_params(which='minor', length=6)#, color='r’)
-    plt.xlabel(r'$\Delta$log(M$_{\rm BH}$/M$_{\odot}$)',fontsize=30)
-    #plt.savefig('comp_scatter_MM_MBIIonly.pdf')
-    if ifplot == True:
-        plt.show()
-    else:
-        plt.close()
+    # MBII_scatter = (MBII['BH_Mass_nois_sl'] - ( m_ml*(MBII['Stellar_Mass_nois_sl']- detlaM)+b_ml ) )
+    # MBII_scatter_nosl = (MBII['BH_Mass_nois'] - ( m_ml*(MBII['Stellar_Mass_nois']- detlaM)+b_ml ) )
+    # HSC_scatter = (HSC['HSC_MBHs'] - ( m_ml*(HSC['HSC_Mstar']- detlaM)+b_ml ) )
+    # #Plot the 1-D scatter for MM.
+    # fig, ax = plt.subplots(figsize=(8,7))
+    # plt.hist(MBII_scatter_nosl, histtype=u'step',density=True,
+    #           label=('MBII sample scatter nosl'), linewidth = 2, color='gray')
+    # plt.hist(MBII_scatter,histtype=u'step',density=True,
+    #           label=('MBII sample scatter'), linewidth = 2, color='steelblue')
+    # plt.hist(HSC_scatter, histtype=u'step',density=True,
+    #           label=('HSC sample scatter'), linewidth = 2, color='orange')
+    # # plt.hist(MBII_scatter_noselect,histtype=u'step',density=True,
+    # #           label=('MBII sample scatter, no selection'), linewidth = 2, color='gray')
+    # plt.title(r"The offset comparison for the M$_{\rm BH}$-M$_{*}$ relation", fontsize = 25)
+    # plt.tick_params(labelsize=20)
+    # plt.legend(prop={'size':10})
+    # plt.yticks([])
+    # # ax.xaxis.set_minor_locator(AutoMinorLocator())
+    # plt.tick_params(which='both', width=2, top=True,direction='in')
+    # plt.tick_params(which='major', length=10)
+    # plt.tick_params(which='minor', length=6)#, color='r’)
+    # plt.xlabel(r'$\Delta$log(M$_{\rm BH}$/M$_{\odot}$)',fontsize=30)
+    # #plt.savefig('comp_scatter_MM_MBIIonly.pdf')
+    # if ifplot == True:
+    #     plt.show()
+    # else:
+    #     plt.close()
         
-    sim_offset_nosl = MBII_scatter_nosl 
-    sim_offset = MBII_scatter
-    obs_offset = HSC_scatter
-    rfilename = 'offset_result/' + 'MBII_zs{0}.txt'.format(zs)
-    if_file = glob.glob(rfilename)
-    write_file =  open(rfilename,'w') 
+    # sim_offset_nosl = MBII_scatter_nosl 
+    # sim_offset = MBII_scatter
+    # obs_offset = HSC_scatter
+    # rfilename = 'offset_result/' + 'MBII_zs{0}.txt'.format(zs)
+    # if_file = glob.glob(rfilename)
+    # write_file =  open(rfilename,'w') 
     
-    for i in range(max(len(sim_offset), len(obs_offset))):
-        try:
-            write_file.write('{0} {1} {2} {3} {4} {5} {6}'.format(sim_offset_nosl[i], sim_offset[i], obs_offset[i], 
-                                                                  MBII['Stellar_Mass_nois_sl'][i], MBII['BH_Mass_nois_sl'][i], HSC['HSC_Mstar'][i], HSC['HSC_MBHs'][i] ))
-        except:
-            try:
-                write_file.write('{0} {1} -99 {2} {3} -99 -99'.format(sim_offset_nosl[i], sim_offset[i], MBII['Stellar_Mass_nois_sl'][i], MBII['BH_Mass_nois_sl'][i]))
-            except:            
-                write_file.write('{0} -99 {1} -99 -99 {2} {3}'.format(sim_offset_nosl[i], obs_offset[i],HSC['HSC_Mstar'][i], HSC['HSC_MBHs'][i]))
-        write_file.write("\n")
-    write_file.close()
+    # for i in range(max(len(sim_offset), len(obs_offset))):
+    #     try:
+    #         write_file.write('{0} {1} {2} {3} {4} {5} {6}'.format(sim_offset_nosl[i], sim_offset[i], obs_offset[i], 
+    #                                                               MBII['Stellar_Mass_nois_sl'][i], MBII['BH_Mass_nois_sl'][i], HSC['HSC_Mstar'][i], HSC['HSC_MBHs'][i] ))
+    #     except:
+    #         try:
+    #             write_file.write('{0} {1} -99 {2} {3} -99 -99'.format(sim_offset_nosl[i], sim_offset[i], MBII['Stellar_Mass_nois_sl'][i], MBII['BH_Mass_nois_sl'][i]))
+    #         except:            
+    #             write_file.write('{0} -99 {1} -99 -99 {2} {3}'.format(sim_offset_nosl[i], obs_offset[i],HSC['HSC_Mstar'][i], HSC['HSC_MBHs'][i]))
+    #     write_file.write("\n")
+    # write_file.close()
 
     
-    from scipy import stats
-    sim_scatter_std = np.std(MBII_scatter)
-    obs_scatter_std = np.std(HSC_scatter)
+    # from scipy import stats
+    # sim_scatter_std = np.std(MBII_scatter)
+    # obs_scatter_std = np.std(HSC_scatter)
     # print("obs scatter:", obs_scatter_std)
     # print("sim scatter:", sim_scatter_std)
     # print("KS p-value:", stats.ks_2samp(MBII_scatter, HSC_scatter).pvalue)
@@ -247,8 +395,8 @@ for ii in range(1):
     # write_file.write('{0:.3f} {1:.3f}'.format(np.mean(MBII_scatter), np.std(MBII_scatter)))
     # write_file.write("\n")
     # write_file.close()
-    if ii%50 == 0:
-        print(ii)
+    # if ii%50 == 0:
+    #     print(ii)
 
 # #%% simulation
 # comp_plot(MBII['Stellar_Mass_nois_sl'], MBII['sdss_g_galaxy_sl'],alpha=0.2)

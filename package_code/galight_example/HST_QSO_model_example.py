@@ -30,7 +30,7 @@ exp_map = exp * wht/mean_wht
 from galight.data_process import DataProcess
 data_process = DataProcess(fov_image = fov_image, target_pos = [1142., 637.], pos_type = 'pixel', header = header,
                           rm_bkglight = False, exptime = exp_map, if_plot=False, zp = 27.0)
-data_process.generate_target_materials(radius=65, create_mask = True, nsigma=2.8,
+data_process.generate_target_materials(radius=65, create_mask = True, nsigma=2.8, if_select_obj=True,
                                       exp_sz= 1.2, npixels = 15, if_plot=True)
 
 

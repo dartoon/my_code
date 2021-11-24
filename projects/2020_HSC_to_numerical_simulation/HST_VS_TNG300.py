@@ -277,7 +277,7 @@ for ii in range(1):
     # plt.plot(x_obs_space,y_space,color='orange',linewidth=3, zorder = 101)
     # x_space_ub=lfit(y_space,fit[0][0],fit[0][1]+sim_scatter)
     # x_space_lb=lfit(y_space,fit[0][0],fit[0][1]-sim_scatter)
-    # plt.fill_betweenx(y_space,x_space_lb,x_space_ub,color='deeppink',alpha=0.35,zorder =1)
+    # plt.fill_betweenx(y_space,x_space_lb,x_space_ub,color='plum',alpha=0.35,zorder =1)
     # x_space_ub=lfit_fixm(y_space,fit_fixm[0]+obs_scatter)
     # x_space_lb=lfit_fixm(y_space,fit_fixm[0]-obs_scatter)                                    
     # plt.fill_betweenx(y_space,x_space_lb,x_space_ub,color='orange',alpha=0.35,zorder =1)
@@ -298,11 +298,77 @@ for ii in range(1):
     obj.set_ylabel(r'log(M$_{\rm BH}$/M$_{\odot}$)',fontsize=35)
     obj.set_xlabel('log(M$_{*}$/M$_{\odot}$)',fontsize=35)
     obj.legend(loc='upper left',fontsize=30,numpoints=1)
-    plt.savefig('MM_TNG300_zs_{0}.png'.format(zs))
+    # plt.savefig('MM_TNG300_zs_{0}.png'.format(zs))
     if ifplot == True:
         plt.show()
     else:
         plt.close()    
+        
+    #%%Plot offset        
+    # import matplotlib as mpl
+    # from matplotlib.ticker import AutoMinorLocator
+    f,ax=plt.subplots(1,2,figsize=(12,10),gridspec_kw={'width_ratios': [7, 1]}, sharey = True)
+    # f.suptitle(r"Offset VS M*, z={0}".format(zs), fontsize = 20)
+    obj=ax[0]
+    
+    sm_int, bh_int = mstar_overall,bhmass_overall
+    sm_sim, bh_sim = mstar_selected,bhmass_selected
+    sm_obs, bh_obs = stellar_mass_obs,bh_mass_obs
+    m_ml, b_ml = (0.981139684856507, -2.545890295477823)
+    
+    off_int = sm_int, bh_int - (m_ml*sm_int+b_ml)
+    off_sim = sm_sim, bh_sim - (m_ml*sm_sim+b_ml),
+    off_obs = sm_obs, bh_obs - (m_ml*sm_obs+b_ml),
+    panel2=obj.hist2d(off_int[0], off_int[1],
+                      norm=mpl.colors.LogNorm(), density = True, cmap='summer',bins=50,zorder=-1,
+                          alpha=0.5, cmin = 0.001)# , cmax = 1.1)
+    ax[0].scatter(off_sim[0], off_sim[1],
+                c='plum',
+                s=420, marker=".",zorder=0, edgecolors='k', alpha = 0.7, label='TNG300 sample z={0}'.format(zs))
+    ax[0].scatter(off_obs[0], off_obs[1],
+                c='orange',
+                s=420, marker=".",zorder=1, edgecolors='k', alpha = 0.7, label='HST sample')
+    # xl = np.linspace(5, 13, 100)
+    # plt.plot(xl, m_ml*xl+b_ml, color="k", linewidth=4.0,zorder=-0.5)
+    # plt.title(r"M$_{\rm BH}-$M$_*$ relation",fontsize=35)
+    ax[0].set_xlabel(r"log(M$_*$/M$_{\odot})$",fontsize=35)
+    ax[0].set_ylabel(r"$\Delta$logM$_{\rm BH}$ (vs M$_*$)",fontsize=35)
+    ax[0].set_xlim(9.5,11.7)
+    ax[0].set_ylim(-1.0, 2.)
+    ax[0].grid(linestyle='--')
+    ax[0].tick_params(labelsize=25)
+    ax[0].tick_params(which='both', width=2, top=True, right=True,direction='in')
+    ax[0].tick_params(which='major', length=10)
+    ax[0].tick_params(which='minor', length=6)#, color='r’)
+    ax[0].legend(scatterpoints=1,numpoints=1,loc=2,prop={'size':25},ncol=2,handletextpad=0)
+    ax[0].xaxis.set_minor_locator(AutoMinorLocator())
+    ax[0].yaxis.set_minor_locator(AutoMinorLocator())
+    
+    his_xy0_ =  ax[1].hist(off_int[1], orientation='horizontal'
+               , histtype=u'step',density=True, color = 'green', linewidth = 4)
+    his_xy1_ = ax[1].hist(off_sim[1], orientation='horizontal'
+               , histtype=u'step',density=True, color = 'plum', linewidth = 4)
+    his_xy2_ = ax[1].hist(off_obs[1], orientation='horizontal'
+               , histtype=u'step',density=True, color = 'orange', linewidth = 4)
+    his_max = np.max([his_xy0_[0].max(), his_xy1_[0].max(), his_xy2_[0].max()])
+    # ax[1].set_yticks([])
+    sim_mean = np.mean(off_sim[1])
+    obs_mean = np.mean(off_obs[1])
+    ax[1].plot([0, 10], [sim_mean,sim_mean], linewidth = 3,color = 'plum')
+    ax[1].plot([0, 10], [obs_mean,obs_mean], linewidth = 3,color = 'orange')
+    ax[1].set_xlim(0, his_max*1.2)
+    ax[1].set_xticks([])
+    
+    f.tight_layout()
+    plt.subplots_adjust(wspace=0.01)
+    from matplotlib.ticker import AutoMinorLocator
+    # cbar=f.colorbar(panel2[3],ax=obj)
+    # cbar.ax.tick_params(labelsize=30) 
+    plt.savefig('DeltaMM_TNG300_zs_{0}.png'.format(zs))
+    plt.show()
+    
+    cals = off_int[1]#[(off_int[0]<off_obs[0].max())*(off_int[0]>off_obs[0].min())]
+    print('{0:.2f}, {1:.2f}'.format(np.mean(cals), np.std(cals)))        
                                         
     # #%%Study the slope uncertainty and the relation to the scatter:
     # def slope_scatter_obs(slope):
@@ -336,8 +402,8 @@ for ii in range(1):
     # write_file.write( "{0:.3f} {1:.3f}".format( -sim_mis, sim_scatter )) 
     # write_file.write("\n")
     # write_file.close()
-    if ii%50 == 0:
-        print(ii)
+    # if ii%50 == 0:
+    #     print(ii)
 
                                     
 # #%%Plot ML data
