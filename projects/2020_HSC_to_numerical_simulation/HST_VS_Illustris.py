@@ -68,7 +68,7 @@ Lbol_overall = logLedd_overall + np.log10(Eddington_ratio)
 dMBH, dmag, dMstar, dLbol= 0.4, 0.3, 0.17, 0.1
 #dMBH, dmag, dMstar, dLbol= 0.00004, 0.00003, 0.000017, 0.000003
 
-for ii in range(10):
+for ii in range(1):
     bhmass_overall_noi = bhmass_overall + np.random.normal(0, dMBH, size=bhmass_overall.shape)
     mstar_overall_noi = mstar_overall + np.random.normal(0, dMstar, size=mstar_overall.shape)
     magr_overall_noi = magr_overall + np.random.normal(0, dmag, size=magr_overall.shape)
@@ -307,8 +307,8 @@ for ii in range(10):
     off_sim = sm_sim, bh_sim - (m_ml*sm_sim+b_ml),
     off_obs = sm_obs, bh_obs - (m_ml*sm_obs+b_ml),
     panel2=obj.hist2d(off_int[0], off_int[1],
-                      norm=mpl.colors.LogNorm(), density = True, cmap='summer',bins=50,zorder=-1,
-                          alpha=0.5, cmin = 0.001)# , cmax = 1.1)
+                      norm=mpl.colors.LogNorm(), density = True, cmap='summer',bins=70,zorder=-1,
+                          alpha=0.5)#, cmin = 0.001)# , cmax = 1.1)
     ax[0].scatter(off_sim[0], off_sim[1],
                 c='c',
                 s=420, marker=".",zorder=0, edgecolors='k', alpha = 0.7, label='Illustris sample z={0}'.format(zs))
@@ -327,7 +327,7 @@ for ii in range(10):
     ax[0].tick_params(which='both', width=2, top=True, right=True,direction='in')
     ax[0].tick_params(which='major', length=10)
     ax[0].tick_params(which='minor', length=6)#, color='r’)
-    ax[0].legend(scatterpoints=1,numpoints=1,loc=2,prop={'size':25},ncol=2,handletextpad=0)
+    ax[0].legend(scatterpoints=1,numpoints=1,loc=2,prop={'size':32},ncol=1,handletextpad=0)
     ax[0].xaxis.set_minor_locator(AutoMinorLocator())
     ax[0].yaxis.set_minor_locator(AutoMinorLocator())
     

@@ -313,7 +313,7 @@ for ii in range(1):
                           alpha=0.5, cmin = 0.001)# , cmax = 1.1)
     ax[0].scatter(off_sim[0], off_sim[1],
                 c='steelblue',
-                s=420, marker=".",zorder=0, edgecolors='k', alpha = 0.7, label='TNG100 sample z={0}'.format(zs))
+                s=420, marker=".",zorder=0, edgecolors='k', alpha = 0.7, label='MBII sample z={0}'.format(zs))
     ax[0].scatter(off_obs[0], off_obs[1],
                 c='orange',
                 s=420, marker=".",zorder=1, edgecolors='k', alpha = 0.7, label='HST sample')
@@ -329,7 +329,7 @@ for ii in range(1):
     ax[0].tick_params(which='both', width=2, top=True, right=True,direction='in')
     ax[0].tick_params(which='major', length=10)
     ax[0].tick_params(which='minor', length=6)#, color='r’)
-    ax[0].legend(scatterpoints=1,numpoints=1,loc=2,prop={'size':25},ncol=2,handletextpad=0)
+    ax[0].legend(scatterpoints=1,numpoints=1,loc=2,prop={'size':32},ncol=2,handletextpad=0)
     ax[0].xaxis.set_minor_locator(AutoMinorLocator())
     ax[0].yaxis.set_minor_locator(AutoMinorLocator())
     

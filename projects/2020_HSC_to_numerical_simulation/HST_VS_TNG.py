@@ -323,7 +323,7 @@ for ii in range(1):
     ax[0].tick_params(which='both', width=2, top=True, right=True,direction='in')
     ax[0].tick_params(which='major', length=10)
     ax[0].tick_params(which='minor', length=6)#, color='r’)
-    ax[0].legend(scatterpoints=1,numpoints=1,loc=2,prop={'size':25},ncol=2,handletextpad=0)
+    ax[0].legend(scatterpoints=1,numpoints=1,loc=2,prop={'size':32},ncol=1,handletextpad=0)
     ax[0].xaxis.set_minor_locator(AutoMinorLocator())
     ax[0].yaxis.set_minor_locator(AutoMinorLocator())
     

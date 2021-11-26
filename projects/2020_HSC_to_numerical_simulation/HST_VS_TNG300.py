@@ -317,7 +317,7 @@ for ii in range(1):
     m_ml, b_ml = (0.981139684856507, -2.545890295477823)
     
     off_int = sm_int, bh_int - (m_ml*sm_int+b_ml)
-    off_sim = sm_sim, bh_sim - (m_ml*sm_sim+b_ml),
+    off_sim = sm_sim[:600], bh_sim[:600] - (m_ml*sm_sim[:600]+b_ml),
     off_obs = sm_obs, bh_obs - (m_ml*sm_obs+b_ml),
     panel2=obj.hist2d(off_int[0], off_int[1],
                       norm=mpl.colors.LogNorm(), density = True, cmap='summer',bins=50,zorder=-1,
@@ -340,7 +340,7 @@ for ii in range(1):
     ax[0].tick_params(which='both', width=2, top=True, right=True,direction='in')
     ax[0].tick_params(which='major', length=10)
     ax[0].tick_params(which='minor', length=6)#, color='r’)
-    ax[0].legend(scatterpoints=1,numpoints=1,loc=2,prop={'size':25},ncol=2,handletextpad=0)
+    ax[0].legend(scatterpoints=1,numpoints=1,loc=2,prop={'size':32},ncol=1,handletextpad=0)
     ax[0].xaxis.set_minor_locator(AutoMinorLocator())
     ax[0].yaxis.set_minor_locator(AutoMinorLocator())
     

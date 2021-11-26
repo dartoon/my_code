@@ -22,9 +22,9 @@ from prep_comparison import HSC_set, Horizon_set, comp_plot
 # zs = 0.7   #Actually from z = 1.0 #!!!
 
 # zs, filename=0. ,      'Horizon/outt00761_halo_gal_centralBHs_2reff'
-# zs, filename=0.3,     'Horizon/outt00638_halo_gal_centralBHs_2reff'
+zs, filename=0.3,     'Horizon/outt00638_halo_gal_centralBHs_2reff'
 # zs, filename=0.5,     'Horizon/outt00552_halo_gal_centralBHs_2reff'
-zs, filename=0.7, 'Horizon/outt00439_halo_gal_centralBHs_2reff'
+# zs, filename=0.7, 'Horizon/outt00439_halo_gal_centralBHs_2reff'
 # zs, filename=1. ,     'Horizon/outt00343_halo_gal_centralBHs_2reff'
 # zs, filename=1.5,     'Horizon/outt00266_halo_gal_centralBHs_2reff'
 
@@ -50,11 +50,11 @@ imf = 'Sal'
 if imf == 'Sal':
     detlaM = 0.23
 
-ifplot = False
+ifplot = True
 
     #%%
 
-for ii in range(10):
+for ii in range(1):
     HSC = HSC_set(zs, core = False,imf = imf)
     Horizon = Horizon_set(filename, HSC_Lbol_overall=HSC['HSC_Lbol_overall'], HSC_MBHs_overall=HSC['HSC_MBHs_overall'],
                   zs = zs, I_mag_break = I_mag_break, imf =  imf)
@@ -179,13 +179,13 @@ for ii in range(10):
     ax[0].set_xlabel(r"log(M$_*$/M$_{\odot})$",fontsize=35)
     ax[0].set_ylabel(r"$\Delta$logM$_{\rm BH}$ (vs M$_*$)",fontsize=35)
     ax[0].set_xlim(9,12.5)
-    ax[0].set_ylim(-2., 2.0)
+    ax[0].set_ylim(-1.5, 2.4)
     ax[0].grid(linestyle='--')
     ax[0].tick_params(labelsize=25)
     ax[0].tick_params(which='both', width=2, top=True, right=True,direction='in')
     ax[0].tick_params(which='major', length=10)
     ax[0].tick_params(which='minor', length=6)#, color='r’)
-    ax[0].legend(scatterpoints=1,numpoints=1,loc=2,prop={'size':25},ncol=2,handletextpad=0)
+    ax[0].legend(scatterpoints=1,numpoints=1,loc=2,prop={'size':32},ncol=1,handletextpad=0)
     ax[0].xaxis.set_minor_locator(AutoMinorLocator())
     ax[0].yaxis.set_minor_locator(AutoMinorLocator())
     
@@ -247,26 +247,26 @@ for ii in range(10):
     else:
         plt.close()
 
-    sim_offset_nosl = Horizon_scatter_nosl 
-    sim_offset = Horizon_scatter
-    obs_offset = HSC_scatter
-    rfilename = 'offset_result/' + 'Horizon_zs{0}.txt'.format(zs)
-    if_file = glob.glob(rfilename)
-    if ii == 0:
-        write_file =  open(rfilename,'w') 
-    for i in range(max(len(sim_offset), len(obs_offset))):
-        try:
-            write_file.write('{0} {1} {2} {3} {4} {5} {6}'.format(sim_offset_nosl[i], sim_offset[i], obs_offset[i], 
-                                                                  Horizon['Stellar_Mass_nois_sl'][i], Horizon['BH_Mass_nois_sl'][i], HSC['HSC_Mstar'][i], HSC['HSC_MBHs'][i] ))
-        except:
-            try:
-                write_file.write('{0} {1} -99 {2} {3} -99 -99'.format(sim_offset_nosl[i], sim_offset[i], Horizon['Stellar_Mass_nois_sl'][i], Horizon['BH_Mass_nois_sl'][i]))
-            except:            
-                write_file.write('{0} -99 {1} -99 -99 {2} {3}'.format(sim_offset_nosl[i], obs_offset[i],HSC['HSC_Mstar'][i], HSC['HSC_MBHs'][i]))
-        write_file.write("\n")
-    # from scipy import stats
-    sim_scatter_std = np.std(Horizon_scatter)
-    obs_scatter_std = np.std(HSC_scatter)
-    if ii%50 == 0:
-        print(ii)    
+    # sim_offset_nosl = Horizon_scatter_nosl 
+    # sim_offset = Horizon_scatter
+    # obs_offset = HSC_scatter
+    # rfilename = 'offset_result/' + 'Horizon_zs{0}.txt'.format(zs)
+    # if_file = glob.glob(rfilename)
+    # if ii == 0:
+    #     write_file =  open(rfilename,'w') 
+    # for i in range(max(len(sim_offset), len(obs_offset))):
+    #     try:
+    #         write_file.write('{0} {1} {2} {3} {4} {5} {6}'.format(sim_offset_nosl[i], sim_offset[i], obs_offset[i], 
+    #                                                               Horizon['Stellar_Mass_nois_sl'][i], Horizon['BH_Mass_nois_sl'][i], HSC['HSC_Mstar'][i], HSC['HSC_MBHs'][i] ))
+    #     except:
+    #         try:
+    #             write_file.write('{0} {1} -99 {2} {3} -99 -99'.format(sim_offset_nosl[i], sim_offset[i], Horizon['Stellar_Mass_nois_sl'][i], Horizon['BH_Mass_nois_sl'][i]))
+    #         except:            
+    #             write_file.write('{0} -99 {1} -99 -99 {2} {3}'.format(sim_offset_nosl[i], obs_offset[i],HSC['HSC_Mstar'][i], HSC['HSC_MBHs'][i]))
+    #     write_file.write("\n")
+    # # from scipy import stats
+    # sim_scatter_std = np.std(Horizon_scatter)
+    # obs_scatter_std = np.std(HSC_scatter)
+    # if ii%50 == 0:
+    #     print(ii)    
 # write_file.close()

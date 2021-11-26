@@ -11,6 +11,8 @@ import matplotlib.pyplot as plt
 import astropy.io.fits as pyfits
 import glob
 import scipy.stats as st
+import matplotlib as mat
+mat.rcParams['font.family'] = 'STIXGeneral'
 
 #%%
 from prep_comparison import HSC_set, comp_plot
@@ -18,7 +20,7 @@ from prep_comparison import TNG_set as MBII_set
 
 filenames = glob.glob('MBII_data/*.npy') 
 filenames.sort()
-idx = 1
+idx = 2
 filename = filenames[idx]
 zs = float(filename.split("_z")[1][:4])
 
@@ -102,83 +104,88 @@ for ii in range(1):
     else:
         plt.close()
     
-    #%% Plot the selection
-    fig, ax = plt.subplots(figsize=(11,9))
-    from prep_comparison import quasar_filter
-    # plt.scatter( MBII['BH_Mass_nois'], MBII['logLbol_nois'],
-    #           color = 'steelblue', edgecolors=None, alpha = 0.2)
-    import matplotlib as mpl
-    BH_overall, logLbol_overall = MBII['BH_Mass_nois'][MBII['logLbol_nois']>0], MBII['logLbol_nois'][MBII['logLbol_nois']>0]
-    plt.hist2d(BH_overall, logLbol_overall,norm=mpl.colors.LogNorm(),
-                cmap='summer',bins=50,zorder=0,alpha=0.5)
-    cbar = plt.colorbar()
-    cbar.ax.tick_params(labelsize=30) 
-    type1_bools = quasar_filter([logLbol_overall, BH_overall], HSC['HSC_Lbol_overall'], HSC['HSC_MBHs_overall'])
-    plt.scatter(BH_overall[type1_bools][:500], logLbol_overall[type1_bools][:500], 
-                color = 'steelblue',edgecolors='black',alpha=0.8, zorder = 1, label= 'selected MBII sample')
-    plt.scatter( HSC['HSC_MBHs_overall'], HSC['HSC_Lbol_overall'], c='orange', 
-                edgecolors='gray', alpha=0.8,zorder = 0.5, label= 'HSC observed sample')
-    plt.xlabel(r'log(M$_{\rm BH}$/M$_{\odot}$)',fontsize=30)
-    plt.ylabel(r'log(L$_{\rm bol}$)', fontsize=30)
-    plt.ylim(40, 48)
-    plt.xlim(5.8,10)
-    plt.tick_params(labelsize=25)
-    from matplotlib.ticker import AutoMinorLocator
-    ax.xaxis.set_minor_locator(AutoMinorLocator())
-    plt.tick_params(which='both', width=2, top=True, right=True,direction='in')
-    plt.tick_params(which='major', length=12)
-    plt.tick_params(which='minor', length=6)#, color='gray')
-    plt.legend(loc='lower right',fontsize=21,numpoints=1)
-    plt.savefig('HSC_selection_MBII.png')
-    if ifplot == True:
-        plt.show()
-    else:
-        plt.close()
-        
-    # #%% Test to see if use the HST selection window
+    # from prep_comparison import quasar_filter
+    # import matplotlib as mpl
+    # from matplotlib.ticker import AutoMinorLocator
+    # #%% Plot the selection
     # fig, ax = plt.subplots(figsize=(11,9))
+    # # plt.scatter( MBII['BH_Mass_nois'], MBII['logLbol_nois'],
+    # #           color = 'steelblue', edgecolors=None, alpha = 0.2)
     # BH_overall, logLbol_overall = MBII['BH_Mass_nois'][MBII['logLbol_nois']>0], MBII['logLbol_nois'][MBII['logLbol_nois']>0]
-    # plt.hist2d(BH_overall, logLbol_overall - (38. + np.log10(1.2) + BH_overall),
-    #            norm=mpl.colors.LogNorm(),
+    # plt.hist2d(BH_overall, logLbol_overall,norm=mpl.colors.LogNorm(),
     #             cmap='summer',bins=50,zorder=0,alpha=0.5)
     # cbar = plt.colorbar()
     # cbar.ax.tick_params(labelsize=30) 
-    # # type1_bools = quasar_filter([logLbol_overall, BH_overall], HSC['HSC_Lbol_overall'], HSC['HSC_MBHs_overall'])
-    # plt.scatter(BH_overall[type1_bools][:500], logLbol_overall[type1_bools][:500] - (38. + np.log10(1.2) + BH_overall[type1_bools][:500]), 
+    # type1_bools = quasar_filter([logLbol_overall, BH_overall], HSC['HSC_Lbol_overall'], HSC['HSC_MBHs_overall'])
+    # plt.scatter(BH_overall[type1_bools][:500], logLbol_overall[type1_bools][:500], 
     #             color = 'steelblue',edgecolors='black',alpha=0.8, zorder = 1, label= 'selected MBII sample')
-    # plt.scatter(HSC['HSC_MBHs_overall'], HSC['HSC_Lbol_overall'] - (38. + np.log10(1.2) + HSC['HSC_MBHs_overall']),
-    #             c='orange', 
+    # plt.scatter( HSC['HSC_MBHs_overall'], HSC['HSC_Lbol_overall'], c='orange', 
     #             edgecolors='gray', alpha=0.8,zorder = 0.5, label= 'HSC observed sample')
-    # xspace = np.linspace(6,10)
-    # plt.plot(xspace, 0*xspace,'k--',linewidth=2)
-    # plt.plot(xspace, 0*xspace-1.5,'k--',linewidth=2)
-    # y_line3 = -1.1*(xspace-7.5) -0.5
-    # plt.plot(xspace, y_line3,'k--',linewidth=2)
-    # yspace = np.linspace(-5,2)
-    # plt.plot(yspace*0+7.7, yspace,'k--',linewidth=2)
-    # plt.plot(xspace*0+8.6, yspace,'k--',linewidth=2)
-    # xfill = np.linspace(7.7, 8.6)
-    # yfill_sline = -1.1*(xfill-7.5) -0.5
-    # y_sline1 = xfill*0
-    # y_sline2 = xfill*0-1.5
-    # y4 = np.maximum(yfill_sline, y_sline2)
-    # plt.fill_between(xfill, y4, y2=0, color='steelblue', alpha=0.5, zorder=10)
-    # plt.tick_params(labelsize=30)
     # plt.xlabel(r'log(M$_{\rm BH}$/M$_{\odot}$)',fontsize=30)
-    # plt.ylabel(r'log(L$_{\rm bol}$/L$_{\rm Edd}$)', fontsize=30)
-    # plt.ylim(-3.0, 1)
+    # plt.ylabel(r'log(L$_{\rm bol}$)', fontsize=30)
+    # plt.ylim(40, 48)
     # plt.xlim(5.8,10)
     # plt.tick_params(labelsize=25)
     # ax.xaxis.set_minor_locator(AutoMinorLocator())
     # plt.tick_params(which='both', width=2, top=True, right=True,direction='in')
     # plt.tick_params(which='major', length=12)
     # plt.tick_params(which='minor', length=6)#, color='gray')
-    # plt.legend(loc='upper right',fontsize=21,numpoints=1)
-    # # plt.savefig('HSC_selection_MBII.png')
+    # plt.legend(loc='lower right',fontsize=21,numpoints=1)
+    # plt.savefig('HSC_selection_MBII.png')
     # if ifplot == True:
     #     plt.show()
     # else:
     #     plt.close()
+        
+    #%% Test to see if use the HST selection window
+    from prep_comparison import quasar_filter
+    import matplotlib as mpl
+    from matplotlib.ticker import AutoMinorLocator
+    fig, ax = plt.subplots(figsize=(11,9))
+    BH_overall, logLbol_overall = MBII['BH_Mass_nois'][MBII['logLbol_nois']>0], MBII['logLbol_nois'][MBII['logLbol_nois']>0]
+    plt.hist2d(BH_overall, logLbol_overall - (38. + np.log10(1.2) + BH_overall),
+                norm=mpl.colors.LogNorm(),
+                cmap='summer',bins=50,zorder=0,alpha=0.5)
+    cbar = plt.colorbar()
+    cbar.ax.tick_params(labelsize=30) 
+    type1_bools = quasar_filter([logLbol_overall, BH_overall], HSC['HSC_Lbol_overall'], HSC['HSC_MBHs_overall'])
+    plt.scatter(BH_overall[type1_bools][:500], logLbol_overall[type1_bools][:500] - (38. + np.log10(1.2) + BH_overall[type1_bools][:500]), 
+                color = 'steelblue',edgecolors='black',alpha=0.8, zorder = 1, label= 'selected MBII sample')
+    plt.scatter(HSC['HSC_MBHs_overall'], HSC['HSC_Lbol_overall'] - (38. + np.log10(1.2) + HSC['HSC_MBHs_overall']),
+                c='orange', 
+                edgecolors='gray', alpha=0.8,zorder = 0.5, label= 'HSC observed sample')
+    xspace = np.linspace(5,10)
+    plt.plot(xspace, 0*xspace,'k--',linewidth=1)
+    plt.plot(xspace, 0*xspace-1.5,'k--',linewidth=1)
+    y_line3 = -1.1*(xspace-7.5) -0.5
+    plt.plot(xspace, y_line3,'k--',linewidth=1)
+    yspace = np.linspace(-5,2)
+    plt.plot(yspace*0+7.7, yspace,'k--',linewidth=1)
+    plt.plot(xspace*0+8.6, yspace,'k--',linewidth=1)
+    xfill = np.linspace(7.7, 8.6)
+    yfill_sline = -1.1*(xfill-7.5) -0.5
+    y_sline1 = xfill*0
+    y_sline2 = xfill*0-1.5
+    y4 = np.maximum(yfill_sline, y_sline2)
+    plt.fill_between(xfill, y4, y2=0, color='steelblue', alpha=0.5, zorder=10)
+    plt.tick_params(labelsize=30)
+    plt.xlabel(r'log(M$_{\rm BH}$/M$_{\odot}$)',fontsize=30)
+    plt.ylabel(r'log(L$_{\rm bol}$/L$_{\rm Edd}$)', fontsize=30)
+    plt.ylim(-3.0, 1)
+    plt.xlim(5.8,10)
+    plt.tick_params(labelsize=25)
+    ax.xaxis.set_minor_locator(AutoMinorLocator())
+    plt.tick_params(which='both', width=2, top=True, right=True,direction='in')
+    plt.tick_params(which='major', length=12)
+    plt.tick_params(which='minor', length=6)#, color='gray')
+    plt.legend(loc='upper right',fontsize=21,numpoints=1)
+    plt.savefig('HSC_selection_MBII.png')
+    if ifplot == True:
+        plt.show()
+    else:
+        plt.close()
+        
+        
     # HSC['Eddratio'] = HSC['HSC_Lbol'] - (38. + np.log10(1.2) + HSC['HSC_MBHs'])
     # ###HSC selection:
     # HSC_bool = (HSC['HSC_MBHs']>xfill.min()) *  (HSC['HSC_MBHs']<xfill.max()) * (HSC['Eddratio']<0) * (HSC['Eddratio'] > -1.1*(HSC['HSC_MBHs']-7.5) -0.5) * (HSC['HSC_ps_mag']<I_mag_break)
@@ -189,7 +196,6 @@ for ii in range(1):
     # MBII_['Mstar'] = MBII_['Mstar'][type1_bools]
     # MBII_bool = (MBII_['MBHs']>xfill.min()) *  (MBII_['MBHs']<xfill.max()) * (MBII_['Eddratio']<0) * (MBII_['Eddratio'] > -1.1*(MBII_['MBHs']-7.5) -0.5)
     # f,ax=plt.subplots(1,1,figsize=(14,12))   
-
     # obj=ax
     # panel2=obj.hist2d(MBII['Stellar_Mass'], MBII['BH_Mass'],
     #                   norm=mpl.colors.LogNorm(), density = True, cmap='summer',bins=50,zorder=-1,
@@ -291,7 +297,7 @@ for ii in range(1):
     ax[0].tick_params(which='both', width=2, top=True, right=True,direction='in')
     ax[0].tick_params(which='major', length=10)
     ax[0].tick_params(which='minor', length=6)#, color='r’)
-    ax[0].legend(scatterpoints=1,numpoints=1,loc=2,prop={'size':25},ncol=2,handletextpad=0)
+    ax[0].legend(scatterpoints=1,numpoints=1,loc=2,prop={'size':32},ncol=2,handletextpad=0)
     ax[0].xaxis.set_minor_locator(AutoMinorLocator())
     ax[0].yaxis.set_minor_locator(AutoMinorLocator())
     

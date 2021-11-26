@@ -11,6 +11,8 @@ import matplotlib.pyplot as plt
 import astropy.io.fits as pyfits
 import glob
 import scipy.stats as st
+import matplotlib as mat
+mat.rcParams['font.family'] = 'STIXGeneral'
 
 #%%
 from prep_comparison import HSC_set, comp_plot
@@ -18,7 +20,7 @@ from prep_comparison import TNG_set as TNG300_set
 
 filenames = glob.glob('TNG300_data/*.npy') 
 filenames.sort()
-idx = 2
+idx = 0
 filename = filenames[idx]
 zs = float(filename.split("_z")[1][:4])
 
@@ -161,7 +163,7 @@ sm_sim, bh_sim = TNG300['Stellar_Mass_nois_sl'], TNG300['BH_Mass_nois_sl']
 sm_obs, bh_obs = HSC['HSC_Mstar'][HSC['HSC_ps_mag']<I_mag_break], HSC['HSC_MBHs'][HSC['HSC_ps_mag']<I_mag_break]
 
 off_int = sm_int, bh_int - (m_ml*sm_int+b_ml)
-off_sim = sm_sim, bh_sim - (m_ml*sm_sim+b_ml),
+off_sim = sm_sim[:600], bh_sim[:600] - (m_ml*sm_sim[:600]+b_ml),
 off_obs = sm_obs, bh_obs - (m_ml*sm_obs+b_ml),
 panel2=obj.hist2d(off_int[0], off_int[1],
                   norm=mpl.colors.LogNorm(), density = True, cmap='summer',bins=50,zorder=-1,
@@ -184,7 +186,7 @@ ax[0].tick_params(labelsize=25)
 ax[0].tick_params(which='both', width=2, top=True, right=True,direction='in')
 ax[0].tick_params(which='major', length=10)
 ax[0].tick_params(which='minor', length=6)#, color='r’)
-ax[0].legend(scatterpoints=1,numpoints=1,loc=2,prop={'size':25},ncol=2,handletextpad=0)
+ax[0].legend(scatterpoints=1,numpoints=1,loc=2,prop={'size':32},ncol=1,handletextpad=0)
 ax[0].xaxis.set_minor_locator(AutoMinorLocator())
 ax[0].yaxis.set_minor_locator(AutoMinorLocator())
 
