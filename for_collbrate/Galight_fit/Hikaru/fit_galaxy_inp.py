@@ -33,13 +33,15 @@ else:
     
 #%%Some settings for the fitting
 fitting_level='deep' #shallow, deep
-bands = 'I'  #Band that will be download
+bands = 'GRIZY'  #Band that will be download
 lband = 'I' #The band fitting first and can also fit n and Re for other band.
 fix_n, fix_re = False, False
 
-
+import sys
+index = int(sys.argv[1])
+print("Which index:", index)
 # for i_ in range(0, len(ID_list)): 
-for i_ in [0]:
+for i_ in [index-1]:
     object_id,ra,dec= '{0}_'.format(i_)+str(ID_list[i_]), RA_list[i_], Dec_list[i_]
     print(object_id)
     #%%Mkdir folder and start downloading
