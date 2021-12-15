@@ -1,14 +1,18 @@
 #!/bin/bash
-#PBS -N demo_array
+#PBS -N run_galight_DOGs
 #PBS -o /home/xuheng.ding/Astro/my_code/for_collbrate/Galight_fit/Hikaru/pbs/
 #PBS -e /home/xuheng.ding/Astro/my_code/for_collbrate/Galight_fit/Hikaru/pbs/
 #PBS -l nodes=1:ppn=1
 #PBS -l walltime=00:50:00
 #PBS -l mem=100mb
-#PBS -t 1-29%29
+#PBS -t 0-28%28
 #PBS -u xuheng.ding
+#PBS -M xuheng.ding@ipmu.jp
 #PBS -m ae
 #PBS -V
+
+source ~/.bashrc
+conda activate astroconda
 
 cd /home/xuheng.ding/Astro/my_code/for_collbrate/Galight_fit/Hikaru
 python3 fit_galaxy_inp.py ${PBS_ARRAYID}

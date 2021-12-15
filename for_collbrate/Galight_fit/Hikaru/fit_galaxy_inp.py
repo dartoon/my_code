@@ -41,7 +41,7 @@ import sys
 index = int(sys.argv[1])
 print("Which index:", index)
 # for i_ in range(0, len(ID_list)): 
-for i_ in [index-1]:
+for i_ in [index]:
     object_id,ra,dec= '{0}_'.format(i_)+str(ID_list[i_]), RA_list[i_], Dec_list[i_]
     print(object_id)
     #%%Mkdir folder and start downloading
