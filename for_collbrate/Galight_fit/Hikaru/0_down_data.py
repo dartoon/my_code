@@ -42,7 +42,7 @@ for i_ in range(0, len(ID_list)):
     object_id,ra,dec= '{0}_'.format(i_)+str(ID_list[i_]), RA_list[i_], Dec_list[i_]
     print(object_id)
     #%%Mkdir folder and start downloading
-    out_dir='./' + qso_type + object_id
+    out_dir='./' + qso_type +'/' + object_id
     if not os.path.exists(out_dir):
         os.makedirs(out_dir)
     if glob.glob(out_dir+'/*psf*fits') == []:
