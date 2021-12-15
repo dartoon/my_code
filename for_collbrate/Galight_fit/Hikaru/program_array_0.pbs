@@ -5,16 +5,14 @@
 #PBS -l nodes=1:ppn=1
 #PBS -l walltime=00:50:00
 #PBS -l mem=100mb
-#PBS -t 0-28%28
+#PBS -J 0-28:29
 #PBS -u xuheng.ding
-#PBS -M xuheng.ding@ipmu.jp
 #PBS -m ae
 #PBS -V
+#PBS -q tiny
 
 source ~/.bashrc
 conda activate astroconda
 
 cd /home/xuheng.ding/Astro/my_code/for_collbrate/Galight_fit/Hikaru
-python3 fit_galaxy_inp.py ${PBS_ARRAYID}
-	
-
+python 1_fit_galaxy_inp.py $PBS_ARRAY_INDEX 0
