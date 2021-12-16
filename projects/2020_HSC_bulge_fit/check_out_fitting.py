@@ -19,17 +19,18 @@ from galight.tools.plot_tools import profile_plots
 import lenstronomy.Util.param_util as param_util
 
 fitsFile_ = glob.glob('SDSS_0.2-0.3/*_HSC-I.fits')
+fitsFile_.sort()
 # NO = 
 # for NO in range(1):
 # for NO in range(21,42):
 # for NO in range(42,63):
 # for NO in range(55):    
 # for NO in range(len(fitsFile_)): 
-for NO in [13]:    
+for NO in [38]:    
     fitsFile  = fitsFile_[NO]
     ID = fitsFile.split('/')[1].split('_')[0]
     PSF_filename = fitsFile.split('.fits')[0]+ '_psf.fits'
-    save_name = 'fit_result_202110/' + fitsFile.split('.fits')[0].split('/')[1]
+    save_name = 'fit_result/' + fitsFile.split('.fits')[0].split('/')[1]
     ## Test load pkl
     
     picklename = save_name+'single_Sersic.pkl'
@@ -56,14 +57,15 @@ for NO in [13]:
 
         print(ID+"Single Sersic fit:")
         fitting_run_class_0.plot_final_qso_fit(target_ID =  ID)
+        AGN = fitting_run_class_0.image_ps_list[0]
 
         #%%Disk+bulge
         print(ID+"Disk + Bulge fit:")    
-        fitting_run_class_1.plot_final_qso_fit(target_ID =  ID)
+        fitting_run_class_1.plot_final_galaxy_fit(target_ID =  ID)
         disk1 = fitting_run_class_1.image_host_list[0]
         bulge1 = fitting_run_class_1.image_host_list[1]
         B2T = np.sum(bulge1)/np.sum(bulge1+disk1)
-        AGN1 = fitting_run_class_1.image_ps_list[0]
+        AGN1 = fitting_run_class_0.image_ps_list[0]
         bulge_Re1 = fitting_run_class_1.final_result_galaxy[0]['R_sersic']
         disk_Re1 = fitting_run_class_1.final_result_galaxy[1]['R_sersic']
         flux_list_2d = [disk1, bulge1, AGN1]
@@ -77,11 +79,11 @@ for NO in [13]:
 
         #%%bar+bulge
         print(ID+"Disk + Bar fit:")    
-        fitting_run_class_1b.plot_final_qso_fit(target_ID =  ID)
+        fitting_run_class_1b.plot_final_galaxy_fit(target_ID =  ID)
         disk1b = fitting_run_class_1b.image_host_list[0]
         bar1b = fitting_run_class_1b.image_host_list[1]
         # B2T = np.sum(bulge1)/np.sum(bulge1+disk1)
-        AGN1v = fitting_run_class_1.image_ps_list[0]
+        AGN1 = fitting_run_class_0.image_ps_list[0]
         # bar_Re1 = fitting_run_class_1.final_result_galaxy[0]['R_sersic']
         # disk_Re1 = fitting_run_class_1.final_result_galaxy[1]['R_sersic']
         flux_list_2d = [disk1b, bar1b, AGN1]
@@ -96,12 +98,12 @@ for NO in [13]:
 
         #%%Disk+bulge+bar
         print("Fitting as Bar + Bulge + Disk")  
-        fitting_run_class_2.plot_final_qso_fit(target_ID =  ID)
+        fitting_run_class_2.plot_final_galaxy_fit(target_ID =  ID)
         disk2 = fitting_run_class_2.image_host_list[0]
         bulge2 = fitting_run_class_2.image_host_list[1]
         bar2 = fitting_run_class_2.image_host_list[2]
         B2T = np.sum(bulge2)/np.sum(bulge2+disk2+bar2)
-        AGN2 = fitting_run_class_2.image_ps_list[0]
+        AGN2 = fitting_run_class_0.image_ps_list[0]
         disk_Re2 = fitting_run_class_2.final_result_galaxy[0]['R_sersic']
         bulge_Re2 = fitting_run_class_2.final_result_galaxy[1]['R_sersic']
         bar_Re2 = fitting_run_class_2.final_result_galaxy[2]['R_sersic']

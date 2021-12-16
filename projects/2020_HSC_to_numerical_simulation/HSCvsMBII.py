@@ -20,7 +20,7 @@ from prep_comparison import TNG_set as MBII_set
 
 filenames = glob.glob('MBII_data/*.npy') 
 filenames.sort()
-idx = 2
+idx = 1
 filename = filenames[idx]
 zs = float(filename.split("_z")[1][:4])
 
@@ -32,7 +32,7 @@ if imf == 'Sal':
     detlaM = 0.23
     
 #%%
-HSC = HSC_set(zs, core = False,imf = imf)
+HSC = HSC_set(zs, core = True,imf = imf)
 if zs <= 0.5:
     # HSC_Mstar = HSC_Mstar_overall[HSC_z<0.5]
     # HSC_MBHs = HSC_MBHs_overall[HSC_z<0.5]
@@ -142,18 +142,24 @@ for ii in range(1):
     import matplotlib as mpl
     from matplotlib.ticker import AutoMinorLocator
     fig, ax = plt.subplots(figsize=(11,9))
-    BH_overall, logLbol_overall = MBII['BH_Mass_nois'][MBII['logLbol_nois']>0], MBII['logLbol_nois'][MBII['logLbol_nois']>0]
+    BH_overall, logLbol_overall = MBII['BH_Mass'][MBII['logLbol']>0], MBII['logLbol'][MBII['logLbol']>0]
     plt.hist2d(BH_overall, logLbol_overall - (38. + np.log10(1.2) + BH_overall),
                 norm=mpl.colors.LogNorm(),
                 cmap='summer',bins=50,zorder=0,alpha=0.5)
     cbar = plt.colorbar()
     cbar.ax.tick_params(labelsize=30) 
-    type1_bools = quasar_filter([logLbol_overall, BH_overall], HSC['HSC_Lbol_overall'], HSC['HSC_MBHs_overall'])
-    plt.scatter(BH_overall[type1_bools][:500], logLbol_overall[type1_bools][:500] - (38. + np.log10(1.2) + BH_overall[type1_bools][:500]), 
+    # type1_bools = quasar_filter([logLbol_overall, BH_overall], HSC['HSC_Lbol_overall'], HSC['HSC_MBHs_overall'])
+    # plt.scatter(BH_overall[type1_bools][:500], logLbol_overall[type1_bools][:500] - (38. + np.log10(1.2) + BH_overall[type1_bools][:500]), 
+    #             color = 'steelblue',edgecolors='black',alpha=0.8, zorder = 1, label= 'selected MBII sample')
+    # plt.scatter(HSC['HSC_MBHs_overall'], HSC['HSC_Lbol_overall'] - (38. + np.log10(1.2) + HSC['HSC_MBHs_overall']),
+    #             c='orange', 
+    #             edgecolors='gray', alpha=0.8,zorder = 0.5, label= 'HSC observed sample')
+    plt.scatter(MBII['BH_Mass_nois_sl'], MBII['logLbol_nois_sl'] - (38. + np.log10(1.2) + MBII['BH_Mass_nois_sl']), 
                 color = 'steelblue',edgecolors='black',alpha=0.8, zorder = 1, label= 'selected MBII sample')
-    plt.scatter(HSC['HSC_MBHs_overall'], HSC['HSC_Lbol_overall'] - (38. + np.log10(1.2) + HSC['HSC_MBHs_overall']),
+    plt.scatter(HSC['HSC_MBHs'], HSC['HSC_Lbol'] - (38. + np.log10(1.2) + HSC['HSC_MBHs']),
                 c='orange', 
                 edgecolors='gray', alpha=0.8,zorder = 0.5, label= 'HSC observed sample')
+    
     xspace = np.linspace(5,10)
     plt.plot(xspace, 0*xspace,'k--',linewidth=1)
     plt.plot(xspace, 0*xspace-1.5,'k--',linewidth=1)
@@ -173,7 +179,7 @@ for ii in range(1):
     plt.ylabel(r'log(L$_{\rm bol}$/L$_{\rm Edd}$)', fontsize=30)
     plt.ylim(-3.0, 1)
     plt.xlim(5.8,10)
-    plt.tick_params(labelsize=25)
+    plt.tick_params(labelsize=30)
     ax.xaxis.set_minor_locator(AutoMinorLocator())
     plt.tick_params(which='both', width=2, top=True, right=True,direction='in')
     plt.tick_params(which='major', length=12)
@@ -184,7 +190,6 @@ for ii in range(1):
         plt.show()
     else:
         plt.close()
-        
         
     # HSC['Eddratio'] = HSC['HSC_Lbol'] - (38. + np.log10(1.2) + HSC['HSC_MBHs'])
     # ###HSC selection:
@@ -234,14 +239,24 @@ for ii in range(1):
     panel2=obj.hist2d(MBII['Stellar_Mass'], MBII['BH_Mass'],
                       norm=mpl.colors.LogNorm(), density = True, cmap='summer',bins=50,zorder=-1,
                       alpha=0.5, cmin = 0.001)
-    
+    # import seaborn as sns
+    # # sns.kdeplot(MBII['Stellar_Mass'], MBII['BH_Mass'])
+    # sns.kdeplot(MBII['Stellar_Mass_nois_sl'], MBII['BH_Mass_nois_sl'], linewidths = 3)
+    # sns.kdeplot(HSC['HSC_Mstar'][HSC['HSC_ps_mag']<I_mag_break],HSC['HSC_MBHs'][HSC['HSC_ps_mag']<I_mag_break],
+    #             linewidths = 3)
+                # hist_kws={"histtype": "step", "linewidth": 13, "alpha": 1, "color": "g"})
+
+    s, alpha = 420, 0.7
+    if zs == 0.3:
+        s = 620
+        alpha = 0.9    
+
     plt.scatter(MBII['Stellar_Mass_nois_sl'], MBII['BH_Mass_nois_sl'],c='steelblue',
                 s=420, marker=".",zorder=0, edgecolors='k', alpha = 0.7, label='MBII sample z={0}'.format(zs))
     # plt.scatter(HSC['HSC_Mstar'],HSC['HSC_MBHs'],c='orange',
     #             s=220, marker=".",zorder=-1, edgecolors='k', alpha = 0.7, label='HSC sample')
     plt.scatter(HSC['HSC_Mstar'][HSC['HSC_ps_mag']<I_mag_break],HSC['HSC_MBHs'][HSC['HSC_ps_mag']<I_mag_break],c='orange',
-                s=420, marker=".",zorder=-1, edgecolors='k', alpha = 0.7, label='HSC sample')
-    
+                s=s, marker=".",zorder=1, edgecolors='k', alpha = alpha, label='HSC sample')
     xl = np.linspace(5, 13, 100)
     m_ml, b_ml = (0.981139684856507, -2.545890295477823)
     plt.plot(xl+detlaM, m_ml*xl+b_ml, color="k", linewidth=4.0,zorder=-0.5)
@@ -261,7 +276,7 @@ for ii in range(1):
     ax.yaxis.set_minor_locator(AutoMinorLocator())
     cbar=f.colorbar(panel2[3],ax=obj, ticks=[])
     cbar.ax.tick_params(labelsize=30) 
-    # plt.savefig('MM_MBII_zs_{0}.png'.format(zs))
+    plt.savefig('MM_MBII_zs_{0}.png'.format(zs))
     plt.show()    
 
     #%%Plot offset        
@@ -276,6 +291,38 @@ for ii in range(1):
     off_int = sm_int, bh_int - (m_ml*sm_int+b_ml)
     off_sim = sm_sim, bh_sim - (m_ml*sm_sim+b_ml),
     off_obs = sm_obs, bh_obs - (m_ml*sm_obs+b_ml),
+    
+    s, alpha = 420, 0.7
+    cal_M_range = np.arange(9.5, 12.1, 0.3)
+    if zs == 0.3:
+        cal_M_range = cal_M_range[1:]
+        cal_M_range[0] = 9.5
+        s = 620
+        alpha = 0.9
+    obs_scatter, sim_scatter = [], []
+    for i in range(len(cal_M_range)-1):
+        s_bool = (sm_obs>cal_M_range[i])*(sm_obs<cal_M_range[i+1])
+        cal_HSC_Mstar = sm_obs[s_bool]
+        cal_HSC_MBHs = bh_obs[s_bool]
+        obs_res = cal_HSC_MBHs-(m_ml*cal_HSC_Mstar+b_ml)
+        obs_scatter.append( [np.mean(obs_res), np.std(obs_res)] )
+        s_bool = (sm_sim>cal_M_range[i])*(sm_sim<cal_M_range[i+1])
+        cal_HSC_Mstar = sm_sim[s_bool]
+        cal_HSC_MBHs = bh_sim[s_bool]
+        obs_res = cal_HSC_MBHs-(m_ml*cal_HSC_Mstar+b_ml)
+        sim_scatter.append( [np.mean(obs_res), np.std(obs_res)] )
+    obs_scatter = np.array(obs_scatter)
+    sim_scatter = np.array(sim_scatter)
+    ax[0].errorbar(cal_M_range[:-1]+ (cal_M_range[1]-cal_M_range[0])/2, obs_scatter[:,0], obs_scatter[:,1], color = 'black', 
+          zorder = 10, linewidth = 3, linestyle= '-',fmt='o', alpha = 0.9)
+    ax[0].scatter(cal_M_range[:-1]+ (cal_M_range[1]-cal_M_range[0])/2, obs_scatter[:,0], s = 300, color = 'orange', marker = 's',
+                  edgecolor = 'black', linewidth=3, zorder = 11)
+    ax[0].errorbar(cal_M_range[:-1]+ (cal_M_range[1]-cal_M_range[0])/2+0.05, sim_scatter[:,0], sim_scatter[:,1], color = 'black', 
+          zorder = 10, linewidth = 3, linestyle= '-',fmt='o', alpha = 0.9)
+    ax[0].scatter(cal_M_range[:-1]+ (cal_M_range[1]-cal_M_range[0])/2+0.05, sim_scatter[:,0], s = 300, color = 'steelblue', marker = 's',
+                  edgecolor = 'black', linewidth=3, zorder = 11)    
+    ax[0].plot(np.linspace(7, 13, 100), np.linspace(7, 13, 100) *0, 'k', zorder = 1, linewidth = 3 )
+    
     panel2=obj.hist2d(off_int[0], off_int[1],
                       norm=mpl.colors.LogNorm(), density = True, cmap='summer',bins=50,zorder=-1,
                           alpha=0.5, cmin = 0.001)# , cmax = 1.1)
@@ -284,7 +331,8 @@ for ii in range(1):
                 s=420, marker=".",zorder=0, edgecolors='k', alpha = 0.7, label='MBII sample z={0}'.format(zs))
     ax[0].scatter(off_obs[0], off_obs[1],
                 c='orange',
-                s=420, marker=".",zorder=-1, edgecolors='k', alpha = 0.7, label='HSC sample')
+                s=s, marker=".",zorder=1, edgecolors='k', alpha = alpha, label='HSC sample')
+    
     # xl = np.linspace(5, 13, 100)
     # plt.plot(xl, m_ml*xl+b_ml, color="k", linewidth=4.0,zorder=-0.5)
     # plt.title(r"M$_{\rm BH}-$M$_*$ relation",fontsize=35)
@@ -316,6 +364,7 @@ for ii in range(1):
     ax[1].set_xlim(0, his_max*1.2)
     ax[1].set_xticks([])
     
+    
     f.tight_layout()
     plt.subplots_adjust(wspace=0.01)
     # from matplotlib.ticker import AutoMinorLocator
@@ -324,8 +373,8 @@ for ii in range(1):
     plt.savefig('DeltaMM_MBII_zs_{0}.png'.format(zs))
     plt.show()
     
-    cals = off_int[1]#[(off_int[0]<off_obs[0].max())*(off_int[0]>off_obs[0].min())]
-    print('{0:.2f}, {1:.2f}'.format(np.mean(cals), np.std(cals)))
+    # cals = off_int[1]#[(off_int[0]<off_obs[0].max())*(off_int[0]>off_obs[0].min())]
+    # print('{0:.2f}, {1:.2f}'.format(np.mean(cals), np.std(cals)))
 
     #%%
     # MBII_scatter = (MBII['BH_Mass_nois_sl'] - ( m_ml*(MBII['Stellar_Mass_nois_sl']- detlaM)+b_ml ) )

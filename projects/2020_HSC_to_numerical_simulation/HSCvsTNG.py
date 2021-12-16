@@ -19,11 +19,11 @@ from prep_comparison import HSC_set, TNG_set, comp_plot
 
 filenames = glob.glob('TNG100/*.npy') 
 filenames.sort()
-idx = 0
+idx = 2
 filename = filenames[idx]
 zs = float(filename.split("_z")[1][:4])
 
-HSC = HSC_set(zs, core = False)
+HSC = HSC_set(zs, core = True)
 if zs < 0.5:
     # HSC_Mstar = HSC_Mstar_overall[HSC_z<0.5]
     # HSC_MBHs = HSC_MBHs_overall[HSC_z<0.5]
@@ -115,47 +115,52 @@ plt.show()
 
 
 #%%
-# f,ax=plt.subplots(1,1,figsize=(14,12))   
-# # plt.scatter(TNG['Stellar_Mass_nois'], TNG['BH_Mass_nois'],c='gray',
-# #             s=220, marker=".",zorder=-10, edgecolors='k', alpha = 0.2)
-# obj=ax
-# panel2=obj.hist2d(TNG['Stellar_Mass'], TNG['BH_Mass'],
-#                   norm=mpl.colors.LogNorm(), density = True, cmap='summer',bins=50,zorder=-1,
-#                       alpha=0.5, cmin = 0.001)# , cmax = 1.1)
-
-# # plt.scatter(TNG['Stellar_Mass'], TNG['BH_Mass'],c='g',
-# #             s=420, marker=".",zorder=0, edgecolors='g', alpha = 0.05, label='TNG100 sample z={0}'.format(zs))
-
-# plt.scatter(TNG['Stellar_Mass_nois_sl'], TNG['BH_Mass_nois_sl'],c='deeppink',
-#             s=420, marker=".",zorder=0, edgecolors='k', alpha = 0.7, label='TNG100 sample z={0}'.format(zs))
-# # plt.scatter(HSC['HSC_Mstar'],HSC['HSC_MBHs'],c='orange',
-# #             s=220, marker=".",zorder=-1, edgecolors='k', alpha = 0.7, label='HSC sample')
-# plt.scatter(HSC['HSC_Mstar'][HSC['HSC_ps_mag']<I_mag_break],HSC['HSC_MBHs'][HSC['HSC_ps_mag']<I_mag_break],c='orange',
-#             s=420, marker=".",zorder=-1, edgecolors='k', alpha = 0.7, label='HSC sample')
-
-# xl = np.linspace(5, 13, 100)
-# plt.plot(xl, m_ml*xl+b_ml, color="k", linewidth=4.0,zorder=-0.5)
-# # plt.title(r"M$_{\rm BH}-$M$_*$ relation",fontsize=35)
-# plt.xlabel(r"log(M$_*$/M$_{\odot})$",fontsize=35)
-# plt.ylabel(r'log(M$_{\rm BH}$/M$_{\odot}$)',fontsize=35)
-# plt.xlim(9,12.5)
-# plt.ylim(6.0,10.3)
-# plt.grid(linestyle='--')
-# plt.tick_params(labelsize=25)
-# plt.tick_params(which='both', width=2, top=True, right=True,direction='in')
-# plt.tick_params(which='major', length=10)
-# plt.tick_params(which='minor', length=6)#, color='r’)
-# plt.legend(scatterpoints=1,numpoints=1,loc=2,prop={'size':32},ncol=1,handletextpad=0)
-# ax.xaxis.set_minor_locator(AutoMinorLocator())
-# ax.yaxis.set_minor_locator(AutoMinorLocator())
-# cbar=f.colorbar(panel2[3],ax=obj)
-# cbar.ax.tick_params(labelsize=30) 
-# plt.savefig('MM_TNG_zs_{0}.png'.format(zs))
-# plt.show()
-
-#%%
 import matplotlib as mpl
 from matplotlib.ticker import AutoMinorLocator
+f,ax=plt.subplots(1,1,figsize=(14,12))   
+# plt.scatter(TNG['Stellar_Mass_nois'], TNG['BH_Mass_nois'],c='gray',
+#             s=220, marker=".",zorder=-10, edgecolors='k', alpha = 0.2)
+obj=ax
+panel2=obj.hist2d(TNG['Stellar_Mass'], TNG['BH_Mass'],
+                  norm=mpl.colors.LogNorm(), density = True, cmap='summer',bins=50,zorder=-1,
+                      alpha=0.5, cmin = 0.001)# , cmax = 1.1)
+
+# plt.scatter(TNG['Stellar_Mass'], TNG['BH_Mass'],c='g',
+#             s=420, marker=".",zorder=0, edgecolors='g', alpha = 0.05, label='TNG100 sample z={0}'.format(zs))
+
+s, alpha = 420, 0.7
+if zs == 0.3:
+    s = 620
+    alpha = 0.9   
+
+plt.scatter(TNG['Stellar_Mass_nois_sl'], TNG['BH_Mass_nois_sl'],c='deeppink',
+            s=420, marker=".",zorder=0, edgecolors='k', alpha = 0.7, label='TNG100 sample z={0}'.format(zs))
+# plt.scatter(HSC['HSC_Mstar'],HSC['HSC_MBHs'],c='orange',
+#             s=220, marker=".",zorder=-1, edgecolors='k', alpha = 0.7, label='HSC sample')
+plt.scatter(HSC['HSC_Mstar'][HSC['HSC_ps_mag']<I_mag_break],HSC['HSC_MBHs'][HSC['HSC_ps_mag']<I_mag_break],c='orange',
+            s=s, marker=".",zorder=1, edgecolors='k', alpha = alpha, label='HSC sample')
+
+xl = np.linspace(5, 13, 100)
+plt.plot(xl, m_ml*xl+b_ml, color="k", linewidth=4.0,zorder=-0.5)
+# plt.title(r"M$_{\rm BH}-$M$_*$ relation",fontsize=35)
+plt.xlabel(r"log(M$_*$/M$_{\odot})$",fontsize=35)
+plt.ylabel(r'log(M$_{\rm BH}$/M$_{\odot}$)',fontsize=35)
+plt.xlim(9,12.5)
+plt.ylim(6.0,10.3)
+plt.grid(linestyle='--')
+plt.tick_params(labelsize=25)
+plt.tick_params(which='both', width=2, top=True, right=True,direction='in')
+plt.tick_params(which='major', length=10)
+plt.tick_params(which='minor', length=6)#, color='r’)
+plt.legend(scatterpoints=1,numpoints=1,loc=2,prop={'size':32},ncol=1,handletextpad=0)
+ax.xaxis.set_minor_locator(AutoMinorLocator())
+ax.yaxis.set_minor_locator(AutoMinorLocator())
+cbar=f.colorbar(panel2[3],ax=obj)
+cbar.ax.tick_params(labelsize=30) 
+plt.savefig('MM_TNG_zs_{0}.png'.format(zs))
+plt.show()
+
+#%%
 f,ax=plt.subplots(1,2,figsize=(12,10),gridspec_kw={'width_ratios': [7, 1]}, sharey = True)
 # f.suptitle(r"Offset VS M*, z={0}".format(zs), fontsize = 20)
 obj=ax[0]
@@ -170,6 +175,38 @@ off_obs = sm_obs, bh_obs - (m_ml*sm_obs+b_ml),
 panel2=obj.hist2d(off_int[0], off_int[1],
                   norm=mpl.colors.LogNorm(), density = True, cmap='summer',bins=50,zorder=-1,
                       alpha=0.5, cmin = 0.001)# , cmax = 1.1)
+
+s, alpha = 420, 0.7
+cal_M_range = np.arange(9.5, 12.1, 0.3)
+if zs == 0.3:
+    cal_M_range = cal_M_range[1:]
+    cal_M_range[0] = 9.5
+    s = 620
+    alpha = 0.9
+obs_scatter, sim_scatter = [], []
+for i in range(len(cal_M_range)-1):
+    s_bool = (sm_obs>cal_M_range[i])*(sm_obs<cal_M_range[i+1])
+    cal_HSC_Mstar = sm_obs[s_bool]
+    cal_HSC_MBHs = bh_obs[s_bool]
+    obs_res = cal_HSC_MBHs-(m_ml*cal_HSC_Mstar+b_ml)
+    obs_scatter.append( [np.mean(obs_res), np.std(obs_res)] )
+    s_bool = (sm_sim>cal_M_range[i])*(sm_sim<cal_M_range[i+1])
+    cal_HSC_Mstar = sm_sim[s_bool]
+    cal_HSC_MBHs = bh_sim[s_bool]
+    obs_res = cal_HSC_MBHs-(m_ml*cal_HSC_Mstar+b_ml)
+    sim_scatter.append( [np.mean(obs_res), np.std(obs_res)] )
+obs_scatter = np.array(obs_scatter)
+sim_scatter = np.array(sim_scatter)
+ax[0].errorbar(cal_M_range[:-1]+ (cal_M_range[1]-cal_M_range[0])/2, obs_scatter[:,0], obs_scatter[:,1], color = 'black', 
+      zorder = 10, linewidth = 3, linestyle= '-',fmt='o', alpha = 0.9)
+ax[0].scatter(cal_M_range[:-1]+ (cal_M_range[1]-cal_M_range[0])/2, obs_scatter[:,0], s = 300, color = 'orange', marker = 's',
+              edgecolor = 'black', linewidth=3, zorder = 11)
+ax[0].errorbar(cal_M_range[:-1]+ (cal_M_range[1]-cal_M_range[0])/2+0.05, sim_scatter[:,0], sim_scatter[:,1], color = 'black', 
+      zorder = 10, linewidth = 3, linestyle= '-',fmt='o', alpha = 0.9)
+ax[0].scatter(cal_M_range[:-1]+ (cal_M_range[1]-cal_M_range[0])/2+0.05, sim_scatter[:,0], s = 300, color = 'deeppink', marker = 's',
+              edgecolor = 'black', linewidth=3, zorder = 11)    
+ax[0].plot(np.linspace(7, 13, 100), np.linspace(7, 13, 100) *0, 'k', zorder = 1, linewidth = 3 )
+
 ax[0].scatter(off_sim[0], off_sim[1],
             c='deeppink',
             s=420, marker=".",zorder=0, edgecolors='k', alpha = 0.7, label='TNG100 sample z={0}'.format(zs))

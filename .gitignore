@@ -78,8 +78,6 @@ projects/Search_Duals/initial_1k/*
 *.pages
 projects/GSF_esti_stellar_mass/TDCOSMO_esti_temp/*
 *.asc
-package_code/decomprofile_example/000017.88+002612.6_result.txt
-package_code/decomprofile_example/run_batch_job.sh
 projects/2020_Fermi_HSC/model/model_image/model_result/*
 projects/2020_Fermi_HSC/model/model_image/SED_file/*
 projects/2020_Fermi_HSC/model/model_image/SED_templates/*
@@ -98,3 +96,5 @@ for_collbrate/Kohei_SFR_template/0.0*Gyr
 projects/2020_HSC_to_numerical_simulation/offset_result/*
 projects/2020_HSC_to_numerical_simulation/_MC_result/*
 *.out
+RefL0100N1504*
+simdata_*

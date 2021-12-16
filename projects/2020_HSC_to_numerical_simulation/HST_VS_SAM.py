@@ -231,17 +231,17 @@ for ii in range(1):
     sim_offset = mstar_selected - lfit(bhmass_selected)
     obs_offset = stellar_mass_obs - lfit(bh_mass_obs)
     leng = max(len(sim_offset),len(obs_offset))
-    # rfilename = 'offset_result/' + 'SAM_zs{0}.txt'.format(zs)
-    # if_file = glob.glob(rfilename)
-    # write_file =  open(rfilename,'w') 
-    # for i in range(leng):
-    #     try:
-    #         write_file.write('{0} {1} {2} {3} {4} {5} {6}'.format(sim_offset_nosl[i], sim_offset[i], obs_offset[i], 
-    #                                                               mstar_selected[i], bhmass_selected[i], stellar_mass_obs[i], bh_mass_obs[i] ))
-    #     except:
-    #         write_file.write('{0} {1} -99 {2} {3} -99 -99'.format(sim_offset_nosl[i], sim_offset[i], mstar_selected[i], bhmass_selected[i]))
-    #     write_file.write("\n")
-    # write_file.close()    
+    rfilename = 'offset_result/' + 'SAM_zs{0}.txt'.format(zs)
+    if_file = glob.glob(rfilename)
+    write_file =  open(rfilename,'w') 
+    for i in range(leng):
+        try:
+            write_file.write('{0} {1} {2} {3} {4} {5} {6}'.format(sim_offset_nosl[i], sim_offset[i], obs_offset[i], 
+                                                                  mstar_selected[i], bhmass_selected[i], stellar_mass_obs[i], bh_mass_obs[i] ))
+        except:
+            write_file.write('{0} {1} -99 {2} {3} -99 -99'.format(sim_offset_nosl[i], sim_offset[i], mstar_selected[i], bhmass_selected[i]))
+        write_file.write("\n")
+    write_file.close()    
     # print("obs scatter:", round(obs_scatter,2))
     # print("sim scatter:", sim_scatter)
     # print("KS scatter:", stats.ks_2samp((mstar_selected - lfit(bhmass_selected,fit[0][0],fit[0][1])),
@@ -360,6 +360,28 @@ for ii in range(1):
     ax[0].legend(scatterpoints=1,numpoints=1,loc=2,prop={'size':32},ncol=1,handletextpad=0)
     ax[0].xaxis.set_minor_locator(AutoMinorLocator())
     ax[0].yaxis.set_minor_locator(AutoMinorLocator())
+    
+    # cal_M_range = np.arange(9.5, 12.1, 0.3)
+    # obs_scatter, sim_scatter = [], []
+    # for i in range(len(cal_M_range)-1):
+    #     s_bool = (sm_obs>cal_M_range[i])*(sm_obs<cal_M_range[i+1])
+    #     cal_HSC_Mstar = sm_obs[s_bool]
+    #     cal_HSC_MBHs = bh_obs[s_bool]
+    #     obs_res = cal_HSC_MBHs-(m_ml*cal_HSC_Mstar+b_ml)
+    #     obs_scatter.append( [np.mean(obs_res), np.std(obs_res)] )
+        
+    #     s_bool = (sm_sim>cal_M_range[i])*(sm_sim<cal_M_range[i+1])
+    #     cal_HSC_Mstar = sm_sim[s_bool]
+    #     cal_HSC_MBHs = bh_sim[s_bool]
+    #     obs_res = cal_HSC_MBHs-(m_ml*cal_HSC_Mstar+b_ml)
+    #     sim_scatter.append( [np.mean(obs_res), np.std(obs_res)] )
+    # obs_scatter = np.array(obs_scatter)
+    # sim_scatter = np.array(sim_scatter)
+    # ax[0].errorbar(cal_M_range[:-1]+ (cal_M_range[1]-cal_M_range[0])/2, obs_scatter[:,0], obs_scatter[:,1], color = 'orange', 
+    #       zorder = 50, linewidth = 3.5, linestyle= '-',fmt='o')
+    # ax[0].errorbar(cal_M_range[:-1]+ (cal_M_range[1]-cal_M_range[0])/2+0.05, sim_scatter[:,0], sim_scatter[:,1], color = 'pink', 
+    #       zorder = 50, linewidth = 3.5, linestyle= '-',fmt='o')
+    ax[0].plot(np.linspace(7, 13, 100), np.linspace(7, 13, 100) *0, 'k' )
     
     his_xy0_ =  ax[1].hist(off_int[1], orientation='horizontal'
                , histtype=u'step',density=True, color = 'green', linewidth = 4)

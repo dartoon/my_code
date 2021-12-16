@@ -19,7 +19,7 @@ from lenstronomy.Data.imaging_data import ImageData
 from lenstronomy.PointSource.point_source import PointSource
 from lenstronomy.LightModel.light_model import LightModel
 import copy
-from decomprofile.tools.plot_tools import profile_plots
+from galight.tools.plot_tools import profile_plots
 import pickle
     
 zp = 27.0 #
@@ -167,9 +167,9 @@ for j in range(78*4):
                   deltaPix = deltaPix,
                   target_ID = 'Simulation', if_annuli=True)
     #%%Model:
-    from decomprofile.data_process import DataProcess
-    from decomprofile.fitting_specify import FittingSpeficy
-    from decomprofile.fitting_process import FittingProcess
+    from galight.data_process import DataProcess
+    from galight.fitting_specify import FittingSpecify
+    from galight.fitting_process import FittingProcess
     
     save_name = 'sim_result_bulge_n{1}_/round0_ID{0}_'.format(j,bulge_n)
     data_process_0 = DataProcess(fov_image = sim_image_noise, fov_noise_map = rms, 
@@ -194,7 +194,7 @@ for j in range(78*4):
     # add_aperture1.a, add_aperture1.b = 2, 2  #define the a, b value of this component, i.e., Reff = sqrt(a^2 +b^2)
     # apertures_0 = apertures_0 + [add_aperture1]  #attach the added aperture into the group.    
     # data_process_0.apertures = apertures_0 #Pass apertures to the data
-    fit_sepc_0 = FittingSpeficy(data_process_0)
+    fit_sepc_0 = FittingSpecify(data_process_0)
     fit_sepc_0.prepare_fitting_seq(point_source_num = 1)#, fix_n_list= [[0,4]], fix_center_list = [[0,0]])
     # fit_sepc_0.plot_fitting_sets()
     fit_sepc_0.build_fitting_seq()
@@ -213,7 +213,7 @@ for j in range(78*4):
     add_aperture0.a, add_aperture0.b = add_aperture0.a/3, add_aperture0.b/3
     apertures = apertures[:comp_id] + [add_aperture0] + apertures[comp_id:]
     data_process_1.apertures = apertures #Pass apertures to the data
-    fit_sepc_1 = FittingSpeficy(data_process_1)
+    fit_sepc_1 = FittingSpecify(data_process_1)
     fit_sepc_1.prepare_fitting_seq(point_source_num = 1, fix_n_list= [[1,1]],  #First component fix n = 4 (bluge), second one fix to 1 (disk).
                                   fix_center_list = [[0,0]], condition = condition_bulgedisk)
     # fit_sepc_1.kwargs_params['source_model']

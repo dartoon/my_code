@@ -37,6 +37,7 @@ for i in [3,2,1,4,5,0]:
                  density=True, #color = 'k',
                  linewidth = 3, alpha = 0.8, zorder = 10)
         obs_mean = np.mean(data[:,2][abs(data[:,2])!=99])
+        obs_ks_sample = data[:,2][abs(data[:,2])!=99]
         axs[0].plot([obs_mean,obs_mean], [0, 2], linewidth = 3,color = colors[0])
     axs[0].set_yticks([])
     axs[0].set_ylim([0,np.max(his_xy_[0])*1.1])
@@ -68,7 +69,7 @@ for i in [3,2,1,4,5,0]:
                 break
     data_c = data[:n+1]        
     # pvalue = stats.ks_2samp(data[:,2][:n+1] , data[:,1][:n+1]).pvalue
-    pvalue = stats.ks_2samp(data_c[:,2][abs(data_c[:,2])!=99], data_c[:,1][abs(data_c[:,1])!=99] ).pvalue
+    pvalue = stats.ks_2samp(obs_ks_sample, data_c[:,1][abs(data_c[:,1])!=99] ).pvalue
     if pvalue>1.e-10:
         print(zs, files[i].split("/")[1].split('_')[0], "%e"%pvalue )
     else:

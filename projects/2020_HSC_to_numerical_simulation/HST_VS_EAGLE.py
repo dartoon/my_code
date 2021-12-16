@@ -26,12 +26,13 @@ h=0.7
 
 ifplot = True
 
-filename = 'Horizon/outt00266_halo_gal_centralBHs_2reff'
+filename = 'EAGLE/simdata_1.5.txt'
 zs = 1.5
 texts = np.loadtxt(filename)
-Stellar_Mass = np.log10(texts[:, 1])+ 11
-BH_Mass = np.log10(texts[:, 2]) + 8
+Stellar_Mass = texts[:, 1]
+BH_Mass = texts[:, 2]
 Eddington_ratio = texts[:, 3]
+Lbol = texts[:, 4]
 
 for ii in range(1):
     Stellar_Mass = Stellar_Mass
@@ -48,9 +49,9 @@ for ii in range(1):
     
     #r_band_magnitudes_selected=np.loadtxt('../Aklant/new_sample/log10_host_r_mag_selected_population.txt')
     
-    logLedd_overall = 38. + np.log10(1.2) + bhmass_overall
-    Eddr_overall = Eddington_ratio
-    Lbol_overall = logLedd_overall + np.log10(Eddington_ratio)
+    # logLedd_overall = 38. + np.log10(1.2) + bhmass_overall
+    Eddr_overall = 10**Eddington_ratio
+    Lbol_overall = Lbol
     
     ###Add noise to the data: 
     #Noise level: MBH 0.4dex, mag_R 0.3mag, M* 0.17dex, Lbol 0.03dex
@@ -63,7 +64,7 @@ for ii in range(1):
     Lbol_overall_noi = Lbol_overall + np.random.normal(0, dLbol, size= Lbol_overall.shape)
     
     logLedd_overall_noi = 38. + np.log10(1.2) + bhmass_overall_noi
-    Eddr_overall_noi = Lbol_overall_noi - logLedd_overall_noi
+    Eddr_overall_noi = Lbol_overall_noi - logLedd_overall_noi + 1 #!!
     
     ###Select sample:
     select_window = (bhmass_overall_noi>7.7)*(bhmass_overall_noi<8.6)*(Eddr_overall_noi<0.0)*\
@@ -79,10 +80,11 @@ for ii in range(1):
     bhmass_overall = bhmass_overall[Eddr_overall!=0]
     mstar_overall = mstar_overall[Eddr_overall!=0]
     Eddr_overall = Eddr_overall[Eddr_overall!=0]
-    plt.hist2d(bhmass_overall,np.log10(Eddr_overall),norm=mpl.colors.LogNorm(),cmap='copper',bins=50,zorder=0,alpha=0.5)
+    # plt.hist2d(bhmass_overall,np.log10(Eddr_overall),norm=mpl.colors.LogNorm(),cmap='copper',bins=50,zorder=0,alpha=0.5)
+    plt.hist2d(bhmass_overall_noi,Eddr_overall_noi,norm=mpl.colors.LogNorm(),cmap='copper',bins=50,zorder=0,alpha=0.5)
     # cbar = plt.colorbar()
     # cbar.ax.tick_params(labelsize=30) 
-    plt.errorbar(bhmass_select_noi, Eddr_select_noi, c='steelblue',linestyle=' ',marker='o',ms=10,mec='k', label='selected Horizon-AGN sample')
+    plt.errorbar(bhmass_select_noi, Eddr_select_noi, c='steelblue',linestyle=' ',marker='o',ms=10,mec='k', label='selected EAGLE sample')
     xspace = np.linspace(6,10)
     plt.plot(xspace, 0*xspace,'k--',linewidth=3)
     plt.plot(xspace, 0*xspace-1.5,'k--',linewidth=3)
@@ -123,8 +125,8 @@ for ii in range(1):
     logEddR_obs = logLbol_obs - logLedd_obs
     
     plt.errorbar(bh_mass_obs, logEddR_obs, c='orange',linestyle=' ',marker='o',ms=10,mec='k',zorder = 100, label='HST observed sample')
-    plt.xlim([7.15,9.15])
-    plt.ylim([-3,1])
+    plt.xlim([4,9.15])
+    # plt.ylim([-3,5])
     xfill = np.linspace(7.7, 8.6)
     yfill_sline = -1.1*(xfill-7.5) -0.5
     y_sline1 = xfill*0
@@ -141,8 +143,8 @@ for ii in range(1):
     
     plt.ylabel(r"log(L$_{\rm bol}$/L$_{\rm Edd}$)",fontsize=30)
     plt.xlabel(r'log(M$_{\rm BH}$/M$_{\odot}$)',fontsize=30)
-    plt.legend(loc='upper right',fontsize=21,numpoints=1)
-    # plt.savefig('Horizon_selectfunc.pdf')
+    plt.legend(fontsize=21,numpoints=1)
+    # plt.savefig('EAGLE_selectfunc.pdf')
     if ifplot == True:
         plt.show()
     else:
@@ -200,7 +202,7 @@ for ii in range(1):
     plt.hist(stellar_mass_obs - lfit(bh_mass_obs), histtype=u'step',density=True,
              label='HST sample', linewidth = 2, color='orange')
     plt.hist(mstar_selected - lfit(bhmass_selected),histtype=u'step',density=True,
-             label='Horizon-AGN sample', linewidth = 2, color='steelblue')
+             label='EAGLE sample', linewidth = 2, color='steelblue')
     plt.title(r"The offset comparison for the M$_{\rm BH}$-M$_{*}$ relation", fontsize = 20)
     plt.tick_params(labelsize=20)
     plt.legend(prop={'size':20})
@@ -212,7 +214,7 @@ for ii in range(1):
     plt.tick_params(which='minor', length=6)#, color='r’)
     
     plt.xlabel('$\Delta$log(M$_{*}$/M$_{\odot}$)',fontsize=30)
-    #plt.savefig('comp_scatter_MM_Horizononly.pdf')
+    #plt.savefig('comp_scatter_MM_EAGLEonly.pdf')
     if ifplot == True:
         plt.show()
     else:
@@ -227,7 +229,7 @@ for ii in range(1):
     sim_offset = mstar_selected - lfit(bhmass_selected)
     obs_offset = stellar_mass_obs - lfit(bh_mass_obs)
     leng = max(len(sim_offset),len(obs_offset))
-    # rfilename = 'offset_result/' + 'Horizon_zs{0}.txt'.format(zs)
+    # rfilename = 'offset_result/' + 'EAGLE_zs{0}.txt'.format(zs)
     # if_file = glob.glob(rfilename)
     # write_file =  open(rfilename,'w') 
     # for i in range(leng):
@@ -254,7 +256,7 @@ for ii in range(1):
     cbar.ax.tick_params(labelsize=30) 
     
     obj.errorbar(mstar_selected,bhmass_selected,zorder=1,
-                 color='m',label='Horizon-AGN sample z=1.5',linestyle=' ',marker='o',ms=10,mec='k')
+                 color='m',label='EAGLE sample z=1.5',linestyle=' ',marker='o',ms=10,mec='k')
     obj.errorbar(stellar_mass_obs,bh_mass_obs, 
     #             xerr = [abs(M_r_obs_err[:,0]),abs(M_r_obs_err[:,1])], yerr=np.ones(len(bh_mass_obs))*0.4, 
                  zorder=100,color='orange',label='HST sample',
@@ -284,7 +286,7 @@ for ii in range(1):
     obj.set_ylabel(r'log(M$_{\rm BH}$/M$_{\odot}$)',fontsize=35)
     obj.set_xlabel('log(M$_{*}$/M$_{\odot}$)',fontsize=35)
     obj.legend(loc='upper left',fontsize=30,numpoints=1)
-    plt.savefig('MM_Horizon_zs_{0}.png'.format(zs))
+    plt.savefig('MM_EAGLE_zs_{0}.png'.format(zs))
     if ifplot == True:
         plt.show()
     else:
@@ -309,7 +311,7 @@ for ii in range(1):
                           alpha=0.5, cmin = 0.001)# , cmax = 1.1)
     ax[0].scatter(off_sim[0], off_sim[1],
                 c='m',
-                s=420, marker=".",zorder=0, edgecolors='k', alpha = 0.7, label='Horizon-AGN sample z={0}'.format(zs))
+                s=420, marker=".",zorder=0, edgecolors='k', alpha = 0.7, label='EAGLE sample z={0}'.format(zs))
     ax[0].scatter(off_obs[0], off_obs[1],
                 c='orange',
                 s=420, marker=".",zorder=1, edgecolors='k', alpha = 0.7, label='HST sample')
@@ -349,7 +351,7 @@ for ii in range(1):
     # from matplotlib.ticker import AutoMinorLocator
     # cbar=f.colorbar(panel2[3],ax=obj)
     # cbar.ax.tick_params(labelsize=30) 
-    plt.savefig('DeltaMM_Horizon_zs_{0}.png'.format(zs))
+    plt.savefig('DeltaMM_EAGLE_zs_{0}.png'.format(zs))
     plt.show()
     
     cals = off_int[1]#[(off_int[0]<off_obs[0].max())*(off_int[0]>off_obs[0].min())]
@@ -374,7 +376,7 @@ for ii in range(1):
     # print(slope_scatter_obs(fit[0][0]+fit_err[0])   )
     # print(slope_scatter_sim(fit[0][0]+fit_err[0])          )
     
-    # print("Horizon compare to Obs:")
+    # print("EAGLE compare to Obs:")
     # print("({0:.2f}, {1:.2f})".format( -(lfit(8,fit[0][0],fit[0][1]) - lfit_fixm(8,fit_fixm[0]))[0], sim_scatter ))
     
     # rfilename = 'MC_result/' + 'Horizion_zs{0}_uselocal.txt'.format(zs)

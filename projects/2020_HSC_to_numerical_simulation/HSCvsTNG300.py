@@ -24,7 +24,7 @@ idx = 0
 filename = filenames[idx]
 zs = float(filename.split("_z")[1][:4])
 
-HSC = HSC_set(zs, core = False)
+HSC = HSC_set(zs, core = True)
 if zs <= 0.5:
     # HSC_Mstar = HSC_Mstar_overall[HSC_z<0.5]
     # HSC_MBHs = HSC_MBHs_overall[HSC_z<0.5]

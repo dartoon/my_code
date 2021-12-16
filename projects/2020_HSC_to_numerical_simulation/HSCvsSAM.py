@@ -19,9 +19,9 @@ from prep_comparison import SAM_set, HSC_set, comp_plot, quasar_filter
 
 ifplot = True
 
-zs = 0.7
+zs = 0.3
 imf = 'Sal'
-HSC = HSC_set(zs, imf = imf)
+HSC = HSC_set(zs, core=True, imf = imf)
 # HSC['HSC_Mstar_overall'] = HSC['HSC_Mstar_overall']+ 0.25
 # HSC['HSC_Mstar'] = HSC['HSC_Mstar']+ 0.25
 if zs == 0.7:
@@ -113,12 +113,23 @@ for ii in range(1):
                       norm=mpl.colors.LogNorm(), density = True, cmap='summer',bins=50,zorder=10,
                       alpha=0.5, cmin = 0.001 , cmax = 1.1)
     
+    # import seaborn as sns
+    # sns.kdeplot(SAM['Stellar_Mass_reali'], SAM['BH_Mass_reali'], linewidths = 2, color = 'green', fill=True, alpha=0.5, zorder = -10)
+
+    s, alpha = 420, 0.7
+    cal_M_range = np.arange(9.5, 12.1, 0.3)
+    if zs == 0.3:
+        cal_M_range = cal_M_range[1:]
+        cal_M_range[0] = 9.5
+        s = 620
+        alpha = 0.9
+    
     plt.scatter(SAM['Stellar_Mass_nois_sl'][:500], SAM['BH_Mass_nois_sl'][:500],c='pink',
                 s=420, marker=".",zorder=1.2, edgecolors='k', alpha = 0.7, label='SAM sample z={0}'.format(zs))
     # plt.scatter(HSC['HSC_Mstar'],HSC['HSC_MBHs'],c='orange',
     #             s=220, marker=".",zorder=-1, edgecolors='k', alpha = 0.7, label='HSC sample')
     plt.scatter(HSC['HSC_Mstar'][HSC['HSC_ps_mag']<I_mag_break][:500],HSC['HSC_MBHs'][HSC['HSC_ps_mag']<I_mag_break][:500],c='orange',
-                s=420, marker=".",zorder=1.1, edgecolors='k', alpha = 0.7, label='HSC sample')
+                s=s, marker=".",zorder=1.3, edgecolors='k', alpha = alpha, label='HSC sample')
     
     xl = np.linspace(5, 13, 100)
     m_ml, b_ml = (0.981139684856507, -2.545890295477823)
@@ -159,12 +170,51 @@ for ii in range(1):
     panel2=obj.hist2d(off_int[0], off_int[1],
                       norm=mpl.colors.LogNorm(), density = True, cmap='summer',bins=50,zorder=-1,
                           alpha=0.5, cmin = 0.001)# , cmax = 1.1)
+
+    
+    s, alpha = 420, 0.7
+    cal_M_range = np.arange(9.5, 12.1, 0.3)
+    if zs == 0.3:
+        cal_M_range = cal_M_range[1:]
+        cal_M_range[0] = 9.5
+        s = 620
+        alpha = 0.9
+        
+    obs_scatter, sim_scatter = [], []
+    for i in range(len(cal_M_range)-1):
+        s_bool = (sm_obs>cal_M_range[i])*(sm_obs<cal_M_range[i+1])
+        cal_HSC_Mstar = sm_obs[s_bool]
+        cal_HSC_MBHs = bh_obs[s_bool]
+        obs_res = cal_HSC_MBHs-(m_ml*cal_HSC_Mstar+b_ml)
+        obs_scatter.append( [np.mean(obs_res), np.std(obs_res)] )
+        s_bool = (sm_sim>cal_M_range[i])*(sm_sim<cal_M_range[i+1])
+        cal_HSC_Mstar = sm_sim[s_bool]
+        cal_HSC_MBHs = bh_sim[s_bool]
+        obs_res = cal_HSC_MBHs-(m_ml*cal_HSC_Mstar+b_ml)
+        sim_scatter.append( [np.mean(obs_res), np.std(obs_res)] )
+    obs_scatter = np.array(obs_scatter)
+    sim_scatter = np.array(sim_scatter)
+    ax[0].errorbar(cal_M_range[:-1]+ (cal_M_range[1]-cal_M_range[0])/2, obs_scatter[:,0], obs_scatter[:,1], color = 'black', 
+          zorder = 10, linewidth = 3, linestyle= '-',fmt='o', alpha = 0.9)
+    ax[0].scatter(cal_M_range[:-1]+ (cal_M_range[1]-cal_M_range[0])/2, obs_scatter[:,0], s = 300, color = 'orange', marker = 's',
+                  edgecolor = 'black', linewidth=3, zorder = 11)
+    ax[0].errorbar(cal_M_range[:-1]+ (cal_M_range[1]-cal_M_range[0])/2+0.05, sim_scatter[:,0], sim_scatter[:,1], color = 'black', 
+          zorder = 10, linewidth = 3, linestyle= '-',fmt='o', alpha = 0.9)
+    ax[0].scatter(cal_M_range[:-1]+ (cal_M_range[1]-cal_M_range[0])/2+0.05, sim_scatter[:,0], s = 300, color = 'pink', marker = 's',
+                  edgecolor = 'black', linewidth=3, zorder = 11)    
+    ax[0].plot(np.linspace(7, 13, 100), np.linspace(7, 13, 100) *0, 'k', zorder = 1, linewidth = 3 )
+    
+    
     ax[0].scatter(off_sim[0], off_sim[1],
                 c='pink',
                 s=420, marker=".",zorder=0, edgecolors='k', alpha = 0.7, label='SAM sample z={0}'.format(zs))
     ax[0].scatter(off_obs[0], off_obs[1],
                 c='orange',
-                s=420, marker=".",zorder=-1, edgecolors='k', alpha = 0.7, label='HSC sample')
+                s=s, marker=".",zorder=1, edgecolors='k', alpha = alpha, label='HSC sample')
+    
+    # import seaborn as sns
+    # sns.kdeplot(off_int[0], off_int[1], linewidths = 1, color = 'green', ax=ax[0])
+    
     # xl = np.linspace(5, 13, 100)
     # plt.plot(xl, m_ml*xl+b_ml, color="k", linewidth=4.0,zorder=-0.5)
     # plt.title(r"M$_{\rm BH}-$M$_*$ relation",fontsize=35)
@@ -204,12 +254,14 @@ for ii in range(1):
     plt.savefig('DeltaMM_SAM_zs_{0}.png'.format(zs))
     plt.show()
     
+    #%%
+    
     cals = off_int[1]#[(off_int[0]<off_obs[0].max())*(off_int[0]>off_obs[0].min())]
     print('{0:.2f}, {1:.2f}'.format(np.mean(cals), np.std(cals)))    
     
     
     # #%%
-    # HSC_scatter = (HSC['HSC_MBHs'] - ( m_ml*(HSC['HSC_Mstar']-detlaM)+b_ml ) )
+    HSC_scatter = (HSC['HSC_MBHs'] - ( m_ml*(HSC['HSC_Mstar']-detlaM)+b_ml ) )
     
     # #Plot the 1-D scatter for MM.
     # fig, ax = plt.subplots(figsize=(8,7))
@@ -237,9 +289,9 @@ for ii in range(1):
     #     plt.close()
         
 
+    obs_offset = HSC_scatter
     # sim_offset_nosl = SAM_scatter_overall 
     # sim_offset = SAM_scatter
-    # obs_offset = HSC_scatter
     # rfilename = 'offset_result/' + 'SAM_zs{0}.txt'.format(zs)
     # if_file = glob.glob(rfilename)
     # write_file =  open(rfilename,'w') 
@@ -266,7 +318,7 @@ for ii in range(1):
     # # print("({0:.2f}, {1:.2f})".format( np.mean(SAM_scatter) - np.mean(HSC_scatter), np.std(SAM_scatter) - np.std(HSC_scatter) ))
     
     # # print("for paper Observation", 'zs=', zs)
-    # # print('{0:.2f}, {1:.2f}'.format(np.mean(HSC_scatter), np.std(HSC_scatter)))
+    print('{0:.2f}, {1:.2f}'.format(np.mean(HSC_scatter), np.std(HSC_scatter)))
     
     # # print("for paper SAM", 'zs=', zs)
     # # print('{0:.2f}, {1:.2f}'.format(np.mean(SAM_scatter), np.std(SAM_scatter)))

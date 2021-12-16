@@ -193,13 +193,13 @@ HSC = {}
 line_means = ['id','z','mbh','mbh_err','stellar_mass','lbol','spectra','bit','ps_gmag','ps_rmag','ps_imag','ps_rmag','ps_zmag','ps_ymag','host_gmag','host_rmag','host_imag','host_zmag','host_ymag']
 infers  = np.loadtxt('../HSC_fitting/sdss_quasar_mbh.txt', dtype=str)
 IDs_ = infers[:, 0]
-HSC_z_overall = infers[:,1].astype(np.float)
-HSC_Mstar_overall = infers[:,4].astype(np.float)
-HSC_MBHs_overall = infers[:,2].astype(np.float)
-HSC_ps_mag_overall = infers[:,10].astype(np.float)  #'ps_imag'
-HSC_MBHs_err_overall  = infers[:,3].astype(np.float)
-HSC_Lbol_overall = infers[:,5].astype(np.float)
-HSC_i_mag_galaxy_overall = infers[:,16].astype(np.float)
+HSC_z_overall = infers[:,1].astype(float)
+HSC_Mstar_overall = infers[:,4].astype(float)
+HSC_MBHs_overall = infers[:,2].astype(float)
+HSC_ps_mag_overall = infers[:,10].astype(float)  #'ps_imag'
+HSC_MBHs_err_overall  = infers[:,3].astype(float)
+HSC_Lbol_overall = infers[:,5].astype(float)
+HSC_i_mag_galaxy_overall = infers[:,16].astype(float)
 core = True
 if core == True:
     HSC_label_ = infers[:,7]
@@ -234,18 +234,19 @@ z_range = np.arange(0.2, 1.0, 0.05)
 mstar_cut_range = np.array([8.9, 9.1, 9.3, 9.4, 9.6, 9.7, 9.8, 9.9, 10.0, 10.1, 10.3, 10.5, 10.5, 10.6, 10.7, 10.8])
 mstar_cut = np.zeros_like(HSC['HSC_z_overall'])
 i_mag_cut = np.zeros_like(HSC['HSC_z_overall'])
-# for i in range(len(mstar_cut)):
-#     mstar_cut[i] = mstar_cut_range[HSC['HSC_z_overall'][i]  > z_range][-1]
-#     if HSC['HSC_z_overall'][i]<0.5:
-#         i_mag_cut[i] = 20.5 
-#     else:
-#         i_mag_cut[i] = 22.0
-    # if HSC['label'][i] == 'ugri':
-    #     i_mag_cut[i] = 19.1
-    # if HSC['label'][i] == 'eboss_core' or HSC['label'] == 'boss_core':
-    #     i_mag_cut[i] = 22.0
+for i in range(len(mstar_cut)):
+    mstar_cut[i] = mstar_cut_range[HSC['HSC_z_overall'][i]  > z_range][-1]
+    if HSC['HSC_z_overall'][i]<0.5:
+        i_mag_cut[i] = 20.5 
+    else:
+        i_mag_cut[i] = 22.0
+    if HSC['label'][i] == 'ugri':
+        i_mag_cut[i] = 19.1
+    if HSC['label'][i] == 'eboss_core' or HSC['label'][i] == 'boss_core':
+        i_mag_cut[i] = 22.0
     
-select_bool = (HSC['HSC_Mstar_overall'] > mstar_cut) #* (HSC['HSC_ps_mag_overall'] <i_mag_cut)
+select_bool = (HSC['HSC_Mstar_overall'] > mstar_cut) * (HSC['HSC_ps_mag_overall'] <i_mag_cut)
+#%%
 redshift_bool = (HSC_z_overall>0.2)*(HSC_z_overall<0.8)
 
 HSC['HSC_Mstar'] = HSC_Mstar_overall[redshift_bool * select_bool]
@@ -356,7 +357,7 @@ if if_int == 0:
     Illustris =  np.array([(0.01, 0.52) , (0.08, 0.53)  , (0.06, 0.54)  , (0.07, 0.32) ])
     TNG100 =  np.array([(0.27, 0.48) , (0.24, 0.46)  , (0.24, 0.45)  , (0.38, 0.33)])
     TNG300 =  np.array([(0.26, 0.48) , (0.20, 0.48)  , (0.17, 0.48)  , (0.41, 0.34)])
-    Horizon =  np.array([(0.20, 0.47) , (0.21, 0.48)  , (0.28, 0.47)  , (0.47, 0.35)])
+    Horizon =  np.array([(0.16, 0.49) , (0.14, 0.47)  , (0.23, 0.47)  , (0.47, 0.35)])
 elif if_int == 1:
     # SAM = np.array([(0.72, 0.20), (0.64, 0.18), (0.56, 0.16) , (0.08, 0.18) ]) #add noise but not select
     # MBII = np.array([(-0.15, 0.21), (-0.15, 0.22) , (0.08, 0.19)])

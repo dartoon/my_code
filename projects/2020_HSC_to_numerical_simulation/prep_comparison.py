@@ -30,7 +30,7 @@ def HSC_set(zs = 0.5, core = False, imf = 'Cha'):
     HSC_i_mag_galaxy_overall = infers[:,16].astype(np.float)
     if core == True:
         HSC_label_ = infers[:,7]
-        HSC_z, HSC_Mstar, HSC_MBHs, HSC_ps_mag, HSC_MBHs_err, HSC_Lbol, HSC_i_mag_galaxy= [], [], [], [], [], [], []
+        HSC_z, HSC_Mstar, HSC_MBHs, HSC_ps_mag, HSC_MBHs_err, HSC_Lbol, HSC_i_mag_galaxy, HSC_label= [], [], [], [], [], [], [], []
         for i in range(len(IDs_)):
             if HSC_label_[i] in ['eboss_core', 'boss_core', 'ugri']:
                 HSC_z.append(HSC_z_overall[i])
@@ -40,6 +40,7 @@ def HSC_set(zs = 0.5, core = False, imf = 'Cha'):
                 HSC_MBHs_err.append(HSC_MBHs_err_overall[i])
                 HSC_Lbol.append(HSC_Lbol_overall[i])
                 HSC_i_mag_galaxy.append(HSC_i_mag_galaxy_overall[i])
+                HSC_label.append([HSC_label_[i]])
         HSC_z_overall = np.array(HSC_z)
         HSC_Mstar_overall = np.array(HSC_Mstar)
         HSC_MBHs_overall = np.array(HSC_MBHs)   
@@ -47,6 +48,7 @@ def HSC_set(zs = 0.5, core = False, imf = 'Cha'):
         HSC_MBHs_err_overall  = np.array(HSC_MBHs_err)   
         HSC_Lbol_overall = np.array(HSC_Lbol)   
         HSC_i_mag_galaxy_overall = HSC_i_mag_galaxy
+        HSC['label'] = np.array(HSC_label)
     HSC['HSC_z_overall'] = HSC_z_overall
     HSC['HSC_Mstar_overall'] = HSC_Mstar_overall
     HSC['HSC_MBHs_overall'] = HSC_MBHs_overall
@@ -54,20 +56,36 @@ def HSC_set(zs = 0.5, core = False, imf = 'Cha'):
     HSC['HSC_MBHs_err_overall']  = HSC_MBHs_err_overall
     HSC['HSC_Lbol_overall'] = HSC_Lbol_overall
     
+    i_mag_cut = np.zeros_like(HSC['HSC_z_overall'])
     redshift_bool = (HSC_z_overall>(zs-0.1))*(HSC_z_overall<(zs+0.1))
-    HSC['HSC_Mstar'] = HSC_Mstar_overall[redshift_bool]
-    HSC['HSC_MBHs'] = HSC_MBHs_overall[redshift_bool]
-    HSC['HSC_ps_mag'] = HSC_ps_mag_overall[redshift_bool]  #'ps_imag'
-    HSC['HSC_Lbol'] = HSC_Lbol_overall[redshift_bool]
-    HSC['HSC_MBHs_err'] = HSC_MBHs_err_overall[redshift_bool]
-    HSC['HSC_z'] = HSC_z_overall[redshift_bool]
+    if core == True:
+        for i in range(len(i_mag_cut)):
+            if HSC['HSC_z_overall'][i]<0.5:
+                i_mag_cut[i] = 20.5 
+            else:
+                i_mag_cut[i] = 22.0
+            if HSC['label'][i] == 'ugri':
+                i_mag_cut[i] = 19.1
+            if HSC['label'][i] == 'eboss_core' or HSC['label'][i] == 'boss_core':
+                i_mag_cut[i] = 22.0
+        i_mag_cut_bool = (HSC['HSC_ps_mag_overall'] <i_mag_cut)
+        select_bool = i_mag_cut_bool * redshift_bool
+    else:
+        select_bool = redshift_bool
+    
+    HSC['HSC_Mstar'] = HSC_Mstar_overall[select_bool ]
+    HSC['HSC_MBHs'] = HSC_MBHs_overall[select_bool]
+    HSC['HSC_ps_mag'] = HSC_ps_mag_overall[select_bool]  #'ps_imag'
+    HSC['HSC_Lbol'] = HSC_Lbol_overall[select_bool]
+    HSC['HSC_MBHs_err'] = HSC_MBHs_err_overall[select_bool]
+    HSC['HSC_z'] = HSC_z_overall[select_bool]
     
     dl_HSC=(1+HSC_z_overall)*c*vec_EE(HSC_z_overall)/h0 *10**6   #zs is a list of redshift of the sources (input as 1 D numpy array)
     HSC_galaxy_abs_iMags_overall = HSC_i_mag_galaxy_overall -5*(np.log10(dl_HSC)-1)   #dl is the luminosity distance which is a function of redshift:
     HSC['HSC_galaxy_abs_iMags_overall'] = HSC_galaxy_abs_iMags_overall
-    HSC['HSC_galaxy_abs_iMags'] = HSC_galaxy_abs_iMags_overall[redshift_bool]
+    HSC['HSC_galaxy_abs_iMags'] = HSC_galaxy_abs_iMags_overall[select_bool]
     HSC['HSC_ps_abs_iMags_overall'] = HSC['HSC_ps_mag_overall'] - 5*(np.log10(dl_HSC)-1)
-    HSC['HSC_ps_abs_iMags'] = HSC['HSC_ps_abs_iMags_overall'][redshift_bool]
+    HSC['HSC_ps_abs_iMags'] = HSC['HSC_ps_abs_iMags_overall'][select_bool]
     return HSC
 
 h0=70.             #km/s/Mpc
@@ -90,7 +108,7 @@ def Horizon_set(filename, HSC_Lbol_overall, HSC_MBHs_overall, zs, I_mag_break = 
     Eddington_ratio = np.log10(texts[:, 3])
     # logLedd = 38. + np.log10(1.2) + BH_Mass
     # logLbol = logLedd + Eddington_ratio
-    logLbol = texts[:, 4]
+    logLbol = texts[:, 4]  #44
 
     Horizon['Stellar_Mass'] = Stellar_Mass
     Horizon['BH_Mass'] = BH_Mass
@@ -100,7 +118,7 @@ def Horizon_set(filename, HSC_Lbol_overall, HSC_MBHs_overall, zs, I_mag_break = 
     
     L_5100 = 10**logLbol / 9.26
     cosmo = FlatLambdaCDM(H0=70, Om0=0.3)
-    redshift = 1  #!!!
+    redshift = zs  #!!!
     dl = cosmo.luminosity_distance(redshift).value  # Mpc
     dis = dl * 3.085677581e+24 #from Mpc to cm
     F_lam_5100 = L_5100 / (4*np.pi * dis**2) / 5100
@@ -117,18 +135,6 @@ def Horizon_set(filename, HSC_Lbol_overall, HSC_MBHs_overall, zs, I_mag_break = 
     obs_mag_r = [(-2.5 * np.log10(F_mu_r[i]) - 48.60) for i in range(len(F_mu_r))]
     r_pointsource = obs_mag_r - 5*(np.log10(dl * 10**6)-1)   #dl is the luminosity distance which is a function of redshift:
     
-    
-    # dl=(1+zs)*c*vec_EE(zs)/h0 *10**6   #zs is a list of redshift of the sources (input as 1 D numpy array)
-    # #Transfer the Horizon magnitude to absolute ones:
-    # i_wavelen = 7496
-    # r_wavelen = 6177
-    # obs_sdss_i_pointsource = sdss_i_pointsource + 5*(np.log10(dl)-1)
-    # F_mu_i = 10**(0.4*(-48.60 - obs_sdss_i_pointsource))   
-    # F_lam_i = F_mu_i /(i_wavelen*(1+zs)) **2 * (2.9979 * 10**18)
-    # F_lam_r = F_lam_i / (i_wavelen*(1+zs))**(-(-0.44+2)) * (r_wavelen*(1+zs))**(-(-0.44+2))
-    # F_mu_r = F_lam_r * (r_wavelen*(1+zs)) **2 / (2.9979 * 10**18)
-    # obs_sdss_r_pointsource = (-2.5 * np.log10(F_mu_r)) - 48.60
-    # abs_sdss_r_pointsource = obs_sdss_r_pointsource - 5*(np.log10(dl)-1)
     abs_Mags = I_mag_break -5*(np.log10(dl * 10**6 )-1)   #dl is the luminosity distance which is a function of redshift:
     if zs >= 0.5:    
         sdss_mag = g_pointsource #-2.5*np.log10(10**(-0.4*sdss_g_galaxy) + 10**(-0.4*sdss_g_pointsource))
@@ -166,6 +172,80 @@ def Horizon_set(filename, HSC_Lbol_overall, HSC_MBHs_overall, zs, I_mag_break = 
     # Horizon['select_abs_Mags'] = abs_Mags
     Horizon['select_bool'] = select_bool
     return Horizon
+
+def EAGLE_set(filename, HSC_Lbol_overall, HSC_MBHs_overall, zs, I_mag_break = 20.5, consider_type1= True, imf ='Sal'):
+    EAGLE = {}
+    # Stellar_Mass, BH_Mass, sdss_i_galaxy, sdss_g_galaxy, sdss_r_galaxy, sdss_i_pointsource, sdss_g_pointsource, Eddington_ratio = np.load(filename)
+    texts = np.loadtxt(filename)
+    Stellar_Mass = texts[:, 1]
+    BH_Mass = texts[:, 2]
+    Eddington_ratio = texts[:, 3]  #In log
+    # logLedd = 38. + np.log10(1.2) + BH_Mass
+    # logLbol = logLedd + Eddington_ratio
+    logLbol = texts[:, 4]
+
+    EAGLE['Stellar_Mass'] = Stellar_Mass
+    EAGLE['BH_Mass'] = BH_Mass
+    # EAGLE['sdss_g_pointsource'] = sdss_g_pointsource
+    EAGLE['Eddington_ratio'] = Eddington_ratio
+    EAGLE['logLbol'] = logLbol
+    
+    L_5100 = 10**logLbol / 9.26
+    cosmo = FlatLambdaCDM(H0=70, Om0=0.3)
+    redshift = texts[:, -1]  #!!!
+    dl = cosmo.luminosity_distance(redshift).value  # Mpc
+    dis = dl * 3.085677581e+24 #from Mpc to cm
+    F_lam_5100 = L_5100 / (4*np.pi * dis**2) / 5100
+    wave_lam_g = 4700 * (1+redshift)  #rest-frame in A  #vanden berk 2001, UV-optical SED slope as -0.44
+    F_lam_g = F_lam_5100 / (5100*(1+redshift) )**(-(-0.44+2)) * wave_lam_g **(-(-0.44+2)) #erg/s/cm^2/A  #!!! 5100 rest-frame?
+    F_mu_g = F_lam_g *  (wave_lam_g) **2 / (2.9979 * 10**18)
+    obs_mag_g = [(-2.5 * np.log10(F_mu_g[i]) - 48.60) for i in range(len(F_mu_g))]
+    g_pointsource = obs_mag_g - 5*(np.log10(dl * 10**6)-1)   #dl is the luminosity distance which is a function of redshift:
+    # g_totall = -2.5*np.log10(10**(-0.4*g_galaxy) + 10**(-0.4*g_pointsource))
+    # g_totall = g_pointsource
+    wave_lam_r = 6100 * (1+redshift)  #rest-frame in A  
+    F_lam_r = F_lam_5100 / 5100**(-(-0.44+2)) * wave_lam_r **(-(-0.44+2)) #erg/s/cm^2/A
+    F_mu_r = F_lam_r *  (wave_lam_r) **2 / (2.9979 * 10**18)
+    obs_mag_r = [(-2.5 * np.log10(F_mu_r[i]) - 48.60) for i in range(len(F_mu_r))]
+    r_pointsource = obs_mag_r - 5*(np.log10(dl * 10**6)-1)   #dl is the luminosity distance which is a function of redshift:
+    
+    abs_Mags = I_mag_break -5*(np.log10(dl * 10**6 )-1)   #dl is the luminosity distance which is a function of redshift:
+    if zs >= 0.5:    
+        sdss_mag = g_pointsource #-2.5*np.log10(10**(-0.4*sdss_g_galaxy) + 10**(-0.4*sdss_g_pointsource))
+    elif zs<0.5:
+        sdss_mag= r_pointsource #-2.5*np.log10(10**(-0.4*sdss_r_galaxy) + 10**(-0.4*abs_sdss_r_pointsource))
+    dMBH, dmag, dMstar, dLbol= 0.4, 0.3, 0.2, 0.1  #dmag is for host magnitude. 
+    # dMBH, dmag, dMstar, dLbol= 0.001, 0.001, 0.001, 0.001  #dmag is for host magnitude. 
+    
+    z_range = np.arange(0.2, 1.0, 0.05)
+    mstar_cut_range = np.array([8.9, 9.1, 9.3, 9.4, 9.6, 9.7, 9.8, 9.9, 10.0, 10.1, 10.3, 10.5, 10.5, 10.6, 10.7, 10.8])
+    if imf =='Sal':
+        mstar_cut_range = mstar_cut_range+0.23
+    mstar_cut = mstar_cut_range[zs > z_range][-1]
+    Stellar_Mass_nois = Stellar_Mass + np.random.normal(0, dMstar, size=Stellar_Mass.shape)
+    BH_Mass_nois = BH_Mass + np.random.normal(0, dMBH, size=BH_Mass.shape)
+    logLbol_nois = logLbol + np.random.normal(0, dLbol, size=logLbol.shape)
+    select_bool = (Stellar_Mass_nois >mstar_cut) * (sdss_mag <abs_Mags) #!!!Assuming sdss_mag_totall are accurate.
+    type1_bools = quasar_filter([logLbol_nois, BH_Mass_nois], HSC_Lbol_overall, HSC_MBHs_overall)
+    if consider_type1 == True:
+        select_bool = select_bool * type1_bools
+    Stellar_Mass_nois_sl = Stellar_Mass_nois[select_bool]
+    BH_Mass_nois_sl = BH_Mass_nois[select_bool]
+    logLbol_nois_sl = logLbol_nois[select_bool]
+    # sdss_g_galaxy_sl = sdss_g_galaxy[select_bool]
+    EAGLE['Stellar_Mass_nois'] = Stellar_Mass_nois
+    EAGLE['Stellar_Mass_nois_sl'] = Stellar_Mass_nois_sl
+    EAGLE['BH_Mass_nois'] = BH_Mass_nois
+    EAGLE['BH_Mass_nois_sl'] = BH_Mass_nois_sl
+    EAGLE['logLbol_nois'] = logLbol_nois
+    EAGLE['logLbol_nois_sl'] = logLbol_nois_sl
+    # EAGLE['sdss_g_galaxy'] = sdss_g_galaxy  #!!! #TODO: Change to r for z<0.5
+    # EAGLE['sdss_g_galaxy_sl'] = sdss_g_galaxy_sl
+    EAGLE['sdss_g_pointsource'] = g_pointsource
+    EAGLE['sdss_g_pointsource_sl'] = g_pointsource[select_bool]
+    # EAGLE['select_abs_Mags'] = abs_Mags
+    EAGLE['select_bool'] = select_bool
+    return EAGLE
 
 def TNG_set(filename, HSC_Lbol_overall, HSC_MBHs_overall, I_mag_break = 20.5, consider_type1= True, imf ='Cha'):
     TNG = {}
@@ -329,6 +409,7 @@ def SAM_set(filename, zs, HSC_Lbol_overall, HSC_MBHs_overall, I_mag_break = [20.
     type1_bools = quasar_filter([AGN_bol_nois, BH_Mass_nois], HSC_Lbol_overall, HSC_MBHs_overall)
     if consider_type1 == True:
         select_bool = select_bool*type1_bools
+    print(np.sum(select_bool ), select_bool.shape)
     
     BH_Mass_nois_sl = BH_Mass_nois[select_bool]
     Stellar_Mass_nois_sl = Stellar_Mass_nois[select_bool]

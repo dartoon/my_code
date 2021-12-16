@@ -100,7 +100,6 @@ for ii in range(1):
     Lbol_selected = Lbol_select_noi
     #logEddR_selected = Eddr_select_noi
     
-    
     # Import data and set up function:
     tab_list = ['CID1174', 'CID1281', 'CID206', 'CID216', 'CID237', 'CID255', 'CID3242', 'CID3570',
                 'CID452', 'CID454', 'CID50', 'CID543', 'CID597', 'CID607', 'CID70', 'LID1273',
@@ -124,7 +123,9 @@ for ii in range(1):
     logEddR_obs = logLbol_obs - logLedd_obs
     
     plt.errorbar(bh_mass_obs, logEddR_obs, c='orange',linestyle=' ',marker='o',ms=10,mec='k',zorder = 100, label='HST observed sample')
-    plt.xlim([7.15,9.15])
+    # plt.xlim([7.15,9.15])
+    # plt.ylim([-3,1])
+    plt.xlim([5.8,10])
     plt.ylim([-3,1])
     xfill = np.linspace(7.7, 8.6)
     yfill_sline = -1.1*(xfill-7.5) -0.5
@@ -143,7 +144,7 @@ for ii in range(1):
     plt.ylabel(r"log(L$_{\rm bol}$/L$_{\rm Edd}$)",fontsize=30)
     plt.xlabel(r'log(M$_{\rm BH}$/M$_{\odot}$)',fontsize=30)
     plt.legend(loc='upper right',fontsize=21,numpoints=1)
-    # plt.savefig('MBII_selectfunc.pdf')
+    plt.savefig('HST_selection_MBII.png')
     if ifplot == True:
         plt.show()
     else:
@@ -332,6 +333,28 @@ for ii in range(1):
     ax[0].legend(scatterpoints=1,numpoints=1,loc=2,prop={'size':32},ncol=2,handletextpad=0)
     ax[0].xaxis.set_minor_locator(AutoMinorLocator())
     ax[0].yaxis.set_minor_locator(AutoMinorLocator())
+    
+    # cal_M_range = np.arange(9.5, 12.1, 0.3)
+    # obs_scatter, sim_scatter = [], []
+    # for i in range(len(cal_M_range)-1):
+    #     s_bool = (sm_obs>cal_M_range[i])*(sm_obs<cal_M_range[i+1])
+    #     cal_HSC_Mstar = sm_obs[s_bool]
+    #     cal_HSC_MBHs = bh_obs[s_bool]
+    #     obs_res = cal_HSC_MBHs-(m_ml*cal_HSC_Mstar+b_ml)
+    #     obs_scatter.append( [np.mean(obs_res), np.std(obs_res)] )
+        
+    #     s_bool = (sm_sim>cal_M_range[i])*(sm_sim<cal_M_range[i+1])
+    #     cal_HSC_Mstar = sm_sim[s_bool]
+    #     cal_HSC_MBHs = bh_sim[s_bool]
+    #     obs_res = cal_HSC_MBHs-(m_ml*cal_HSC_Mstar+b_ml)
+    #     sim_scatter.append( [np.mean(obs_res), np.std(obs_res)] )
+    # obs_scatter = np.array(obs_scatter)
+    # sim_scatter = np.array(sim_scatter)
+    # ax[0].errorbar(cal_M_range[:-1]+ (cal_M_range[1]-cal_M_range[0])/2, obs_scatter[:,0], obs_scatter[:,1], color = 'orange', 
+    #       zorder = 50, linewidth = 3.5, linestyle= '-',fmt='o')
+    # ax[0].errorbar(cal_M_range[:-1]+ (cal_M_range[1]-cal_M_range[0])/2+0.05, sim_scatter[:,0], sim_scatter[:,1], color = 'steelblue', 
+    #       zorder = 50, linewidth = 3.5, linestyle= '-',fmt='o')
+    ax[0].plot(np.linspace(7, 13, 100), np.linspace(7, 13, 100) *0, 'k' )
     
     his_xy0_ =  ax[1].hist(off_int[1], orientation='horizontal'
                , histtype=u'step',density=True, color = 'green', linewidth = 4)
