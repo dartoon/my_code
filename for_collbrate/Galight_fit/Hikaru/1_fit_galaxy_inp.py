@@ -97,7 +97,6 @@ for i_ in [index]:
         data_process.generate_target_materials(radius=None, detect_tool='sep')
         data_process.PSF_list = [PSF]
         data_process_list.append(data_process)
-    
     # % Determining the common settings for all bands, including cutout radius and apertures.
     l_idx = [i for i in range(len(bands)) if bands[i] == lband][0]  #The first index to run
     run_list = [i for i in range(len(bands))]
@@ -117,49 +116,58 @@ for i_ in [index]:
             covers = mask_obj(data_process_list[i].target_stamp, apertures, if_plot=False, sum_mask = True)
             for j in range(len(data_process_list[i].apertures)):
                 new_cover = mask_obj(data_process_list[i].target_stamp, [data_process_list[i].apertures[j]], if_plot=False, sum_mask = True)
-                if np.sum(covers - new_cover*covers) > np.sum(1-new_cover)/2 :   #If 1/2 of the area covered by the aperture is new)
+                positions = [apertures[k].positions for k in range(len(apertures)) ]
+                dists = [ np.sqrt((np.sum((data_process_list[i].apertures[j].positions - 
+                                  positions[k])**2))) for k in range(len(apertures)) ]
+                print(len(apertures))
+                cond1 = np.sum(covers - new_cover*covers) > np.sum(1-new_cover)/2 #If 1/2 of the area covered by the aperture is new)
+                cond2 = np.sum( (1-new_cover) * covers ) > np.sum(1-new_cover )*4/5 #If 1/5 of the new aper is not overlap with pervious aper
+                cond3 = np.min(dists) > 4  #If center offset above 4 pixel
+                if cond1 and cond2 and cond3 :
                     apertures.append(data_process_list[i].apertures[j])
                     
     fit_sepc_l, fit_run_l = [None]*5, [None]*5
-    for i in run_list:  
+    for i in run_list:
         band = bands[i]
-        print("Staring fitting band-"+band+"... ... ...")
-        data_process_list[i].apertures = apertures #Pass apertures to the data
-        fit_sepc_l[i] = FittingSpecify(data_process_list[i])
-        fix_n_list, fix_Re_list = None, None
-        if i != l_idx:
-            if fix_n == True:
-                fix_n_list = [[0,fit_run_l[l_idx].final_result_galaxy[0]['n_sersic'] ]]
-            if fix_re == True:
-                fix_Re_list = [[0,fit_run_l[l_idx].final_result_galaxy[0]['R_sersic'] ]]
-        fit_sepc_l[i].prepare_fitting_seq(point_source_num = point_source_num, supersampling_factor=3,  
-                                          ps_pix_center_list=ps_pix_center_list,
-                                          fix_n_list= fix_n_list, fix_Re_list=fix_Re_list)
-        fit_sepc_l[i].plot_fitting_sets(out_dir+'/fitconfig-band-{0}.png'.format(band), show_plot=show_plot)
-        fit_sepc_l[i].build_fitting_seq()
-        fit_run_l[i] = FittingProcess(fit_sepc_l[i], savename = out_dir+'/result-band-{0}'.format(band), 
-                                      fitting_level=fitting_level)
-        fit_run_l[i].run(algorithm_list = ['PSO'], setting_list=[None])
-        for j in range(5):  #!!!Will be removed after Lenstrnomy debug.
-            if np.sum(fit_run_l[i].image_host_list[0]) != 0:
-                continue
+        if glob.glob(out_dir+'/*-{0}.pkl'.format(band)) == []:
+            print("Staring fitting band-"+band+"... ... ...")
+            data_process_list[i].apertures = apertures #Pass apertures to the data
+            fit_sepc_l[i] = FittingSpecify(data_process_list[i])
+            fix_n_list, fix_Re_list = None, None
+            if i != l_idx:
+                if fix_n == True:
+                    fix_n_list = [[0,fit_run_l[l_idx].final_result_galaxy[0]['n_sersic'] ]]
+                if fix_re == True:
+                    fix_Re_list = [[0,fit_run_l[l_idx].final_result_galaxy[0]['R_sersic'] ]]
+            fit_sepc_l[i].prepare_fitting_seq(point_source_num = point_source_num, supersampling_factor=3,  
+                                              ps_pix_center_list=ps_pix_center_list,
+                                              fix_n_list= fix_n_list, fix_Re_list=fix_Re_list)
+            fit_sepc_l[i].plot_fitting_sets(out_dir+'/fitconfig-band-{0}.png'.format(band), show_plot=show_plot)
+            fit_sepc_l[i].build_fitting_seq()
+            fit_run_l[i] = FittingProcess(fit_sepc_l[i], savename = out_dir+'/result-band-{0}'.format(band), 
+                                          fitting_level=fitting_level)
+            fit_run_l[i].run(algorithm_list = ['PSO'], setting_list=[None])
+            for j in range(5):  #!!!Will be removed after Lenstrnomy debug.
+                if np.sum(fit_run_l[i].image_host_list[0]) != 0:
+                    continue
+                else:
+                    cut_radius = cut_radius-1
+                    data_process_list[i].generate_target_materials(radius=cut_radius)
+                    data_process_list[i].checkout()
+                    data_process_list[i].apertures = apertures #Pass apertures to the data
+                    fit_sepc_ = FittingSpecify(data_process_list[i])
+                    fit_sepc_.prepare_fitting_seq(point_source_num = point_source_num, 
+                                                      supersampling_factor=3,
+                                                      ps_pix_center_list=ps_pix_center_list)
+                    fit_sepc_.kwargs_params = fit_sepc_l[i].kwargs_params
+                    fit_sepc_.build_fitting_seq()
+                    fit_run_l[i] = FittingProcess(fit_sepc_, savename = out_dir+'/result-band-{0}'.format(band), 
+                                                  fitting_level=fitting_level)
+                    fit_run_l[i].run(algorithm_list = ['PSO'], setting_list=[None])
+            if fit_run_l[i].image_ps_list != []:
+                fit_run_l[i].plot_final_qso_fit(save_plot=True, target_ID= object_id[2:] +'-'+ band, show_plot=show_plot )
             else:
-                cut_radius = cut_radius-1
-                data_process_list[i].generate_target_materials(radius=cut_radius)
-                data_process_list[i].checkout()
-                data_process_list[i].apertures = apertures #Pass apertures to the data
-                fit_sepc_ = FittingSpecify(data_process_list[i])
-                fit_sepc_.prepare_fitting_seq(point_source_num = point_source_num, 
-                                                  supersampling_factor=3,  ps_pix_center_list=ps_pix_center_list)
-                fit_sepc_.kwargs_params = fit_sepc_l[i].kwargs_params
-                fit_sepc_.build_fitting_seq()
-                fit_run_l[i] = FittingProcess(fit_sepc_, savename = out_dir+'/result-band-{0}'.format(band), 
-                                              fitting_level=fitting_level)
-                fit_run_l[i].run(algorithm_list = ['PSO'], setting_list=[None])
-        if fit_run_l[i].image_ps_list != []:
-            fit_run_l[i].plot_final_qso_fit(save_plot=True, target_ID= object_id[2:] +'-'+ band, show_plot=show_plot )
-        else:
-            fit_run_l[i].plot_final_galaxy_fit(save_plot=True, target_ID= object_id[2:] +'-'+ band, show_plot=show_plot )
-        fit_run_l[i].cal_astrometry()
-        fit_run_l[i].dump_result()
+                fit_run_l[i].plot_final_galaxy_fit(save_plot=True, target_ID= object_id[2:] +'-'+ band, show_plot=show_plot )
+            fit_run_l[i].cal_astrometry()
+            fit_run_l[i].dump_result()
     
