@@ -21,7 +21,7 @@ mat.rcParams['font.family'] = 'STIXGeneral'
 # sys.path.insert(0,'../../py_tools')
 # from load_result import load_MBH, load_host_p, load_err, load_Lbol
 import matplotlib as mpl
-h=0.7
+# h=0.7
 ifplot = True
 import glob
 filenames = glob.glob('MBII_data/*') 
@@ -100,16 +100,16 @@ for ii in range(1):
     Lbol_selected = Lbol_select_noi
     #logEddR_selected = Eddr_select_noi
     
-    # Import data and set up function:
-    tab_list = ['CID1174', 'CID1281', 'CID206', 'CID216', 'CID237', 'CID255', 'CID3242', 'CID3570',
-                'CID452', 'CID454', 'CID50', 'CID543', 'CID597', 'CID607', 'CID70', 'LID1273',
-                'LID1538', 'LID360', 'XID2138', 'XID2202', 'XID2396', 'CDFS-1', 'CDFS-229',
-                'CDFS-321', 'CDFS-724', 'ECDFS-358', 'SXDS-X1136', 'SXDS-X50', 'SXDS-X717', 'SXDS-X735', 'SXDS-X763', 'SXDS-X969']
-    ext_ID = {'XID2202':'LID1622', 'XID2138':'LID1820', 'XID2396':'LID1878', 'CDFS-321':'ECDFS-321'}
-    tab_sub_list = copy.deepcopy(tab_list)
-    for i in range(len(tab_sub_list)):
-        if tab_sub_list[i] in ext_ID.keys():
-            tab_sub_list[i] = ext_ID[tab_sub_list[i]]
+    # # Import data and set up function:
+    # tab_list = ['CID1174', 'CID1281', 'CID206', 'CID216', 'CID237', 'CID255', 'CID3242', 'CID3570',
+    #             'CID452', 'CID454', 'CID50', 'CID543', 'CID597', 'CID607', 'CID70', 'LID1273',
+    #             'LID1538', 'LID360', 'XID2138', 'XID2202', 'XID2396', 'CDFS-1', 'CDFS-229',
+    #             'CDFS-321', 'CDFS-724', 'ECDFS-358', 'SXDS-X1136', 'SXDS-X50', 'SXDS-X717', 'SXDS-X735', 'SXDS-X763', 'SXDS-X969']
+    # ext_ID = {'XID2202':'LID1622', 'XID2138':'LID1820', 'XID2396':'LID1878', 'CDFS-321':'ECDFS-321'}
+    # tab_sub_list = copy.deepcopy(tab_list)
+    # for i in range(len(tab_sub_list)):
+    #     if tab_sub_list[i] in ext_ID.keys():
+    #         tab_sub_list[i] = ext_ID[tab_sub_list[i]]
     # Lr, M_star, M_r = load_host_p(tab_list, folder = '../../')  # M_star by Chabrier 
     
     import pickle

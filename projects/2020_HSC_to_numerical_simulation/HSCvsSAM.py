@@ -47,9 +47,8 @@ for ii in range(1):
     if imf == 'Sal':
         detlaM = 0.23
     
-    SAM_scatter_overall = (SAM['BH_Mass_nois'] - ( m_ml* ( SAM['Stellar_Mass_nois'] - detlaM) +b_ml ) )
-    SAM_scatter = (SAM['BH_Mass_nois_sl'] - ( m_ml* ( SAM['Stellar_Mass_nois_sl'] - detlaM) +b_ml ) )
-    
+    # SAM_scatter_overall = (SAM['BH_Mass_nois'] - ( m_ml* ( SAM['Stellar_Mass_nois'] - detlaM) +b_ml ) )
+    # SAM_scatter = (SAM['BH_Mass_nois_sl'] - ( m_ml* ( SAM['Stellar_Mass_nois_sl'] - detlaM) +b_ml ) )
     # text  = np.loadtxt(filename)
     # text = text[text[:,5] != 0]
     # redshift = text[:, 0]

@@ -97,12 +97,15 @@ for i in run_list:
             positions = [apertures[k].positions for k in range(len(apertures)) ]
             dists = [ np.sqrt((np.sum((data_process_list[i].apertures[j].positions - 
                               positions[k])**2))) for k in range(len(apertures)) ]
-            print(len(apertures))
             cond1 = np.sum(covers - new_cover*covers) > np.sum(1-new_cover)/2 #If 1/2 of the area covered by the aperture is new)
             cond2 = np.sum( (1-new_cover) * covers ) > np.sum(1-new_cover )*4/5 #If 1/5 of the new aper is not overlap with pervious aper
             cond3 = np.min(dists) > 4  #If center offset above 4 pixel
             if cond1 and cond2 and cond3 :
                 apertures.append(data_process_list[i].apertures[j])
+
+from galight.tools.measure_tools import sort_apertures
+apertures = sort_apertures(data_process_list[0].target_stamp, apertures)
+
                 
 fit_sepc_l, fit_run_l = [None]*5, [None]*5
 for i in run_list:  
@@ -122,32 +125,32 @@ for i in run_list:
                                           fix_n_list= fix_n_list, fix_Re_list=fix_Re_list)
         fit_sepc_l[i].plot_fitting_sets(out_dir+'/fitconfig-band-{0}.png'.format(band))
         fit_sepc_l[i].build_fitting_seq()
-        fit_run_l[i] = FittingProcess(fit_sepc_l[i], savename = out_dir+'/result-band-{0}'.format(band), fitting_level=fitting_level)
-        fit_run_l[i].run(algorithm_list = ['PSO'], setting_list=[None])
-        for j in range(5):  #!!!Will be removed after Lenstrnomy debug.
-            if np.sum(fit_run_l[i].image_host_list[0]) != 0:
-                continue
-            else:
-                cut_radius = cut_radius-1
-                data_process_list[i].generate_target_materials(radius=cut_radius)
-                data_process_list[i].checkout()
-                data_process_list[i].apertures = apertures #Pass apertures to the data
-                fit_sepc_ = FittingSpecify(data_process_list[i])
-                fit_sepc_.prepare_fitting_seq(point_source_num = point_source_num, 
-                                                  supersampling_factor=3,
-                                                  ps_pix_center_list=ps_pix_center_list)
-                fit_sepc_.kwargs_params = fit_sepc_l[i].kwargs_params
-                fit_sepc_.build_fitting_seq()
-                fit_run_l[i] = FittingProcess(fit_sepc_, savename = out_dir+'/result-band-{0}'.format(band), 
-                                              fitting_level=fitting_level)
-                fit_run_l[i].run(algorithm_list = ['PSO'], setting_list=[None])
+        # fit_run_l[i] = FittingProcess(fit_sepc_l[i], savename = out_dir+'/result-band-{0}'.format(band), fitting_level=fitting_level)
+        # fit_run_l[i].run(algorithm_list = ['PSO'], setting_list=[None])
+        # for j in range(5):  #!!!Will be removed after Lenstrnomy debug.
+        #     if np.sum(fit_run_l[i].image_host_list[0]) != 0:
+        #         continue
+        #     else:
+        #         cut_radius = cut_radius-1
+        #         data_process_list[i].generate_target_materials(radius=cut_radius)
+        #         data_process_list[i].checkout()
+        #         data_process_list[i].apertures = apertures #Pass apertures to the data
+        #         fit_sepc_ = FittingSpecify(data_process_list[i])
+        #         fit_sepc_.prepare_fitting_seq(point_source_num = point_source_num, 
+        #                                           supersampling_factor=3,
+        #                                           ps_pix_center_list=ps_pix_center_list)
+        #         fit_sepc_.kwargs_params = fit_sepc_l[i].kwargs_params
+        #         fit_sepc_.build_fitting_seq()
+        #         fit_run_l[i] = FittingProcess(fit_sepc_, savename = out_dir+'/result-band-{0}'.format(band), 
+        #                                       fitting_level=fitting_level)
+        #         fit_run_l[i].run(algorithm_list = ['PSO'], setting_list=[None])
         
-        if fit_run_l[i].image_ps_list != []:
-            fit_run_l[i].plot_final_qso_fit(save_plot=True, target_ID= object_id +'-'+ band )
-        else:
-            fit_run_l[i].plot_final_galaxy_fit(save_plot=True, target_ID= object_id +'-'+ band )
+        # if fit_run_l[i].image_ps_list != []:
+        #     fit_run_l[i].plot_final_qso_fit(save_plot=True, target_ID= object_id +'-'+ band )
+        # else:
+        #     fit_run_l[i].plot_final_galaxy_fit(save_plot=True, target_ID= object_id +'-'+ band )
             
-        fit_run_l[i].cal_astrometry()
-        fit_run_l[i].dump_result()
+        # fit_run_l[i].cal_astrometry()
+        # fit_run_l[i].dump_result()
         # Script to remove the fitted target
         # fit_run_l[i].targets_subtraction(save_fitsfile=True, sub_gal_list=[1,2], sub_qso_list=[0])

@@ -73,7 +73,7 @@ def HSC_set(zs = 0.5, core = False, imf = 'Cha'):
     else:
         select_bool = redshift_bool
     
-    HSC['HSC_Mstar'] = HSC_Mstar_overall[select_bool ]
+    HSC['HSC_Mstar'] = HSC_Mstar_overall[select_bool]
     HSC['HSC_MBHs'] = HSC_MBHs_overall[select_bool]
     HSC['HSC_ps_mag'] = HSC_ps_mag_overall[select_bool]  #'ps_imag'
     HSC['HSC_Lbol'] = HSC_Lbol_overall[select_bool]
@@ -409,7 +409,6 @@ def SAM_set(filename, zs, HSC_Lbol_overall, HSC_MBHs_overall, I_mag_break = [20.
     type1_bools = quasar_filter([AGN_bol_nois, BH_Mass_nois], HSC_Lbol_overall, HSC_MBHs_overall)
     if consider_type1 == True:
         select_bool = select_bool*type1_bools
-    print(np.sum(select_bool ), select_bool.shape)
     
     BH_Mass_nois_sl = BH_Mass_nois[select_bool]
     Stellar_Mass_nois_sl = Stellar_Mass_nois[select_bool]
@@ -444,7 +443,6 @@ def quasar_filter(group_list, HSC_Lbol_overall, HSC_MBHs_overall):
     from matplotlib import cm 
     t = [kernel.pdf([HSC_Lbol_overall[i] , HSC_MBHs_overall[i]]) for i in range(len(HSC_Lbol_overall))]
     min_pdf = np.min(t)
-    # print(np.mean(min_pdf))
     bools = [ (kernel.pdf([group_list[0][i] , group_list[1][i]]) > min_pdf/2)[0] for i in range(len(group_list[0]))]  
     # plt.scatter(HSC_Lbol_overall, HSC_MBHs_overall,c='blue')
     # plt.contourf(xx, yy, f, cmap=cm.Blues, alpha=0.5)

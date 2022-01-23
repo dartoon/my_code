@@ -173,7 +173,7 @@ for ii in range(1):
     y_sline1 = xfill*0
     y_sline2 = xfill*0-1.5
     y4 = np.maximum(yfill_sline, y_sline2)
-    plt.fill_between(xfill, y4, y2=0, color='steelblue', alpha=0.5, zorder=10)
+    plt.fill_between(xfill, y4, y2=0, color='steelblue', alpha=0.5, zorder=0.1)
     plt.tick_params(labelsize=30)
     plt.xlabel(r'log(M$_{\rm BH}$/M$_{\odot}$)',fontsize=30)
     plt.ylabel(r'log(L$_{\rm bol}$/L$_{\rm Edd}$)', fontsize=30)
@@ -373,8 +373,8 @@ for ii in range(1):
     plt.savefig('DeltaMM_MBII_zs_{0}.png'.format(zs))
     plt.show()
     
-    # cals = off_int[1]#[(off_int[0]<off_obs[0].max())*(off_int[0]>off_obs[0].min())]
-    # print('{0:.2f}, {1:.2f}'.format(np.mean(cals), np.std(cals)))
+    cals = off_sim[1]#[(off_int[0]<off_obs[0].max())*(off_int[0]>off_obs[0].min())]
+    print('{0:.2f}, {1:.2f}'.format(np.mean(cals), np.std(cals)))
 
     #%%
     # MBII_scatter = (MBII['BH_Mass_nois_sl'] - ( m_ml*(MBII['Stellar_Mass_nois_sl']- detlaM)+b_ml ) )

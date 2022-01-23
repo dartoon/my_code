@@ -252,7 +252,7 @@ from matplotlib.ticker import AutoMinorLocator
 plt.savefig('DeltaMM_TNG_zs_{0}.png'.format(zs))
 plt.show()
 
-cals = off_int[1]#[(off_int[0]<off_obs[0].max())*(off_int[0]>off_obs[0].min())]
+cals = off_sim[1]#[(off_int[0]<off_obs[0].max())*(off_int[0]>off_obs[0].min())]
 print('{0:.2f}, {1:.2f}'.format(np.mean(cals), np.std(cals)))
 
 #%%

@@ -98,3 +98,4 @@ projects/2020_HSC_to_numerical_simulation/_MC_result/*
 *.out
 RefL0100N1504*
 simdata_*
+*.gif

@@ -21,7 +21,7 @@ from prep_comparison import TNG_set as Illustris_set
 
 filenames = glob.glob('Illustris_data/*.npy') 
 filenames.sort()
-idx = 2
+idx = 0
 filename = filenames[idx]
 zs = float(filename.split("_z")[1][:4])
 
@@ -273,11 +273,11 @@ from matplotlib.ticker import AutoMinorLocator
 plt.savefig('DeltaMM_Illustris_zs_{0}.png'.format(zs))
 plt.show()
 
-cals = off_int[1]#[(off_int[0]<off_obs[0].max())*(off_int[0]>off_obs[0].min())]
+cals = off_sim[1]#[(off_int[0]<off_obs[0].max())*(off_int[0]>off_obs[0].min())]
 print('{0:.2f}, {1:.2f}'.format(np.mean(cals), np.std(cals)))
 
 
-# #%%
+#%%
 # #Plot the 1-D scatter for MM.
 # fig, ax = plt.subplots(figsize=(8,7))
 # plt.hist(Illustris_scatter_nosl, histtype=u'step',density=True,
@@ -299,18 +299,18 @@ print('{0:.2f}, {1:.2f}'.format(np.mean(cals), np.std(cals)))
 # plt.xlabel(r'$\Delta$log(M$_{\rm BH}$/M$_{\odot}$)',fontsize=30)
 # #plt.savefig('comp_scatter_MM_MBIIonly.pdf')
 # plt.show()
-# from scipy import stats
-# sim_scatter_std = np.std(Illustris_scatter)
-# obs_scatter_std = np.std(HSC_scatter)
-# print("obs scatter:", obs_scatter_std)
-# print("sim scatter:", sim_scatter_std)
-# print("KS p-value:", stats.ks_2samp(Illustris_scatter, HSC_scatter).pvalue)
-# print(np.mean(Illustris_scatter_nosl), np.mean(Illustris_scatter) )
+from scipy import stats
+sim_scatter_std = np.std(Illustris_scatter)
+obs_scatter_std = np.std(HSC_scatter)
+print("obs scatter:", obs_scatter_std)
+print("sim scatter:", sim_scatter_std)
+print("KS p-value:", stats.ks_2samp(Illustris_scatter, HSC_scatter).pvalue)
+print(np.mean(Illustris_scatter_nosl), np.mean(Illustris_scatter) )
 
-# print("for paper Observation", 'zs=', zs)
-# print('{0:.2f}, {1:.2f}'.format(np.mean(HSC_scatter), np.std(HSC_scatter)))
-# print("for paper Illustris", 'zs=', zs)
-# print('{0:.2f}, {1:.2f}'.format(np.mean(Illustris_scatter), np.std(Illustris_scatter)))
+print("for paper Observation", 'zs=', zs)
+print('{0:.2f}, {1:.2f}'.format(np.mean(HSC_scatter), np.std(HSC_scatter)))
+print("for paper Illustris", 'zs=', zs)
+print('{0:.2f}, {1:.2f}'.format(np.mean(Illustris_scatter), np.std(Illustris_scatter)))
 
 
 # sim_offset_nosl = Illustris_scatter_nosl 

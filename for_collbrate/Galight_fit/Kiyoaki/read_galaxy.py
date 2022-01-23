@@ -13,7 +13,7 @@ import matplotlib.pyplot as plt
 import pickle
 import glob
 
-for i in [1]:
+for i in range(20):
     idx = i
     filename = glob.glob('{0}_*/*pkl'.format(idx))
     if filename == []:
@@ -28,16 +28,16 @@ for i in [1]:
     result.plot_final_galaxy_fit(target_ID = ID)
 
     # %%
-    from matplotlib.colors import LogNorm
-    norm = LogNorm()
-    plt.imshow(data, origin='lower', norm = norm) 
-    plt.colorbar()
-    plt.show() 
+    # from matplotlib.colors import LogNorm
+    # norm = LogNorm()
+    # plt.imshow(data, origin='lower', norm = norm) 
+    # plt.colorbar()
+    # plt.show() 
     
-    plt.imshow(model, origin='lower', norm = norm) 
-    plt.colorbar()
-    plt.show() 
+    # plt.imshow(model, origin='lower', norm = norm) 
+    # plt.colorbar()
+    # plt.show() 
     
-    plt.imshow((data-model)/noise, origin='lower', norm = norm) 
-    plt.colorbar()
-    plt.show() 
+    # plt.imshow((data-model)/noise, origin='lower', norm = norm) 
+    # plt.colorbar()
+    # plt.show() 

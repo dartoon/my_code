@@ -20,12 +20,12 @@ ID_list = sample['id']
 RA_list = sample['RA']
 Dec_list = sample['DEC']
 
-# for i_ in range(1, 100):
+# for i_ in range(1):
 # for i_ in range(100, 200):
 # for i_ in range(200, 300):    
 # for i_ in range(300, 400):
 # for i_ in range(400, len(ID_list)):    
-for i_ in [24,81,331,339,382,415]:
+for i_ in [24,81,331,339,382,387,415]:
     object_id,ra,dec= '{0}_'.format(i_)+str(ID_list[i_]), RA_list[i_], Dec_list[i_]
     print(object_id)
     #%%
@@ -134,6 +134,4 @@ for i_ in [24,81,331,339,382,415]:
         residual = fit_run_l[i].flux_2d_out['data'] - fit_run_l[i].flux_2d_out['model']
         pyfits.PrimaryHDU(residual).writeto(object_id+'/residual(data-model).fits',overwrite=True)
         
-    
-    
     

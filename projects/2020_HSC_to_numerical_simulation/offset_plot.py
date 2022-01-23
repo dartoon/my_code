@@ -16,7 +16,7 @@ from scipy import stats
 import matplotlib as mat
 mat.rcParams['font.family'] = 'STIXGeneral'
 
-zs = 0.7
+zs = 1.5
 files = glob.glob("offset_result/*{0}.txt".format(zs))
 if zs == 0.5 or zs == 0.7:
     files = files+glob.glob("offset_result/*{0}.txt".format(0.6))
@@ -24,7 +24,8 @@ files.sort()
 ct = 0
 # fig, ax = plt.subplots(figsize=(8,7))
 # colors = ['green','steelblue','c','deeppink','plum','m']
-colors = ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b', '#e377c2', '#7f7f7f', '#bcbd22', '#17becf']
+# colors = ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b', '#e377c2', '#7f7f7f', '#bcbd22', '#17becf']
+colors = ['orange','deepskyblue', 'steelblue', 'c', 'deeppink', 'deeppink', 'm']
 fig, axs = plt.subplots(len(files)+1, figsize=(5,8), sharex = True)
 for i in [3,2,1,4,5,0]:
     data = np.loadtxt(files[i]) #nosl, sl, obs, sl_M*, sl_BH, obs_M*, obs_BH
@@ -34,7 +35,7 @@ for i in [3,2,1,4,5,0]:
     
     if ct == 0:
         his_xy_ = axs[0].hist(data[:,2][abs(data[:,2])!=99],histtype= u'barstacked', 
-                 density=True, #color = 'k',
+                 density=True, color = colors[0],
                  linewidth = 3, alpha = 0.8, zorder = 10)
         obs_mean = np.mean(data[:,2][abs(data[:,2])!=99])
         obs_ks_sample = data[:,2][abs(data[:,2])!=99]
@@ -50,7 +51,6 @@ for i in [3,2,1,4,5,0]:
         label = label + '\n-AGN'
     his_xy = axs[ct+1].hist(data[:,1][abs(data[:,1])!=99], histtype=u'barstacked',
              density=True,
-              # label=' '+label, 
               linewidth = 14,alpha = 0.8,
                color = colors[ct+1])
     axs[ct+1].set_yticks([])

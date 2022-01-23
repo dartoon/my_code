@@ -119,7 +119,6 @@ for i_ in [index]:
                 positions = [apertures[k].positions for k in range(len(apertures)) ]
                 dists = [ np.sqrt((np.sum((data_process_list[i].apertures[j].positions - 
                                   positions[k])**2))) for k in range(len(apertures)) ]
-                print(len(apertures))
                 cond1 = np.sum(covers - new_cover*covers) > np.sum(1-new_cover)/2 #If 1/2 of the area covered by the aperture is new)
                 cond2 = np.sum( (1-new_cover) * covers ) > np.sum(1-new_cover )*4/5 #If 1/5 of the new aper is not overlap with pervious aper
                 cond3 = np.min(dists) > 4  #If center offset above 4 pixel

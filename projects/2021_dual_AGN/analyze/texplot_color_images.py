@@ -80,6 +80,7 @@ for k in range(len(ID_list)):
         image_folder = image_folder_1[0].split(ID)[0]
     else:
         image_folder = image_folder[0]
+    print(image_folder)
     
     #%%
     band_seq = ['I', 'G', 'R', 'Z', 'Y']
