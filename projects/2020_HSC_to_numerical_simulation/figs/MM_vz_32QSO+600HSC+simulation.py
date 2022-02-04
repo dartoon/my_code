@@ -388,8 +388,8 @@ for i in range(len(sims)):
     elif i == 1:
         zs = np.array([0.3, 0.6, 1.5])
     # line = plt.plot(np.log10(1+zs), sims[i][:,0], linestyle = '--', color =c[i],  linewidth=3,zorder=10)
-    plt.errorbar(np.log10(1+zs)+0.01/6*i, sims[i][:,0], sims[i][:,1], linestyle = ls, color =c[i],
-                  zorder = 50, linewidth = 2)
+    plt.errorbar(np.log10(1+zs)+0.015/6*i, sims[i][:,0], sims[i][:,1], linestyle = ls, color =c[i],
+                  zorder = 50, linewidth = 3)
     ty1=sims[i][:,0] + sims[i][:,1]
     ty2=sims[i][:,0] - sims[i][:,1]
     # zs[0] = zs[0]-0.1
@@ -415,7 +415,7 @@ plt.xlim([-0.01,0.5])
 plt.ylabel(r"$\Delta$logM$_{\rm BH}$ (vs M$_*$)",fontsize=45)
 plt.grid()
 plt.tick_params(labelsize=35)
-
+plt.tick_params(which='major', width=2, length=10, direction='in')
 ax2=ax.twiny()
 tticks=np.array([10**xl-1,0.5,1,1.5,2,10**xh-1])
 ax2.set_xticks([np.log(t+1) for t in tticks])  # for the entire scale
