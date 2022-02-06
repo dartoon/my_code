@@ -16,7 +16,7 @@ from scipy import stats
 import matplotlib as mat
 mat.rcParams['font.family'] = 'STIXGeneral'
 
-zs = 1.5
+zs = 0.7
 files = glob.glob("offset_result/*{0}.txt".format(zs))
 if zs == 0.5 or zs == 0.7:
     files = files+glob.glob("offset_result/*{0}.txt".format(0.6))
@@ -55,7 +55,7 @@ for i in [3,2,1,4,5,0]:
               linewidth = 14,alpha = 0.8,
                color = colors[ct+1])
     axs[ct+1].set_yticks([])
-    if zs == 0.3:
+    if zs == 0.3 or zs == 0.7:
         axs[ct+1].set_ylabel(label, fontsize = 20)#, rotation=0)
         axs[0].set_ylabel('Obs.', fontsize = 20)
     axs[ct+1].plot([obs_mean,obs_mean], [0, 2], linewidth = 3,color = colors[0])
