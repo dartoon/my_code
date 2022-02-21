@@ -57,11 +57,11 @@ keys = []
 for key in target_info.keys():
     keys.append(key)
 #%%
-ID = 0
+# ID = 0
 # seed = 0
 # for seed in range(0, 20):
 seed = int(sys.argv[1])
-for seed in [seed]:
+for ID in range(12):
     np.random.seed(seed = seed)
     name = keys[ID] #!!! ID of target
     host_flux_ratio = np.random.uniform(0.07,0.9) #!!!
