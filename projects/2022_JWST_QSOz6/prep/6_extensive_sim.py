@@ -26,7 +26,7 @@ from galight.fitting_process import FittingProcess
 
 if_plot = False
 
-filt_id = int(sys.argv[2])
+filt_id = 0 #int(sys.argv[2])
 filt = ['f150w', 'f356w'][filt_id]
 # filt = 'f150w' #!!!
 # filt = 'f356w'
@@ -44,11 +44,13 @@ FWHMs, fluxs = np.array(FWHMs), np.array(fluxs)
 
 def find_close_PSF_idx(psf_id):
     sort = np.argsort(abs(FWHMs[psf_id] - FWHMs))[1:]
+    idx = sort[0] #Setting a initial value
     for i in sort:
         # print( abs((fluxs[i]- fluxs[psf_id])/fluxs[psf_id]  ) )
         if abs( (fluxs[i]- fluxs[psf_id])/fluxs[psf_id])<0.5 and fluxs[i]>500:
             idx = i
             break
+        
     # print(sort)
     return idx
 # print(find_close_PSF_idx(0))
@@ -60,7 +62,7 @@ for key in target_info.keys():
 # ID = 0
 # seed = 0
 # for seed in range(0, 20):
-seed = int(sys.argv[1])
+seed = 0 #int(sys.argv[1])
 for ID in range(12):
     np.random.seed(seed = seed)
     name = keys[ID] #!!! ID of target
