@@ -9,6 +9,6 @@ Read me:
 4_load_psf_lib.py: Example of loading PSF.
 
 
-5_ a collection of M1450 for all sample
+5_M1450_and_mag.py: a collection of M1450 for all sample and their filter mags.
 6_ a extensive simulation and model?
 7_ checkout result
