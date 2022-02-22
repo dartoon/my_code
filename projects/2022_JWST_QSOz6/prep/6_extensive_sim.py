@@ -23,10 +23,11 @@ from galight.data_process import DataProcess
 from galight.fitting_specify import FittingSpecify
 from galight.tools.astro_tools import plt_many_fits
 from galight.fitting_process import FittingProcess
+from galight.tools.measure_tools import detect_obj
+from photutils.segmentation import SourceCatalog
 
 if_plot = False
-
-filt_id = 0 #int(sys.argv[2])
+filt_id = int(sys.argv[2])
 filt = ['f150w', 'f356w'][filt_id]
 # filt = 'f150w' #!!!
 # filt = 'f356w'
@@ -50,7 +51,6 @@ def find_close_PSF_idx(psf_id):
         if abs( (fluxs[i]- fluxs[psf_id])/fluxs[psf_id])<0.5 and fluxs[i]>500:
             idx = i
             break
-        
     # print(sort)
     return idx
 # print(find_close_PSF_idx(0))
@@ -62,7 +62,7 @@ for key in target_info.keys():
 # ID = 0
 # seed = 0
 # for seed in range(0, 20):
-seed = 0 #int(sys.argv[1])
+seed = int(sys.argv[1])
 for ID in range(12):
     np.random.seed(seed = seed)
     name = keys[ID] #!!! ID of target
@@ -73,10 +73,12 @@ for ID in range(12):
     im = pyfits.open(folder+file)
     data = im[1].data
     header = im[1].header
+    flux_mjsr = header['PHOTMJSR']
     # print('For flux value in unit of MJy/sr.') #https://en.wikipedia.org/wiki/AB_magnitude
     # value_unit = header['BUNIT']
     # print("Data unit:", value_unit)
     # flux(Mjy/sr) * 2.350443 * 10**(-5) *0.03**2   #Flux to Jy  https://irsa.ipac.caltech.edu/data/SPITZER/docs/spitzermission/missionoverview/spitzertelescopehandbook/18/
+    data = data/flux_mjsr # To change MJ/sr to flux
     
     psf_id = np.random.randint(0,len(psfs))
     if filt=='f356w':
@@ -95,8 +97,6 @@ for ID in range(12):
     psf_id_model = find_close_PSF_idx(psf_id)
     psf_model = psfs[psf_id_model]
     
-    from galight.tools.measure_tools import detect_obj
-    from photutils.segmentation import SourceCatalog
     for i in range(500):
         if filt=='f150w':
             pos = [int(np.random.uniform(200, 4200)), int(np.random.uniform(200, 4200))]  #!!!
@@ -119,11 +119,12 @@ for ID in range(12):
         #     break
     
     pixscale = read_pixel_scale(header)
-    zp = -2.5*np.log10(2.350443 * 10**(-5) *pixscale**2/3631)
+    zp = -2.5*np.log10(2.350443 * 10**(-5) *pixscale**2/3631) - 2.5*np.log10(flux_mjsr)  #zp for flux
     header0 = im[0].header
     img_filter = header0['FILTER']
     img_cam = header0['APERNAME'] #In JDAT'simulation it is 'DETECTOR'
     exptime = header0['TEXPTIME'] #The assumed exp time.
+    # exptime /= flux_mjsr  #active this part if zp is for mJy/sr
     # plt_fits(data_sb)
     
     #%%For mock galaxy
