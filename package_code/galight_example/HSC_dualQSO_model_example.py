@@ -39,20 +39,20 @@ data_process.PSF_list = [PSF]
 data_process.checkout() #Check if all the materials is known.
 
 #%%Start to produce the class and params for lens fitting.
-from galight.fitting_specify import FittingSpeficy
-fit_sepc = FittingSpeficy(data_process)
+from galight.fitting_specify import FittingSpecify
+fit_sepc = FittingSpecify(data_process)
 fit_sepc.prepare_fitting_seq(point_source_num = 2)#, fix_n_list= [[0,4]], fix_center_list = [[0,0]])
 fit_sepc.build_fitting_seq()
 
 from galight.tools.measure_tools import plot_data_apertures, plot_data_apertures_point
 plot_data_apertures_point(fit_sepc.data_class.data, fit_sepc.apertures, fit_sepc.center_pix_pos)
 
-# #%%Setting the fitting method and run.
-# from galight.fitting_process import FittingProcess
-# fit_run = FittingProcess(fit_sepc, savename = 'dualQSO_HSC')
-# fit_run.run()
-# fit_run.plot_all()
-# fit_run.dump_result()
-# # # print(fit_run.final_galaxy_result[0])
+# # #%%Setting the fitting method and run.
+# # from galight.fitting_process import FittingProcess
+# # fit_run = FittingProcess(fit_sepc, savename = 'dualQSO_HSC')
+# # fit_run.run()
+# # fit_run.plot_all()
+# # fit_run.dump_result()
+# # # # print(fit_run.final_galaxy_result[0])
 
 
