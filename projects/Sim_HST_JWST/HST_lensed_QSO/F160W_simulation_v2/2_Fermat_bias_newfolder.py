@@ -15,7 +15,7 @@ mat.rcParams['font.family'] = 'STIXGeneral'
 
 potential_mismatch_list = []
 geometry_mismatch_list = []
-
+fer_pot_mismatch_list = []
     #folder_type = 'sim_lens_ID_'
     #file_type = 'model_result.pkl'
 
@@ -149,6 +149,7 @@ for folder in folder_list_list:
     for i in range(len(true_potential_diff)):
         potential_mismatch_list.append(infe_potential_diff[i] - true_potential_diff[i])
         geometry_mismatch_list.append(infe_geometry_diff[i]- true_geometry_diff[i])
+        fer_pot_mismatch_list.append((infe_geometry_diff[i] - infe_potential_diff[i]) - (true_geometry_diff[i] - true_potential_diff[i]) )
     # potential_mismatch_list.append(np.average( true_potential_diff - infe_potential_diff ))
     # geometry_mismatch_list.append(np.average( true_geometry_diff - infe_geometry_diff ))
 
@@ -178,3 +179,5 @@ print("np.std(geometry_mismatch_list):", np.std(geometry_mismatch_list))
 
 print("np.mean(potential_mismatch_list):", np.mean(potential_mismatch_list))
 print("np.std(potential_mismatch_list):", np.std(potential_mismatch_list))
+
+print('fermat potential', np.mean(fer_pot_mismatch_list), np.std(fer_pot_mismatch_list))
