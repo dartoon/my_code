@@ -122,7 +122,7 @@ for ii in range(1):
     # Lr, M_star, M_r = load_host_p(tab_list, folder = '../../')  # M_star by Chabrier 
     
     import pickle
-    HST_results = pickle.load(open('HST_saves.pkl','rb'))
+    HST_results = pickle.load(open('./pickles/HST_saves.pkl','rb'))
     Lr, M_star, M_r, M_r_obs_err, bh_mass_obs, stellar_mass_obs_err, logLbol_obs = HST_results
     
     M_r_obs= M_r
@@ -229,17 +229,18 @@ for ii in range(1):
     sim_offset = mstar_selected - lfit(bhmass_selected)
     obs_offset = stellar_mass_obs - lfit(bh_mass_obs)
     leng = max(len(sim_offset),len(obs_offset))
-    rfilename = 'offset_result/' + 'Illustris_zs{0}.txt'.format(zs)
-    if_file = glob.glob(rfilename)
-    write_file =  open(rfilename,'w') 
-    for i in range(leng):
-        try:
-            write_file.write('{0} {1} {2} {3} {4} {5} {6}'.format(sim_offset_nosl[i], sim_offset[i], obs_offset[i], 
-                                                                  mstar_selected[i], bhmass_selected[i], stellar_mass_obs[i], bh_mass_obs[i] ))
-        except:
-            write_file.write('{0} {1} -99 {2} {3} -99 -99'.format(sim_offset_nosl[i], sim_offset[i], mstar_selected[i], bhmass_selected[i]))
-        write_file.write("\n")
-    write_file.close()        
+    print(np.mean(sim_offset),np.std(sim_offset))
+    # rfilename = 'offset_result/' + 'Illustris_zs{0}.txt'.format(zs)
+    # if_file = glob.glob(rfilename)
+    # write_file =  open(rfilename,'w') 
+    # for i in range(leng):
+    #     try:
+    #         write_file.write('{0} {1} {2} {3} {4} {5} {6}'.format(sim_offset_nosl[i], sim_offset[i], obs_offset[i], 
+    #                                                               mstar_selected[i], bhmass_selected[i], stellar_mass_obs[i], bh_mass_obs[i] ))
+    #     except:
+    #         write_file.write('{0} {1} -99 {2} {3} -99 -99'.format(sim_offset_nosl[i], sim_offset[i], mstar_selected[i], bhmass_selected[i]))
+    #     write_file.write("\n")
+    # write_file.close()        
     # print("obs scatter:", obs_scatter)
     # print("sim scatter:", sim_scatter)
     # print("KS scatter:", stats.ks_2samp((mstar_selected - lfit(bhmass_selected,fit[0][0],fit[0][1])),

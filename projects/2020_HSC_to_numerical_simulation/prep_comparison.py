@@ -99,7 +99,7 @@ def EE(z):
 vec_EE=np.vectorize(EE)               #Perform the function EE in array style
 
 
-def Horizon_set(filename, HSC_Lbol_overall, HSC_MBHs_overall, zs, I_mag_break = 20.5, consider_type1= True, imf ='Sal'):
+def Horizon_set(filename, HSC_Lbol_overall, HSC_MBHs_overall, zs, I_mag_break = 20.5, consider_type1= True, imf ='Sal', no_noise = False):
     Horizon = {}
     # Stellar_Mass, BH_Mass, sdss_i_galaxy, sdss_g_galaxy, sdss_r_galaxy, sdss_i_pointsource, sdss_g_pointsource, Eddington_ratio = np.load(filename)
     texts = np.loadtxt(filename)
@@ -140,7 +140,11 @@ def Horizon_set(filename, HSC_Lbol_overall, HSC_MBHs_overall, zs, I_mag_break = 
         sdss_mag = g_pointsource #-2.5*np.log10(10**(-0.4*sdss_g_galaxy) + 10**(-0.4*sdss_g_pointsource))
     elif zs<0.5:
         sdss_mag= r_pointsource #-2.5*np.log10(10**(-0.4*sdss_r_galaxy) + 10**(-0.4*abs_sdss_r_pointsource))
-    dMBH, dmag, dMstar, dLbol= 0.4, 0.3, 0.2, 0.1  #dmag is for host magnitude. 
+    if  no_noise == False:
+        dMBH, dmag, dMstar, dLbol= 0.4, 0.3, 0.2, 0.1  #dmag is for host magnitude. 
+    elif no_noise == True:
+        dMBH, dmag, dMstar, dLbol= 0.001, 0.001, 0.001, 0.001  #dmag is for host magnitude. 
+    # dMBH, dmag, dMstar, dLbol= 0.4, 0.3, 0.2, 0.1  #dmag is for host magnitude. 
     # dMBH, dmag, dMstar, dLbol= 0.001, 0.001, 0.001, 0.001  #dmag is for host magnitude. 
     
     z_range = np.arange(0.2, 1.0, 0.05)
@@ -247,7 +251,7 @@ def EAGLE_set(filename, HSC_Lbol_overall, HSC_MBHs_overall, zs, I_mag_break = 20
     EAGLE['select_bool'] = select_bool
     return EAGLE
 
-def TNG_set(filename, HSC_Lbol_overall, HSC_MBHs_overall, I_mag_break = 20.5, consider_type1= True, imf ='Cha'):
+def TNG_set(filename, HSC_Lbol_overall, HSC_MBHs_overall, I_mag_break = 20.5, consider_type1= True, imf ='Cha', no_noise =False):
     TNG = {}
     zs = float(filename.split("_z")[1][:4])
     TNG['zs'] = zs
@@ -282,8 +286,10 @@ def TNG_set(filename, HSC_Lbol_overall, HSC_MBHs_overall, I_mag_break = 20.5, co
         sdss_mag = sdss_g_pointsource #-2.5*np.log10(10**(-0.4*sdss_g_galaxy) + 10**(-0.4*sdss_g_pointsource))
     elif zs<0.5:
         sdss_mag= abs_sdss_r_pointsource #-2.5*np.log10(10**(-0.4*sdss_r_galaxy) + 10**(-0.4*abs_sdss_r_pointsource))
-    dMBH, dmag, dMstar, dLbol= 0.4, 0.3, 0.2, 0.1  #dmag is for host magnitude. 
-    # dMBH, dmag, dMstar, dLbol= 0.001, 0.001, 0.001, 0.001  #dmag is for host magnitude. 
+    if  no_noise == False:
+        dMBH, dmag, dMstar, dLbol= 0.4, 0.3, 0.2, 0.1  #dmag is for host magnitude. 
+    elif no_noise == True:
+        dMBH, dmag, dMstar, dLbol= 0.001, 0.001, 0.001, 0.001  #dmag is for host magnitude. 
     logLedd = 38. + np.log10(1.2) + BH_Mass
     logLbol = logLedd + Eddington_ratio
     TNG['logLbol'] = logLbol
@@ -319,7 +325,7 @@ def TNG_set(filename, HSC_Lbol_overall, HSC_MBHs_overall, I_mag_break = 20.5, co
     return TNG
 
 def SAM_set(filename, zs, HSC_Lbol_overall, HSC_MBHs_overall, I_mag_break = [20.5,22], 
-            consider_type1= True, imf = 'Sal'):
+            consider_type1= True, imf = 'Sal', no_noise= False):
     SAM = {}
     text  = np.loadtxt(filename)
     text = text[text[:,5] != 0]
@@ -370,8 +376,12 @@ def SAM_set(filename, zs, HSC_Lbol_overall, HSC_MBHs_overall, I_mag_break = [20.
     abs_Mags_break = abs_Mags_break[redshift_bool]
     agn_mag = agn_mag[redshift_bool]
     redshift = redshift[redshift_bool]
-    dMBH, dmag, dMstar,dLbol= 0.4, 0.3, 0.2, 0.1 #dmag is for host magnitude. 
-    # dMBH, dmag, dMstar, dLbol= 0.001, 0.001, 0.001, 0.001  #dmag is for host magnitude. 
+    if  no_noise == False:
+        dMBH, dmag, dMstar, dLbol= 0.4, 0.3, 0.2, 0.1  #dmag is for host magnitude. 
+    elif no_noise == True:
+        dMBH, dmag, dMstar, dLbol= 0.001, 0.001, 0.001, 0.001  #dmag is for host magnitude. 
+    # dMBH, dmag, dMstar,dLbol= 0.4, 0.3, 0.2, 0.1 #dmag is for host magnitude. 
+    # # dMBH, dmag, dMstar, dLbol= 0.001, 0.001, 0.001, 0.001  #dmag is for host magnitude. 
 
     z_range = np.arange(0.2, 1.0, 0.05)
     mstar_cut_range = np.array([8.9, 9.1, 9.3, 9.4, 9.6, 9.7, 9.8, 9.9, 10.0, 10.1, 10.3, 10.5, 10.5, 10.6, 10.7, 10.8])

@@ -17,6 +17,10 @@ ax=host.add_subplot(111)   #to get the log(1+z) and z label
 
 import matplotlib as mpl
 mpl.rc('image', cmap='jet')
+
+if_shift = 0
+
+if_int = 0
 # import sys
 ########## input local data ####
 #==============================================================================
@@ -349,15 +353,14 @@ print(value,sig)
 
 
 #%%Fill in the simulation data
-if_int = 0
 ls = '-'
 if if_int == 0:
-    SAM = np.array([(0.73, 0.49) , (0.65, 0.46)  , (0.51, 0.45)  , (0.51, 0.36) ])
-    MBII =  np.array([(-0.15, 0.48) , (-0.16, 0.48)  , (0.14, 0.31)])
-    Illustris =  np.array([(0.01, 0.52) , (0.08, 0.53)  , (0.06, 0.54)  , (0.07, 0.32) ])
-    TNG100 =  np.array([(0.27, 0.48) , (0.24, 0.46)  , (0.24, 0.45)  , (0.38, 0.33)])
-    TNG300 =  np.array([(0.26, 0.48) , (0.20, 0.48)  , (0.17, 0.48)  , (0.41, 0.34)])
-    Horizon =  np.array([(0.16, 0.49) , (0.14, 0.47)  , (0.23, 0.47)  , (0.47, 0.35)])
+    SAM = np.array([(0.72, 0.49) , (0.63, 0.49)  , (0.55, 0.44)  , (0.51, 0.36) ])
+    MBII =  np.array([(-0.15, 0.47) , (-0.11, 0.45)  , (0.14, 0.31)])
+    Illustris =  np.array([(0.04, 0.53) , (0.05, 0.55)  , (0.12, 0.52)  , (0.07, 0.32) ])
+    TNG100 =  np.array([(0.32, 0.55) , (0.21, 0.41)  , (0.31, 0.47)  , (0.38, 0.33)])
+    TNG300 =  np.array([(0.22, 0.50) , (0.22, 0.48)  , (0.18, 0.47)  , (0.41, 0.34)])
+    Horizon =  np.array([(0.23, 0.51) , (0.20, 0.46)  , (0.25, 0.46)  , (0.47, 0.35)])
 elif if_int == 1:
     # SAM = np.array([(0.72, 0.20), (0.64, 0.18), (0.56, 0.16) , (0.08, 0.18) ]) #add noise but not select
     # MBII = np.array([(-0.15, 0.21), (-0.15, 0.22) , (0.08, 0.19)])
@@ -388,8 +391,13 @@ for i in range(len(sims)):
     elif i == 1:
         zs = np.array([0.3, 0.6, 1.5])
     # line = plt.plot(np.log10(1+zs), sims[i][:,0], linestyle = '--', color =c[i],  linewidth=3,zorder=10)
-    plt.errorbar(np.log10(1+zs)+0.015/6*i, sims[i][:,0], sims[i][:,1], linestyle = ls, color =c[i],
-                  zorder = 50, linewidth = 3)
+    if if_shift == 0:
+        plt.errorbar(np.log10(1+zs)+0.015/6*i, sims[i][:,0], sims[i][:,1], linestyle = ls, color =c[i],
+                      zorder = 50, linewidth = 3)
+    elif if_shift ==1:
+        off = sims[i][0,0] - obs_scatter[0,0]
+        plt.errorbar(np.log10(1+zs)+0.015/6*i, sims[i][:,0] - off, sims[i][:,1], linestyle = ls, color =c[i],
+                      zorder = 50, linewidth = 3)     
     ty1=sims[i][:,0] + sims[i][:,1]
     ty2=sims[i][:,0] - sims[i][:,1]
     # zs[0] = zs[0]-0.1

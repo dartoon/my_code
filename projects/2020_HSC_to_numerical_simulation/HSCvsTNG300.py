@@ -25,14 +25,15 @@ filename = filenames[idx]
 zs = float(filename.split("_z")[1][:4])
 
 HSC = HSC_set(zs, core = True)
-if zs <= 0.5:
-    # HSC_Mstar = HSC_Mstar_overall[HSC_z<0.5]
-    # HSC_MBHs = HSC_MBHs_overall[HSC_z<0.5]
-    I_mag_break = 20.5  #z~0.3
-if zs > 0.5:    
-    # HSC_Mstar = HSC_Mstar_overall[HSC_z>0.5]
-    # HSC_MBHs = HSC_MBHs_overall[HSC_z>0.5]
-    I_mag_break = 22.0    #z~0.7
+# if zs <= 0.5:
+#     # HSC_Mstar = HSC_Mstar_overall[HSC_z<0.5]
+#     # HSC_MBHs = HSC_MBHs_overall[HSC_z<0.5]
+#     I_mag_break = 20.5  #z~0.3
+# if zs > 0.5:    
+#     # HSC_Mstar = HSC_Mstar_overall[HSC_z>0.5]
+#     # HSC_MBHs = HSC_MBHs_overall[HSC_z>0.5]
+#     I_mag_break = 22.0    #z~0.7
+I_mag_break = 19.5
 
 for i in range(1):
     TNG300 = TNG300_set(filename, HSC_Lbol_overall=HSC['HSC_Lbol_overall'], HSC_MBHs_overall=HSC['HSC_MBHs_overall'],
