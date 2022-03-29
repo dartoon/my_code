@@ -7,17 +7,17 @@ Created on Wed Mar 17 15:03:07 2021
 """
 
 ID_list = [
-    # '022404.85+014941.9',  #!!! pick it
+    '022404.85+014941.9',  #!!! pick it
     # '022906.04-051428.9',  #!!! pick it
     '092532.13-020806.1',  #!!! pick it, PS0 fainter but similar color
     '095218.04-000459.1', #SAVED
     '105458.01+043310.6',  #!!! pick it, PS0 slightly redder. PS1 too faint
     '150216.66+025719.8',         #No R band data but looks interesting.
-    # '122144.31-004144.1', #SAVED
-    # '124618.51-001750.2',  #!!! pick it, very similar and bright color
-    # '162501.98+430931.6', #!!! Pick it 
-    # '220642.82+003016.2', #!!! pick it, close and color similar.
-    # '230402.77-003855.4', #Very close, PS1 redder
+    '122144.31-004144.1', #SAVED
+    '124618.51-001750.2',  #!!! pick it, very similar and bright color
+    '162501.98+430931.6', #!!! Pick it 
+    '220642.82+003016.2', #!!! pick it, close and color similar.
+    '230402.77-003855.4', #Very close, PS1 redder
     # '090559.70+022408.2', #SAVED However, too faint
     # '141911.59+520545.2', #!!! John's proposal, But missed I band in S20a, but have I band in S19a  
     # '013834.18-000509.3',  #similar color PS1 fainter

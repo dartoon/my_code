@@ -99,12 +99,25 @@ for ID in ID_list:
     RA, Dec = line[0].split(' ')[1], line[0].split(' ')[2]
     # RA, Dec, z = read_info(ID)
     
-    files_1 = glob.glob('../proof2close_HSC_images_5band/*/' + ID + '/fit_result/')
-    files_2 = glob.glob('../extra/*/fit_result*/' + ID + '/')
-    files = files_1 + files_2
-    file = glob.glob(files[-1]+'fit_result_{0}-band.txt'.format('I'))
+    # files_1 = glob.glob('../proof2close_HSC_images_5band/*/' + ID + '/fit_result/')
+    # files_2 = glob.glob('../extra/*/fit_result*/' + ID + '/')
+    # files = files_1 + files_2
+    
+    folder_1 = glob.glob('../proof2close_HSC_images_5band/*/'+ ID+ '/')
+    if folder_1 != []: # and 'z_below1' not in folder_1[0]:
+        folder = folder_1[0] + 'fit_result/'
+        file = folder + 'fit_result_I-band.txt'
+    # elif folder_1 != [] and 'z_below1' in folder_1[0]:
+    #     folder = '../_John_fitted/'+ID+'_HSC-I/'   #For these z below 1(or z unkonwn), not fitted and use John's fit.
+    #     file = folder + 'fit_result.txt'
+    else:
+        folder_2 = glob.glob('../proofBHBH/model_Iband_zover1/'+ ID + '*/') 
+        folder = folder_2[0]
+        file = folder + 'fit_result_I-band.txt'
+    
+    # file = glob.glob(files[-1]+'fit_result_{0}-band.txt'.format('I'))
     if file != []:
-        f = open(file[0],"r")    
+        f = open(file,"r")    
     string = f.read()    
     lines = string.split('\n')   # Split in to \n
     trust = 2    
@@ -132,12 +145,15 @@ for ID in ID_list:
 #%%
 import sys
 sys.path.insert(0,'Shenli_materials/shenli_figure1/')
-
+fig, ax = plt.subplots(figsize=(11, 9))
 import separation  #Import Shenli's data
 import matplotlib as mat
 mat.rcParams['font.family'] = 'STIXGeneral'
 
-plt.scatter(np.array(z_list), np.array(offset_kpc_h0_list), c = 'red', marker = '*', edgecolors='black', s = 605, alpha = 0.9, label = 'Proposed Sample')
+plt.scatter(np.array(z_list), np.array(offset_kpc_h0_list), c = 'red', marker = '*', edgecolors='black', s = 305, alpha = 0.9, label = 'Proposed Sample')
+
+plt.scatter(3.174, 3.8 * 0.7, 
+            c = 'red', marker = '*', edgecolors='black', s = 305, alpha = 0.9)
 
 import pandas as pd
 shenli_sample = pd.read_csv('../whole_sample_new.csv', index_col = 0)
@@ -147,11 +163,13 @@ shenli_tel = shenli_sample['telescope']
 shenli_stat = shenli_sample['status']
 shenli_sep_l, shenli_z_l = [], []
 shenli_tele = []
+tele_l = []
 for i in range(len(shenli_sample)):
     if shenli_stat[i] == 'QSO': 
         scale_relation = cosmo.angular_diameter_distance(shenli_z[i]).value * 10**3 * (1/3600./180.*np.pi)  #Kpc/arc
         shenli_sep_l.append(shenli_sep[i]* scale_relation )
         shenli_z_l.append(shenli_z[i])
+        tele_l.append(shenli_tel[i])
         if shenli_tel[i] == 'Gemini':
             shenli_tele.append(1)
         else:
@@ -160,12 +178,12 @@ for i in range(len(shenli_sample)):
 #ID  z  sep(")
 # 123939.06+003439.8 2.138 2.139
 # 145201.59-011945.3 1.8709 2.61
-add_z = [2.138, 1.8709 ]
-add_sep = [2.139, 2.61]
-for i in range(len(add_sep)):
-    scale_relation = cosmo.angular_diameter_distance(add_z[i]).value * 10**3 * (1/3600./180.*np.pi)  #Kpc/arc
-    shenli_sep_l.append(add_sep[i]* scale_relation )  
-    shenli_z_l.append(add_z[i])
+# add_z = [2.138, 1.8709 ]
+# add_sep = [2.139, 2.61]
+# for i in range(len(add_sep)):
+#     scale_relation = cosmo.angular_diameter_distance(add_z[i]).value * 10**3 * (1/3600./180.*np.pi)  #Kpc/arc
+#     shenli_sep_l.append(add_sep[i]* scale_relation )  
+#     shenli_z_l.append(add_z[i])
             
 shenli_sep_l = np.array(shenli_sep_l)
 shenli_z_l = np.array(shenli_z_l)
@@ -175,14 +193,14 @@ plt.scatter(0.2, 0.430* 70 / 100,c = 'blue', marker = 'o', edgecolors='black', s
 plt.scatter(shenli_z_l, shenli_sep_l * 70 / 100, marker="h",edgecolors='black',
             c='m', s=220,zorder=10,alpha=1, label = 'Our paper')
 
-plt.scatter(shenli_z_l[2], shenli_sep_l[2] * 70 / 100, marker="s",edgecolors='red',
-              facecolors='none', s=520,zorder=0,alpha=1, linewidth = 2.5)
-plt.scatter(shenli_z_l[5], shenli_sep_l[5] * 70 / 100, marker="s",edgecolors='red',
-              facecolors='none', s=520,zorder=0,alpha=1, linewidth = 2.5)
-plt.scatter(shenli_z_l[6], shenli_sep_l[6] * 70 / 100, marker="s",edgecolors='red',
-              facecolors='none', s=520,zorder=0,alpha=1, linewidth = 2.5)
-plt.scatter(shenli_z_l[7], shenli_sep_l[7] * 70 / 100, marker="s",edgecolors='red',
-              facecolors='none', s=520,zorder=0,alpha=1, linewidth = 2.5)
+# plt.scatter(shenli_z_l[2], shenli_sep_l[2] * 70 / 100, marker="s",edgecolors='red',
+#               facecolors='none', s=520,zorder=0,alpha=1, linewidth = 2.5)
+# plt.scatter(shenli_z_l[5], shenli_sep_l[5] * 70 / 100, marker="s",edgecolors='red',
+#               facecolors='none', s=520,zorder=0,alpha=1, linewidth = 2.5)
+# plt.scatter(shenli_z_l[6], shenli_sep_l[6] * 70 / 100, marker="s",edgecolors='red',
+#               facecolors='none', s=520,zorder=0,alpha=1, linewidth = 2.5)
+# plt.scatter(shenli_z_l[7], shenli_sep_l[7] * 70 / 100, marker="s",edgecolors='red',
+#               facecolors='none', s=520,zorder=0,alpha=1, linewidth = 2.5)
 
 
 
@@ -203,12 +221,13 @@ order = [5,7,0,1,2,3,6,8,4,9]
 plt.legend([handles[idx] for idx in order],[labels[idx] for idx in order], loc=4, prop={'size': 16}, ncol=2, frameon=True,  
            bbox_to_anchor=(1, -0.01))
 plt.tick_params(labelsize=20)
-ax = plt.axes()
+#!!!
+# ax = plt.axes()
 ax.set_xticks(np.arange(0, 5, 0.5))
 
 plt.tick_params(which='both', width=1)
 plt.tick_params(which='major', length=7)
 plt.tick_params(which='minor', length=4)#, color='r’)
-# plt.savefig('offset_vs_z.png')
+plt.savefig('offset_vs_z.png')
 plt.show()
 # mv offset_vs_z.png ../../../../../../../../Astro/proposal/2021_HST_Grism/

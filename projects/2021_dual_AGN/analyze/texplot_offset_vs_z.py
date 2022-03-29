@@ -68,7 +68,7 @@ z_list = np.array(z_list)
 ID_list = np.array(ID_list)
 mags_list = np.array(mags_list)
 
-plt.figure(figsize=(11, 9))
+fig, ax = plt.subplots(figsize=(11, 9))
 
 p_ID_list = []
 legend = 'Proposed sample'
@@ -97,32 +97,36 @@ shenli_comr = shenli_sample['com_r']
 shenli_z = shenli_sample['Redshift']
 shenli_tel = shenli_sample['telescope']
 shenli_stat = shenli_sample['status']
-legends = ['Confirmed QSO pairs', 'Confirmed nonQSO pairs', 'Gemini/NTT confirming', 'xxx']
+legends = ['Confirmed QSO pairs', 'Confirmed nonQSO pairs', 'Gemini/NTT in progress', 'xxx']
 for i in range(len(shenli_sample)):
     offset = cal_offset(shenli_ID[i])
-    if offset == None:
-        print(shenli_ID[i], "use Shenli")
-        offset = shenli_sep[i]
-    if shenli_stat[i] == 'QSO': 
-        plt.scatter(shenli_z[i], offset, marker="h",edgecolors='black',
-            c='m', s=220,zorder=10,alpha=1, label = legends[0])
-        legends[0] = None
-        p_ID_list.append(shenli_ID[i])
-    labels = ['QSO', 'wait', 'done', 'issued']
-    if shenli_stat[i] not in labels: 
-        plt.scatter(shenli_z[i], offset, marker="X",
-            c='green', edgecolors='black', s=150,zorder=10,alpha=1, label = legends[1])
-        legends[1] = None
-        p_ID_list.append(shenli_ID[i])
-        if shenli_sep[i]<0.5:
-            print(shenli_ID[i])
-    if shenli_stat[i] == 'done' or shenli_stat[i] == 'issued': 
-        plt.scatter(shenli_z[i], offset, marker="^",
-            c='c', edgecolors='black',s=100,zorder=9,alpha=0.9, label = legends[2])
-        legends[2] = None
-        if shenli_ID[i] in run_ID_list:
-            print(shenli_ID[i])
-        p_ID_list.append(shenli_ID[i])
+    if shenli_comg[i] - shenli_comr[i] < 1:
+        if offset == None:
+            print(shenli_ID[i], "use Shenli")
+            offset = shenli_sep[i]
+        if shenli_stat[i] == 'QSO': 
+            plt.scatter(shenli_z[i], offset, marker="h",edgecolors='black',
+                c='m', s=220,zorder=10,alpha=1, label = legends[0])
+            legends[0] = None
+            p_ID_list.append(shenli_ID[i])
+        # labels = ['QSO', 'wait', 'done', 'issued']
+        labels_1 = ['star','galaxy','unclassified','done','pQSO','lens']
+        labels_2 = ['wait','issued','proposed','aborted']
+        if shenli_stat[i] in labels_1: 
+            plt.scatter(shenli_z[i], offset, marker="X",
+                c='green', edgecolors='black', s=150,zorder=10,alpha=1, label = legends[1])
+            legends[1] = None
+            p_ID_list.append(shenli_ID[i])
+            if shenli_sep[i]<0.5:
+                print(shenli_ID[i])
+        if shenli_tel[i] == 'NTT':
+            if shenli_stat[i] == 'proposed': 
+                plt.scatter(shenli_z[i], offset, marker="^",
+                    c='c', edgecolors='black',s=100,zorder=9,alpha=0.9, label = legends[2])
+                legends[2] = None
+                if shenli_ID[i] in run_ID_list:
+                    print(shenli_ID[i])
+                p_ID_list.append(shenli_ID[i])
     # if shenli_stat[i] == 'wait': 
     #     if (shenli_comg[i] - shenli_comr[i] ) <1 and (shenli_qsog[i] - shenli_qsor[i] ) <1:
     #         plt.scatter(shenli_z[i], shenli_sep[i],
@@ -176,7 +180,10 @@ for i in range(len(file_all_cand)):
 # special_ID = list(dict.fromkeys(special_ID))
 # len(special_ID) #result:39
 
-plt.plot(np.linspace(-0.2,6)*0 + 1 ,np.linspace(-0.2,6), '--' , c ='black', linewidth = 2.0 )
+plt.scatter(3.174, 0.50,
+            c='red',s=405,marker="*",zorder=100, edgecolors='black',alpha=0.8, label = legend)
+
+# plt.plot(np.linspace(-0.2,6)*0 + 1 ,np.linspace(-0.2,6), '--' , c ='black', linewidth = 2.0 )
 plt.xlabel("Redshift",fontsize=27)
 plt.ylabel("Projected separation (arcsec)",fontsize=27)
 plt.tick_params(labelsize=20)
@@ -196,15 +203,16 @@ plt.xlim(0., 4.7)
 handles, labels = plt.gca().get_legend_handles_labels()
 order = [0,3,1,2]
 
-ax = plt.axes()
 plt.tick_params(axis="x",direction="in", right=True)
 plt.tick_params(axis="y",which = 'both', direction="in", top = True)
 plt.tick_params(which='both', width=1)
 plt.tick_params(which='major', length=7)
+#!!!
+# ax = plt.axes()
 ax.set_xticks(np.arange(0, 5, 0.5))
 ax.set_yticks([0,0.7,1,2,3,4,5])
 plt.legend([handles[idx] for idx in order],[labels[idx] for idx in order], loc='upper right', prop={'size': 20},ncol=1)
-# plt.savefig('sample_select.png')
+plt.savefig('sample_select.png')
 plt.show()
 
 special_ID = list(dict.fromkeys(special_ID))
