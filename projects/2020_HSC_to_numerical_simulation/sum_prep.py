@@ -45,7 +45,7 @@ def load_HSC_comp(zs, I_mag_break=None, no_noise = False):
     zs_MBII = 0.3
     if zs!= 0.3:
         zs_MBII = 0.6
-        HSC_dict['zs06'] = HSC_set(zs=zs_MBII, core = True, imf = 'Sal')
+        HSC_dict['zs06'] = HSC_set(zs=zs_MBII, core = True, imf = imf_dict['MBII'])
         HSC_dict['zs06']['Mstar'] = HSC_dict['zs06']['HSC_Mstar']
         HSC_dict['zs06']['MBHs'] = HSC_dict['zs06']['HSC_MBHs']
     filename_dict['MBII'] = glob.glob('MBII_data/*{0}*.npy'.format(zs_MBII))[0]
@@ -60,9 +60,15 @@ def load_HSC_comp(zs, I_mag_break=None, no_noise = False):
                         '0.7': 'Horizon/outt00439_halo_gal_centralBHs_2reff'} 
     filename_dict['Horizon'] = Horizon_name_dict['{0}'.format(zs)]
     sim_dict = {}
-    sim_dict['MBII'] = TNG_set(filename_dict['MBII'], HSC_Lbol_overall=HSC_dict[imf_dict['MBII']]['HSC_Lbol_overall'], 
-                   HSC_MBHs_overall=HSC_dict[imf_dict['MBII']]['HSC_MBHs_overall'],
-                  I_mag_break = I_mag_break, imf = imf_dict['MBII'], no_noise=no_noise)
+    if zs== 0.3:
+        sim_dict['MBII'] = TNG_set(filename_dict['MBII'], HSC_Lbol_overall=HSC_dict[imf_dict['MBII']]['HSC_Lbol_overall'], 
+                       HSC_MBHs_overall=HSC_dict[imf_dict['MBII']]['HSC_MBHs_overall'],
+                      I_mag_break = I_mag_break, imf = imf_dict['MBII'], no_noise=no_noise)
+    else:
+        sim_dict['MBII'] = TNG_set(filename_dict['MBII'], HSC_Lbol_overall=HSC_dict['zs06']['HSC_Lbol_overall'], 
+                       HSC_MBHs_overall=HSC_dict['zs06']['HSC_MBHs_overall'],
+                      I_mag_break = I_mag_break, imf = imf_dict['MBII'], no_noise=no_noise)
+    
     sim_dict['SAM'] = SAM_set(filename_dict['SAM'], zs=zs, HSC_Lbol_overall=HSC_dict[imf_dict['SAM']]['HSC_Lbol_overall'], 
                   HSC_MBHs_overall=HSC_dict[imf_dict['SAM']]['HSC_MBHs_overall'],
                   I_mag_break = I_mag_break_SAM, imf =  imf_dict['SAM'], no_noise=no_noise)
@@ -126,16 +132,16 @@ def load_HST_comp(no_noise = False):
     load = ['MBII', 'TNG100', 'TNG300', 'Illustris']
     for i in range(len(load)):
         filename = glob.glob('{1}*/*{0}*npy'.format(zs, load[i]))[0]
-        BH_Mass, _, StellarMass_30kpc, _, _, _, _, _, _, Eddington_ratio = np.load(filename)
+        BH_Mass, StellarMass, StellarMass_30kpc, _, _, _, _, _, _, Eddington_ratio = np.load(filename)
         
         
         bhmass_overall = np.log10(BH_Mass) #in log
         mstar_overall = np.log10(StellarMass_30kpc) #in log
         Eddr_overall = np.log10(Eddington_ratio) #in log
         if load[i] == 'Illustris':
-            print('Illustris working')
+            # print('Illustris working')
             outl_bool = (lfit(bhmass_overall) - 0.5 < mstar_overall)
-            print(len(outl_bool), np.sum(outl_bool))
+            # print(len(outl_bool), np.sum(outl_bool))
             bhmass_overall, mstar_overall, Eddr_overall = bhmass_overall[outl_bool], mstar_overall[outl_bool],  Eddr_overall[outl_bool]
         sim_dict[load[i]] = prep_sim_hst(bhmass_overall,mstar_overall,Eddr_overall, imf=imf_dict[load[i]],no_noise = no_noise)
     filename = 'Horizon/outt00266_halo_gal_centralBHs_2reff'

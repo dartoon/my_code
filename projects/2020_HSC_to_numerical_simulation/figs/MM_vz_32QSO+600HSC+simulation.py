@@ -350,17 +350,15 @@ plt.plot(xl, xl*0, color="black", linewidth=2.0,zorder=0)
 value,sig=round(b_ml_offset,2),round((np.percentile(samples,84,axis=0)[0]-np.percentile(samples,16,axis=0)[0])/2,2)
 print(value,sig)
 
-
-
 #%%Fill in the simulation data
 ls = '-'
 if if_int == 0:
-    SAM = np.array([(0.72, 0.49) , (0.63, 0.49)  , (0.55, 0.44)  , (0.51, 0.36) ])
-    MBII =  np.array([(-0.15, 0.47) , (-0.11, 0.45)  , (0.14, 0.31)])
-    Illustris =  np.array([(0.04, 0.53) , (0.05, 0.55)  , (0.12, 0.52)  , (0.07, 0.32) ])
-    TNG100 =  np.array([(0.32, 0.55) , (0.21, 0.41)  , (0.31, 0.47)  , (0.38, 0.33)])
-    TNG300 =  np.array([(0.22, 0.50) , (0.22, 0.48)  , (0.18, 0.47)  , (0.41, 0.34)])
-    Horizon =  np.array([(0.23, 0.51) , (0.20, 0.46)  , (0.25, 0.46)  , (0.47, 0.35)])
+    SAM = np.array([(0.72, 0.48) , (0.63, 0.49)  , (0.55, 0.44)  , (0.50, 0.34) ])
+    MBII =  np.array([(0.13, 0.48), (0.18, 0.48)  , (0.14, 0.31)])
+    Illustris =  np.array([(0.21, 0.49) , (0.20, 0.49)  , (0.17, 0.54)  , (0.07, 0.32) ])
+    TNG100 =  np.array([(0.28, 0.49) , (0.24, 0.44)  , (0.21, 0.52)  , (0.38, 0.33)])
+    TNG300 =  np.array([ (0.25, 0.49) , (0.22, 0.47)  , (0.19, 0.47)  , (0.41, 0.34)])
+    Horizon =  np.array([(0.21, 0.47) , (0.23, 0.49)  , (0.24, 0.46)  , (0.47, 0.35)])
 elif if_int == 1:
     # SAM = np.array([(0.72, 0.20), (0.64, 0.18), (0.56, 0.16) , (0.08, 0.18) ]) #add noise but not select
     # MBII = np.array([(-0.15, 0.21), (-0.15, 0.22) , (0.08, 0.19)])
@@ -438,7 +436,7 @@ plt.legend([Bkc,
             # SS13, 
             li_sample, ding_sample]+lines_legend,
 [
-'Local sample',\
+'D20 local scaling relation',\
 # "Local by H&R",
 # "Intermediate redshift AGNs",
 "$0.2<$z$<0.8$ AGNs by HSC",

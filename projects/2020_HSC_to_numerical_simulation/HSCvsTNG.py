@@ -6,6 +6,7 @@ Created on Thu Jan 14 16:46:42 2021
 @author: Xuheng Ding
 """
 
+
 import numpy as np
 import matplotlib.pyplot as plt
 import astropy.io.fits as pyfits

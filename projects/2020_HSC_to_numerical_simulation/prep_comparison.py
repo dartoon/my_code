@@ -258,7 +258,7 @@ def TNG_set(filename, HSC_Lbol_overall, HSC_MBHs_overall, I_mag_break = 20.5, co
     # Stellar_Mass, BH_Mass, sdss_i_galaxy, sdss_g_galaxy, sdss_r_galaxy, sdss_i_pointsource, sdss_g_pointsource, Eddington_ratio = np.load(filename)
     BH_Mass, Stellar_Mass, StellarMass_30kpc, sdss_i_stellar, sdss_g_stellar, sdss_r_stellar, sdss_i_pointsource, sdss_g_pointsource, BH_Lbol, Eddington_ratio = np.load(filename)
     BH_Mass = np.log10(BH_Mass)
-    Stellar_Mass = np.log10(Stellar_Mass)
+    Stellar_Mass = np.log10(StellarMass_30kpc)
     Eddington_ratio = np.log10(Eddington_ratio)
     
     TNG['Stellar_Mass'] = Stellar_Mass

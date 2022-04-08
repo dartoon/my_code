@@ -28,23 +28,12 @@ i, j = 0, 0
 obsname = ['HSC', 'HST']
 colors_sim = ['deepskyblue', 'steelblue', 'c', 'deeppink', 'hotpink', 'm']
 
-Imag_list = {0.3: 19.5, 0.5: 20.5, 0.7: 21.5}
+Imag_list = {0.3: 20.0, 0.5: 20.5, 0.7: 21.5}
 
 for zs in [0.3, 0.5, 0.7, 1.5]:
-    # if glob.glob('comb_zs{0}.pkl'.format(zs)) != []:
-    #     obs_dict, sim_dict = pickle.load(open(glob.glob('comb_zs{0}.pkl'.format(zs))[0],'rb'))
-    # if zs<1:
-    #     Imag= Imag_list[zs]
-    #     obs_dict, sim_dict = load_HSC_comp(zs =zs, I_mag_break=Imag, no_noise=True)
-    #     pickle.dump([obs_dict, sim_dict], open('comb_zs{0}_Imag_{1}_nonoise.pkl'.format(zs,Imag), 'wb'))    
-    # elif zs>1: 
-    #     obs_dict, sim_dict = load_HST_comp(no_noise=False)
-    #     pickle.dump([obs_dict, sim_dict], open('comb_zs{0}.pkl'.format(zs), 'wb'))    
-    # print(np.std(sim_dict['Illustris']['BH_Mass_nois_sl']- (m_ml*sim_dict['Illustris']['Stellar_Mass_nois_sl']+b_ml)))
-    # plt.scatter(sim_dict['Illustris']['Stellar_Mass'], sim_dict['Illustris']['BH_Mass_nois_sl'])
     if zs<1:
         Imag= Imag_list[zs]
-        obs_dict, sim_dict = pickle.load(open(glob.glob('pickles/comb_zs{0}_Imag_{1}.pkl'.format(zs,Imag))[0],'rb'))
+        obs_dict, sim_dict = pickle.load(open(glob.glob('pickles/comb_zs{0}_Imag_{1}_0.pkl'.format(zs,Imag))[0],'rb'))
     else:
         obs_dict, sim_dict = pickle.load(open(glob.glob('pickles/comb_zs{0}.pkl'.format(zs))[0],'rb'))
         
@@ -80,7 +69,19 @@ for zs in [0.3, 0.5, 0.7, 1.5]:
         if i == 0:
             sns.kdeplot(sim['Stellar_Mass'], sim['BH_Mass'], linewidths = 2*eps, color = 'seagreen', 
                         fill=True, alpha=0.5, zorder = -10, ax = axs[i,j])
-
+        # elif i in [1,2,3,4] and j == 3:
+        #     sns.kdeplot(sim['Stellar_Mass'][sim['Stellar_Mass']>5.5], sim['BH_Mass'][sim['Stellar_Mass']>5.5],
+        #                 linewidths = 1.5*eps, color = 'green', 
+        #                 fill=False, alpha=0.5, zorder = 10, ax = axs[i,j], levels=5)
+        elif j < 3:
+            sns.kdeplot(sim['Stellar_Mass'][sim['BH_Mass']>5.8], sim['BH_Mass'][sim['BH_Mass']>5.8], 
+                        linewidths = 1.5*eps, color = 'green', 
+                        fill=False, alpha=0.5, zorder = 10, ax = axs[i,j], levels=5)
+        elif j ==3:
+            sns.kdeplot(sim['Stellar_Mass'][sim['BH_Mass']>7.2], sim['BH_Mass'][sim['BH_Mass']>7.2], 
+                        linewidths = 1.5*eps, color = 'green', 
+                        fill=False, alpha=0.5, zorder = 10, ax = axs[i,j], levels=5)
+            
         s, alpha = 150, 0.7
         if sname == 'Horizon':
             sname = 'Horizon-AGN'
@@ -144,9 +145,15 @@ for zs in [0.3, 0.5, 0.7, 1.5]:
 plt.savefig('MM_sum.png')
 plt.show()    
 
+
 # # %%Plot Delta M relation
 # import copy
-# sname_l = ['SAM', 'MBII', 'Illustris', 'TNG100', 'Horizon']
+# # #%%
+# # for i in range(10):
+# #     Imag = 21.5
+# #     obs_dict, sim_dict = load_HSC_comp(zs =0.7, I_mag_break=Imag)
+# #     pickle.dump([obs_dict, sim_dict], open('comb_zs{0}_Imag_{1}_{2}.pkl'.format(zs,Imag,i), 'wb'))    
+# sname_l = ['SAM','MBII', 'Illustris', 'TNG100', 'Horizon']
 # # cal_M_range = np.arange(9., 12.51, 0.4)
 # for zs in [0.7]:
 #     # if glob.glob('comb_zs{0}.pkl'.format(zs)) != []:
@@ -160,7 +167,7 @@ plt.show()
     
 #     if zs<1:
 #         Imag= Imag_list[zs]
-#         obs_dict, sim_dict = pickle.load(open(glob.glob('pickles/comb_zs{0}_Imag_{1}.pkl'.format(zs,Imag))[0],'rb'))
+#         obs_dict, sim_dict = pickle.load(open(glob.glob('pickles/comb_zs{0}_Imag_{1}_0.pkl'.format(zs,Imag))[0],'rb'))
 #     else:
 #         obs_dict, sim_dict = pickle.load(open(glob.glob('pickles/comb_zs{0}.pkl'.format(zs))[0],'rb'))
         
@@ -178,6 +185,9 @@ plt.show()
 #             if zs==0.5 or zs == 0.7: 
 #                 obs = obs_dict['zs06']   
 #                 zs_ = 0.6
+#                 sm_obs, bh_obs = obs_dict['zs06']['Mstar'] - detlaM,obs_dict['zs06']['MBHs']
+#         else:
+#             sm_obs, bh_obs = obs_dict[imf]['Mstar'] - detlaM,obs_dict[imf]['MBHs']
 #         imf = imf_dict[sname]
 #         detlaM  = 0
 #         if imf == 'Sal': 
@@ -185,9 +195,16 @@ plt.show()
 #         f,ax=plt.subplots(1,2,figsize=(12,10),gridspec_kw={'width_ratios': [7, 1]}, sharey = True)
 #         obj=ax[0]
 #         sm_int, bh_int = sim_dict[sname]['Stellar_Mass']- detlaM, sim_dict[sname]['BH_Mass']
-#         sm_sim, bh_sim = sim_dict[sname]['Stellar_Mass_nois_sl'][:500]- detlaM, sim_dict[sname]['BH_Mass_nois_sl'][:500]
-#         sm_obs, bh_obs = obs_dict[imf]['Mstar'] - detlaM,obs_dict[imf]['MBHs']
-        
+#         sm_sim, bh_sim = sim_dict[sname]['Stellar_Mass_nois_sl']- detlaM, sim_dict[sname]['BH_Mass_nois_sl']
+#         sm_sim_sum, bh_sim_sum = sm_sim+0, bh_sim+0
+#         for i in range(10):
+#             _, sim_dict_ = pickle.load(open(glob.glob('pickles/comb_zs{0}_Imag_{1}_{2}.pkl'.format(zs,Imag,i))[0],'rb'))
+#             sm_sim_, bh_sim_ = sim_dict_[sname]['Stellar_Mass_nois_sl'] - detlaM, sim_dict_[sname]['BH_Mass_nois_sl']
+#             # print(sm_sim_.shape, bh_sim_.shape)
+#             sm_sim_sum = np.concatenate((sm_sim_sum, sm_sim_))
+#             bh_sim_sum = np.concatenate((bh_sim_sum, bh_sim_))
+#         sm_sim, bh_sim = sm_sim_sum, bh_sim_sum
+#         # print(sname, sm_sim.shape, bh_sim.shape)
 #         off_int = sm_int, bh_int - (m_ml*sm_int+b_ml)
 #         off_sim = sm_sim, bh_sim - (m_ml*sm_sim+b_ml),
 #         off_obs = sm_obs, bh_obs - (m_ml*sm_obs+b_ml),
@@ -195,6 +212,8 @@ plt.show()
 #                           norm=mpl.colors.LogNorm(), density = True, cmap='summer',bins=50,zorder=-1,
 #                               alpha=0.5, cmin = 0.001)# , cmax = 1.1)
         
+#         sns.kdeplot( off_int[0], off_int[1], linewidths = 1.5*eps, color = 'green', 
+#                     fill=False, alpha=0.5, zorder = 10, ax = ax[0], levels=5)
 #         s, alpha = 420, 0.7
 #         if zs > 1:
 #             s,alpha= 800, 0.9
@@ -218,6 +237,8 @@ plt.show()
 #             sm_ = copy.deepcopy(sm_sim)
 #             sm_.sort()
 #             m_min, m_max = np.mean(sm_[:3]), np.mean(sm_[-10:])
+#             if sname == 'TNG100':
+#                 m_max = 11.5
 #             cal_M_range_1 = np.arange(m_min, m_max, 0.3)
 #             for i in range(len(cal_M_range_1)-1):
 #                 s_bool = (sm_sim>cal_M_range_1[i])*(sm_sim<cal_M_range_1[i+1])
@@ -256,7 +277,8 @@ plt.show()
 #         ssname = sname
 #         if sname == 'Horizon':
 #             ssname = 'Horizon-AGN'
-#         ax[0].scatter(off_sim[0], off_sim[1],
+#         num = np.max([int(len(off_sim[0])/10), 500])
+#         ax[0].scatter(off_sim[0][:num], off_sim[1][:num],
 #                     c=colors_sim[idx],
 #                     s=420, marker=".",zorder=0, edgecolors='k', alpha = 0.7, label='{1} sample z={0}'.format(zs_, ssname))
 #         ax[0].scatter(off_obs[0], off_obs[1],
@@ -299,6 +321,6 @@ plt.show()
         
 #         f.tight_layout()
 #         plt.subplots_adjust(wspace=0.01)
-#        # plt.savefig('DeltaMM_{1}_zs_{0}.png'.format(str(zs_).replace('.',''), sname))
+#         plt.savefig('DeltaMM_{1}_zs_{0}.png'.format(str(zs_).replace('.',''), sname))
 #         plt.show()
             
