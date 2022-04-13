@@ -48,18 +48,25 @@ sim_y = sim_dict[name]['logLbol'] - (38. + np.log10(1.2) + sim_dict[name]['BH_Ma
 sns.kdeplot(sim_x, sim_y,
             linewidths = 1.5, color = 'blue', 
             fill=True, alpha=0.5, zorder = 10, levels=5)
-plt.scatter(sim_x[sim_dict[name]['select_bool']], sim_y[sim_dict[name]['select_bool']],
-                c='deepskyblue', 
-                zorder = 0, alpha=0.2, edgecolors='white')
+# plt.scatter(sim_x[:69526], sim_y[:69526],
+#                 c='deepskyblue', 
+#                 zorder = 0, alpha=0.2, edgecolors='white')
+
+# plt.scatter(sim_x[sim_dict[name]['select_bool']], sim_y[sim_dict[name]['select_bool']],
+#                 c='deepskyblue', 
+#                 zorder = 0, alpha=0.2, edgecolors='white')
 
 sim_z_x = sim_dict_z[name]['BH_Mass']
 sim_z_y = sim_dict_z[name]['logLbol'] - (38. + np.log10(1.2) + sim_dict_z[name]['BH_Mass'])
 sns.kdeplot(sim_z_x, sim_z_y,
             linewidths = 2.5, color = 'pink', 
             fill=True, alpha=0.5, zorder = 10, levels=5)
-plt.scatter(sim_dict_z[name]['BH_Mass_nois_sl'], sim_dict_z[name]['logLbol_nois_sl'] - (38. + np.log10(1.2) + sim_dict_z[name]['BH_Mass_nois_sl']),
-            c='deeppink',
-            zorder = 0, alpha=0.2, edgecolors='white')
+# plt.scatter(sim_z_x[:69526], sim_z_y[:69526],
+#             c='deeppink',
+#             zorder = 0, alpha=0.2, edgecolors='white')
+# plt.scatter(sim_dict_z[name]['BH_Mass_nois_sl'], sim_dict_z[name]['logLbol_nois_sl'] - (38. + np.log10(1.2) + sim_dict_z[name]['BH_Mass_nois_sl']),
+#             c='deeppink',
+#             zorder = 0, alpha=0.2, edgecolors='white')
 lowz = mlines.Line2D([], [], color='blue', ls='-', markersize=15)
 highz = mlines.Line2D([], [], color='pink', ls='-', markersize=15)
 
@@ -74,5 +81,5 @@ plt.title("Distribution of {0} sample".format(name),fontsize=35)
 plt.tick_params(labelsize=25)
 plt.xlim(6,10)
 plt.ylim(-8,-0.1)
-plt.savefig('{0}_fedd_dis_withselection.pdf'.format(name))
+plt.savefig('{0}_fedd_dis.pdf'.format(name))
 plt.show()
