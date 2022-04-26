@@ -11,8 +11,8 @@ import astropy.io.fits as pyfits
 import matplotlib.pyplot as plt
 
 filefolder = 'COSMOSweb_pointing/'
-filename = '1727_cosmos_mosaic_nircam_LW_exptime_scale1.0.fits'
-# filename = '1727_cosmos_mosaic_miri_exptime_scale1.0.fits'
+# filename = '1727_cosmos_mosaic_nircam_LW_exptime_scale1.0.fits'
+filename = '1727_cosmos_mosaic_miri_exptime_scale1.0.fits'
 fitsFile = pyfits.open(filefolder+filename)
 reg_img = fitsFile[0].data # check the back grounp
 header = fitsFile[0].header # if target position is add in WCS, the header should have the wcs information, i.e. header['EXPTIME']

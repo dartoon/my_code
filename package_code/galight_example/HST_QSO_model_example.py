@@ -38,7 +38,9 @@ data_process.generate_target_materials(radius=65, create_mask = True, nsigma=2.8
 data_process.find_PSF(radius = 30, user_option = True)
 # data_process.find_PSF(radius = 50, PSF_pos_list = [[ 350., 1055.], [2078., 1910.]], user_option = False)
 data_process.plot_overview(label = 'Example', target_label = None)
-data_process.profiles_compare(norm_pix = 5, if_annuli=False, y_log = False,
+
+#%%
+data_process.profiles_compare(norm_pix = 5, if_annuli=False, y_log = False, radius = 60,
                   prf_name_list = (['target'] + ['PSF{0}'.format(i) for i in range(len(data_process.PSF_list))]) )
 
 # data_process.psf_id_for_fitting = 11
@@ -63,18 +65,17 @@ fit_sepc.plot_fitting_sets()
 #%%Setting the fitting method and run.
 from galight.fitting_process import FittingProcess
 fit_run = FittingProcess(fit_sepc, savename = 'savename', fitting_level='norm')
-fit_run.run(algorithm_list = ['PSO', 'MCMC','MCMC'], setting_list=[None,{'n_burn': 100, 'n_run': 100, 'walkerRatio': 10,'sigma_scale': .1},
-                                                                   {'n_burn': 200, 'n_run': 200, 'walkerRatio': 10,'sigma_scale': .1}])
+fit_run.run(algorithm_list = ['PSO', 'MCMC'], setting_list=[None,{'n_burn': 50, 'n_run': 60, 'walkerRatio': 10,'sigma_scale': .1}])
             # setting_list = [{'sigma_scale': 1., 'n_particles': 100, 'n_iterations': 100}, {'n_burn': 100, 'n_run': 100, 'walkerRatio': 10,'sigma_scale': .1}])
 fit_run.plot_all()
 
-fit_run.dump_result()
-print(fit_run.final_result_galaxy[0])
+# fit_run.dump_result()
+# print(fit_run.final_result_galaxy[0])
 
-#%%
-# Test load pkl
-import pickle
-picklename = 'savename.pkl'
-fitting_run_class = pickle.load(open(picklename,'rb'))
-fitting_run_class.run_diag()
+# #%%
+# # Test load pkl
+# import pickle
+# picklename = 'savename.pkl'
+# fitting_run_class = pickle.load(open(picklename,'rb'))
+# fitting_run_class.run_diag()
 
