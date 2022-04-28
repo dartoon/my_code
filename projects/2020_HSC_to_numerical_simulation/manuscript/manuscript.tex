@@ -26,18 +26,17 @@
 %% does not need to be explicitly stated.
 %%
 %% using aastex version 6.3
-%\documentclass[twocolumn, linenumbers]{aastex631}
-\documentclass[twocolumn]{aastex631}
+\documentclass[twocolumn, linenumbers]{aastex631}
+%\documentclass[twocolumn]{aastex631}
 
 \newcommand{\vdag}{(v)^\dagger}
 \newcommand\aastex{AAS\TeX}
 \newcommand\latex{La\TeX}
 \newcommand{\todo}[1]{\textcolor{red}{[{\bf TODO}: #1]}}
-\newcommand{\ding}[1]{\textcolor{red}{[{\bf Xuheng}: #1]}}
 \newcommand{\jshi}[1]{\textcolor{orange}{#1}}
 \newcommand{\blue}[1]{\textcolor{blue}{#1}}
-\newcommand{\yo}[1]{\textcolor{purple}{[{\bf Yohan}: #1]}}
-\newcommand{\red}[1]{\textcolor{purple}{#1}}
+%\newcommand{\red}[1]{\textcolor{purple}{#1}}
+\newcommand{\red}[1]{{\bf #1}}
 
 \def\smass{{$M_*$}}
 \def\sersic{S\'ersic}
@@ -47,7 +46,6 @@
 \def\lcdm{$\Lambda$CDM}	
 \def\hst{{\it HST}}
 \def\kms{km~s$^{\rm -1}$}
-
 
 \newcommand{\aklant}[1]{\textcolor{blue}{#1}}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -71,7 +69,7 @@
 \author[0000-0001-8917-2148]{Xuheng Ding}
 \affiliation{Kavli Institute for the Physics and Mathematics of the Universe, The University of Tokyo, Kashiwa, Japan 277-8583 (Kavli IPMU, WPI)}
 
-\author[0000-0002-0000-6977]{John D.Silverman}
+\author[0000-0002-0000-6977]{John D. Silverman}
 \affiliation{Kavli Institute for the Physics and Mathematics of the Universe, The University of Tokyo, Kashiwa, Japan 277-8583 (Kavli IPMU, WPI)}
 
 \author[0000-0002-8460-0390]{Tommaso Treu}
@@ -102,7 +100,7 @@
 
 
 \begin{abstract}
-We carry out a comparative analysis of the relation between the mass of supermassive black holes (BHs) and the stellar mass of their host \red{galaxies} at $0.2<z<1.7$ using well-matched observations and multiple state-of-the-art simulations (e.g., Massive Black II, Horizon-AGN, Illustris, TNG and a semi-analytic model). The observed sample consist of 646 uniformly-selected SDSS quasars ($0.2 < z < 0.8$) and 32 broad-line AGNs ($1.2<z<1.7$) with imaging from Hyper Suprime-Cam (HSC) for the former and Hubble Space Telescope (HST) for the latter. \red{We} first add realistic observational uncertainties to the simulation data and then construct a simulated sample in the same manner as the observations. Over the full redshift range, our analysis demonstrates that all simulations predict a level of intrinsic scatter of the scaling relations comparable to the observations which appear to agree with the dispersion of the local relation. Regarding the mean relation, Horizon-AGN and TNG are in closest agreement with the \red{observations} at low and high redshift ($z\sim$ 0.2 and 1.5, respectively) while the other simulations show subtle differences within the uncertainties. For insight into the physics involved, the scatter of the scaling relation, seen in the SAM, is reduced by a factor of two and closer to the observations after adopting a new feedback model which considers the geometry of the AGN outflow. The consistency in the dispersion with redshift in our analysis \red{supports} the importance of both quasar and radio mode feedback prescriptions in the simulations. Finally, we \red{highlight the importance of increasing} the sensitivity, e.g., JWST, thereby pushing to lower masses and minimizing biases \red{due to} selection effects.
+We carry out a comparative analysis of the relation between the mass of supermassive black holes (BHs) and the stellar mass of their host \red{galaxies} at $0.2<z<1.7$ using well-matched observations and multiple state-of-the-art simulations (e.g., Massive Black II, Horizon-AGN, Illustris, TNG and a semi-analytic model). The observed sample consist\red{s} of 646 uniformly-selected SDSS quasars ($0.2 < z < 0.8$) and 32 broad-line AGNs ($1.2<z<1.7$) with imaging from Hyper Suprime-Cam (HSC) for the former and Hubble Space Telescope (HST) for the latter. \red{We} first add realistic observational uncertainties to the simulation data and then construct a simulated sample in the same manner as the observations. Over the full redshift range, our analysis demonstrates that all simulations predict a level of intrinsic scatter of the scaling relations comparable to the observations which appear to agree with the dispersion of the local relation. Regarding the mean relation, Horizon-AGN and TNG are in closest agreement with the \red{observations} at low and high redshift ($z\sim$ 0.2 and 1.5, respectively) while the other simulations show subtle differences within the uncertainties. For insight into the physics involved, the scatter of the scaling relation, seen in the SAM, is reduced by a factor of two and closer to the observations after adopting a new feedback model which considers the geometry of the AGN outflow. The consistency in the dispersion with redshift in our analysis \red{supports} the importance of both quasar and radio mode feedback prescriptions in the simulations. Finally, we \red{highlight the importance of increasing} the sensitivity, e.g., JWST, thereby pushing to lower masses and minimizing biases \red{due to} selection effects.
 \end{abstract}
 \keywords{Galaxy evolution (594); Active galaxies (17); Active galactic nuclei (16)}
 
@@ -190,7 +188,7 @@ and was run with the moving Voronoi mesh code {\tt Arepo}~\citep{2010MNRAS.401..
 BHs are seeded with an initial mass of $1 \times 10^5~M_{\odot}/h$ when a halo exceeds a mass of $5 \times 10^{10}~M_{\odot}/h$. BHs then grow via accretion described by the Eddington limited Bondi-Hoyle-Lyttleton formalism ($\alpha4\pi G^2M_{BH}^2 \rho/c_s^3$), as well as mergers with other BHs. The boost factor $\alpha=100$ is introduced to account for the unresolved multiphase ISM~\citep{Springel2005, 2009MNRAS.398...53B}, which is otherwise expected to underestimate the density around the BHs. Lastly, accreting \red{BH}s radiate with a bolometric luminosity given by $\epsilon_r \dot{M}_{BH}c^2$, where $\dot{M}_{BH}$ is the mass accretion rate and $\epsilon_r=0.2$ is the radiative efficiency.
 
 The AGN feedback consists of three components, namely quasar-mode, radio-mode and radiative feedback. In the quasar-mode which holds for BHs with Eddington ratio $>0.01$, the AGNs deposit $5\%$~(quasar-mode feedback efficiency) of their released energy into the surrounding gas as thermal energy. For Eddington ratios $<0.01$, the AGN feedback is in radio-mode where the thermal energy is released as hot bubbles with a radius of $\sim$ 100~kpc at \red{the} intervals between which the BH mass grows by a fixed fraction. 
-(%\todo{Aklant: Referee asks: are these irregular intervals included in the feedback modeling, or simply due to the time-varying accretion onto BHs? does it mean that the BH accretion is not modeled by the Bondi accretion between AGN feedback events?} \aklant{\bf{They are irregular simply because the BH mass growth is non- uniform. So it takes different amounts of time for the BH to grow by a fixed fraction. Bondi accretion is happening at all times. I have now removed the word `irregular' from this statement.}} 
+%\todo{Aklant: Referee asks: are these irregular intervals included in the feedback modeling, or simply due to the time-varying accretion onto BHs? does it mean that the BH accretion is not modeled by the Bondi accretion between AGN feedback events?} \aklant{\bf{They are irregular simply because the BH mass growth is non- uniform. So it takes different amounts of time for the BH to grow by a fixed fraction. Bondi accretion is happening at all times. I have now removed the word `irregular' from this statement.}} 
 The energy of the bubbles is given by $\epsilon_m \epsilon_r \delta M_{BH} c^2$ where $\delta M_{BH}$ is the change in BH mass within the last time interval, and $\epsilon_m=0.35$ is the radio-mode feedback efficiency. Lastly, the radiative feedback mode is implemented by modifying the heating and cooling rates of the gas in the presence of radiation from all surrounding AGN. \red{Halos and galaxies are identified similar to that of MBII}. As in MBII, a 3D 30~kpc spherical aperture is used to obtained the galaxy \red{stellar mass}. %, assuming a \cite{2003PASP..115..763C} IMF.
 
 
@@ -438,7 +436,8 @@ For the MBII sample, the simulation does not produce the sample at $z=0.5$ or $z
 \end{figure} 
 
 %\todo{TNG100 and TNG300 -- explain the why no difference between TNGs. P8}~\red{We note that TNG100 and TNG300 yield very similar comparison results, thus only TNG100 is presented in~Figure~\ref{fig:comparsion}}.
-\red{In the literature~\citep{Weinberger2018, Habouzit2021}, it has been noted that the mass correlations predicted by TNG300 and TNG100 are not identical. For example, TNG300 appares to have different scatter in \mbh\ at fixed \smass\ to TNG100 at \smass $>10^{10}M_{\odot}$. Also, BH growth is more efficient in TNG100 thus causing the BH mass function to have higher normalization at the low mass end. In our work, the differences between TNG100 and TNG300 also exist. However, the difference are milder after selection effects and random noise injection have been applied to the samples.} \todo{The referee says TNG300 has larger scatter, but in Habouzit2021 section 4.2.2, it actually says scatter in TNG300 is smaller. Any one know if the referee is wrong?}
+\red{In the literature~\citep{Weinberger2018, Habouzit2021}, it has been noted that the mass correlations predicted by TNG300 and TNG100 are not identical. For example, TNG300 appares to have different scatter in \mbh\ at fixed \smass\ to TNG100 at \smass $>10^{10}M_{\odot}$. Also, BH growth is more efficient in TNG100 thus causing the BH mass function to have higher normalization at the low mass end. In our work, the differences between TNG100 and TNG300 also exist. However, the difference are milder after selection effects and random noise injection have been applied to the samples.} 
+%\todo{The referee says TNG300 has larger scatter, but in Habouzit2021 section 4.2.2, it actually says scatter in TNG300 is smaller. Any one know if the referee is wrong?}
 
 %\todo{Some discussion on BH spin. What does consistent means? P9, P12 and P18.}
 \red{We considered all known observational effects, including sample selection and random noise injection, and applied these to the data products from the simulations in order to directly compare with observations. Our result shows that the scatter between the observations and simulations are very similar. Considering that the observational and simulated samples are matched to the best of our ability, their intrinsic properties are also similar. However, there may be limitations in our comparisons that may impact the results. For instance, there may be unknown observational effects that haven't been properly applied to the simulations. Even so, state-of-the-art simulations likely do not capture all the physical aspects that impact the scatter. For example, the spin of BHs is not modeled in the simulation which could change the scatter since the spin affects both the accretion rate and the energy that can be released through AGN feedback \citep{Dubois2014, 2019MNRAS.490.4133B, Habouzit2021} at some level. Even though the spin effect is still not well known and such a study is beyond the scope of this paper, a future effort may be warranted when the simulations incorporate spin.}
@@ -454,7 +453,7 @@ We compared the observed scaling relation \mbh-\smass\ with the predictions from
 \item{}To understand how much the {\it observed} scatter is dominated by random observational error,
 we re-run the estimation without injecting noise to the simulations. The obtained scatter for both $z<1$ and $z>1$ are at a similar level (i.e.,  $\sim$0.15$-$0.2 dex, see Table~\ref{tab:sum}), indicating that observational errors dominate the scatter.
 
-\item{} Regarding the \red{offsets of the scaling relation from the local one} ($\Delta$\mbh\ at a given \smass; D20), {\it all simulations generally match the observations} with some subtle, yet notable, differences. While Illustris\red{, MBII,} and Horizon-AGN show good correspondence with observations at $z<0.6$, the comparisons at $z>0.6$ are better for SAM, \red{MBII,} TNG100, TNG300 and Horizon-AGN. Bridging the gap from \hbox{$z\sim0.7$} to $z\sim1.5$, TNG100, TNG300 and Horizon-AGN simulations match well the observed evolution of the scaling relation, i.e., the offsets are larger at higher redshift as shown in Figure~\ref{fig:offsets_vz} and Table~\ref{tab:sum}. Four out of six of the simulations have a decreasing mass offset from $z=0.2$ to $z=0.6$ while the observational mass offset increases with redshift; however, this is well below the observed scatter.
+\item{} Regarding the \red{offsets of the scaling relation from the local one} ($\Delta$\mbh\ at a given \smass; D20), {\it all simulations generally match the observations} with some subtle, yet notable, differences. While Illustris\red{, MBII,} and Horizon-AGN show good correspondence with observations at $z<0.6$, the comparisons at $z>0.6$ are better for SAM, \red{MBII,} TNG100, TNG300 and Horizon-AGN. Bridging the gap from \hbox{$z\sim0.7$} to $z\sim1.5$, TNG100, TNG300 and Horizon-AGN simulations match well the observed evolution of the scaling relation, i.e., the offsets are larger at higher redshift as shown in Figure~\ref{fig:offsets_vz} and Table~\ref{tab:sum}. \red{Four out of six of the simulations have a decreasing mass offset from $z=0.2$ to $z=0.6$ while the observational mass offset increases with redshift; however, this is well below the observed scatter.}
 \end{enumerate}
 
 \red{These results are based on samples with stellar masses mainly with the range [9.5, 11.5] $M_{\odot}$. Note that
@@ -519,8 +518,8 @@ Horizon-AGN & 2.01e-01 & 4.83e-01  & 1.40e-01  & 1.95e-01  \\
 \tablecomments{These p-values are obtained by the KS test between the simulation and the observation \red{based on one realization}.}
 \end{deluxetable*}
 
-\bibliography{reference}{}
-%\input{manuscript.bbl}
+%\bibliography{reference}{}
+\input{manuscript.bbl}
 \bibliographystyle{aasjournal}
 
 \end{document}
