@@ -19,16 +19,16 @@ res_files = glob.glob('/Users/Dartoon/Downloads/sim_results/qsoID*filt_f35*pkl')
 res_files.sort()
 
 res_scatter_diffPSF, res_scatter_samePSF = [], []
-
+res_reff = []
 y = 'mag (inf$-$true)'
 # y = 'reff ratio (inf/true)'
 ratio = []
 for file in res_files:
     res = pickle.load(open(file,'rb'))
-    
     # print(round(res['true_host_flux'],1), round(res['inferred_host_flux'],1))
     # print(res['PSF_id_true'], res['PSF_id_model'])
     # print(res['host_Reff_kpc'], res['host_flux_ratio'])
+    res_reff.append(res['assumed_host_Re_kpc'])
     if y == 'mag (inf$-$true)':
         res_scatter_diffPSF.append( res['inferred_magnitude_diff_psf'] - res['true_host_mag'] )
         res_scatter_samePSF.append( res['inferred_magnitude_same_psf'] - res['true_host_mag'] )
@@ -40,7 +40,6 @@ for file in res_files:
     ratio.append( res['true_host_flux_ratio'] )
 #%%
 
-
 plt.figure(figsize=(11,11))
 plt.scatter(ratio, res_scatter_samePSF, label = 'use True PSF')
 plt.scatter(ratio, res_scatter_diffPSF, label = 'use diff PSF')
@@ -50,6 +49,20 @@ else:
     plt.ylim([0, 3])
 plt.tick_params(labelsize=20)
 plt.xlabel('flux ratio',fontsize=27)
+plt.ylabel(y, fontsize=27)
+plt.legend(prop={'size':28})
+plt.show()
+
+#%%
+plt.figure(figsize=(11,11))
+plt.scatter(res_reff, res_scatter_samePSF, label = 'use True PSF')
+plt.scatter(res_reff, res_scatter_diffPSF, label = 'use diff PSF')
+if y == 'mag (inf$-$true)':
+    plt.ylim([-2.5, 2.5])
+else:
+    plt.ylim([0, 3])
+plt.tick_params(labelsize=20)
+plt.xlabel('Host Reff (kpc)',fontsize=27)
 plt.ylabel(y, fontsize=27)
 plt.legend(prop={'size':28})
 plt.show()
