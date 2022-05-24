@@ -22,6 +22,8 @@ lines = string.split('\n')   # Split in to \n
 mag_mis = []
 IDs = glob.glob('s21a/*')
 
+images = []
+IDs.sort()
 for ID in IDs:
     ID = ID.split('/')[1]
     idx = np.where(Reines_t1[:,2] == ID)[0][0]
@@ -50,7 +52,7 @@ for ID in IDs:
     data_process = DataProcess(fov_image = fov_image, fov_noise_map = err_data, target_pos = [ra, dec],
                                pos_type = 'wcs', header = header,
                                rm_bkglight = True, if_plot=False, zp = zp)
-    data_process.generate_target_materials(radius=None, create_mask = False, nsigma=2.8,
+    data_process.generate_target_materials(radius=180, create_mask = False, nsigma=2.8,
                                            radius_list = [80, 100, 120, 140, 160, 180], 
                                           exp_sz= 1.2, npixels = 15, if_plot=False)
     data_process.PSF_list = [PSF]
@@ -59,6 +61,7 @@ for ID in IDs:
     fit_sepc = FittingSpecify(data_process)
     fit_sepc.prepare_fitting_seq(point_source_num = 1, supersampling_factor=3)#, fix_n_list= [[0,4]], fix_center_list = [[0,0]])
     # plt_fits(data_process.target_stamp)
+    images.append(data_process.target_stamp)
     # fit_sepc.plot_fitting_sets()
     # fit_sepc.build_fitting_seq()
 
@@ -70,7 +73,9 @@ for ID in IDs:
     print("mag miss:", abs_mag - Reines_iMag)
     mag_mis.append(abs_mag - Reines_iMag)
     
-    
-    
+#%%
+from galight.tools.astro_tools import plt_many_fits
+plt_many_fits(images, labels = [IDs[i][5:] for i in range(len(IDs))], label_size=13)
+
     
     
