@@ -64,8 +64,8 @@ fit_sepc.plot_fitting_sets()
 
 #%%Setting the fitting method and run.
 from galight.fitting_process import FittingProcess
-fit_run = FittingProcess(fit_sepc, savename = 'savename', fitting_level='norm')
-fit_run.run(algorithm_list = ['PSO', 'MCMC'], setting_list=[None,{'n_burn': 50, 'n_run': 60, 'walkerRatio': 10,'sigma_scale': .1}])
+fit_run = FittingProcess(fit_sepc, savename = 'savename', fitting_level=['norm','norm', 'deep'])
+fit_run.run(algorithm_list = ['PSO','PSO', 'PSO'])
             # setting_list = [{'sigma_scale': 1., 'n_particles': 100, 'n_iterations': 100}, {'n_burn': 100, 'n_run': 100, 'walkerRatio': 10,'sigma_scale': .1}])
 fit_run.plot_all()
 

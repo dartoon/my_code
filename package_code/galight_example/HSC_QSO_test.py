@@ -34,11 +34,24 @@ data_process = DataProcess(fov_image = fov_image, fov_noise_map = err_data, targ
                           rm_bkglight = True, if_plot=False, zp = zp)
 
 data_process.generate_target_materials(radius=None, create_mask = False, nsigma=2.8,
-                                      exp_sz= 1.2, npixels = 15, if_plot=True)
-
+                                      exp_sz= 1.2, npixels = 15, if_plot=True, use_moments=False)
 data_process.PSF_list = [PSF]
 
 data_process.checkout() #Check if all the materials is known.
+
+#%%
+# from galight.tools.measure_tools import image_moments
+# image = data_process.target_stamp
+# segm = data_process.segm_deblend
+# moments = image_moments(image, segm, 1)
+
+# target = data_process.apertures[0]
+# positions = [moments['X'],moments['Y']]
+# a = moments['Mrr']
+# b = moments['Mrr']*moments['q']
+# theta = moments['phi_deg']*np.pi/180
+
+
 
 # #%%Update the apretures:
 # import copy
@@ -57,18 +70,18 @@ data_process.checkout() #Check if all the materials is known.
 # plt.show()
 
 #%%Start to produce the class and params for lens fitting.
-from galight.fitting_specify import FittingSpecify
-fit_sepc = FittingSpecify(data_process)
-fit_sepc.prepare_fitting_seq(point_source_num = 1, supersampling_factor=3, mpi=False)#, fix_n_list= [[0,4]], fix_center_list = [[0,0]])
-# fit_sepc.plot_fitting_sets()
-fit_sepc.build_fitting_seq()
+# from galight.fitting_specify import FittingSpecify
+# fit_sepc = FittingSpecify(data_process)
+# fit_sepc.prepare_fitting_seq(point_source_num = 1, supersampling_factor=3, mpi=False)#, fix_n_list= [[0,4]], fix_center_list = [[0,0]])
+# # fit_sepc.plot_fitting_sets()
+# fit_sepc.build_fitting_seq()
 
-#Setting the fitting method and run.
-from galight.fitting_process import FittingProcess
-fit_run = FittingProcess(fit_sepc, savename = 'HSC_QSO', fitting_level='norm')
-fit_run.run(algorithm_list = ['PSO','PSO'], setting_list=None,threadCount=2)
+# #Setting the fitting method and run.
+# from galight.fitting_process import FittingProcess
+# fit_run = FittingProcess(fit_sepc, savename = 'HSC_QSO', fitting_level='norm')
+# fit_run.run(algorithm_list = ['PSO','PSO'], setting_list=None,threadCount=2)
 # # fit_run.plot_all()
-# fit_run.dump_result()
+# # fit_run.dump_result()
 # print(fit_run.final_result_galaxy[0])
 
 # #%%
