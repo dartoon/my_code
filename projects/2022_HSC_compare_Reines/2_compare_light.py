@@ -45,22 +45,10 @@ for ID in IDs:
     print(ID, 'z', z)
     try:
         for band in bands:
-            fitsname = glob.glob('./s21a/{0}/*cutout*{1}*.fits'.format(ID, band))
-            fitsFile = pyfits.open(fitsname[0])
-            fov_image= fitsFile[1].data
-            header = fitsFile[1].header # if target position is add in WCS, the header should have the wcs information, i.e. header['EXPTIME']
-            err_data= fitsFile[3].data ** 0.5
-            
-            file_header0 = fitsFile[0].header
-            FLUXMAG0 = file_header0['FLUXMAG0']
-            zp =  2.5 * np.log10(FLUXMAG0)
-            psfname = glob.glob('./s21a/{0}/*psf*{1}*.fits'.format(ID, band))
-            PSF = pyfits.getdata(psfname[0])
-            
             if glob.glob('galight_results/'+ID+'_{0}*pkl'.format(band)) != []:
                 fit_run = pickle.load(open(glob.glob('galight_results/'+ID+'_{0}*pkl'.format(band))[0],'rb')) 
                 print(ID, band,':')
-                fit_run.plot_final_qso_fit(target_ID = ID)
+                # fit_run.plot_final_qso_fit(target_ID = ID)
                 obs_mag = fit_run.final_result_galaxy[0]['magnitude']
                 # print(obs_mag)
                 # obs_mag = -2.5*np.log10(np.sum(fit_run.flux_2d_out['data'])) + zp
