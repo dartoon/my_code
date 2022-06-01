@@ -5,7 +5,7 @@
 #PBS -l nodes=1:ppn=1
 #PBS -l walltime=01:50:00
 #PBS -l mem=200mb
-#PBS -J 501-1000:1
+#PBS -J 1-500:1
 #PBS -u xuheng.ding
 #PBS -m ae
 #PBS -V
