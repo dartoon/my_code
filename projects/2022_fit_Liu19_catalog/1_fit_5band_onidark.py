@@ -27,7 +27,7 @@ import sys
 point_source_num = 1  #Number for Point sources (AGNs, or stars) in the target. 0 means no PS.
 lband = 'I' #The band fitting first and can also fit n and Re for other band.
 fix_n, fix_re = False, False  #Fix sersic n and Re based on I band fitting.
-idx = int(sys.argv[2])
+idx = int(sys.argv[1])
 
 #%%
 line = lines[idx-1]
@@ -100,11 +100,11 @@ for i in run_list:
     fit_sepc_l[i].prepare_fitting_seq(point_source_num = point_source_num, supersampling_factor=3, 
                                       fix_n_list= fix_n_list, fix_Re_list=fix_Re_list,
                                       ps_pix_center_list = [[0,0]])
-    fit_sepc_l[i].plot_fitting_sets('fit_result/'+ID+'-{0}_set.png'.format(band))
+    fit_sepc_l[i].plot_fitting_sets(savename='fit_result/'+ID+'-{0}_set.png'.format(band), show_plot=False)
     fit_sepc_l[i].build_fitting_seq()
     fit_run_l[i] = FittingProcess(fit_sepc_l[i], savename = 'fit_result/'+ID+'-{0}'.format(band), fitting_level=['norm', 'norm'])
     fit_run_l[i].run(algorithm_list = ['PSO', 'PSO'])
-    fit_run_l[i].plot_final_qso_fit(save_plot=True, target_ID= 'fit_result/'+ID +'-'+ band )
+    fit_run_l[i].plot_final_qso_fit(save_plot=True, target_ID= 'fit_result/'+ID +'-'+ band, show_plot=False)
     fit_run_l[i].dump_result()
     
 
