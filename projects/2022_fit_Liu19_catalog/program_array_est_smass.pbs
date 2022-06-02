@@ -1,0 +1,15 @@
+#!/bin/bash
+#PBS -N Galight_on_Liu19
+#PBS -o /home/xuheng.ding/Astro/my_code/projects/2022_fit_Liu19_catalog/pbs/
+#PBS -e /home/xuheng.ding/Astro/my_code/projects/2022_fit_Liu19_catalog/pbs/
+#PBS -l nodes=1:ppn=1
+#PBS -l walltime=01:50:00
+#PBS -l mem=200mb
+#PBS -J 2-1984:1
+#PBS -u xuheng.ding
+#PBS -m ae
+#PBS -V
+#PBS -q tiny
+
+cd /home/xuheng.ding/Astro/my_code/projects/2022_fit_Liu19_catalog/
+python 2_esti_mass_id.py $PBS_ARRAY_INDEX
