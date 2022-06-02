@@ -29,10 +29,10 @@ lband = 'I' #The band fitting first and can also fit n and Re for other band.
 fix_n, fix_re = False, False  #Fix sersic n and Re based on I band fitting.
 
 #%%
-for _, line in enumerate(lines[:1]):
-        ID, Ra, Dec = line.split(' ')
+for _, line in enumerate(lines):
+    ID, Ra, Dec = line.split(' ')
     # if ID in ['10547', '13120', '13338', '14503', '1956', '2831', '5328', '7007', '8457', '8917', '9009', '9209']:
-    # if ID > 0:
+    if ID == '12474':        
         print(_, ID)
         QSO_RA, QSO_DEC = float(Ra), float(Dec)
         data_process_list = []
