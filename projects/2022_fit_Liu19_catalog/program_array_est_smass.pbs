@@ -11,5 +11,6 @@
 #PBS -V
 #PBS -q tiny
 
+source activate gsf
 cd /home/xuheng.ding/Astro/my_code/projects/2022_fit_Liu19_catalog/
 python 2_esti_mass_id.py $PBS_ARRAY_INDEX
