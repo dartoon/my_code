@@ -78,8 +78,9 @@ for i in run_list[1:]:
         if np.sum(covers - new_cover*covers) > np.sum(1-new_cover)/2 :               
             apertures.append(data_process_list[i].apertures[j])
 rm_list = []
-for i in range(len(apertures)):
-    all_cover = mask_obj(data_process_list[l_idx].target_stamp, apertures[:i]+apertures[i+1:], if_plot=False, sum_mask = True)
+for i in range(1,len(apertures)):
+    other_apertures = [apertures[j] for j in range(len(apertures)) if i!=j]
+    all_cover = mask_obj(data_process_list[l_idx].target_stamp, other_apertures, if_plot=False, sum_mask = True)
     one_cover = mask_obj(data_process_list[l_idx].target_stamp, [apertures[i]], if_plot=False, sum_mask = True)
     if  np.sum(all_cover) - np.sum(all_cover*one_cover) < np.sum(1-one_cover)/1.6:
         rm_list.append(i)
@@ -102,7 +103,7 @@ for i in run_list:
                                       ps_pix_center_list = [[0,0]])
     fit_sepc_l[i].plot_fitting_sets(savename='fit_result/'+ID+'-{0}_set.png'.format(band), show_plot=False)
     fit_sepc_l[i].build_fitting_seq()
-    fit_run_l[i] = FittingProcess(fit_sepc_l[i], savename = 'fit_result/'+ID+'-{0}'.format(band), fitting_level=['norm', 'norm'])
+    fit_run_l[i] = FittingProcess(fit_sepc_l[i], savename = 'fit_result/'+ID+'-{0}'.format(band), fitting_level=['norm', 'deep'])
     fit_run_l[i].run(algorithm_list = ['PSO', 'PSO'])
     fit_run_l[i].plot_final_qso_fit(save_plot=True, target_ID= 'fit_result/'+ID +'-'+ band, show_plot=False)
     fit_run_l[i].dump_result()
