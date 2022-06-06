@@ -20,8 +20,41 @@ lines = string.split('\n')   # Split in to \n
 import glob
 from galight.data_process import DataProcess
 
-write_file = open('table_mag_frameflux.txt','w') 
-write_file.write("#ID, (mag using flux with frame) Gmag, Rmag, Imag, Zmag, Ymag  \n")
+# write_file = open('table_mag_frameflux.txt','w') 
+# write_file.write("#ID, (mag using flux with frame) Gmag, Rmag, Imag, Zmag, Ymag  \n")
+# for _, line in enumerate(lines):
+#     ID, Ra, Dec = line.split(' ')
+#     write_file.write(ID+' ')
+#     for band in bands:
+#         glob_files = glob.glob('fit_result/{0}-{1}.pkl'.format(ID,band))
+#         if glob_files != []:
+#             fit_run  = pickle.load(open(glob_files[0],'rb'))
+#             # print(fit_run.final_result_galaxy[0])
+#             write_file.write('{0:.3f} '.format(fit_run.final_result_galaxy[0]['magnitude']))
+#         else:
+#             write_file.write('-99 ')
+#     write_file.write('\n')
+# write_file.close()
+
+# write_file = open('table_mag_sersicflux.txt','w') 
+# write_file.write("#ID, (mag using flux with frame) Gmag, Rmag, Imag, Zmag, Ymag  \n")
+# for _, line in enumerate(lines):
+#     ID, Ra, Dec = line.split(' ')
+#     write_file.write(ID+' ')
+#     for band in bands:
+#         glob_files = glob.glob('fit_result/{0}-{1}.pkl'.format(ID,band))
+#         if glob_files != []:
+#             fit_run  = pickle.load(open(glob_files[0],'rb'))
+#             sersic_mag = -2.5*np.log10(fit_run.final_result_galaxy[0]['flux_sersic_model']) + 27.0
+#             # print(fit_run.final_result_galaxy[0])
+#             write_file.write('{0:.3f} '.format(sersic_mag))
+#         else:
+#             write_file.write('-99 ')
+#     write_file.write('\n')
+# write_file.close()
+
+write_file = open('table_mag_sersic_Re_n.txt','w') 
+write_file.write("#ID, Sersic Re, Sersic n (G R I Z Y)  \n")
 for _, line in enumerate(lines):
     ID, Ra, Dec = line.split(' ')
     write_file.write(ID+' ')
@@ -29,26 +62,10 @@ for _, line in enumerate(lines):
         glob_files = glob.glob('fit_result/{0}-{1}.pkl'.format(ID,band))
         if glob_files != []:
             fit_run  = pickle.load(open(glob_files[0],'rb'))
-            # print(fit_run.final_result_galaxy[0])
-            write_file.write('{0:.3f} '.format(fit_run.final_result_galaxy[0]['magnitude']))
+            write_file.write('{0:.3f}  {1:.3f}'.format(fit_run.final_result_galaxy[0]['R_sersic'], fit_run.final_result_galaxy[0]['n_sersic']))
         else:
-            write_file.write('-99 ')
+            write_file.write('-99 -99 ')
     write_file.write('\n')
 write_file.close()
 
-write_file = open('table_mag_sersicflux.txt','w') 
-write_file.write("#ID, (mag using flux with frame) Gmag, Rmag, Imag, Zmag, Ymag  \n")
-for _, line in enumerate(lines):
-    ID, Ra, Dec = line.split(' ')
-    write_file.write(ID+' ')
-    for band in bands:
-        glob_files = glob.glob('fit_result/{0}-{1}.pkl'.format(ID,band))
-        if glob_files != []:
-            fit_run  = pickle.load(open(glob_files[0],'rb'))
-            sersic_mag = -2.5*np.log10(fit_run.final_result_galaxy[0]['flux_sersic_model']) + 27.0
-            # print(fit_run.final_result_galaxy[0])
-            write_file.write('{0:.3f} '.format(sersic_mag))
-        else:
-            write_file.write('-99 ')
-    write_file.write('\n')
-write_file.close()
+

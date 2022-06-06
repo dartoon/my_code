@@ -22,7 +22,6 @@ for line in lines[1:-1]:
         result.append([float(z), float(smass), float(Mbh)])
         
 result = np.array(result)
-
 inf_Mstar,inf_MBHs = result[:,1],  result[:,2]
 
 #%%
@@ -316,8 +315,12 @@ plt.scatter(Mstar,MBs,c='lightsalmon',s=420,marker=".",zorder=100, edgecolors='k
 # plt.errorbar(Mstar,MBs, xerr=[np.abs(Mstar_err)[:,0], np.abs(Mstar_err)[:,1]], yerr=0.4, color='blue',ecolor='orange', fmt='.',zorder=-500,markersize=1, alpha = 0.4)
 
 #%%
-plt.scatter(inf_Mstar,inf_MBHs,c='blue',
-            s=220, marker=".",zorder=-1, edgecolors='k', alpha = 0.4)
+import seaborn as sns
+
+sns.kdeplot(inf_Mstar, inf_MBHs, linewidths = 2, color = 'blue', 
+            fill=True, alpha=0.4, zorder = 1)
+# plt.scatter(inf_Mstar,inf_MBHs,c='blue',
+#             s=220, marker=".",zorder=100, edgecolors='k', alpha = 0.2)
 
 #%%    
 
