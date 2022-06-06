@@ -53,7 +53,7 @@ from galight.data_process import DataProcess
 #     write_file.write('\n')
 # write_file.close()
 
-write_file = open('table_mag_sersic_Re_n.txt','w') 
+write_file = open('table_sersic_Re_n.txt','w') 
 write_file.write("#ID, Sersic Re, Sersic n (G R I Z Y)  \n")
 for _, line in enumerate(lines):
     ID, Ra, Dec = line.split(' ')
@@ -62,7 +62,7 @@ for _, line in enumerate(lines):
         glob_files = glob.glob('fit_result/{0}-{1}.pkl'.format(ID,band))
         if glob_files != []:
             fit_run  = pickle.load(open(glob_files[0],'rb'))
-            write_file.write('{0:.3f}  {1:.3f}'.format(fit_run.final_result_galaxy[0]['R_sersic'], fit_run.final_result_galaxy[0]['n_sersic']))
+            write_file.write('{0:.3f} {1:.3f} '.format(fit_run.final_result_galaxy[0]['R_sersic'], fit_run.final_result_galaxy[0]['n_sersic']))
         else:
             write_file.write('-99 -99 ')
     write_file.write('\n')
