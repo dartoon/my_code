@@ -230,7 +230,7 @@ cis11 = np.array([[ 0.73,  7.72, 10.3 ],
        [ 0.66,  8.19, 11.03],
        [ 0.38,  8.25, 11.08]])
 if inp_Cis ==1:
-    plt.scatter(cis11[:,2],cis11[:,1],c='darkseagreen',marker="^",s=180,zorder=100, edgecolors='white')
+    plt.scatter(cis11[:,2],cis11[:,1],c='darkseagreen',marker="^",s=80,zorder=100, edgecolors='white')
 
 # inp_Knud= 0
 # Knud = np.array([[ 1.841, 46.58 ,  8.55 ,  6.56 , 10.69 ],
@@ -311,16 +311,23 @@ Mstar_err = np.array([[-0.15,  0.19], [-0.15,  0.19], [-0.14,  0.16], [-0.14,  0
                       [-0.12,  0.12], [-0.24,  0.48], [-0.17,  0.23], [-0.12,  0.12], 
                       [-0.14,  0.16], [-0.19,  0.28], [-0.25,  0.53], [-0.14,  0.16], 
                       [-0.18,  0.25], [-0.18,  0.24], [-0.15,  0.18], [-0.15,  0.18]])
-plt.scatter(Mstar,MBs,c='lightsalmon',s=420,marker=".",zorder=100, edgecolors='k', alpha = 0.8)
+plt.scatter(Mstar,MBs,c='lightsalmon',s=220,marker=".",zorder=100, edgecolors='k', alpha = 0.8)
 # plt.errorbar(Mstar,MBs, xerr=[np.abs(Mstar_err)[:,0], np.abs(Mstar_err)[:,1]], yerr=0.4, color='blue',ecolor='orange', fmt='.',zorder=-500,markersize=1, alpha = 0.4)
 
 #%%
 import seaborn as sns
-
 sns.kdeplot(inf_Mstar, inf_MBHs, linewidths = 2, color = 'blue', 
             fill=True, alpha=0.4, zorder = 1)
 # plt.scatter(inf_Mstar,inf_MBHs,c='blue',
 #             s=220, marker=".",zorder=100, edgecolors='k', alpha = 0.2)
+
+#%%
+Reines_t1 = np.loadtxt('../2022_HSC_compare_Reines/2021_previous/Reines_2015_table_1.txt', dtype=str)
+Reines_MM = np.asarray(Reines_t1[:,-2:], dtype=float)
+# sns.kdeplot(Reines_MM[:,0], Reines_MM[:,1], linewidths = 2, color = 'yellow', 
+#             fill=True, alpha=0.4, zorder = 1)
+plt.scatter(Reines_MM[:,0], Reines_MM[:,1],c='yellow',
+            s=220, marker=".",zorder=100, edgecolors='k', alpha = 0.2)
 
 #%%    
 
@@ -340,11 +347,13 @@ Bkc=mlines.Line2D([], [], color='gray', ls='', marker='.', markersize=15)
 Hkc=mlines.Line2D([], [], color='black', ls='', marker='.', markersize=15)
 SS13 = mlines.Line2D([], [], color='darkseagreen', ls='', marker='^', markersize=13)
 ding_sample = mlines.Line2D([], [], color='lightsalmon', ls='', marker='.', markersize=20,markeredgecolor='k')
-plt.legend([Bkc,Hkc,SS13,ding_sample],[
+Rie_sample = mlines.Line2D([], [], color='yellow', ls='', marker='.', markersize=20,markeredgecolor='k', alpha=0.2)
+plt.legend([Bkc,Hkc,SS13,ding_sample, Rie_sample],[
 'Local by Bennert+11',\
 "Local by H&R",
 "intermediate redshift AGNs",
-"$1.2<z<1.7$ AGNs by D20"\
-],scatterpoints=1,numpoints=1,loc=3,prop={'size':20,'family': 'Arial'},ncol=2)
+"$1.2<z<1.7$ AGNs by D20",
+"Reines 2015"\
+],scatterpoints=1,numpoints=1,loc=0,prop={'size':20,'family': 'Arial'},ncol=2)
 # plt.savefig("MBH-Mstar.pdf")
 plt.show()

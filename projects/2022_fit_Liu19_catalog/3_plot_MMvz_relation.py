@@ -7,26 +7,10 @@ Created on Thu Jun  2 16:43:33 2022
 """
 
 import numpy as np
-import astropy.io.fits as pyfits
 import matplotlib.pyplot as plt
 
-f = open("table_summary.txt","r")
-string = f.read()
-lines = string.split('\n')   # Split in to \n
 
-result = []
-for line in lines[1:-1]:
-    results = line.split()
-    ID, z, smass, Mbh, magG, magR, magI, magZ, magY = results
-    if float(smass) >0:
-        result.append([float(z), float(smass), float(Mbh)])
-        
-result = np.array(result)
-inf_z, inf_Mstar,inf_MBHs =result[:,0], result[:,1],  result[:,2]
-
-import numpy as np
 np.set_printoptions(precision=4)
-import matplotlib.pyplot as plt
 import matplotlib as mat
 import matplotlib.lines as mlines
 from matplotlib import colors
@@ -400,7 +384,23 @@ value,sig=round(b_ml_offset,2),round((np.percentile(samples,84,axis=0)[0]-np.per
 print(value,sig)
 
 #%%
-#Plot HSC data on top of Ding 2020
+f = open("table_summary.txt","r")
+string = f.read()
+lines = string.split('\n')   # Split in to \n
+
+Reines_t1 = np.loadtxt('./table_sersic_Re_n.txt', dtype='str')
+
+result = []
+for line in lines[1:-1]:
+    results = line.split()
+    ID, z, smass, Mbh, magG, magR, magI, magZ, magY = results
+    sersic_n = float(Reines_t1[ID == Reines_t1[:,0]][0][6])
+    if float(smass) >0:
+        result.append([float(z), float(smass), float(Mbh), sersic_n])
+        
+result = np.array(result)
+inf_z, inf_Mstar,inf_MBHs,inf_n =result[:,0], result[:,1],  result[:,2], result[:,3],
+
 inf_z = inf_z
 inf_Mstar = inf_Mstar
 inf_MBHs = inf_MBHs
@@ -420,30 +420,15 @@ inf_y = inf_y[inf_y>-100]
 #             s=220, marker=".",zorder=-1, edgecolors='k', alpha = 0.4)
 import seaborn as sns
 
-sns.kdeplot(inf_x,inf_y, linewidths = 2, color = 'blue', 
-            fill=True, alpha=0.4, zorder = 1)
-# result_HSC = op.minimize(nll, [1.8, 0.3], args=(inf_x, inf_y, yerr_highz))
-# b_ml_HSC,_= result_HSC["x"]
-# plt.plot(xl, xl*0+xl*b_ml_HSC, color="black", linewidth=4.0,zorder=0)
-
-# ndim, nwalkers = 2, 100
-# pos_HSC = [result_HSC["x"] + 1e-4*np.random.randn(ndim) for i in range(nwalkers)]
-# sampler_HSC = emcee.EnsembleSampler(nwalkers, ndim, lnprob, args=(inf_x, inf_y, yerr_highz))
-# sampler_HSC.run_mcmc(pos_HSC, 500)
-# sampler_HSC = sampler_HSC.chain[:, 50:, :].reshape((-1, ndim))
-
-# b_ml_HSC, _ =np.percentile(sampler_HSC, 50,axis=0)
-# #print "lnlike=",lnlike(theta=[b_ml_offset, sint_mid],x=x, y=y, yerr=yerr)
-# plt.plot(xl, xl*0+xl*b_ml_HSC, color="black", linewidth=4.0,zorder=0)
-
-# # HSC_b=np.percentile(sampler_HSC,50,axis=0)[0]
-# #print samples[:,1][samples[:,0]==find_n(samples[:,0],m)]
-# for i in range(100):
-#     posi=np.random.uniform(16,84)
-#     b_HSC=np.percentile(sampler_HSC,posi,axis=0)[0]    
-#     #print b
-#     plt.plot(xl, xl*0+xl*b_HSC, color="gray", alpha=0.1,linewidth=7.0,zorder=-1+np.random.normal(0,0.02))
-
+# sns.kdeplot(inf_x,inf_y, linewidths = 2, color = 'blue', 
+#             fill=True, alpha=0.6, zorder = 1)
+# inf_n[inf_n<0] = 2
+plt.scatter(inf_x,inf_y,c=inf_n,
+            s=220, marker=".",zorder=100, alpha = 0.5)
+cbar = plt.colorbar()
+plt.clim(0, 4)
+cbar.ax.tick_params(labelsize=20)
+cbar.ax.set_ylabel('sersic n', rotation=270, fontsize = 25, labelpad=25)
 
 #%% Where loop ends
 plt.xlabel(r"log(1+z)",fontsize=45)
@@ -459,7 +444,7 @@ if style ==0:
 if style ==1:
     plt.yticks(np.arange(-5.5,6,0.5))
     plt.axis([xl,xh,-2.0,3.5])
-    plt.ylim([-2.0,3.5])
+    plt.ylim([-3.5,3.5])
     plt.ylabel(r"$\Delta$logM$_{\rm BH}$ (vs M$_*$)",fontsize=45)
 plt.grid()
 plt.tick_params(labelsize=35)
