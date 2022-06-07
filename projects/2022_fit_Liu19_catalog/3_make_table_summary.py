@@ -20,9 +20,9 @@ f_Liu_t2 = open("Liu_files/table2.dat","r")
 t2_string = f_Liu_t2.read()
 t2_lines = t2_string.split('\n')
 
-f_Liu_t1 = open("Liu_files/table1.dat","r")
-t1_string = f_Liu_t1.read()
-t1_lines = t1_string.split('\n')
+f_Liu_t3 = open("Liu_files/table3.dat","r")
+t3_string = f_Liu_t3.read()
+t3_lines = t3_string.split('\n')
 
 f = open("table_mag_frameflux.txt","r")
 string = f.read()
@@ -46,8 +46,8 @@ for line in lines[1:-1]:
     info2_l = t2_lines[int(ID)-1]
     info2 = info2_l.split(' ')
     info2 = [s for s in info2 if s != '']
-    ID_load1, Mbh = info2[0], info2[-2]
-    # Mbh_list.append(float(Mbh))
+    ID_load1, Mbh = info2[0], info2[-4]
+    print(Mbh)
     z_list.append(float(z))
     if ID!= ID_load0 or ID!= ID_load1:
         print(ID)

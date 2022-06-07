@@ -423,12 +423,14 @@ import seaborn as sns
 # sns.kdeplot(inf_x,inf_y, linewidths = 2, color = 'blue', 
 #             fill=True, alpha=0.6, zorder = 1)
 # inf_n[inf_n<0] = 2
-plt.scatter(inf_x,inf_y,c=inf_n,
+bool_ = inf_n>3
+plt.scatter(inf_x[bool_],inf_y[bool_],c=inf_n[bool_],
             s=220, marker=".",zorder=100, alpha = 0.5)
 cbar = plt.colorbar()
 plt.clim(0, 4)
 cbar.ax.tick_params(labelsize=20)
 cbar.ax.set_ylabel('sersic n', rotation=270, fontsize = 25, labelpad=25)
+print(np.mean(inf_y[bool_]))
 
 #%% Where loop ends
 plt.xlabel(r"log(1+z)",fontsize=45)

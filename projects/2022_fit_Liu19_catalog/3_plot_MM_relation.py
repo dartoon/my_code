@@ -10,20 +10,6 @@ import numpy as np
 import astropy.io.fits as pyfits
 import matplotlib.pyplot as plt
 
-f = open("table_summary.txt","r")
-string = f.read()
-lines = string.split('\n')   # Split in to \n
-
-result = []
-for line in lines[1:-1]:
-    results = line.split()
-    ID, z, smass, Mbh, magG, magR, magI, magZ, magY = results
-    if float(smass) >0:
-        result.append([float(z), float(smass), float(Mbh)])
-        
-result = np.array(result)
-inf_Mstar,inf_MBHs = result[:,1],  result[:,2]
-
 #%%
 np.set_printoptions(precision=4)
 from matplotlib import colors
@@ -315,11 +301,33 @@ plt.scatter(Mstar,MBs,c='lightsalmon',s=220,marker=".",zorder=100, edgecolors='k
 # plt.errorbar(Mstar,MBs, xerr=[np.abs(Mstar_err)[:,0], np.abs(Mstar_err)[:,1]], yerr=0.4, color='blue',ecolor='orange', fmt='.',zorder=-500,markersize=1, alpha = 0.4)
 
 #%%
+f = open("table_summary.txt","r")
+string = f.read()
+lines = string.split('\n')   # Split in to \n
+
+Reines_t1 = np.loadtxt('./table_sersic_Re_n.txt', dtype='str')
+
+result = []
+for line in lines[1:-1]:
+    results = line.split()
+    ID, z, smass, Mbh, magG, magR, magI, magZ, magY = results
+    sersic_n = float(Reines_t1[ID == Reines_t1[:,0]][0][6])
+    if float(smass) >0:
+        result.append([float(z), float(smass), float(Mbh), sersic_n])
+        
+result = np.array(result)
+inf_z, inf_Mstar,inf_MBHs,inf_n =result[:,0], result[:,1],  result[:,2], result[:,3],
+
 import seaborn as sns
-sns.kdeplot(inf_Mstar, inf_MBHs, linewidths = 2, color = 'blue', 
-            fill=True, alpha=0.4, zorder = 1)
-# plt.scatter(inf_Mstar,inf_MBHs,c='blue',
-#             s=220, marker=".",zorder=100, edgecolors='k', alpha = 0.2)
+# sns.kdeplot(inf_Mstar[inf_n>3], inf_MBHs[inf_n>3], linewidths = 2, color = 'blue', 
+#             fill=True, alpha=0.4, zorder = 1)
+
+plt.scatter(inf_Mstar,inf_MBHs,c=inf_n,
+            s=220, marker=".",zorder=100, alpha = 0.5)
+cbar = plt.colorbar()
+plt.clim(0, 4)
+cbar.ax.tick_params(labelsize=20)
+cbar.ax.set_ylabel('sersic n', rotation=270, fontsize = 25, labelpad=25)
 
 #%%
 Reines_t1 = np.loadtxt('../2022_HSC_compare_Reines/2021_previous/Reines_2015_table_1.txt', dtype=str)
