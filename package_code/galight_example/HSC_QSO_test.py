@@ -39,50 +39,50 @@ data_process.PSF_list = [PSF]
 
 data_process.checkout() #Check if all the materials is known.
 
-#%%
-# from galight.tools.measure_tools import image_moments
-# image = data_process.target_stamp
-# segm = data_process.segm_deblend
-# moments = image_moments(image, segm, 1)
+# %%
+from galight.tools.measure_tools import image_moments
+image = data_process.target_stamp
+segm = data_process.segm_deblend
+moments = image_moments(image, segm, 1)
 
-# target = data_process.apertures[0]
-# positions = [moments['X'],moments['Y']]
-# a = moments['Mrr']
-# b = moments['Mrr']*moments['q']
-# theta = moments['phi_deg']*np.pi/180
+target = data_process.apertures[0]
+positions = [moments['X'],moments['Y']]
+a = moments['Mrr']
+b = moments['Mrr']*moments['q']
+theta = moments['phi_deg']*np.pi/180
 
 
 
-# #%%Update the apretures:
-# import copy
-# apertures = copy.deepcopy(data_process.apertures)
-# add_aperture0 = copy.deepcopy(apertures[0])
-# add_aperture0.a, add_aperture0.b = 3, 3 # A a b for aperture
-# add_aperture0.positions = np.array([40,50])
-# data_process.apertures = apertures +  [add_aperture0]#Pass apertures to the data_process
+#%%Update the apretures:
+import copy
+apertures = copy.deepcopy(data_process.apertures)
+add_aperture0 = copy.deepcopy(apertures[0])
+add_aperture0.a, add_aperture0.b = 3, 3 # A a b for aperture
+add_aperture0.positions = np.array([40,50])
+data_process.apertures = apertures +  [add_aperture0]#Pass apertures to the data_process
 
-# # #Update the segm map:
-# from galight.tools.measure_tools import mask_obj
-# mask = mask_obj(data_process.target_stamp, [add_aperture0])
-# data_process.segm_deblend = data_process.segm_deblend*mask[0] + (1-mask[0])*(np.max(data_process.segm_deblend)+1)
-# plt.imshow(data_process.segm_deblend, origin='lower')
-# plt.colorbar()
-# plt.show()
+# #Update the segm map:
+from galight.tools.measure_tools import mask_obj
+mask = mask_obj(data_process.target_stamp, [add_aperture0])
+data_process.segm_deblend = data_process.segm_deblend*mask[0] + (1-mask[0])*(np.max(data_process.segm_deblend)+1)
+plt.imshow(data_process.segm_deblend, origin='lower')
+plt.colorbar()
+plt.show()
 
-#%%Start to produce the class and params for lens fitting.
-# from galight.fitting_specify import FittingSpecify
-# fit_sepc = FittingSpecify(data_process)
-# fit_sepc.prepare_fitting_seq(point_source_num = 1, supersampling_factor=3, mpi=False)#, fix_n_list= [[0,4]], fix_center_list = [[0,0]])
-# # fit_sepc.plot_fitting_sets()
-# fit_sepc.build_fitting_seq()
+# %%Start to produce the class and params for lens fitting.
+from galight.fitting_specify import FittingSpecify
+fit_sepc = FittingSpecify(data_process)
+fit_sepc.prepare_fitting_seq(point_source_num = 1, supersampling_factor=3, mpi=False)#, fix_n_list= [[0,4]], fix_center_list = [[0,0]])
+# fit_sepc.plot_fitting_sets()
+fit_sepc.build_fitting_seq()
 
-# #Setting the fitting method and run.
-# from galight.fitting_process import FittingProcess
-# fit_run = FittingProcess(fit_sepc, savename = 'HSC_QSO', fitting_level='norm')
-# fit_run.run(algorithm_list = ['PSO','PSO'], setting_list=None,threadCount=2)
-# # fit_run.plot_all()
-# # fit_run.dump_result()
-# print(fit_run.final_result_galaxy[0])
+#Setting the fitting method and run.
+from galight.fitting_process import FittingProcess
+fit_run = FittingProcess(fit_sepc, savename = 'HSC_QSO', fitting_level='norm')
+fit_run.run(algorithm_list = ['PSO','PSO'], setting_list=None,threadCount=2)
+# fit_run.plot_all()
+# fit_run.dump_result()
+print(fit_run.final_result_galaxy[0])
 
 # #%%
 # import pickle
@@ -143,7 +143,7 @@ data_process.checkout() #Check if all the materials is known.
 # from galight.tools.cutout_tools import pix_region
 # region = pix_region(pos['x']+np.array([len(asy_class.img)/2]*2),
 #                     r_p, q=data_process.apertures[obj_id].b/data_process.apertures[obj_id].a,
-#                      theta = data_process.apertures[obj_id].theta)
+#                       theta = data_process.apertures[obj_id].theta)
 # mask = region.to_mask(mode='exact')
 
 # from photutils import EllipticalAperture
