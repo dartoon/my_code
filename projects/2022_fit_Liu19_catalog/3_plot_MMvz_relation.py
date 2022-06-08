@@ -388,15 +388,19 @@ f = open("table_summary.txt","r")
 string = f.read()
 lines = string.split('\n')   # Split in to \n
 
-Reines_t1 = np.loadtxt('./table_sersic_Re_n.txt', dtype='str')
+my_t1 = np.loadtxt('./table_sersic_Re_n.txt', dtype='str')
+my_mbh_tb = np.loadtxt('./table_cal_MBH.txt', dtype='str')
 
 result = []
+my_bh_type = 2  # Halpha 1, Hbeta 2
+
 for line in lines[1:-1]:
     results = line.split()
     ID, z, smass, Mbh, magG, magR, magI, magZ, magY = results
-    sersic_n = float(Reines_t1[ID == Reines_t1[:,0]][0][6])
+    sersic_n = float(my_t1[ID == my_t1[:,0]][0][6])
+    my_mbh = my_mbh_tb[ID == my_mbh_tb[:,0]][0][my_bh_type]
     if float(smass) >0:
-        result.append([float(z), float(smass), float(Mbh), sersic_n])
+        result.append([float(z), float(smass), float(my_mbh), sersic_n])
         
 result = np.array(result)
 inf_z, inf_Mstar,inf_MBHs,inf_n =result[:,0], result[:,1],  result[:,2], result[:,3],
@@ -412,25 +416,24 @@ yerr_highz = ((m_ml*np.ones_like(inf_Mstar)*0.2)**2+0.4**2)**0.5
 
 inf_x=np.log10(1+inf_z)
 inf_y=inf_MBHs-(m_ml*inf_Mstar+b_ml)
-inf_x = inf_x[inf_y>-100]
-yerr_highz = yerr_highz[inf_y>-100]
-inf_y = inf_y[inf_y>-100]
+inf_x = inf_x
+yerr_highz = yerr_highz
+inf_y = inf_y
 
 # plt.scatter(inf_x,inf_y,c='blue',
 #             s=220, marker=".",zorder=-1, edgecolors='k', alpha = 0.4)
+bool_ = (inf_n>0) * (inf_MBHs>0)
 import seaborn as sns
 
-# sns.kdeplot(inf_x,inf_y, linewidths = 2, color = 'blue', 
-#             fill=True, alpha=0.6, zorder = 1)
-# inf_n[inf_n<0] = 2
-bool_ = inf_n>3
-plt.scatter(inf_x[bool_],inf_y[bool_],c=inf_n[bool_],
-            s=220, marker=".",zorder=100, alpha = 0.5)
-cbar = plt.colorbar()
-plt.clim(0, 4)
-cbar.ax.tick_params(labelsize=20)
-cbar.ax.set_ylabel('sersic n', rotation=270, fontsize = 25, labelpad=25)
-print(np.mean(inf_y[bool_]))
+sns.kdeplot(inf_x[bool_],inf_y[bool_], linewidths = 2, color = 'blue', 
+            fill=True, alpha=0.6, zorder = 1)
+# plt.scatter(inf_x[bool_],inf_y[bool_],c=inf_n[bool_],
+#             s=220, marker=".",zorder=100, alpha = 0.5)
+# cbar = plt.colorbar()
+# plt.clim(0, 4)
+# cbar.ax.tick_params(labelsize=20)
+# cbar.ax.set_ylabel('sersic n', rotation=270, fontsize = 25, labelpad=25)
+# print(np.mean(inf_y[bool_]))
 
 #%% Where loop ends
 plt.xlabel(r"log(1+z)",fontsize=45)
