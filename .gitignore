@@ -106,5 +106,6 @@ projects/2022_HSC_compare_Reines/*/*
 projects/2022_fit_Liu19_catalog/Liu_files/*
 projects/2022_fit_Liu19_catalog/esti_smass/*
 template/gsf_temp/templates/*
-projects/2022_fit_Liu19_catalog/table_sersic_Re_n.txt
 projects/2022_fit_Liu19_catalog/table_summary.txt
+projects/2022_JWST_QSOz6/prep_use_HST_highRes/JWST_CEERS/*
+projects/2022_fit_Liu19_catalog/*.txt
