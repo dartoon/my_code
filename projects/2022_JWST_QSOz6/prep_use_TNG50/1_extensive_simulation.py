@@ -13,8 +13,6 @@ import pickle
 from galight.tools.astro_tools import plt_fits
 from galight.tools.astro_tools import read_pixel_scale
 from astropy.cosmology import FlatLambdaCDM
-import sys
-sys.path.insert(0,'../prep_use_HST_highRes/')
 from source_info import source_list #[0]: file name [1]: total size [2]: galfit R_e [3]:R_e/totalzise
 from scipy.ndimage import zoom
 import copy
@@ -24,24 +22,25 @@ from galight.fitting_specify import FittingSpecify
 from galight.tools.astro_tools import plt_many_fits
 from galight.fitting_process import FittingProcess
 from galight.tools.measure_tools import detect_obj
-from photutils.segmentation import SourceCatalog
+# from photutils.segmentation import SourceCatalog
+# from source_info import source_list
 
 if_plot = True
 filt_id = 1 #int(sys.argv[2])
 filt = ['f150w', 'f356w'][filt_id]
-# filt = 'f150w' #!!!
-# filt = 'f356w'
 folder = '../prep_use_HST_highRes/JWST_CEERS/'
-file = 'ceers5_{filt}_i2d.fits'.format(filt=filt)
+ceers_file = 'ceers5_{filt}_i2d.fits'.format(filt=filt)
 target_info = pickle.load(open('../prep_use_HST_highRes/target_info.pkl','rb'))
-_psfs, _FWHMs = pickle.load(open('../prep_use_HST_highRes/'+filt+'_psfs.pkl','rb'))
-psfs, FWHMs, fluxs = [], [], []
-for i in range(len(_psfs)):
-    psfs = psfs + _psfs[i]
-    FWHMs = FWHMs + _FWHMs[i]
-    fluxs = fluxs + [np.sum(_psfs[i][j]) for j in range(len(_psfs[i]))]
-FWHMs, fluxs = np.array(FWHMs), np.array(fluxs)
 
+psfs, FWHMs = pickle.load(open(filt+'_psfs_star.pkl','rb'))
+fluxs= []
+for i in range(len(psfs)):
+    fluxs.append(np.sum(psfs[i]))
+fluxs = np.array(fluxs)
+# from psf_if_star import if_star
+# for i in range(len(psfs)):
+#     if_star(psfs[i], filt)
+    
 def find_close_PSF_idx(psf_id):
     sort = np.argsort(abs(FWHMs[psf_id] - FWHMs))[1:]
     idx = sort[0] #Setting a initial value
@@ -50,71 +49,66 @@ def find_close_PSF_idx(psf_id):
         if abs( (fluxs[i]- fluxs[psf_id])/fluxs[psf_id])<0.5 and fluxs[i]>500:
             idx = i
             break
-    # print(sort)
     return idx
-# 
+
 keys = []
 for key in target_info.keys():
     keys.append(key)
 #%%
-# ID = 0
-# seed = 0
-# for seed in range(0, 20):
-seed = 5 #int(sys.argv[1])
-for ID in range(0, 1):
+import glob
+# TNG_files = glob.glob('TNG50_img/*photo.fits')
+# TNG_files.sort()
+TNG_ids = ['101491', '101499', '119454', '140982', '15', '219845', '272230', '321717', '561512', '579945']
+TNG_files = [ 'TNG50_img/shalo_091-{0}_v0_photo.fits'.format(i) for i in TNG_ids  ]
+
+#!!!
+#U band 364 nm ~ 368 * 7.2 /1.1 = 2408 nm for F150w
+#G band 464 nm ~ 480 * 7.2 /1.1 = 3141 nm for F356w
+#R band 622 nm ~ 622 * 7.2 /1.1 = 4071 nm
+TNG_band = ['CFHT_MegaCam.u', 'SUBARU_HSC.G'][filt_id] #
+from galight.tools.measure_tools import flux_profile
+
+seed = 0 #int(sys.argv[1])
+for ID in range(1):
     np.random.seed(seed = seed)
-    name = keys[ID] #!!! ID of target
-    # host_flux_ratio = np.random.uniform(0.07,0.9) #!!!
-    host_flux_ratio = np.random.uniform(0.5,0.9) #!!!
-    host_Reff_kpc = np.random.uniform(1,3)   #Host effective radius, unit: Kpc #!!!
-    source_id = np.random.randint(0,25) #!!!
-    
-    im = pyfits.open(folder+file)
+    name = keys[ID] # ID of target
+    host_flux_ratio = np.random.uniform(0.07,0.95) #
+    # host_Reff_kpc = np.random.uniform(1,3)   #Host effective radius, unit: Kpc #
+    source_id = np.random.randint(0,len(TNG_ids)) #
+    im = pyfits.open(folder+ceers_file)
     data = im[1].data
     header = im[1].header
     flux_mjsr = header['PHOTMJSR']
-    # print('For flux value in unit of MJy/sr.') #https://en.wikipedia.org/wiki/AB_magnitude
-    # value_unit = header['BUNIT']
-    # print("Data unit:", value_unit)
-    # flux(Mjy/sr) * 2.350443 * 10**(-5) *0.03**2   #Flux to Jy  https://irsa.ipac.caltech.edu/data/SPITZER/docs/spitzermission/missionoverview/spitzertelescopehandbook/18/
     data = data/flux_mjsr # To change MJ/sr to flux
     
     psf_id = np.random.randint(0,len(psfs))
     if filt=='f356w':
         data_sbs = [data[2000:4000,2000:4000], data[100:2100,100:2100]]
         fov_cut_idx = np.random.randint(0,len(data_sbs))
-        data_sb = data_sbs[fov_cut_idx]   #!!!
+        data_sb = data_sbs[fov_cut_idx]   #
     elif filt=='f150w':
         pos_list = [[0,0], [0,4600], [4600,0], [4600, 4600], [250+0,11550+0], [250+0,11550+4600], [250+4600,11550+0], [250+4600, 11550+4600]]
         data_sbs = []
         for s_pos in pos_list:
             data_sbs.append(data[s_pos[0]:s_pos[0]+4400,s_pos[1]:s_pos[1]+4400])
         fov_cut_idx = np.random.randint(0,len(data_sbs))
-        data_sb = data_sbs[fov_cut_idx]   #!!!
-    psf_true = psfs[psf_id] #!!!
+        data_sb = data_sbs[fov_cut_idx]   #
+    psf_true = psfs[psf_id] #
     psf_true = psf_true/np.sum(psf_true) 
     psf_id_model = find_close_PSF_idx(psf_id)
     psf_model = psfs[psf_id_model]
     
-    for i in range(1000):
+    for i in range(200):
         if filt=='f150w':
-            pos = [int(np.random.uniform(400, 4000)), int(np.random.uniform(400, 4000))]  #!!!
+            pos = [int(np.random.uniform(400, 4000)), int(np.random.uniform(400, 4000))]  #
         elif filt=='f356w':
-            pos = [int(np.random.uniform(300, 1700)), int(np.random.uniform(300, 1700))]  #!!!
+            pos = [int(np.random.uniform(300, 1700)), int(np.random.uniform(300, 1700))]  #
         rad1 = 100
         cut1 = data_sb[ pos[1]-rad1:pos[1]+rad1+1, pos[0]-rad1:pos[0]+rad1+1]
-        try:
-            res, segm_map, tbl = detect_obj(cut1, segm_map=True, return_cat_tbl=(True))
-            if np.max(tbl['kron_flux']) < 4:
-                _ = detect_obj(cut1, if_plot=False)
-                # print('max flux in empty fov:', np.max(cat.to_table()['kron_flux']))
-                break
-        except:
+        _, _, _, tbl = detect_obj(cut1, nsigma=1, npixels=6, use_moments=False)
+        tbl_kron_flux = np.nan_to_num(tbl['kron_flux'])
+        if np.max(tbl_kron_flux) < 4:
             break
-        # rad2 = 40
-        # cut2 = data_sb[ pos[1]-rad2:pos[1]+rad2+1, pos[0]-rad2:pos[0]+rad2+1]
-        # if np.sum(cut1)<5 and np.sum(cut2)<1: #!!!Need to be updated by detect_obj()
-        #     break
     
     pixscale = read_pixel_scale(header)
     zp = -2.5*np.log10(2.350443 * 10**(-5) *pixscale**2/3631) - 2.5*np.log10(flux_mjsr)  #zp for flux
@@ -122,8 +116,6 @@ for ID in range(0, 1):
     img_filter = header0['FILTER']
     img_cam = header0['APERNAME'] #In JDAT'simulation it is 'DETECTOR'
     exptime = header0['TEXPTIME'] #The assumed exp time.
-    # exptime /= flux_mjsr  #active this part if zp is for mJy/sr
-    # plt_fits(data_sb)
     
     #%%For mock galaxy
     #Generate the QSO galaxy info
@@ -148,27 +140,29 @@ for ID in range(0, 1):
     # project_gal_img = project_gal_img/np.sum(project_gal_img)*galaxy_flux
     galaxy_mag = -2.5*np.log10(galaxy_flux) + zp
     
-    # file = 'TNG50_img/shalo_091-540258_v0_photo.fits'
+    # TNG_file = 'TNG50_img/shalo_091-540258_v0_photo.fits'
     # file = 'TNG50_img/shalo_091-542669_v0_photo.fits'
-    file = 'TNG50_img/shalo_091-572599_v0_photo.fits'
-    im = pyfits.open(file)
-    fits = im['SUBARU_HSC.G'].data
-    # _header = im['SUBARU_HSC.G'].header
+    # file = 'TNG50_img/shalo_091-572599_v0_photo.fits'
+    TNG_file = TNG_files[source_id]
+    im = pyfits.open(TNG_file)
+    fits = im[TNG_band].data  
     flux_hd = 10**(-0.4*(fits-zp))
-    # plt_fits(flux_hd[450:-450, 450:-450])
-    flux_hd = flux_hd[450:-450, 450:-450]
     z_s = 6.2
     cosmo = FlatLambdaCDM(H0=70, Om0=0.3)
     scale_relation = cosmo.angular_diameter_distance(z_s).value * 10**3 * (1/3600./180.*np.pi)  #Kpc/"
     scale = 0.1/scale_relation/ pixscale #Project as 0.1 #!!!
-    # host_Reff = host_Reff_kpc/scale_relation   #In arcsec
     flux_zoom = zoom(flux_hd, scale)
     flux_zoom = flux_zoom/np.sum(flux_zoom) * galaxy_flux
+    
+    _fluxs, rad, _ = flux_profile(flux_zoom, center=[len(flux_zoom)/2]*2 , radius=len(flux_zoom)/2, if_plot=False, #if_annuli=(True), 
+                      fits_plot=(False), grids=50, x_gridspace=None)
+    Reff_rad = rad[_fluxs<_fluxs[-1]/2][-1]
+    Reff_kpc = Reff_rad / scale * 0.1
+    Reff_arcsec = Reff_rad * pixscale
     
     #convolve:
     conv_project_gal_img = signal.fftconvolve(flux_zoom, psf_true, mode='full')
     conv_project_qso_img = copy.deepcopy(conv_project_gal_img)
-    
     
     psf_true = psf_true/np.sum(psf_true) #Make sure PSF is normalized
     cut = (len(conv_project_gal_img) - len(psf_true))/2
@@ -191,6 +185,15 @@ for ID in range(0, 1):
         rad = int(rad)
         data_mock[ pos[1]-rad:pos[1]+rad, pos[0]-rad:pos[0]+rad] += noise_conv_project_qso_img
     
+    #Get the Noise QSO - AGN image.
+    cut = (len(conv_project_gal_img) - len(psf_true))/2
+    _noise_conv_project_qsosub_img = copy.deepcopy(noise_conv_project_qso_img)
+    if cut == int(cut):
+        cut = int(cut)
+        _noise_conv_project_qsosub_img[cut:-cut,cut:-cut] = _noise_conv_project_qsosub_img[cut:-cut,cut:-cut] - qso_flux*psf_true
+    else:
+        cut = int(cut)
+        _noise_conv_project_qsosub_img[cut:-cut-1,cut:-cut-1] = _noise_conv_project_qsosub_img[cut:-cut-1,cut:-cut-1] - qso_flux*psf_true
     # plt_fits(hd_gal_img)    
     # plt_fits(project_gal_img)
     # plt_fits(conv_project_qso_img)
@@ -199,19 +202,14 @@ for ID in range(0, 1):
     filename = folder_save+ 'qsoID'+str(ID)+'_filt_'+filt+'_seed'+str(seed) #+'_smallcutout'
     #Plot and save sim details
     plot_sim_name = filename + '_sim.pdf'
-    labels = ['org_gal_img', 'project_gal_img', 'conv_gal_img', 'add_ps_noise']
-    plt_many_fits([flux_hd, flux_zoom, conv_project_gal_img, noise_conv_project_qso_img], labels = labels,
+    labels = ['org_gal_img', 'project_gal_img', 'conv_gal_img', 'add_ps+Poss_noi.', 'Host image (ps sub.)']
+    plt_many_fits([flux_hd, flux_zoom, conv_project_gal_img, noise_conv_project_qso_img, _noise_conv_project_qsosub_img], labels = labels,
                   savename=plot_sim_name, if_plot=True)
     
-    # from galight.tools.measure_tools import SB_profile, flux_profile
-    # _ = flux_profile(flux_hd, center=[len(flux_hd)/2]*2 , radius=len(flux_hd)/3, if_plot=True, #if_annuli=(True), 
-    #                  fits_plot=(True), grids=50, x_gridspace='log')
-    
     #%%Obtain PSF stars:
-    
     data_process = DataProcess(fov_image = data_mock, target_pos = pos, pos_type = 'pixel', header = header,
                                 rm_bkglight = True, exptime = np.ones_like(data_sb)*exptime, if_plot=False, zp = zp)  #Gain value assuming as 1
-    data_process.generate_target_materials(radius=100, #len(project_gal_img)/2*1.1, 
+    data_process.generate_target_materials(radius=np.max([Reff_rad*3.5, 80]), 
                                            create_mask = False, nsigma=2.8, if_select_obj=False,
                                           exp_sz= 1.2, npixels = 15, if_plot=True)
     data_process.plot_overview(label = filt+'_'+str(fov_cut_idx)+'_FOV', target_label=name[:7],
@@ -238,7 +236,7 @@ for ID in range(0, 1):
             fit_run.run(algorithm_list = ['PSO', 'PSO'])
         info['inferred_host_flux_'+name] = fit_run.final_result_galaxy[0]['flux_within_frame']
         info['inferred_magnitude_'+name] = fit_run.final_result_galaxy[0]['magnitude']
-        info['inferred_R_sersic_'+name] = fit_run.final_result_galaxy[0]['R_sersic']
+        info['inferred_R_sersic_'+name] = fit_run.final_result_galaxy[0]['R_sersic'] * fit_run.final_result_galaxy[0]['q']
         info['inferred_n_sersic_'+name] = fit_run.final_result_galaxy[0]['n_sersic']
         info['plot_fit_name_'+name] = plot_fit_name +'_qso_final_plot.pdf'
         print('inferred galaxy flux, mag, Re (arcsec)):\n\t', round(fit_run.final_result_galaxy[0]['flux_within_frame'],2), 
@@ -263,10 +261,12 @@ for ID in range(0, 1):
     info['true_host_flux_ratio'] = host_flux_ratio
     info['true_host_flux'] = galaxy_flux
     info['true_host_mag'] = galaxy_mag
+    info['true_host_Reff_arcsec'] = Reff_arcsec
+    info['true_host_Reff_kpc'] = Reff_kpc
+    info['TNG_ID'] = TNG_file
     # info['assumed_host_Re_kpc'] = host_Reff_kpc
     # info['galfit_Re'] = host_Reff
     pickle.dump(info, open(filename+'_result.pkl', 'wb'))   
-    
     # infos = ID, filt, zp, target_name, host_flux_ratio, host_Reff_kpc, host_Reff, source_id, fov_cut_idx, psf_id, add_pos
     # save_result = true_flux, true_mag, true_galfit_Re, inferred_flux, inferred_mag, inferred_Re, inferred_n
     # save_plot_name

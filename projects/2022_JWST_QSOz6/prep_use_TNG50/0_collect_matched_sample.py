@@ -21,7 +21,10 @@ flag = cata['Unnamed: 0']
 reff_star = cata['SubhaloHalfmassRadType_stars']
 reff_dm = cata['SubhaloHalfmassRadType_dm']
 
-print(flag[(smass>10.4)*(smass<10.5)*(reff_star<3)*(reff_star>1)])
+# print(flag[(smass>10.4)*(smass<10.5)*(reff_star<3)*(reff_star>1)])
 
-for k in flag[(smass>10.4)*(smass<10.5)*(reff_star<3)*(reff_star>1)]:
+bool_ = (smass>10.3)*(smass<10.8)*(reff_star<2)*(reff_star>0.5)
+# print(flag[bool_])
+
+for k in flag[bool_]:
     print('http://idark.ipmu.jp/hsc405/SKIRT9/Photometry/091/shalo_091-{0}_v0_photo.fits'.format(k))
