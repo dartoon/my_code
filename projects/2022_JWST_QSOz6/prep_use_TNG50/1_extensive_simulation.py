@@ -22,11 +22,10 @@ from galight.fitting_specify import FittingSpecify
 from galight.tools.astro_tools import plt_many_fits
 from galight.fitting_process import FittingProcess
 from galight.tools.measure_tools import detect_obj
-# from photutils.segmentation import SourceCatalog
-# from source_info import source_list
+import sys
 
-if_plot = True
-filt_id = 1 #int(sys.argv[2])
+if_plot = False
+filt_id = int(sys.argv[2])
 filt = ['f150w', 'f356w'][filt_id]
 folder = '../prep_use_HST_highRes/JWST_CEERS/'
 ceers_file = 'ceers5_{filt}_i2d.fits'.format(filt=filt)
@@ -37,9 +36,6 @@ fluxs= []
 for i in range(len(psfs)):
     fluxs.append(np.sum(psfs[i]))
 fluxs = np.array(fluxs)
-# from psf_if_star import if_star
-# for i in range(len(psfs)):
-#     if_star(psfs[i], filt)
     
 def find_close_PSF_idx(psf_id):
     sort = np.argsort(abs(FWHMs[psf_id] - FWHMs))[1:]
@@ -68,8 +64,8 @@ TNG_files = [ 'TNG50_img/shalo_091-{0}_v0_photo.fits'.format(i) for i in TNG_ids
 TNG_band = ['CFHT_MegaCam.u', 'SUBARU_HSC.G'][filt_id] #
 from galight.tools.measure_tools import flux_profile
 
-seed = 0 #int(sys.argv[1])
-for ID in range(1):
+seed = int(sys.argv[1])
+for ID in range(len(keys)):
     np.random.seed(seed = seed)
     name = keys[ID] # ID of target
     host_flux_ratio = np.random.uniform(0.07,0.95) #
@@ -204,14 +200,14 @@ for ID in range(1):
     plot_sim_name = filename + '_sim.pdf'
     labels = ['org_gal_img', 'project_gal_img', 'conv_gal_img', 'add_ps+Poss_noi.', 'Host image (ps sub.)']
     plt_many_fits([flux_hd, flux_zoom, conv_project_gal_img, noise_conv_project_qso_img, _noise_conv_project_qsosub_img], labels = labels,
-                  savename=plot_sim_name, if_plot=True)
+                  savename=plot_sim_name, if_plot=if_plot)
     
     #%%Obtain PSF stars:
     data_process = DataProcess(fov_image = data_mock, target_pos = pos, pos_type = 'pixel', header = header,
                                 rm_bkglight = True, exptime = np.ones_like(data_sb)*exptime, if_plot=False, zp = zp)  #Gain value assuming as 1
     data_process.generate_target_materials(radius=np.max([Reff_rad*3.5, 80]), 
                                            create_mask = False, nsigma=2.8, if_select_obj=False,
-                                          exp_sz= 1.2, npixels = 15, if_plot=True)
+                                          exp_sz= 1.2, npixels = 15, if_plot=if_plot)
     data_process.plot_overview(label = filt+'_'+str(fov_cut_idx)+'_FOV', target_label=name[:7],
                                ifsave=True, filename = filename+'_FOV', if_plot=if_plot)
     # data_process.find_PSF(radius = 50, user_option = True, psf_edge=10)
@@ -227,7 +223,7 @@ for ID in range(1):
         fit_sepc.prepare_fitting_seq(point_source_num = 1) #, fix_n_list= [[0,4],[1,1]])
         fit_sepc.build_fitting_seq()
         #Plot the initial settings for fittings. 
-        fit_sepc.plot_fitting_sets()
+        # fit_sepc.plot_fitting_sets()
         #
         fit_run = FittingProcess(fit_sepc, savename = plot_fit_name, fitting_level='norm')
         fit_run.run(algorithm_list = ['PSO', 'PSO'])
@@ -244,7 +240,7 @@ for ID in range(1):
               round(fit_run.final_result_galaxy[0]['R_sersic'],2))
         fit_run.plot_final_qso_fit(target_ID=name[:5]+'_HostRto_'+str(round(host_flux_ratio,3)), save_plot=True, 
                                    show_plot=if_plot)
-        fit_run.dump_result()
+        # fit_run.dump_result()
     #%%
     # print('True galaxy flux, mag, Re (arcsec)):\n\t', round(galaxy_flux,2), round(galaxy_mag,2),
     #       round(host_Reff,2))

@@ -1,0 +1,15 @@
+#!/bin/bash
+#PBS -N JWST_sim_f150w
+#PBS -o /home/xuheng.ding/Astro/my_code/projects/2022_JWST_QSOz6/prep/pbs/
+#PBS -e /home/xuheng.ding/Astro/my_code/projects/2022_JWST_QSOz6/prep/pbs/
+#PBS -l nodes=1:ppn=1
+#PBS -l walltime=01:50:00
+#PBS -l mem=100mb
+#PBS -J 0-100:1
+#PBS -u xuheng.ding
+#PBS -m ae
+#PBS -V
+#PBS -q tiny
+
+cd /home/xuheng.ding/Astro/my_code/projects/2022_JWST_QSOz6/prep_use_TNG50
+python 1_extensive_simulation.py $PBS_ARRAY_INDEX 1
