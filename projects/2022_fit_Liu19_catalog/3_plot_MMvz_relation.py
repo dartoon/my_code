@@ -390,7 +390,7 @@ lines = string.split('\n')   # Split in to \n
 
 my_t1 = np.loadtxt('./table_sersic_Re_n.txt', dtype='str')
 my_mbh_tb = np.loadtxt('./table_cal_MBH.txt', dtype='str')
-
+my_CAS = np.loadtxt('./table_asy_concentration.txt', dtype='str')
 result = []
 my_bh_type = 2  # Halpha 1, Hbeta 2
 
@@ -398,12 +398,15 @@ for line in lines[1:-1]:
     results = line.split()
     ID, z, smass, Mbh, magG, magR, magI, magZ, magY = results
     sersic_n = float(my_t1[ID == my_t1[:,0]][0][6])
+    asy = float(my_CAS[ID == my_CAS[:,0]][0][5]) #I band asy
+    conc = float(my_CAS[ID == my_CAS[:,0]][0][6]) #I band conc
     my_mbh = my_mbh_tb[ID == my_mbh_tb[:,0]][0][my_bh_type]
     if float(smass) >0:
-        result.append([float(z), float(smass), float(my_mbh), sersic_n])
+        result.append([float(z), float(smass), float(my_mbh), sersic_n, asy, conc])
         
 result = np.array(result)
-inf_z, inf_Mstar,inf_MBHs,inf_n =result[:,0], result[:,1],  result[:,2], result[:,3],
+inf_z, inf_Mstar,inf_MBHs,inf_n, inf_asy, inf_conc =result[:,0], result[:,1],  result[:,2], result[:,3], result[:,4], result[:,5]
+
 
 inf_z = inf_z
 inf_Mstar = inf_Mstar
@@ -425,8 +428,10 @@ inf_y = inf_y
 bool_ = (inf_n>0) * (inf_MBHs>0)
 import seaborn as sns
 
-sns.kdeplot(inf_x[bool_],inf_y[bool_], linewidths = 2, color = 'blue', 
-            fill=True, alpha=0.6, zorder = 1)
+# sns.kdeplot(inf_x[bool_],inf_y[bool_], linewidths = 2, color = 'blue', 
+#             fill=True, alpha=0.6, zorder = 1)
+
+
 # plt.scatter(inf_x[bool_],inf_y[bool_],c=inf_n[bool_],
 #             s=220, marker=".",zorder=100, alpha = 0.5)
 # cbar = plt.colorbar()
@@ -434,6 +439,23 @@ sns.kdeplot(inf_x[bool_],inf_y[bool_], linewidths = 2, color = 'blue',
 # cbar.ax.tick_params(labelsize=20)
 # cbar.ax.set_ylabel('sersic n', rotation=270, fontsize = 25, labelpad=25)
 # print(np.mean(inf_y[bool_]))
+
+# plt.scatter(inf_x[bool_],inf_y[bool_],c=inf_asy[bool_],
+#             s=220, marker=".",zorder=100, alpha = 0.5)
+# cbar = plt.colorbar()
+# plt.clim(0, 0.4)
+# cbar.ax.tick_params(labelsize=20)
+# cbar.ax.set_ylabel('asy', rotation=270, fontsize = 25, labelpad=25)
+
+plt.scatter(inf_x[bool_],inf_y[bool_],c=inf_conc[bool_],
+            s=220, marker=".",zorder=100, alpha = 0.5)
+cbar = plt.colorbar()
+plt.clim(1, 5)
+cbar.ax.tick_params(labelsize=20)
+cbar.ax.set_ylabel('concentration', rotation=270, fontsize = 25, labelpad=25)
+
+
+
 
 #%% Where loop ends
 plt.xlabel(r"log(1+z)",fontsize=45)
