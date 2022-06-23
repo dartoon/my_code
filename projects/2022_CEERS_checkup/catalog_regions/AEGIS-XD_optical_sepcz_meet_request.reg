@@ -1,0 +1,6 @@
+# Region file format: DS9 astropy/regions
+icrs
+circle(214.77680,52.825876,0.005)
+circle(214.87073,52.833117,0.005)
+circle(214.75522,52.836795,0.005)
+circle(214.93166,52.908708,0.005)
