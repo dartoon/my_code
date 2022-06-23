@@ -39,7 +39,7 @@ for i in range(len(table)):
     if RA != -99:
         pos = wcs.all_world2pix([[RA, Dec]], 1)[0]
         try:
-            exp = reg_img[int(pos[0]), int(pos[1]) ]
+            exp = reg_img[int(pos[0]), int(pos[1]) ]  #!!! To be confirm if pos[1], pos[0]
         except:
             exp = 0
         cata_list.append([i, pos[0], pos[1], exp, table[i][38], table[i][39]]) #idx, posx, posy, exp, z_best, z_spec
