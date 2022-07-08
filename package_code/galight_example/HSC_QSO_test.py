@@ -34,40 +34,38 @@ data_process = DataProcess(fov_image = fov_image, fov_noise_map = err_data, targ
                           rm_bkglight = True, if_plot=False, zp = zp)
 
 data_process.generate_target_materials(radius=None, create_mask = False, nsigma=2.8,
-                                      exp_sz= 1.2, npixels = 15, if_plot=True, use_moments=False)
+                                      exp_sz= 1.2, npixels = 15, if_plot=True, use_moments=True)
 data_process.PSF_list = [PSF]
 
 data_process.checkout() #Check if all the materials is known.
 
 # %%
-from galight.tools.measure_tools import image_moments
-image = data_process.target_stamp
-segm = data_process.segm_deblend
-moments = image_moments(image, segm, 1)
+# from galight.tools.measure_tools import image_moments
+# image = data_process.target_stamp
+# segm = data_process.segm_deblend
+# moments = image_moments(image, segm, 1)
 
-target = data_process.apertures[0]
-positions = [moments['X'],moments['Y']]
-a = moments['Mrr']
-b = moments['Mrr']*moments['q']
-theta = moments['phi_deg']*np.pi/180
+# target = data_process.apertures[0]
+# positions = [moments['X'],moments['Y']]
+# a = moments['Mrr']
+# b = moments['Mrr']*moments['q']
+# theta = moments['phi_deg']*np.pi/180
 
+# #%%Update the apretures:
+# import copy
+# # apertures = copy.deepcopy(data_process.apertures)
+# # add_aperture0 = copy.deepcopy(apertures[0])
+# # add_aperture0.a, add_aperture0.b = 3, 3 # A a b for aperture
+# # add_aperture0.positions = np.array([40,50])
+# # data_process.apertures = apertures +  [add_aperture0]#Pass apertures to the data_process
 
-
-#%%Update the apretures:
-import copy
-apertures = copy.deepcopy(data_process.apertures)
-add_aperture0 = copy.deepcopy(apertures[0])
-add_aperture0.a, add_aperture0.b = 3, 3 # A a b for aperture
-add_aperture0.positions = np.array([40,50])
-data_process.apertures = apertures +  [add_aperture0]#Pass apertures to the data_process
-
-# #Update the segm map:
-from galight.tools.measure_tools import mask_obj
-mask = mask_obj(data_process.target_stamp, [add_aperture0])
-data_process.segm_deblend = data_process.segm_deblend*mask[0] + (1-mask[0])*(np.max(data_process.segm_deblend)+1)
-plt.imshow(data_process.segm_deblend, origin='lower')
-plt.colorbar()
-plt.show()
+# # #Update the segm map:
+# from galight.tools.measure_tools import mask_obj
+# # mask = mask_obj(data_process.target_stamp, [add_aperture0])
+# # data_process.segm_deblend = data_process.segm_deblend*mask[0] + (1-mask[0])*(np.max(data_process.segm_deblend)+1)
+# plt.imshow(data_process.segm_deblend, origin='lower')
+# plt.colorbar()
+# plt.show()
 
 # %%Start to produce the class and params for lens fitting.
 from galight.fitting_specify import FittingSpecify
@@ -79,10 +77,10 @@ fit_sepc.build_fitting_seq()
 #Setting the fitting method and run.
 from galight.fitting_process import FittingProcess
 fit_run = FittingProcess(fit_sepc, savename = 'HSC_QSO', fitting_level='norm')
-fit_run.run(algorithm_list = ['PSO','PSO'], setting_list=None,threadCount=2)
+fit_run.run(algorithm_list = ['PSO'], setting_list=None)
 # fit_run.plot_all()
 # fit_run.dump_result()
-print(fit_run.final_result_galaxy[0])
+# print(fit_run.final_result_galaxy[0])
 
 # #%%
 # import pickle

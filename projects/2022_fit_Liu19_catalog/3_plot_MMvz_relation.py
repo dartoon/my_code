@@ -425,7 +425,7 @@ inf_y = inf_y
 
 # plt.scatter(inf_x,inf_y,c='blue',
 #             s=220, marker=".",zorder=-1, edgecolors='k', alpha = 0.4)
-bool_ = (inf_n>0) * (inf_MBHs>0)
+bool_ = (inf_n>0) * (inf_MBHs>0)* (inf_asy<0.07)
 import seaborn as sns
 
 # sns.kdeplot(inf_x[bool_],inf_y[bool_], linewidths = 2, color = 'blue', 

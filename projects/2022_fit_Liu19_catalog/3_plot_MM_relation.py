@@ -323,7 +323,7 @@ for line in lines[1:-1]:
 result = np.array(result)
 inf_z, inf_Mstar,inf_MBHs,inf_n, inf_asy, inf_conc =result[:,0], result[:,1],  result[:,2], result[:,3], result[:,4], result[:,5]
 
-bool_ = (inf_n>0) * (inf_MBHs>0)
+bool_ = (inf_n>0) * (inf_MBHs>0) * (inf_asy>0.1)
 
 # import seaborn as sns
 # sns.kdeplot(inf_Mstar[bool_], inf_MBHs[bool_], linewidths = 2, color = 'blue', 
@@ -341,7 +341,7 @@ bool_ = (inf_n>0) * (inf_MBHs>0)
 # plt.scatter(inf_Mstar[bool_],inf_MBHs[bool_],c=inf_asy[bool_],
 #             s=220, marker=".",zorder=100, alpha = 0.5)
 # cbar = plt.colorbar()
-# plt.clim(0, 0.4)
+# plt.clim(0, 0.2)
 # cbar.ax.tick_params(labelsize=20)
 # cbar.ax.set_ylabel('asy', rotation=270, fontsize = 25, labelpad=25)
 
@@ -356,12 +356,12 @@ cbar.ax.set_ylabel('concentration', rotation=270, fontsize = 25, labelpad=25)
 
 
 #%%
-Reines_t1 = np.loadtxt('../2022_HSC_compare_Reines/2021_previous/Reines_2015_table_1.txt', dtype=str)
-Reines_MM = np.asarray(Reines_t1[:,-2:], dtype=float)
-# sns.kdeplot(Reines_MM[:,0], Reines_MM[:,1], linewidths = 2, color = 'yellow', 
-#             fill=True, alpha=0.4, zorder = 1)
-plt.scatter(Reines_MM[:,0], Reines_MM[:,1],c='yellow',
-            s=120, marker="s",zorder=100, edgecolors='k', alpha = 0.2)
+# Reines_t1 = np.loadtxt('../2022_HSC_compare_Reines/2021_previous/Reines_2015_table_1.txt', dtype=str)
+# Reines_MM = np.asarray(Reines_t1[:,-2:], dtype=float)
+# # sns.kdeplot(Reines_MM[:,0], Reines_MM[:,1], linewidths = 2, color = 'yellow', 
+# #             fill=True, alpha=0.4, zorder = 1)
+# plt.scatter(Reines_MM[:,0], Reines_MM[:,1],c='yellow',
+#             s=120, marker="s",zorder=100, edgecolors='k', alpha = 0.2)
 
 #%%    
 

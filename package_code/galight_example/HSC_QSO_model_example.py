@@ -73,11 +73,10 @@ cas = CAS_class.cal_CAS(mask_type='segm', if_plot=True)
 print(cas)
 
 #%%
-morph = fit_run_pkl.cal_statmorph(obj_id=0, segm=fit_run_pkl.fitting_specify_class.segm_deblend , if_plot = True)
+morph = fit_run_pkl.cal_statmorph(obj_id=0, segm=fit_run_pkl.fitting_specify_class.segm_deblend, if_plot = True)
 
 from statmorph.utils.image_diagnostics import make_figure
 fig = make_figure(morph)
-plt.show()
 print('xc_asymmetry =', morph.xc_asymmetry)
 print('yc_asymmetry =', morph.yc_asymmetry)
 print('ellipticity_asymmetry =', morph.ellipticity_asymmetry)
