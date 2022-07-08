@@ -6,6 +6,8 @@ Created on Thu Jun 16 12:02:18 2022
 @author: Dartoon
 """
 
+#To make sure the used PSFs are stars.
+
 import numpy as np
 import pickle
 # from photutils.segmentation import SourceCatalog
