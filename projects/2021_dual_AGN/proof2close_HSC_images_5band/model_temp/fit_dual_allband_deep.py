@@ -47,7 +47,8 @@ ID_list = [
     '124618.51-001750.2',  #!!! pick it, very similar and bright color
     '162501.98+430931.6', #!!! Pick it 
     '220642.82+003016.2', #!!! pick it, close and color similar.
-    '230402.77-003855.4', ] #Very close, PS1 redder]
+    '230402.77-003855.4', 
+    ] #Very close, PS1 redder]
 
 for image_ID in ID_list:
     f = open("../../_pdfs_2close/DR144.4_short.asc","r")
@@ -192,10 +193,11 @@ for image_ID in ID_list:
             _fit_sepc_0.plot_fitting_sets(savename = fit_folder + 'fitting0_used_aper.pdf'.format(image_ID),
                                         show_plot=show_plot)         
         
-        _fit_run_0 = FittingProcess(_fit_sepc_0, savename = tag)
-        _fit_run_0.run(algorithm_list = ['PSO'], setting_list= [pso_setting]) 
+        _fit_run_0 = FittingProcess(_fit_sepc_0, savename = tag, fitting_level=['deep', 'deep'])
+        _fit_run_0.run(algorithm_list = ['PSO','PSO'])
         _fit_run_0.translate_result()
         _fit_run_0.plot_final_qso_fit(target_ID = image_ID, save_plot = True, show_plot = show_plot)
+        _fit_run_0.dump_result()    
         source_result_0, ps_result_0 = _fit_run_0.final_result_galaxy, _fit_run_0.final_result_ps
         host_mag, AGN_mag = source_result_0[0]['magnitude'], ps_result_0[0]['magnitude']
         c_miss = np.sqrt((source_result_0[0]['center_x']-ps_result_0[0]['ra_image'])**2+(source_result_0[0]['center_y']-ps_result_0[0]['dec_image'])**2)
@@ -229,10 +231,11 @@ for image_ID in ID_list:
             _fit_sepc_1.plot_fitting_sets(savename = fit_folder + 'fitting1_used_aper.pdf'.format(image_ID),
                                         show_plot=show_plot)        
         
-        _fit_run_1 = FittingProcess(_fit_sepc_1, savename = tag)
-        _fit_run_1.run(algorithm_list = ['PSO'], setting_list= [pso_setting]) 
+        _fit_run_1 = FittingProcess(_fit_sepc_1, savename = tag, fitting_level=['deep', 'deep'])
+        _fit_run_1.run(algorithm_list = ['PSO','PSO']) 
         _fit_run_1.translate_result()
-        _fit_run_1.plot_final_qso_fit(target_ID = image_ID, save_plot = True, show_plot = show_plot)            
+        _fit_run_1.plot_final_qso_fit(target_ID = image_ID, save_plot = True, show_plot = show_plot)
+        _fit_run_1.dump_result()            
         source_result_1, ps_result_1 = _fit_run_1.final_result_galaxy, _fit_run_1.final_result_ps 
         AGN_mags = [ps_result_1[i]['magnitude'] for i in range(len(ps_result_1))]
         if len(ps_result_1) == 2:
@@ -278,10 +281,11 @@ for image_ID in ID_list:
         if k == run_list[0]:
             _fit_sepc_2.plot_fitting_sets(savename = fit_folder + 'fitting2_used_aper.pdf'.format(image_ID),
                                         show_plot=show_plot)        
-        _fit_run_2 = FittingProcess(_fit_sepc_2, savename = tag)
-        _fit_run_2.run(algorithm_list = ['PSO'], setting_list= [pso_setting]) 
+        _fit_run_2 = FittingProcess(_fit_sepc_2, savename = tag, fitting_level=['deep', 'deep'])
+        _fit_run_2.run(algorithm_list = ['PSO','PSO'])
         _fit_run_2.translate_result()
         _fit_run_2.plot_final_qso_fit(target_ID = image_ID, save_plot = True, show_plot = show_plot)     
+        _fit_run_2.dump_result()
         source_result_2, ps_result_2 = _fit_run_2.final_result_galaxy, _fit_run_2.final_result_ps 
         host_mag = source_result_2[0]['magnitude']
         AGN_mags = [ps_result_2[i]['magnitude'] for i in range(len(ps_result_2))]
