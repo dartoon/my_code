@@ -128,7 +128,7 @@ for ID in ID_list:
     scale_relation = cosmo.angular_diameter_distance(z).value * 10**3 * (1/3600./180.*np.pi)  #Kpc/arc
     offset_kpc = offset * scale_relation   #In kpc
     Mags = [AGN_dic[0]['magnitude'], AGN_dic[1]['magnitude']]
-    APT_orie_1 = cal_oreination(ID)+135
+    APT_orie_1 = cal_oreination(ID, trust = trust)+135
     if APT_orie_1 >360:
         APT_orie_1 = APT_orie_1-360
     if APT_orie_1< 180:
@@ -137,8 +137,8 @@ for ID in ID_list:
         APT_orie_2 = APT_orie_1 - 180
     print(show_ID, '&' , RA, '&' , Dec, '&' , '{0:.3f}'.format(z), '&' , '{0:.2f},{1:.1f}'.format(offset, offset_kpc), '&', 
           '{0:.1f},{1:.1f}'.format(np.min(Mags), np.max(Mags)), '&', 
-          av_filter(z), '& {0:.1f} \\\\'.format(cal_oreination(ID)), '%{0:.0f} {1:.0f}degree'.format(APT_orie_1, APT_orie_2) )
-    print(deg2HMS(ra=float(RA), dec = float(Dec)) )
+          av_filter(z), '& {0:.1f} \\\\'.format(cal_oreination(ID, trust= trust)), '%{0:.0f} {1:.0f}degree'.format(APT_orie_1, APT_orie_2) )
+    # print(deg2HMS(ra=float(RA), dec = float(Dec)) )
     offset_kpc_h0_list.append(offset_kpc * 70 / 100)
     z_list.append(z)
     

@@ -71,16 +71,15 @@ def read_info(ID):
     return RA, Dec, z
 
 # ID = '001459.72+002319.2'
-def cal_oreination(ID):
-    files_1 = glob.glob('../proof2close_HSC_images_5band/*/' + ID + '/fit_result/')
+def cal_oreination(ID, add = '',trust=2):
+    files_1 = glob.glob('../proof2close_HSC_images_5band/*/' + ID +'/'+ add+'fit_result/')
     files_2 = glob.glob('../extra/*/fit_result*/' + ID + '/')
     files = files_1 + files_2
-    file = glob.glob(files[-1]+'fit_result_{0}-band.txt'.format('I'))
+    file = glob.glob(files[-1]+add+'fit_result_{0}-band.txt'.format('I'))
     if file != []:
         f = open(file[0],"r")    
     string = f.read()    
     lines = string.split('\n')   # Split in to \n
-    trust = 2    
     l1 = [i for i in range(len(lines)) if 'model_PS_result:' in lines[i]]
     AGN_dic = read_string_list(string = lines[l1[trust]].split('model_PS_result: ')[1])    
     if AGN_dic[0]['flux_within_frame'] < AGN_dic[1]['flux_within_frame']:
