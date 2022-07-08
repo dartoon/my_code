@@ -28,14 +28,6 @@ f = open(reg_file,"r")
 string = f.read()
 lines = string.split('\n')   # Split in to \n
 
-reg_file_deg = 'catalog_regions/AEGIS-XD_optical.reg'
-f = open(reg_file_deg,"r")
-string = f.read()
-lines_deg = string.split('\n')   # Split in to \n
-
-f = open('catalog_regions/AEGIS_data_140612.csv',"r") ##This RA DEC of the optical counterparts is used to get hte reg file
-string = f.read()
-AEGIS_2014 = string.split('\n')   # Split in to \n
 
 positions = []
 for i in range(len(lines)):
@@ -45,14 +37,6 @@ for i in range(len(lines)):
         positions.append([float(x),float(y)])
 positions = np.array(positions)
 
-pos_deg = []
-for i in range(len(lines_deg)):
-    if 'circle' in lines_deg[i]:    
-        ra = lines_deg[i].split('circle(')[1].split(',')[0]
-        dec = lines_deg[i].split('circle(')[1].split(',')[1]
-        pos_deg.append([ra, dec])
-
-
 in_fov_idx = []
 for i in range(len(positions)):
     pos = positions[i]
@@ -61,9 +45,25 @@ for i in range(len(positions)):
     except:
         exp = 0
     if exp!=0:
-        # in_pos.append([pos, exp])
-        # in_pos_deg.append(pos_deg[i])
-        in_fov_idx.append(i)
+        in_fov_idx.append(i)  #in_fov_idx record the id that have exp >0
+
+#In the following, we make cross match to get catalog information.
+reg_file_deg = 'catalog_regions/AEGIS-XD_optical.reg' #This is the origial RA Dec from the AEGIS_data_140612.csv file.
+f = open(reg_file_deg,"r")
+string = f.read()
+lines_deg = string.split('\n')   # Split in to \n
+        
+pos_deg = []
+for i in range(len(lines_deg)):
+    if 'circle' in lines_deg[i]:    
+        ra = lines_deg[i].split('circle(')[1].split(',')[0]
+        dec = lines_deg[i].split('circle(')[1].split(',')[1]
+        pos_deg.append([ra, dec])
+
+
+f = open('catalog_regions/AEGIS_data_140612.csv',"r") ##This RA DEC of the optical counterparts is used to get hte reg file
+string = f.read()
+AEGIS_2014 = string.split('\n')   # Split in to \n
 
 in_aegids = []
 for i in range(len(in_fov_idx)):
@@ -74,7 +74,7 @@ for i in range(len(in_fov_idx)):
 f = open('catalog_regions/AEGIS-XD_redshift_catalog.txt',"r") ##This RA DEC of the optical counterparts is used to get hte reg file
 string = f.read()
 AEGIS_redshift = string.split('\n')   # Split in to \n
-# #%% Check if the numer actually be around 365.
+# #%% Check if the number of sample with spec-z is actually be around 365... Yes, it is 365
 # c = 0
 # for s in AEGIS_redshift:
 #     if 'aegis_' in s:
@@ -99,7 +99,7 @@ for _id in in_aegids:
                 # pos_deg[in_fov_idx[i]]
                 print(_id, info[6], info[2], info[3], pos_deg[in_fov_idx[i]],'pz')
                 
-# #%% Check how many photo-z over 2:
+# #%% Check how many photo-z (only) over 2:
 # count = 0
 # count1  = 0
 # for s in AEGIS_redshift:
