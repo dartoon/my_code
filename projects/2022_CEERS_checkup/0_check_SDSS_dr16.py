@@ -29,10 +29,10 @@ table = table[table['RA']<216]
 table = table[table['Dec']>52]
 table = table[table['Dec']<54]
 
-write_file = open('SDSS_dr16.reg','w') 
-for i in range(len(table)):
-    write_file.write("circle({0},{1},0.005)\n".format(table[i]['RA'],table[i]['Dec']) )
-write_file.close()
+# write_file = open('SDSS_dr16.reg','w') 
+# for i in range(len(table)):
+#     write_file.write("circle({0},{1},0.005)\n".format(table[i]['RA'],table[i]['Dec']) )
+# write_file.close()
 
 # from astropy.coordinates import SkyCoord
 # import astropy.units as u

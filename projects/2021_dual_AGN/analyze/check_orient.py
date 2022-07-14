@@ -35,7 +35,7 @@ def draw_line(x, y, angle):
 #   '220642.82+003016.2',
 #  # '230402.77-003855.4'
 #  ][0]
-for ID in ID_list[-3:-2]:
+for ID in ID_list:
 # for ID in [ID]:
     adding_ori = 0
     if ID == '022906.04-051428.9':
