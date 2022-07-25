@@ -11,7 +11,7 @@ import astropy.io.fits as pyfits
 import matplotlib.pyplot as plt
 import glob
 
-raw_files = glob.glob('./F356W/*i2d.fits')
+raw_files = glob.glob('./F356W/*cal.fits')
 #%% Remove bkg for each dither
 for file in raw_files:
     fitsFile = pyfits.open(file, mode='update')

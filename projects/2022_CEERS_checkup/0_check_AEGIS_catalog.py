@@ -94,11 +94,11 @@ for _id in in_aegids:
                 # pos_deg[in_fov_idx[i]]
                 print(_id, info[6], info[2], pos_deg[in_fov_idx[i]])
             # print("Let's check photo z")
-            elif float(info[6])>2: #Check up for photo-z.
-                i = [i for i in range(len(in_aegids)) if _id == in_aegids[i]][0]
-                # pos_deg[in_fov_idx[i]]
-                if float(info[2])> 2 or float(info[2]) == -1:
-                    print(_id, info[6], info[2], info[3], pos_deg[in_fov_idx[i]],'pz')
+            # elif float(info[6])>2: #Check up for photo-z.
+            #     i = [i for i in range(len(in_aegids)) if _id == in_aegids[i]][0]
+            #     # pos_deg[in_fov_idx[i]]
+            #     if float(info[2])> 2 or float(info[2]) == -1:
+            #         print(_id, info[6], info[2], info[3], pos_deg[in_fov_idx[i]],'pz')
                 
 # #%% Check how many photo-z (only) over 2:
 # count = 0

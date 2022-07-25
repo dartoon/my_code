@@ -18,11 +18,11 @@ fov_image = fitsFile[1].data # check the back grounp
 fov_noise_image = fitsFile[2].data # check the back grounp
 header = fitsFile[1].header # if target position is add in WCS, the header should have the wcs information, i.e. header['EXPTIME']
 
-#%% Grab the JWST provided ERR map:
 flux_mjsr = header['PHOTMJSR']
 pixscale = read_pixel_scale(header)
 zp = -2.5*np.log10(2.350443 * 10**(-5) *pixscale**2/3631) #- 2.5*np.log10(flux_mjsr)  #zp for flux
 
+#%% Grab the JWST provided ERR map:
 data_process = DataProcess(fov_image = fov_image, target_pos = [700., 500.], pos_type = 'pixel', header = header, fov_noise_map = fov_noise_image,
                           rm_bkglight = True, if_plot=False, zp = zp)
 data_process.generate_target_materials(radius=65, create_mask = False, nsigma=2.8, if_select_obj=False,
