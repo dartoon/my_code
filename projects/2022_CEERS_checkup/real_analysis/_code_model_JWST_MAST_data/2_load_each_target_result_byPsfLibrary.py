@@ -11,7 +11,7 @@ import astropy.io.fits as pyfits
 import matplotlib.pyplot as plt
 import pickle
 
-folder = 'fit_result/'
+folder = '../fit_result_JWST_MAST/'
 
 # ID = '142008.61+530004.0'
 # ID = 'aegis_630'
@@ -24,8 +24,9 @@ lines = open(folder+'f356w'+"_targets_info.txt","r").read().split('\n')
 target_IDs = [lines[i].split("['")[1].split("'")[0] for i in range(len(lines)) if lines[i] != ''] 
     # ID = target_IDs[10]
     # print(ID)
-for ID in target_IDs:
-    filts = ['f150w', 'f356w']
+# for ID in target_IDs:
+for ID in ['142008.61+530004.0']:
+    filts = ['f356w']
     for filt in filts:
         filename = folder +filt+'_fit_result_PsfLib'+'_'+ID+'.pkl'
         fit_run_list, use_PSF_list = pickle.load(open(filename,'rb'))
@@ -42,5 +43,7 @@ for ID in target_IDs:
         ratio = host_flux/(host_flux+AGN_flux)
         print(filt, round(fit_run.final_result_galaxy[0]['flux_within_frame'],2),
               "host ratio",round(ratio,2),
-              round(fit_run.final_result_galaxy[0]['magnitude'],2) )
+              round(fit_run.final_result_galaxy[0]['magnitude'],2),
+              round(fit_run.final_result_galaxy[0]['n_sersic'],2),
+              )
 

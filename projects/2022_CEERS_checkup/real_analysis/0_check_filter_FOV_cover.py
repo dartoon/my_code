@@ -14,7 +14,8 @@ from astropy.wcs import WCS
 import glob
 # from astropy.utils.data import get_pkg_data_filename
 
-folder = '/Users/Dartoon/Downloads/CEERS_JWST_data'
+# folder = '/Users/Dartoon/Downloads/CEERS_JWST_data'
+folder = '/Volumes/Seagate_Expansion_Drive/data_backup/JWST_CEERS/CEERS_JWST_data'
 all_files= glob.glob(folder+'/*clear*/*_i2d.fits')  #For NIRCam
 # all_files= glob.glob(folder+'/jw*/*_i2d.fits')
 filters = []
@@ -94,6 +95,10 @@ for ct, file in enumerate(data_file):
     ax.plot(xs_, ys_, color="green", label=label)
     plt.text(np.mean(xs_), np.mean(ys_), file.split('/')[-1].split('_')[1])
 
+target_ID_list = []
+target_ID_RA_DEC = []
+target_ID_z = []
+
 # =============================================================================
 # #Plot target in fov
 # =============================================================================
@@ -117,10 +122,15 @@ for i in range(len(all_files)):
         pos = wcs_i.all_world2pix([[RA, Dec]], 1)[0]
         try:
             if pos[0]>0 and pos[1]>0 and fov_image[int(pos[1])-1, int(pos[0])-1 ] > 0 :
-                if z >2:#  or z_photo>2 and z_spec ==-99.0:
-                    pos_ = wcs.all_world2pix( [ [RA, Dec] ], 1)[0]
-                    plt.scatter(pos_[0], pos_[1], c = 'red')
-                    plt.text(pos_[0], pos_[1], table[j][0])
+                # if z >2:#  or z_photo>2 and z_spec ==-99.0:
+                pos_ = wcs.all_world2pix( [ [RA, Dec] ], 1)[0]
+                target_ID = table[j][0]
+                plt.scatter(pos_[0], pos_[1], c = 'red')
+                plt.text(pos_[0], pos_[1], target_ID)
+                if target_ID not in target_ID_list:
+                    target_ID_list.append(target_ID)
+                    target_ID_RA_DEC.append( [RA, Dec] )
+                    target_ID_z.append([z, -99])
         except:
             None
 f = open('../catalog_regions/AEGIS_data_140612.csv',"r") ##This RA DEC of the optical counterparts is used to get hte reg file
@@ -160,6 +170,11 @@ for i in range(len(all_files)):
         try:
             if pos[0]>0 and pos[1]>0 and fov_image[int(pos[1])-1, int(pos[0])-1 ] > 0 :
                 z_spec, z_photo = return_z(target_id)
+                
+                if target_id not in target_ID_list:
+                    target_ID_list.append(target_id)
+                    target_ID_RA_DEC.append( [RA, Dec] )
+                    target_ID_z.append([z_spec, z_photo])
                 if z_spec >2:# or z_photo>2 and z_spec ==-99.0:
                     pos_ = wcs.all_world2pix( [ [RA, Dec] ], 1)[0]
                     plt.scatter(pos_[0], pos_[1], c = 'blue')  
@@ -167,10 +182,8 @@ for i in range(len(all_files)):
                 if z_spec <2 and z_photo>2:
                     pos_ = wcs.all_world2pix( [ [RA, Dec] ], 1)[0]
                     plt.scatter(pos_[0], pos_[1], c = 'green')  
-                    # plt.text(pos_[0], pos_[1], target_id)
+                    plt.text(pos_[0], pos_[1], target_id)
                     # print(target_id, RA, Dec, 'flux:',fov_image[int(pos[1])-1, int(pos[0])-1 ], 'redshift:', z_spec, z_photo)
-                    if target_id not in targets:
-                        targets.append(target_id)
         except: 
             None
 
@@ -183,3 +196,11 @@ ax.set_xlabel('',fontsize = 25)
 ax.set_ylabel('',fontsize = 25)
 ax.set_aspect('equal', 'box')
 plt.show()
+
+#%%
+write_file = open('target_info.txt','w') 
+write_file.write("#ID, RA, Dec, spec_z, photo_z\n")
+for i in range(len(target_ID_list)):
+    write_file.write("{0} {1} {2} {3} {4}\n".format(target_ID_list[i], target_ID_RA_DEC[i][0], target_ID_RA_DEC[i][1],
+                                                     target_ID_z[i][0], target_ID_z[i][1],))
+write_file.close()

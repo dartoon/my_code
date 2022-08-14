@@ -18,7 +18,7 @@ from galight.data_process import DataProcess
 from galight.tools.astro_tools import read_pixel_scale
 
 filt = 'f356w'
-folder = '/Users/Dartoon/Downloads/CEERS_JWST_data'
+folder = '/Volumes/Seagate_Expansion_Drive/data_backup/CEERS_JWST_MAST_data/'
 filenames = glob.glob(folder+'/bkg_removed/*'+filt+'*.fits')
 targets_info = target_in_fits(filenames)
 
@@ -117,4 +117,4 @@ for target_id, RA, Dec, z, file in targets_info[fit_id:fit_id+1]:
         fit_run.run(algorithm_list = ['PSO','PSO'])
         fit_run.plot_final_qso_fit(target_ID =target_id)
         fit_run_list.append(fit_run)
-    pickle.dump([fit_run_list, use_PSF_RA_DEC_list], open(save_f+filt+'_fit_result_PsfLib'+'_'+target_id+'.pkl', 'wb'))
+    # pickle.dump([fit_run_list, use_PSF_RA_DEC_list], open(save_f+filt+'_fit_result_PsfLib'+'_'+target_id+'.pkl', 'wb'))

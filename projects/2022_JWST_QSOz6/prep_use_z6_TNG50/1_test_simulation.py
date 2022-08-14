@@ -34,7 +34,7 @@ filt = ['f150w', 'f356w'][filt_id]
 folder = '../prep_use_HST_highRes/JWST_CEERS/'
 ceers_file = 'ceers5_{filt}_i2d.fits'.format(filt=filt)
 target_info = pickle.load(open('../prep_use_HST_highRes/target_info.pkl','rb'))
-_psfs, _FWHMs = pickle.load(open('../prep_use_TNG50/'+filt+'_psfs_star.pkl','rb'))
+_psfs, _FWHMs = pickle.load(open('../prep_use_z0.1_TNG50/'+filt+'_psfs_star.pkl','rb'))
 psfs, FWHMs, fluxs = [], [], []
 for i in range(len(_psfs)):
     psfs = psfs +[_psfs[i]]
@@ -278,7 +278,7 @@ for ID in range(1):
     info['TNG_ID'] = TNG_file
     # info['assumed_host_Re_kpc'] = host_Reff_kpc
     # info['galfit_Re'] = host_Reff
-    pickle.dump(info, open(filename+'_result.pkl', 'wb'))   
+    # pickle.dump(info, open(filename+'_result.pkl', 'wb'))   
     
     # infos = ID, filt, zp, target_name, host_flux_ratio, host_Reff_kpc, host_Reff, source_id, fov_cut_idx, psf_id, add_pos
     # save_result = true_flux, true_mag, true_galfit_Re, inferred_flux, inferred_mag, inferred_Re, inferred_n

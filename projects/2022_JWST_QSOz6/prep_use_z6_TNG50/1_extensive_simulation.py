@@ -262,7 +262,7 @@ for ID in range(len(keys)):
     info['TNG_ID'] = TNG_file
     # info['assumed_host_Re_kpc'] = host_Reff_kpc
     # info['galfit_Re'] = host_Reff
-    pickle.dump(info, open(filename+'_result.pkl', 'wb'))   
+    # pickle.dump(info, open(filename+'_result.pkl', 'wb'))   
     # infos = ID, filt, zp, target_name, host_flux_ratio, host_Reff_kpc, host_Reff, source_id, fov_cut_idx, psf_id, add_pos
     # save_result = true_flux, true_mag, true_galfit_Re, inferred_flux, inferred_mag, inferred_Re, inferred_n
     # save_plot_name

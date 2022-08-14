@@ -14,27 +14,26 @@ import matplotlib.pyplot as plt
 from astropy.wcs import WCS
 
 def RA_Dec_in_fit(all_files, RA,Dec):
-    filename = None
+    filename = []
     for i in range(len(all_files)):
         file = all_files[i]
-        print(file)
         fitsFile = pyfits.open(file)
         fov_image = fitsFile[1].data # check the back grounp
         header = fitsFile[1].header # if target position is add in WCS, the header should have the wcs information, i.e. header['EXPTIME']
         wcs_i = WCS(header)
         pos = wcs_i.all_world2pix([[RA, Dec]], 1)[0]
-        print('pos')
-        print(pos)
+        # print(file)
+        # print('pos', pos)
         try:
             if pos[0]>0 and pos[1]>0 and fov_image[int(pos[1])-1, int(pos[0])-1 ] > 0 :
-                filename = file
+                filename.append(file)
         except:
             None
     return filename
 
-def target_in_fits(all_files):
+def target_in_fits(all_files, root_folder = ''):
     target_info = []
-    cata_file = '../catalog_regions/SDSS_DR16Q_v4.fits'
+    cata_file = root_folder+'../catalog_regions/SDSS_DR16Q_v4.fits'
     hdul = pyfits.open(cata_file)
     table = hdul[1].data
     name = hdul[1].columns
@@ -58,10 +57,10 @@ def target_in_fits(all_files):
                         target_info.append([table[j][0], RA, Dec, [z], file])
             except:
                 None
-    f = open('../catalog_regions/AEGIS_data_140612.csv',"r") ##This RA DEC of the optical counterparts is used to get hte reg file
+    f = open(root_folder+'../catalog_regions/AEGIS_data_140612.csv',"r") ##This RA DEC of the optical counterparts is used to get hte reg file
     string = f.read()
     AEGIS_2014 = string.split('\n')   # Split in to \n
-    f = open('../catalog_regions/AEGIS-XD_redshift_catalog.txt',"r") ##This RA DEC of the optical counterparts is used to get hte reg file
+    f = open(root_folder+'../catalog_regions/AEGIS-XD_redshift_catalog.txt',"r") ##This RA DEC of the optical counterparts is used to get hte reg file
     string = f.read()
     AEGIS_redshift = string.split('\n')   # Split in to \n
     def return_z(target_id):

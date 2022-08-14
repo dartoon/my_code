@@ -10,6 +10,8 @@ import numpy as np
 import astropy.io.fits as pyfits
 import matplotlib.pyplot as plt
 import glob
+import sys
+sys.path.insert(0,'..')
 from def_functions import target_in_fits, RA_Dec_in_fit
 import pickle
 from galight.fitting_specify import FittingSpecify
@@ -18,15 +20,15 @@ from galight.data_process import DataProcess
 from galight.tools.astro_tools import read_pixel_scale
 
 filt = 'f150w'
-folder = '/Users/Dartoon/Downloads/CEERS_JWST_data'
+folder = '/Volumes/Seagate_Expansion_Drive/data_backup/CEERS_data/CEERS_JWST_MAST_data/'
 filenames = glob.glob(folder+'/bkg_removed/*'+filt+'*.fits')
-targets_info = target_in_fits(filenames)
-save_f = 'fit_result/'
-#Save targets_info manually.
-write_file = open(save_f+filt+'_targets_info'+'.txt','w') 
-for i in range(len(targets_info)):
-    write_file.write(str(targets_info[i]) + '\n')
-write_file.close()
+targets_info = target_in_fits(filenames, root_folder = '../')
+save_f = '../fit_result_JWST_MAST/'
+# #Save targets_info manually.
+# write_file = open(save_f+filt+'_targets_info'+'.txt','w') 
+# for i in range(len(targets_info)):
+#     write_file.write(str(targets_info[i]) + '\n')
+# write_file.close()
 
 
 #%%
@@ -72,11 +74,12 @@ for target_id, RA, Dec, z, file in targets_info[7:8]:
     exp = fitsFile[0].header['EFFEXPTM']
     gain_value = 1.8
     exp_map = exp * wht/wht.max() / flux_mjsr * gain_value
+    fov_noise_map = fitsFile[2].data 
     data_process = DataProcess(fov_image = fov_image, target_pos = [RA, Dec], pos_type = 'wcs', header = header,
-                              rm_bkglight = False, if_plot=False, zp = zp, exptime= exp_map )
+                              rm_bkglight = False, if_plot=True, zp = zp, exptime= exp_map, fov_noise_map=fov_noise_map)
     data_process.generate_target_materials(radius=65, create_mask = create_mask, nsigma=2.8, 
                                            cut_kernel = 'center_bright', if_select_obj=False,
-                                          exp_sz= 1.2, npixels = 30, contrast = 0.5, if_plot=False, )
+                                          exp_sz= 1.2, npixels = 30, contrast = 0.5, if_plot=True, )
     
     if np.sum(data_process.target_stamp ==0) >20:
         data_process.target_mask = data_process.target_stamp != 0
@@ -117,7 +120,7 @@ for target_id, RA, Dec, z, file in targets_info[7:8]:
         #     data_process.stack_PSF()
         fit_sepc = FittingSpecify(data_process)
         fit_sepc.prepare_fitting_seq(point_source_num = 1, supersampling_factor = 3,
-                                     ps_pix_center_list = [[0,0]]) #, fix_n_list= [[0,4],[1,1]])
+                                      ps_pix_center_list = [[0,0]]) #, fix_n_list= [[0,4],[1,1]])
         fit_sepc.build_fitting_seq()
         if i == 0:
             fit_sepc.plot_fitting_sets()

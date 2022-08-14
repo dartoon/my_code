@@ -29,7 +29,7 @@ import copy, matplotlib
 #             'spring', 'summer', 'autumn', 'winter', 'cool', 'Wistia',
 #             'hot', 'afmhot', 'gist_heat', 'copper']
 
-cmap = ['winter','summer','afmhot','spring', 'autumn', 'gist_heat','hot' ]
+# cmap = ['winter','summer','afmhot','spring', 'autumn', 'gist_heat','hot' ]
 
 for i, filename in enumerate(pkl_files):
     fit_run_list, use_PSF_list = pickle.load(open(filename,'rb'))
@@ -40,13 +40,18 @@ for i, filename in enumerate(pkl_files):
         print("The AGN org image is used PSF in", target_id , filt)
         idx_counts = idx_counts[1:]
     fit_run = fit_run_list[idx_counts[0]]
-    my_cmap = copy.copy(matplotlib.cm.get_cmap(cmap[i])) # copy the default cmap
-    my_cmap.set_bad('black')
-    print(cmap[i])
-    fit_run.plot_final_qso_fit(target_ID = target_id + ' '+filt, cmap = my_cmap)
+    # my_cmap = copy.copy(matplotlib.cm.get_cmap(cmap[i])) # copy the default cmap
+    # my_cmap.set_bad('black')
+    # print(cmap[i])
+    fit_run.plot_final_qso_fit(target_ID = target_id + ' '+filt, cmap = None)
     host_flux = fit_run.final_result_galaxy[0]['flux_within_frame']
     AGN_flux = fit_run.final_result_ps[0]['flux_within_frame']
     ratio = host_flux/(host_flux+AGN_flux)
     print(filt, round(fit_run.final_result_galaxy[0]['flux_within_frame'],2),
           "host ratio",round(ratio,2),
-          round(fit_run.final_result_galaxy[0]['magnitude'],2) )
+          round(fit_run.final_result_galaxy[0]['magnitude'],2),
+          round(fit_run.final_result_galaxy[0]['n_sersic'],2) )
+    
+    
+    
+    

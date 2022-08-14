@@ -18,7 +18,7 @@ from galight.data_process import DataProcess
 from galight.tools.astro_tools import read_pixel_scale
 from galight.tools.cutout_tools import psf_clean
 
-datafolder = '/Users/Dartoon/Downloads/CEERS_JWST_data'
+datafolder = '/Volumes/Seagate_Expansion_Drive/data_backup/CEERS_JWST_MAST_data/'
 save_f = 'output/'
 create_mask = False
 # target_id = 'aegis_509'
