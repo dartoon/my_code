@@ -12,7 +12,9 @@ import numpy as np
 import astropy.io.fits as pyfits
 import matplotlib.pyplot as plt
 import glob
-from def_functions import target_in_fits, RA_Dec_in_fit
+import sys
+sys.path.insert(0,'..')
+from def_functions import RA_Dec_in_fit
 import pickle
 from galight.fitting_specify import FittingSpecify
 from galight.fitting_process import FittingProcess

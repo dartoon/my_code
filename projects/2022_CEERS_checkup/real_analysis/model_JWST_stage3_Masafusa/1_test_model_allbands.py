@@ -12,7 +12,9 @@ import numpy as np
 import astropy.io.fits as pyfits
 import matplotlib.pyplot as plt
 import glob
-from def_functions import target_in_fits, RA_Dec_in_fit
+import sys
+sys.path.insert(0,'..')
+from def_functions import RA_Dec_in_fit
 import pickle
 from galight.fitting_specify import FittingSpecify
 from galight.fitting_process import FittingProcess
@@ -26,6 +28,7 @@ from galight.tools.plot_tools import plot_data_apertures_point
 from galight.tools.cutout_tools import common_data_class_aperture
 import warnings
 warnings.filterwarnings("ignore")
+
 #%%
 folder = '/Volumes/Seagate_Expansion_Drive/data_backup/CEERS_data/CEERS_JWST_Masafusa'
 filenames = glob.glob(folder+'/bkg_removed/'+'*.fits')
@@ -84,7 +87,7 @@ for idx, line in enumerate(lines[4:5]):
         data_process = DataProcess(fov_image = fov_image, target_pos = [cut_RA, cut_Dec], 
                                    pos_type = 'wcs', header = header,rm_bkglight = False, 
                                    if_plot=False, zp = zp, exptime= exp_map, 
-                                   fov_noise_map = fov_noise_map)
+                                   fov_noise_map = None)
         #estimate local bkg and remove:
         
         data_process.generate_target_materials(radius=250 * expsize, create_mask = create_mask, nsigma=2.8, 

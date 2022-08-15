@@ -15,7 +15,7 @@ import glob
 # from astropy.utils.data import get_pkg_data_filename
 
 # folder = '/Users/Dartoon/Downloads/CEERS_JWST_data'
-folder = '/Volumes/Seagate_Expansion_Drive/data_backup/JWST_CEERS/CEERS_JWST_data'
+folder = '/Volumes/Seagate_Expansion_Drive/data_backup/CEERS_data/CEERS_JWST_MAST_data/'
 all_files= glob.glob(folder+'/*clear*/*_i2d.fits')  #For NIRCam
 # all_files= glob.glob(folder+'/jw*/*_i2d.fits')
 filters = []
@@ -102,7 +102,7 @@ target_ID_z = []
 # =============================================================================
 # #Plot target in fov
 # =============================================================================
-cata_file = '../catalog_regions/SDSS_DR16Q_v4.fits'
+cata_file = '../../catalog_regions/SDSS_DR16Q_v4.fits'
 hdul = pyfits.open(cata_file)
 table = hdul[1].data
 name = hdul[1].columns
@@ -133,10 +133,10 @@ for i in range(len(all_files)):
                     target_ID_z.append([z, -99])
         except:
             None
-f = open('../catalog_regions/AEGIS_data_140612.csv',"r") ##This RA DEC of the optical counterparts is used to get hte reg file
+f = open('../../catalog_regions/AEGIS_data_140612.csv',"r") ##This RA DEC of the optical counterparts is used to get hte reg file
 string = f.read()
 AEGIS_2014 = string.split('\n')   # Split in to \n
-f = open('../catalog_regions/AEGIS-XD_redshift_catalog.txt',"r") ##This RA DEC of the optical counterparts is used to get hte reg file
+f = open('../../catalog_regions/AEGIS-XD_redshift_catalog.txt',"r") ##This RA DEC of the optical counterparts is used to get hte reg file
 string = f.read()
 AEGIS_redshift = string.split('\n')   # Split in to \n
 def return_z(target_id):
@@ -197,10 +197,10 @@ ax.set_ylabel('',fontsize = 25)
 ax.set_aspect('equal', 'box')
 plt.show()
 
-#%%
-write_file = open('target_info.txt','w') 
-write_file.write("#ID, RA, Dec, spec_z, photo_z\n")
-for i in range(len(target_ID_list)):
-    write_file.write("{0} {1} {2} {3} {4}\n".format(target_ID_list[i], target_ID_RA_DEC[i][0], target_ID_RA_DEC[i][1],
-                                                     target_ID_z[i][0], target_ID_z[i][1],))
-write_file.close()
+# #%%
+# write_file = open('target_info.txt','w') 
+# write_file.write("#ID, RA, Dec, spec_z, photo_z\n")
+# for i in range(len(target_ID_list)):
+#     write_file.write("{0} {1} {2} {3} {4}\n".format(target_ID_list[i], target_ID_RA_DEC[i][0], target_ID_RA_DEC[i][1],
+#                                                      target_ID_z[i][0], target_ID_z[i][1],))
+# write_file.close()
