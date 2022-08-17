@@ -19,7 +19,6 @@ from galight.tools.measure_tools import measure_bkg
 import pickle
 import sys
 
-from acstools import acszpt
 dp_files = glob.glob('fit_material/data_process_idx*.pkl')
 dp_files.sort()
 f = open("../model_JWST_stage3_Masafusa/target_idx_info.txt","r")
