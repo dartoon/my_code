@@ -12,4 +12,4 @@
 #PBS -q tiny
 
 cd /home/xuheng.ding/Astro/my_code/projects/2022_CEERS_checkup/real_analysis/model_HST_material/
-python 1_fit_5band_onidark.py $PBS_ARRAY_INDEX
+python 1_fit_use_DP_onidark.py $PBS_ARRAY_INDEX
