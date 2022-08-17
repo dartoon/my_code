@@ -1,7 +1,7 @@
 #!/bin/bash
 #PBS -N fit_run_HST
-#PBS -o /home/xuheng.ding/Astro/my_code/projects/2022_CEERS_checkup/real_analysis/model_HST_material/pbs
-#PBS -e /home/xuheng.ding/Astro/my_code/projects/2022_CEERS_checkup/real_analysis/model_HST_material/pbs
+#PBS -o /home/xuheng.ding/Astro/my_code/projects/2022_CEERS_checkup/real_analysis/model_HST_material/pbs/
+#PBS -e /home/xuheng.ding/Astro/my_code/projects/2022_CEERS_checkup/real_analysis/model_HST_material/pbs/
 #PBS -l nodes=1:ppn=1
 #PBS -l walltime=01:50:00
 #PBS -l mem=200mb
