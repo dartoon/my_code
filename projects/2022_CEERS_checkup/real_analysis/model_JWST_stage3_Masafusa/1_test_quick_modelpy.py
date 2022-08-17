@@ -29,7 +29,7 @@ filenames = glob.glob(folder+'/bkg_removed/'+'*.fits')
 # filters = ['F356W', 'F410M', 'F444W']
 # filt = filters[0]
 
-f = open("target_info.txt","r")
+f = open("material/target_info.txt","r")
 string = f.read()
 lines = string.split('\n')   # Split in to \n
 result_folder = 'fit_result/'
