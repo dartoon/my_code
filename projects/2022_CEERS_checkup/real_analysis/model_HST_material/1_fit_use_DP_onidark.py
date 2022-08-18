@@ -34,6 +34,7 @@ print(file)
 idx = file.split('idx')[1].split('_')[0]
 target_id = [lines[i].split(' ')[1] for i in range(len(lines)) if lines[i].split(' ')[0] == str(idx)][0]
 _data_process = pickle.load(open(file,'rb'))
+_data_process.noise_map = np.nan_to_num(_data_process.noise_map, nan=1000)
 ps_pos = _data_process.apertures[0].positions - _data_process.radius
 fit_sepc = FittingSpecify(_data_process)
 fit_sepc.prepare_fitting_seq(point_source_num = 1, supersampling_factor = 3,
@@ -45,4 +46,6 @@ fit_run = FittingProcess(fit_sepc, savename = target_id, fitting_level=['norm','
 fit_run.run(algorithm_list = ['PSO','PSO','PSO'])
 # fit_run.plot_final_qso_fit(target_ID =target_id)
 filt = _data_process.filt
-pickle.dump(fit_run , open('fit_material/'+'fit_run_idx{2}_{0}_psf{1}.pkl'.format(filt, i, idx), 'wb'))
+# pickle.dump(fit_run , open('fit_material/'+'fit_run_idx{2}_{0}_psf{1}.pkl'.format(filt, i, idx), 'wb'))
+filename = dp_files[i].replace('data_process', 'fit_run')[:-4]+'_{0}.pkl'.format(i)
+pickle.dump(fit_run , open(filename, 'wb'))
