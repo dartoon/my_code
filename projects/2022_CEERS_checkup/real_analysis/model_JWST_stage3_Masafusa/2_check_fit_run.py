@@ -21,11 +21,11 @@ import glob
 
 dp_files = glob.glob('fit_material/data_process_idx*.pkl')
 dp_files.sort()
-for i in range(len(dp_files)):
+for i in range(2768, len(dp_files)):
 # for i in range(0,100):
-    file = glob.glob('fit_material/'+'fit_run_idx*_*_psf*_{0}.pkl'.format(i))[0]
+    file = glob.glob('fit_material/'+'fit_run_idx*_*_psf*_{0}.pkl'.format(i))
     if file == []:
-        print(i)
+        print(i, dp_files[i])
     # # print(dp_files[i], file)
     # new_filename = dp_files[i].replace('data_process', 'fit_run')[:-4]+'_{0}.pkl'.format(i)
     # # print(file, new_filename)

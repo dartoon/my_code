@@ -1,11 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Created on Wed Aug 17 19:29:07 2022
+Created on Thu Aug 18 17:03:39 2022
 
 @author: Dartoon
-
-Improved the POS using _1_fit_use_DP_betterPSpos.py
 """
 
 import numpy as np
@@ -21,16 +19,13 @@ from galight.tools.measure_tools import measure_bkg
 import pickle
 import sys
 
-dp_files = glob.glob('fit_material/data_process_idx*_psf*.pkl')
+dp_files = glob.glob('fit_material/data_process_idx*_CombPsfsNO_*.pkl')
 dp_files.sort()
 f = open("../model_JWST_stage3_Masafusa/target_idx_info.txt","r")
 string = f.read()
 lines = string.split('\n')   # Split in to \n
-# for i in range(1):
-# for i in range(len(dp_files)):
 
-# len(dp_files) = 3378
-i = int(sys.argv[1]) - 1 # 1 - 6596
+i = int(sys.argv[1]) - 1 
 file = dp_files[i]
 print(file)
 idx = file.split('idx')[1].split('_')[0]
@@ -44,6 +39,7 @@ if int(idx) in [31, 32, 56]:
 else:
     ps_pos = _data_process.apertures[0].positions - _data_process.radius
 
+filename = dp_files[i].replace('data_process', 'fit_run')[:-4]+'_{0}.pkl'.format(i)
 fit_sepc = FittingSpecify(_data_process)
 fit_sepc.prepare_fitting_seq(point_source_num = 1, supersampling_factor = 3,
                               ps_pix_center_list = [ps_pos]  ) #, fix_n_list= [[0,4],[1,1]])
@@ -53,6 +49,5 @@ fit_sepc.build_fitting_seq()
 fit_run = FittingProcess(fit_sepc, savename = target_id, fitting_level=['norm','deep','deep'])
 fit_run.run(algorithm_list = ['PSO','PSO','PSO'])
 # fit_run.plot_final_qso_fit(target_ID =target_id)
-filt = _data_process.filt
-filename = dp_files[i].replace('data_process', 'fit_run')[:-4]+'_{0}.pkl'.format(i)
+# filt = _data_process.filt
 pickle.dump(fit_run , open(filename, 'wb'))

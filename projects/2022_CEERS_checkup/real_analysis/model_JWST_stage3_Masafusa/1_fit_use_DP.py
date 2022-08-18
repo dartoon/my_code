@@ -28,6 +28,7 @@ lines = string.split('\n')   # Split in to \
 # run_list = [1274, 1275]
 # run_list = [1276, 3923]
 # for i in range(len(dp_files)):
+#i =  105 will have negative PS flux.    
 for i in [105]:
     if glob.glob('fit_material/temp/fit_run*_{0}.pkl'.format(i)) == []:
         print(i)
@@ -41,7 +42,14 @@ for i in [105]:
     psf[psf<0] = 0
     _data_process.PSF_list[0] = psf
     _data_process.noise_map = np.nan_to_num(_data_process.noise_map, nan=1000)
-    ps_pos = _data_process.apertures[0].positions - _data_process.radius
+    
+    if int(idx) in [31, 32, 56]:
+        ps_pos = np.where(_data_process.target_stamp == _data_process.target_stamp.max())
+        ps_pos = (ps_pos[0][0] - _data_process.radius, ps_pos[1][0] - _data_process.radius)
+        ps_pos = [ps_pos[1], ps_pos[0]]
+    else:
+        ps_pos = _data_process.apertures[0].positions - _data_process.radius
+    
     fit_sepc = FittingSpecify(_data_process)
     fit_sepc.prepare_fitting_seq(point_source_num = 1, supersampling_factor = 3,
                                   ps_pix_center_list = [ps_pos]  ) #, fix_n_list= [[0,4],[1,1]])
