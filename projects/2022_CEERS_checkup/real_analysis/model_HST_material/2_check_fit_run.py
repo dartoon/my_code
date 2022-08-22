@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Created on Thu Aug 18 11:25:37 2022
+Created on Wed Aug 17 20:30:48 2022
 
 @author: Dartoon
 """
@@ -9,10 +9,34 @@ Created on Thu Aug 18 11:25:37 2022
 import numpy as np
 import astropy.io.fits as pyfits
 import matplotlib.pyplot as plt
-import glob
 import pickle
-import copy
+import os
+import glob
 
+# for file in glob.glob("fit_material/fit_run_idx10_F160W_*")[:]:
+# # for file in ['fit_material/fit_run_idx10_F115W_CombPsfsNO_8_10.pkl']:
+#     fit_run = pickle.load(open(file,'rb'))
+#     fit_run.plot_final_qso_fit()
+#     print(fit_run.final_result_ps[0]['point_amp'])
+#     print(fit_run.fitting_seq.likelihoodModule.log_likelihood(verbose=True, kwargs_return=fit_run.kwargs_result))
+
+# f = open("../model_JWST_stage3_Masafusa/target_idx_info.txt","r")
+# string = f.read()
+# lines = string.split('\n')   # Split in to \n
+
+dp_files = glob.glob('fit_material/data_process_idx*.pkl')
+dp_files.sort()
+for i in range(2768, len(dp_files)):
+# for i in range(0,100):
+    file = glob.glob('fit_material/'+'fit_run_idx*_*_psf*_{0}.pkl'.format(i))
+    if file == []:
+        print(i, dp_files[i])
+    # # print(dp_files[i], file)
+    # new_filename = dp_files[i].replace('data_process', 'fit_run')[:-4]+'_{0}.pkl'.format(i)
+    # # print(file, new_filename)
+    # os.rename(file, new_filename)
+
+#%%
 files = glob.glob('fit_material/data_process_idx*_psf*.pkl')
 files.sort()
 collect_info = []
@@ -24,24 +48,12 @@ for i in range(len(files)):
     if this_info not in collect_info:
         collect_info.append(this_info)
 
-# - [ ] F115W_psf6 is QSO (idx 2). [136, 137, 139]
-# - [ ] F150W_psf7 is QSO (idx 2).
-# - [ ] F277W_psf2 is QSO (idx 2).
-
-#%%
-if_printshow = False
+if_printshow = True
 for count in range(len(collect_info)):
-# for count in range(0,59):
-# for count in range(59, 2*59):
-# for count in range(2*59, 3*59):
-# for count in range(3*59, 4*59):
-# for count in range(4*59, 5*59):
-# for count in range(5*59, len(collect_info)):
-# for count in range(2*88, 3*88):
     item = collect_info[count]
     fit_run_list = []
     idx, filt= item
-    fit_files = glob.glob('fit_material/fit_run_idx{0}_{1}_C*.pkl'.format(idx, filt))
+    fit_files = glob.glob('fit_material/fit_run_idx{0}_{1}_*.pkl'.format(idx, filt))
     fit_files.sort()
     warn_strs = ['F115W_psf6', 'F150W_psf7', 'F277W_psf2']
     for warn_str in warn_strs:
@@ -54,15 +66,6 @@ for count in range(len(collect_info)):
     if len(idx_counts)<8:
         print(idx, filt, len(idx_counts))
     print("work on", count, 'idx', idx, filt, "Total PSF NO.", len(idx_counts))
-    for ct in [3, 5, 8, len(idx_counts)]:
-        _data_process_list = [fit_run_list[i].fitting_specify_class.data_process_class for i in idx_counts[:ct]] 
-        PSF_list_for_comb = [_data_process_list[i].PSF_list[0] for i in range(len(_data_process_list))]
-        _data_process = copy.deepcopy(_data_process_list[0])
-        _data_process.PSF_list  = copy.deepcopy(PSF_list_for_comb)
-        _data_process.stack_PSF(if_plot = False, tool = 'psfr')
-        if ct >8:
-            ct = 'all'
-        pickle.dump(_data_process , open('fit_material/'+'data_process_idx{0}_{2}_CombPsfsNO_{1}.pkl'.format(idx, ct, filt), 'wb'))
         
     if if_printshow==True:
         fit_run = fit_run_list[idx_counts[0]]

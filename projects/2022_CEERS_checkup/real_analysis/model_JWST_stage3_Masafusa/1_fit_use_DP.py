@@ -18,7 +18,7 @@ from galight.tools.astro_tools import plt_fits
 from galight.tools.measure_tools import measure_bkg
 import pickle
 
-dp_files = glob.glob('fit_material/data_process_idx*.pkl')
+dp_files = glob.glob('fit_material/data_process_idx**.pkl')
 dp_files.sort()
 f = open("target_idx_info.txt","r")
 string = f.read()
@@ -28,19 +28,19 @@ lines = string.split('\n')   # Split in to \
 # run_list = [1274, 1275]
 # run_list = [1276, 3923]
 # for i in range(len(dp_files)):
+    
 #i =  105 will have negative PS flux.    
 for i in [105]:
-    if glob.glob('fit_material/temp/fit_run*_{0}.pkl'.format(i)) == []:
-        print(i)
     file = dp_files[i]
     print(file)
     filename = dp_files[i].replace('data_process', 'fit_run')[:-4]+'_{0}.pkl'.format(i)
     idx = file.split('idx')[1].split('_')[0]
     target_id = [lines[i].split(' ')[1] for i in range(len(lines)) if lines[i].split(' ')[0] == str(idx)][0]
     _data_process = pickle.load(open(file,'rb'))
-    psf = _data_process.PSF_list[0]
-    psf[psf<0] = 0
-    _data_process.PSF_list[0] = psf
+    psf = _data_process.PSF_list[-1]
+    psf[psf<0] = 0.
+    psf = abs(psf)
+    _data_process.PSF_list[-1] = psf
     _data_process.noise_map = np.nan_to_num(_data_process.noise_map, nan=1000)
     
     if int(idx) in [31, 32, 56]:
@@ -54,11 +54,11 @@ for i in [105]:
     fit_sepc.prepare_fitting_seq(point_source_num = 1, supersampling_factor = 3,
                                   ps_pix_center_list = [ps_pos]  ) #, fix_n_list= [[0,4],[1,1]])
     fit_sepc.kwargs_params['lens_light_model'][3][0]['R_sersic'] = 0.06
-    fit_sepc.build_fitting_seq()
+    fit_sepc.kwargs_constraints['linear_solver'] = False
     fit_sepc.plot_fitting_sets()
-    fit_run = FittingProcess(fit_sepc, savename = target_id, fitting_level=['norm','deep','deep'])
-    fit_run.run(algorithm_list = ['PSO','PSO','PSO'])
-    # fit_run.plot_final_qso_fit(target_ID =target_id)
+    fit_run = FittingProcess(fit_sepc, savename = target_id)
+    fit_run.run(algorithm_list = ['PSO','MCMC'], fitting_level=['norm','deep'])
+    fit_run.plot_final_qso_fit(target_ID =target_id)
     filt = _data_process.filt
     # pickle.dump(fit_run , open(filename, 'wb'))
     
