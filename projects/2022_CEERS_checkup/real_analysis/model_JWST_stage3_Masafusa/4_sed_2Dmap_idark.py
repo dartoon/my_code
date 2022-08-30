@@ -22,7 +22,7 @@ idx = 1
 target_id, z = load_info(idx)
 sed_2d_info = pickle.load(open('sed_2d_info.pkl','rb'))
 mag_dict = sed_2d_info[count][2]
-esti_smass(ID = '20220830'+str(count), mags_dict = mag_dict, z = z, flag = flag, if_run_gsf=True)
+esti_smass(ID = '20220830'+str(int(count)), mags_dict = mag_dict, z = z, flag = flag, if_run_gsf=True)
 folder = 'esti_smass/20220830'+str(count)
 spec_file = glob.glob(folder+'/gsf_spec_*.fits')[0]
 hdul_spec = pyfits.open(spec_file)
