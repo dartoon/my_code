@@ -25,23 +25,11 @@ mat.rcParams['font.family'] = 'STIXGeneral'
 #mel_idx = [i for i in range(len(name_sum)) if 'logZsun' in str(name_sum[i])][0]
 #z = table_sum[1][z_idx] #Redshift
 #mel = table_sum[1][mel_idx] #Metallicity 
-
-# filename_p  = 'gsf_spec_12345.fits'
-# filename_p = glob.glob(filename_p)[0]
-# hdul = pyfits.open(filename_p)
-# table = hdul[1].data
-# name = hdul[1].columns
-# # info = hdul[1].header 
-
-filename_p  = 'SFH_12345.fits'
+filename_p  = '../2_WFI2033_color/SFH_*_PA00_param.fits'
 filename_p = glob.glob(filename_p)[0]
 hdul = pyfits.open(filename_p)
 table = hdul[1].data
 name = hdul[1].columns
-info = hdul[0].header 
-
-
-#%%
 age_idx = [i for i in range(len(name)) if 'T_MW' in str(name[i])][0]
 age = str(round(10**table[1][age_idx],3)) # 'AGE:' Gyr
 z_idx = [i for i in range(len(name)) if 'zmc' in str(name[i])][0]
@@ -50,10 +38,10 @@ mel_idx = [i for i in range(len(name)) if 'Z_MW' in str(name[i])][0]
 mel = str(round(10**table[1][mel_idx],3)) # 'Mel:' Z*/Z_sun
 
 #%%
-spec1d = pyfits.open("gsf_spec_12345.fits")  
+spec1d = pyfits.open("/Users/Dartoon/Astro/Packages/gsf/gsf/example/templates/gsf_spec_2033.fits")  
 name_spec = spec1d[1].columns
 table_spec = spec1d[1].data
-array_spec = np.zeros((len(table_spec), 15))
+array_spec = np.zeros((len(table_spec), 7))
 for i in range(len(table_spec)):
     array_spec[i, :] = table_spec[i]
 
