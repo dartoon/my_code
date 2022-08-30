@@ -12,4 +12,5 @@
 #PBS -q tiny
 
 cd /home/xuheng.ding/Astro/my_code/projects/2022_CEERS_checkup/real_analysis/model_JWST_stage3_Masafusa/
+source activate gsf
 python 4_sed_2Dmap_idark.py $PBS_ARRAY_INDEX 1
