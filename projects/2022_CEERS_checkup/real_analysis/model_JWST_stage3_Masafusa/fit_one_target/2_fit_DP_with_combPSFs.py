@@ -18,10 +18,11 @@ from galight.tools.astro_tools import plt_fits
 from galight.tools.measure_tools import measure_bkg
 import pickle
 import sys
+from galight.tools.measure_tools import mask_obj
 
-dp_files = glob.glob('fit_material/data_process_idx10_*_CombPsfsNO_*.pkl')
+dp_files = glob.glob('fit_material/data_process_id*F444W*_CombPsfsNO_*.pkl')
 dp_files.sort()
-f = open("../model_JWST_stage3_Masafusa/target_idx_info.txt","r")
+f = open("../target_idx_info.txt","r")
 string = f.read()
 lines = string.split('\n')   # Split in to \n
 
@@ -29,16 +30,15 @@ lines = string.split('\n')   # Split in to \n
 for i in range(len(dp_files)):
     file = dp_files[i]
     print(file)
-    idx = file.split('idx')[1].split('_')[0]
-    target_id = [lines[i].split(' ')[1] for i in range(len(lines)) if lines[i].split(' ')[0] == str(idx)][0]
+    # idx = file.split('idx')[1].split('_')[0]
+    target_id = 'SDSS_0'
     _data_process = pickle.load(open(file,'rb'))
     _data_process.noise_map = np.nan_to_num(_data_process.noise_map, nan=1000)
-    if int(idx) in [31, 32, 56]:
-        ps_pos = np.where(_data_process.target_stamp == _data_process.target_stamp.max())
-        ps_pos = (ps_pos[0][0] - _data_process.radius, ps_pos[1][0] - _data_process.radius)
-        ps_pos = [ps_pos[1], ps_pos[0]]
-    else:
-        ps_pos = _data_process.apertures[0].positions - _data_process.radius
+    target_stamp = _data_process.target_stamp 
+    mask = mask_obj(target_stamp, _data_process.apertures[:1], if_plot=False)
+    ps_pos = np.where(target_stamp == np.max(target_stamp * (1-mask[0])))
+    ps_pos = (ps_pos[0][0] - _data_process.radius, ps_pos[1][0] - _data_process.radius)
+    ps_pos = [ps_pos[1], ps_pos[0]]
     
     filename = dp_files[i].replace('data_process', 'fit_run')[:-4]+'_{0}.pkl'.format(i)
     fit_sepc = FittingSpecify(_data_process)

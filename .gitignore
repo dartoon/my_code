@@ -111,5 +111,7 @@ projects/2022_JWST_QSOz6/prep_use_HST_highRes/JWST_CEERS/*
 projects/2022_fit_Liu19_catalog/*.txt
 projects/2021_dual_AGN/proof2close_HSC_images_5band/z_over1/*/deep_fit_result/*
 *.json
-projects/2022_CEERS_checkup/real_analysis/esti_smass/*
+projects/2022_CEERS_checkup/real_analysis/_esti_smass/*
 projects/2022_CEERS_checkup/real_analysis/*/backup_files/*
+projects/2022_CEERS_checkup/real_analysis/_esti_smass/12345/plot_spec_filter.py
+projects/2022_CEERS_checkup/real_analysis/*/esti_smass/*

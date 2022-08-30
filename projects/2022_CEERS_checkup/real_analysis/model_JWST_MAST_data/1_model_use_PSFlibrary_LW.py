@@ -19,10 +19,10 @@ from galight.fitting_process import FittingProcess
 from galight.data_process import DataProcess
 from galight.tools.astro_tools import read_pixel_scale
 
-filt = 'f356w'
+filt = 'f444w'
 folder = '/Volumes/Seagate_Expansion_Drive/data_backup/CEERS_JWST_MAST_data/'
 filenames = glob.glob(folder+'/bkg_removed/*'+filt+'*.fits')
-targets_info = target_in_fits(filenames)
+targets_info = target_in_fits(filenames, root_folder='../')
 
 save_f = 'fit_result/'
 #Save targets_info manually.
@@ -48,7 +48,7 @@ from galight.tools.cutout_tools import psf_clean
 
 
 #%%
-fit_id = 11
+fit_id = 0
 create_mask = False
 for target_id, RA, Dec, z, file in targets_info[fit_id:fit_id+1]:
     print("Fit", fit_id, target_id)

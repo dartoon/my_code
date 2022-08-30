@@ -24,7 +24,7 @@ lines = lines[1:]
 
 remove_id = [24, 55]
 # for idx in range(59):    
-for idx in [10]:    
+for idx in [1]:    
     if idx in remove_id:
         continue
     line = lines[idx]
@@ -39,18 +39,20 @@ for idx in [10]:
         filt = data_process.filt
         PSF_lib_files = glob.glob('material/*'+filt[:-1]+'*_PSF_Library.pkl')[0]
         PSF_list, PSF_list_clean, PSF_RA_DEC_list, PSF_from_file_list = pickle.load(open(PSF_lib_files,'rb'))
-        for i in range(len(PSF_list_clean)):
-            psf = PSF_list_clean[i]
-            data_process.PSF_list = [psf]
-            pickle.dump(data_process , open('fit_material/'+'data_process_idx{2}_{0}_psf{1}.pkl'.format(filt, i, idx), 'wb'))
+        if filt == 'F444W':
+            for i in range(len(PSF_list_clean)):
+                psf = PSF_list_clean[i]
+                data_process.PSF_list = [psf]
+                pickle.dump(data_process , open('fit_material/'+'data_process_idx{2}_{0}_psf{1}.pkl'.format(filt, i, idx), 'wb'))
         
     for data_process in data_process_list_s:
         data_process.apertures = com_aper_s
         filt = data_process.filt
         PSF_lib_files = glob.glob('material/*'+filt[:-1]+'*_PSF_Library.pkl')[0]
         PSF_list, PSF_list_clean, PSF_RA_DEC_list, PSF_from_file_list = pickle.load(open(PSF_lib_files,'rb'))
-        for i in range(len(PSF_list_clean)):
-            psf = PSF_list_clean[i]
-            data_process.PSF_list = [psf]
-            pickle.dump(data_process , open('fit_material/'+'data_process_idx{2}_{0}_psf{1}.pkl'.format(filt, i, idx), 'wb'))
+        if filt == 'F200W':
+            for i in range(len(PSF_list_clean)):
+                psf = PSF_list_clean[i]
+                data_process.PSF_list = [psf]
+                pickle.dump(data_process , open('fit_material/'+'data_process_idx{2}_{0}_psf{1}.pkl'.format(filt, i, idx), 'wb'))
             

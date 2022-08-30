@@ -18,14 +18,14 @@ fit_run = pickle.load(open('40968511920540721/result-band-I.pkl','rb'))
 # fit_run.fitting_specify_class.plot_fitting_sets()
 # data_process = fit_run.fitting_specify_class.data_process_class
 
-# asy_class = Measure_asy(fit_run, seg_cal_reg = 'or', obj_id=0)
-# asy_class.asy_segm(mask_type='aper')
-# result = asy_class.find_pos()
-# print(result["x"])
-# plt_fits(asy_class.img,colorbar=True)
-# asy_class.make_bkg(rotate_pix = result["x"], if_remeasure_bkg=False ,)
-# asy = asy_class.cal_asymmetry(rotate_pix = result["x"], if_plot=True, if_plot_bkg=True)
-# print('asymmetry :', asy)
+asy_class = Measure_asy(fit_run, seg_cal_reg = 'or', obj_id=0)
+asy_class.asy_segm(mask_type='aper')
+result = asy_class.find_pos()
+print(result["x"])
+plt_fits(asy_class.img,colorbar=True)
+asy_class.make_bkg(rotate_pix = result["x"], if_remeasure_bkg=False ,)
+asy = asy_class.cal_asymmetry(rotate_pix = result["x"], if_plot=True, if_plot_bkg=True)
+print('asymmetry :', asy)
 
 from galight.tools.asymmetry_tools import CAS
 CAS_class = CAS(fit_run, seg_cal_reg = 'or', obj_id=0, rm_ps=False)

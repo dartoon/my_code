@@ -28,8 +28,13 @@ from galight.tools.cutout_tools import cutout
 import warnings
 warnings.filterwarnings("ignore")
 
+import sys
+sys.path.insert(0,'..')
+from def_functions import RA_Dec_in_fit
+
 #%%
-shift_list = pickle.load(open('material/jwst_shift_list.pkl','rb')) #For fov shift
+shift_info_list = pickle.load(open('material/jwst_shift_list.pkl','rb')) #For fov shift
+
 #load HST
 HST_folder = '/Volumes/Seagate_Expansion_Drive/data_backup/CEERS_data/CEERS_HST_data/'
 HST_all_files= glob.glob(HST_folder+'/egs_all_wfc3_ir_f160w_030mas_v1.9_drz.fits')  #For NIRCam
@@ -38,9 +43,21 @@ fov_image_HST = HST_fitsFile[0].data # check the back grounp
 header_HST = HST_fitsFile[0].header # if target position is add in WCS, the header should have the wcs information, i.e. header['EXPTIME']
 # plt_fits(fov_image[14000:14000+8000,19000:19000+8000])
 
+
 #%%
 ignore_id = [10, 21, 30, 31,  41, 46, 47, 49, 52, 56]
 remove_id = [24, 55]
+
+#%%Check how many in NIRCam2_F200W.
+# #Find that idx 0 3 4 5 6 7 8 9 10 11 12 13 14 may have target data problem.
+# for idx in range(len(shift_info_list)):
+#     if idx in remove_id:
+#         continue
+#     if shift_info_list[idx]:
+#         if 'NIRCam2_F200W_1_i2d_rmbkg.fits' in shift_info_list[idx][2]:
+#             print(idx)
+
+#%%
 #Load JWST
 folder = '/Volumes/Seagate_Expansion_Drive/data_backup/CEERS_data/CEERS_JWST_Masafusa/bkg_removed/'
 # jwst_all_filenames = glob.glob(folder+'/bkg_removed/'+'*.fits')
@@ -51,8 +68,15 @@ result_folder = 'fit_result/'
 lines = lines[1:]
 # for line in enumerate(lines[2:]):
 # for idx in range(len(lines)):
+cid = 0
 
-cid = 1
+filenames = glob.glob(folder+'*.fits')
+# remove_i = [i for i in range(len(filenames)) if 'NIRCam2_F' in filenames[i]][0]
+filenames = [filenames[i] for i in range(len(filenames)) if 'NIRCam2_F200W' not in filenames[i]]
+filenames = [filenames[i] for i in range(len(filenames)) if 'NIRCam2_F444W' not in filenames[i]]
+
+#%%
+
 for idx in range(cid,cid+1):
 # for idx in range(cid,59):
     cut_kernel = None
@@ -61,23 +85,27 @@ for idx in range(cid,cid+1):
     line = lines[idx]
     target_id, RA, Dec, spec_z, photo_z = line.split(' ')
     RA, Dec, spec_z, photo_z = float(RA), float(Dec), float(spec_z), float(photo_z)
-    files_list = shift_list[idx][2]
-    # shift_list[idx][0][-1][0] = shift_list[idx][0][-1][0] - 10 #!!!
-    # shift_list[idx][0][-1][1] = shift_list[idx][0][-1][1] + 5 #!!!
+    # files_list = shift_info_list[idx][2]
+
+    files_list = RA_Dec_in_fit(all_files=filenames, RA=float(RA), Dec=float(Dec))
+    
+    # shift_info_list[idx][0][-1][0] = shift_info_list[idx][0][-1][0] - 10 #!!!
+    # shift_info_list[idx][0][-1][1] = shift_info_list[idx][0][-1][1] + 5 #!!!
     # cut_kernel = 'nearest_obj_center'
     # filters = [files_list[i].split('NIRCam')[1][2:7] for i in range(len(files_list))]
     filters = []
     cut_RA, cut_Dec = RA, Dec
     data_process_list_l, data_process_list_s = [], []
     for i in range(len(files_list))[::-1]:  #Start with the reddest filter.
-        cut_kernel = None #After pos correct then, do the nearest_obj_center
+        # cut_kernel = None #After pos correct then, do the nearest_obj_center
+        cut_kernel = 'nearest_obj_center' #After pos correct then, do the nearest_obj_center
         # if i == 0:
         #     cut_kernel = None
         file = files_list[i]
-        filt = file.split('NIRCam')[1][2:7]
+        filt = file.split('_1_i2d')[0][-5:]
         filters.append(filt)
         print("Loading...,", 'idx', idx, file)
-        _fitsFile = pyfits.open(folder+file)
+        _fitsFile = pyfits.open(file)
         fov_image = _fitsFile[1].data # check the back grounp
         header = _fitsFile[1].header # if target position is add in WCS, the header should have the wcs information, i.e. header['EXPTIME']
         # flux_mjsr = header['PHOTMJSR']
@@ -102,7 +130,7 @@ for idx in range(cid,cid+1):
                                    if_plot=False, zp = zp, exptime= exp_map, 
                                    fov_noise_map = None)
         if idx not in ignore_id:
-            data_process.target_pos = data_process.target_pos - np.array(shift_list[idx][0][i]) + np.array(shift_list[idx][0][-1]) * exppix
+            data_process.target_pos = data_process.target_pos - np.array(shift_info_list[idx][0][i]) + np.array(shift_info_list[idx][0][-1]) * exppix
         #estimate local bkg and remove:
         data_process.generate_target_materials(radius=145 * expsize, skip = False,
                                                 cut_kernel = cut_kernel, 

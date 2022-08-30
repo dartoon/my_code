@@ -30,14 +30,19 @@ exp_map = exp * wht/mean_wht
 from galight.data_process import DataProcess
 data_process = DataProcess(fov_image = fov_image, target_pos = [1142., 637.], pos_type = 'pixel', header = header,
                           rm_bkglight = False, exptime = exp_map, if_plot=False, zp = 27.0)
-data_process.generate_target_materials(radius=65, create_mask = True, nsigma=2.8, if_select_obj=True,
+data_process.generate_target_materials(radius=65, create_mask = True, nsigma=2.8, if_select_obj=False,
                                       exp_sz= 1.2, npixels = 15, if_plot=True)
 
 
 #%%PSF works.
-data_process.find_PSF(radius = 30, user_option = True)
+data_process.find_PSF(radius = 30, user_option = True, if_filter=True, nearyby_obj_filter=True)
 # data_process.find_PSF(radius = 50, PSF_pos_list = [[ 350., 1055.], [2078., 1910.]], user_option = False)
-data_process.plot_overview(label = 'Example', target_label = None)
+# data_process.plot_overview(label = 'Example', target_label = None)
+
+#%%
+# from galight.tools.measure_tools import stack_PSF
+# epsf = stack_PSF(data_process.fov_image, data_process.PSF_pos_list, psf_size=len(data_process.PSF_list[0]))
+data_process.stack_PSF()
 
 #%%
 data_process.profiles_compare(norm_pix = 5, if_annuli=False, y_log = False, radius = 60,
@@ -64,18 +69,18 @@ fit_sepc.plot_fitting_sets()
 
 #%%Setting the fitting method and run.
 from galight.fitting_process import FittingProcess
-fit_run = FittingProcess(fit_sepc, savename = 'savename', fitting_level=['norm','norm', 'deep'])
-fit_run.run(algorithm_list = ['PSO','PSO', 'PSO'])
+fit_run = FittingProcess(fit_sepc, savename = 'savename', fitting_level=['norm','norm'])
+fit_run.run(algorithm_list = ['PSO','PSO', ])
             # setting_list = [{'sigma_scale': 1., 'n_particles': 100, 'n_iterations': 100}, {'n_burn': 100, 'n_run': 100, 'walkerRatio': 10,'sigma_scale': .1}])
 fit_run.plot_all()
 
-# fit_run.dump_result()
-# print(fit_run.final_result_galaxy[0])
+# # fit_run.dump_result()
+# # print(fit_run.final_result_galaxy[0])
 
-# #%%
-# # Test load pkl
-# import pickle
-# picklename = 'savename.pkl'
-# fitting_run_class = pickle.load(open(picklename,'rb'))
-# fitting_run_class.run_diag()
+# # #%%
+# # # Test load pkl
+# # import pickle
+# # picklename = 'savename.pkl'
+# # fitting_run_class = pickle.load(open(picklename,'rb'))
+# # fitting_run_class.run_diag()
 

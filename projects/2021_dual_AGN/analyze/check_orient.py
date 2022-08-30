@@ -35,7 +35,7 @@ def draw_line(x, y, angle):
 #   '220642.82+003016.2',
 #  # '230402.77-003855.4'
 #  ][0]
-for ID in ID_list:
+for ID in ID_list[8:9]:
 # for ID in [ID]:
     adding_ori = 0
     if ID == '022906.04-051428.9':
@@ -51,7 +51,7 @@ for ID in ID_list:
     if ID == '122144.31-004144.1':
         adding_ori = 0 #- 30
     if ID == '162501.98+430931.6':
-        adding_ori = 0 +8 # To avoid the left source
+        adding_ori = 0 + 8  # To avoid the left source
     pair_ori = cal_oreination(ID)
     APT_orie_1 = pair_ori+135
     APT_orie_1 = round(APT_orie_1) + adding_ori  #The value to input to APT to get the aperture ori as shown

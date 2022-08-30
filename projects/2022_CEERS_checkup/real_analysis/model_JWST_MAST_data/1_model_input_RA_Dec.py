@@ -10,6 +10,8 @@ import numpy as np
 import astropy.io.fits as pyfits
 import matplotlib.pyplot as plt
 import glob
+import sys
+sys.path.insert(0,'..')
 from def_functions import target_in_fits, RA_Dec_in_fit
 import pickle
 from galight.fitting_specify import FittingSpecify
@@ -18,7 +20,7 @@ from galight.data_process import DataProcess
 from galight.tools.astro_tools import read_pixel_scale
 from galight.tools.cutout_tools import psf_clean
 
-datafolder = '/Volumes/Seagate_Expansion_Drive/data_backup/CEERS_JWST_MAST_data/'
+datafolder = '/Volumes/Seagate_Expansion_Drive/data_backup/CEERS_data/CEERS_JWST_MAST_data'
 save_f = 'output/'
 create_mask = False
 # target_id = 'aegis_509'
@@ -27,9 +29,13 @@ create_mask = False
 # target_id = 'aegis_511'
 # RA, Dec = 214.89561, 52.856516
 
-filters =  ['f115w', 'f200w', 'f277w', 'f410m', 'f444w']
+target_id = 'SDSS1419+5254'
+RA, Dec = 214.9316, 52.90871
+
+filters =  ['f200w']
 for filt in filters:
-    filenames = glob.glob(datafolder+'/bkg_removed/*'+filt+'*.fits')
+    # filenames = glob.glob(datafolder+'/bkg_removed/*'+filt+'*.fits')
+    filenames = glob.glob(datafolder+'/*-f200w/*f200w_i2d.fits')
     #%% Plot the PSF library
     # PSF_lib_files = glob.glob('material/'+filt+'*_PSF_info.pkl')
     # PSF_list = []
@@ -44,9 +50,9 @@ for filt in filters:
     #     plt_fits(psf)
     
     #%%
-    
     print("Fit", target_id)
-    file = RA_Dec_in_fit(all_files=filenames, RA=RA, Dec=Dec)
+    file = RA_Dec_in_fit(all_files=filenames, RA=RA, Dec=Dec)[0]
+    #%%
     fitsFile = pyfits.open(file)
     
     fov_image = fitsFile[1].data # check the back grounp
@@ -59,7 +65,7 @@ for filt in filters:
     gain_value = 1.8
     exp_map = exp * wht/wht.max() / flux_mjsr * gain_value
     data_process = DataProcess(fov_image = fov_image, target_pos = [RA, Dec], pos_type = 'wcs', header = header,
-                              rm_bkglight = False, if_plot=False, zp = zp, exptime= exp_map )
+                              rm_bkglight = True, if_plot=False, zp = zp, exptime= exp_map )
     data_process.generate_target_materials(radius=None, create_mask = create_mask, nsigma=2.8, 
                                            cut_kernel = 'center_bright', if_select_obj=False,
                                           exp_sz= 1.2, npixels = 80, contrast = 0.01, if_plot=False, )

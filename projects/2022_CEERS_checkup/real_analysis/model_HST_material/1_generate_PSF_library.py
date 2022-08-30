@@ -17,15 +17,22 @@ from galight.tools.astro_tools import plt_many_fits
 from astropy.wcs import WCS
 import pickle
 folder = '/Volumes/Seagate_Expansion_Drive/data_backup/CEERS_data/CEERS_HST_data/'
-all_files= glob.glob(folder+'/egs_all_wfc3_ir_*_030mas_v1.9_drz.fits')  #For NIRCam
+# all_files= glob.glob(folder+'/egs_all_wfc3_ir_*_030mas_v1.9_drz.fits')  #For IR
+all_files= glob.glob(folder+'/egs_all_acs_wfc*_030mas_v1.9_drz.fits')  #For ACS
 all_files.sort()
 
-i = 3
+#%%
+i = 0
 
 fitsFile = pyfits.open(all_files[i])
 fov_image = fitsFile[0].data # check the back grounp
 header = fitsFile[0].header # if target position is add in WCS, the header should have the wcs information, i.e. header['EXPTIME']
-filt = header['filter']
+if i == 0:
+    filt = header['FILTER1']
+else:
+    filt = header['FILTER2']
+# filt = header['filter']
+#%%
 # plt_fits(fov_image[14000:14000+8000,19000:19000+8000])
 
 data_process = DataProcess(fov_image = fov_image, target_pos = [100, 100], 

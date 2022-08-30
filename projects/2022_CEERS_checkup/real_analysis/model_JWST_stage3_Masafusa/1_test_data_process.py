@@ -27,9 +27,12 @@ from galight.tools.plot_tools import plot_data_apertures_point
 from galight.tools.cutout_tools import cutout
 import warnings
 warnings.filterwarnings("ignore")
+from galight.fitting_specify import FittingSpecify
+from galight.fitting_process import FittingProcess
 
 #%%
 shift_list = pickle.load(open('material/jwst_shift_list.pkl','rb')) #For fov shift
+
 #load HST
 HST_folder = '/Volumes/Seagate_Expansion_Drive/data_backup/CEERS_data/CEERS_HST_data/'
 HST_all_files= glob.glob(HST_folder+'/egs_all_wfc3_ir_f160w_030mas_v1.9_drz.fits')  #For NIRCam
@@ -52,7 +55,7 @@ lines = lines[1:]
 # for line in enumerate(lines[2:]):
 # for idx in range(len(lines)):
 
-cid = 1
+cid = 35
 for idx in range(cid,cid+1):
 # for idx in range(cid,59):
     cut_kernel = None
@@ -69,7 +72,7 @@ for idx in range(cid,cid+1):
     filters = []
     cut_RA, cut_Dec = RA, Dec
     data_process_list_l, data_process_list_s = [], []
-    for i in range(len(files_list))[::-1]:  #Start with the reddest filter.
+    for i in range(len(files_list))[-1:]:  #Start with the reddest filter.
         cut_kernel = None #After pos correct then, do the nearest_obj_center
         # if i == 0:
         #     cut_kernel = None
@@ -118,7 +121,6 @@ for idx in range(cid,cid+1):
         plt_fits(fov_cutout)
         
         bkglight = measure_bkg(fov_cutout, if_plot=False) # Remove bkg light
-        
         data_process.generate_target_materials(radius=45 * expsize, create_mask = False, nsigma=2.0, 
                                                 cut_kernel = None, if_select_obj=False,
                                               exp_sz= 1.2, npixels = 100 * expsize, if_plot=False, bkg_std= bkg_std)
@@ -129,8 +131,8 @@ for idx in range(cid,cid+1):
         ct = int((len(bkglight) - len(data_process.target_stamp ))/2)
         data_process.target_stamp = data_process.target_stamp - bkglight[ct:-ct, ct:-ct]
 
-        del data_process.fov_image
-        del data_process.exptime
+        # del data_process.fov_image
+        # del data_process.exptime
         print('idx', idx, target_id, filt, 'apertures', len(data_process.apertures) )
         data_process.filt = filt
         data_process.file = file
@@ -177,13 +179,21 @@ for idx in range(cid,cid+1):
         shift = (cut_RA - float(RA))*3600/_data_process.deltaPix , (cut_Dec-float(Dec))*3600/_data_process.deltaPix
         print('SW shift',data_process_list_s[i].filt , shift)
     
-    print("Above are for the", 'idx:', idx, target_id, 'filts:', filters)
+    fit_sepc = FittingSpecify(_data_process)
+    fit_sepc.prepare_fitting_seq(point_source_num = 1, supersampling_factor = 3) #, fix_n_list= [[0,4],[1,1]])
+    fit_sepc.kwargs_params['lens_light_model'][3][0]['R_sersic'] = 0.06
+    fit_sepc.build_fitting_seq()
+    fit_run = FittingProcess(fit_sepc, savename = target_id, fitting_level=['norm','deep'])
+    fit_run.run(algorithm_list = ['PSO','PSO'])
+    fit_run.plot_final_qso_fit(target_ID =target_id)
+    
+    # print("Above are for the", 'idx:', idx, target_id, 'filts:', filters)
     
     
-    hold = input('Hold ... OK?\n')
-    if hold == '!':
-        break
-    pickle.dump([[data_process_list_l, com_aper_l], [data_process_list_s, com_aper_s] ], open('material/'+'data_process+apertures_{0}.pkl'.format(idx), 'wb'))
+    # hold = input('Hold ... OK?\n')
+    # if hold == '!':
+    #     break
+    # pickle.dump([[data_process_list_l, com_aper_l], [data_process_list_s, com_aper_s] ], open('material/'+'data_process+apertures_{0}.pkl'.format(idx), 'wb'))
     
-    import shutil
-    shutil.copyfile('1_generate_data_process.py', 'backup_files/1_generate_data_process_idx{0}.py'.format(idx))
+    # import shutil
+    # shutil.copyfile('1_generate_data_process.py', 'backup_files/1_generate_data_process_idx{0}.py'.format(idx))

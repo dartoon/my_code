@@ -13,7 +13,8 @@ import glob
 import pickle
 import copy
 
-files = glob.glob('fit_material/data_process_idx10_*_psf*.pkl')
+# files = glob.glob('fit_material/data_process_idx0_*_psf*.pkl')
+files = glob.glob('fit_material/data_process_idx1_F200W_psf*.pkl')
 files.sort()
 collect_info = []
 for i in range(len(files)):
@@ -41,7 +42,7 @@ for count in range(len(collect_info)):
     item = collect_info[count]
     fit_run_list = []
     idx, filt= item
-    fit_files = glob.glob('fit_material/fit_run_idx{0}_{1}_*.pkl'.format(idx, filt))
+    fit_files = glob.glob('fit_material/fit_run_idx{0}_{1}_psf*.pkl'.format(idx, filt))
     fit_files.sort()
     warn_strs = ['F115W_psf6', 'F150W_psf7', 'F277W_psf2']
     for warn_str in warn_strs:

@@ -24,19 +24,19 @@ result_folder = 'fit_result/'
 lines = lines[1:]
 
 
-zp_list = {'F105W':26.264, 'F125W':26.232, 'F140W':26.450, 'F160W':25.936}
-
+zp_list = {'F606W':26.489, 'F814W':25.937, 'F105W':26.264, 'F125W':26.232, 'F140W':26.450, 'F160W':25.936}
 
 remove_id = [24, 55]
 
-for idx in range(len(lines)):    
+# for idx in range(len(lines)):   
+for idx in [0, 1, 2, 28, 35, 51]:  #z_spec > 1.6
     if idx in remove_id:
         continue
     line = lines[idx]
     target_id, RA, Dec, spec_z, photo_z = line.split(' ')
     print(idx, target_id, RA, Dec)
     RA, Dec, spec_z, photo_z = float(RA), float(Dec), float(spec_z), float(photo_z)
-    HST_data_process_list = pickle.load(open('material/data_process+apertures_{0}.pkl'.format(idx),'rb'))
+    HST_data_process_list = pickle.load(open('material/data_process+apertures_{0}_ACS.pkl'.format(idx),'rb'))
     [[data_process_list, com_aper]]  = HST_data_process_list
     for data_process in data_process_list:
         data_process.apertures = com_aper

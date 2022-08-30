@@ -13,12 +13,12 @@ import glob
 import pickle
 import copy
 
-files = glob.glob('fit_material/data_process_idx10_*_psf*.pkl')
+files = glob.glob('fit_material/data_process_id*_psf*.pkl')
 files.sort()
 collect_info = []
 for i in range(len(files)):
     _file = files[i]
-    idx_info = _file.split('idx')[1].split('_')[0]
+    idx_info = _file.split('id')[1].split('_')[0]
     filt_info = _file.split('_psf')[0].split('_')[-1]
     this_info = [idx_info, filt_info]
     if this_info not in collect_info:
@@ -41,7 +41,7 @@ for count in range(len(collect_info)):
     item = collect_info[count]
     fit_run_list = []
     idx, filt= item
-    fit_files = glob.glob('fit_material/fit_run_idx{0}_{1}_*.pkl'.format(idx, filt))
+    fit_files = glob.glob('fit_material/fit_run_id*{0}_*.pkl'.format(filt))
     fit_files.sort()
     warn_strs = ['F115W_psf6', 'F150W_psf7', 'F277W_psf2']
     for warn_str in warn_strs:
@@ -62,7 +62,7 @@ for count in range(len(collect_info)):
         _data_process.stack_PSF(if_plot = False, tool = 'psfr')
         if ct >8:
             ct = 'all'
-        pickle.dump(_data_process , open('fit_material/'+'data_process_idx{0}_{2}_CombPsfsNO_{1}.pkl'.format(idx, ct, filt), 'wb'))
+        pickle.dump(_data_process , open('fit_material/'+'data_process_id{0}_{2}_CombPsfsNO_{1}.pkl'.format(idx, ct, filt), 'wb'))
         
     if if_printshow==True:
         fit_run = fit_run_list[idx_counts[0]]

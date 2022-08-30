@@ -15,34 +15,66 @@ import glob
 
 remove_id = [24, 55]
 
-# for idx in range(11,70):
-# for idx in [0, 2, 8, 28, 35, 51]:
-for idx in [31, 32, 56]:
+#!!! 0 141943.58+525431.3 214.93160692630738 52.90871362182564 3.442 -99
+#!!! 1 142005.59+530036.7 215.0233219305857 53.01020458328741 1.646 -99
+#!!! 2 142008.61+530004.0 215.03590035000232 53.00111935271983 2.588 -99
+
+#### 8 aegis_585 214.93166 52.908708 3.435 3.364  #Same as idx 0
+#### 26 aegis_742 215.02339 53.010207 1.644 1.74  # Same as SDSS idx 1
+#### 28 aegis_463 214.7768 52.825876 2.274 2.24  #A type 2
+#!!! 35 aegis_482 214.75522 52.836795 3.465 3.345
+#!!! 51 aegis_477 214.87073 52.833117 2.317 2.136
+
+#### 29 aegis_465 214.74245 52.826187 -99.0 3.019 #Photoz>3
+#### 53 aegis_495 214.87124 52.845067 -99.0 3.422 #Photoz>3
+
+# for idx in range(1,2):
+# for idx in [31, 32, 56]:   #JWST PS position corrected
+# for idx in [0, 2, 8, 28, 35, 51]:  #z_spec > 2
+# for idx in [29, 53]:  #z_spec > 2
+
+
+result = []
+# for idx in [0, 1, 2, 35, 51]:  #z_spec > 1.6, QSO 
+for idx in [35]:  #z_spec > 1.6
+# for idx in [2]:  #z_spec > 1.6
     if idx in remove_id:
         continue
     else:
-        files = glob.glob('../*/fit_material/data_process_idx{0}_*_psf*.pkl'.format(idx))
+        files = glob.glob('../*/*fit_material/data_process_idx{0}_*_psf*.pkl'.format(idx))
+        # files = glob.glob('./*fit_material/data_process_idx{0}_*_psf*.pkl'.format(idx))
         files.sort()
+        # file_ACS = glob.glob('../model_HST_material/material/data_process+apertures_{0}_ACS.pkl'.format(idx))
+        # file_WFC= glob.glob('../model_HST_material/material/data_process+apertures_{0}_IR.pkl'.format(idx))
+        # file_JWST = glob.glob('../model_JWST_stage3_Masafusa/material/data_process+apertures_{0}.pkl'.format(idx))
         
-        collect_info = []
+        _collect_info = []
         for i in range(len(files)):
             _file = files[i]
             idx_info = _file.split('idx')[1].split('_')[0]
             filt_info = _file.split('_psf')[0].split('_')[-1]
             this_info = [idx_info, filt_info]
-            if this_info not in collect_info:
-                collect_info.append(this_info)
+            if this_info not in _collect_info:
+                _collect_info.append(this_info)
         
+        filters = [_collect_info[i][1] for i in range(len(_collect_info))]
+        if 'F814W' in filters:
+            filters = ['F814W'] + [filters[i] for i in range(len(filters)) if filters[i]!='F814W' ]
+        if 'F606W' in filters:
+            filters = ['F606W'] + [filters[i] for i in range(len(filters)) if filters[i]!='F606W' ]
+        
+            
         f = open("../model_JWST_stage3_Masafusa/target_idx_info.txt","r")
         string = f.read()
         lines = string.split('\n')   # Split in to \n
         target_id = [lines[i].split(' ')[1] for i in range(len(lines)) if lines[i].split(' ')[0] == str(idx)][0]
         
-        for count in range(len(collect_info)):
-            item = collect_info[count]
+        for count in range(len(filters)):
             fit_run_list = []
-            idx, filt= item
-            fit_files = glob.glob('../model_JWST_stage3_Masafusa/fit_material/fit_run_idx{0}_{1}_*.pkl'.format(idx, filt))+\
+            idx = idx_info
+            filt = filters[count]
+            # idx, filt= item
+            fit_files = glob.glob('./*fit_material/fit_run_idx{0}_{1}_*.pkl'.format(idx, filt))+\
                         glob.glob('../model_HST_material/fit_material/fit_run_idx{0}_{1}_*.pkl'.format(idx, filt))
             fit_files.sort()
             warn_strs = ['F115W_psf6', 'F150W_psf7', 'F277W_psf2']
@@ -58,7 +90,7 @@ for idx in [31, 32, 56]:
             if 'HST_material' in fit_files[0]:
                 weight = np.zeros(len(chisqs))
                 weight[sort_Chisq[0]] = 1
-            elif 'JWST_stage3' in fit_files[0]:
+            else:
                 count_n = 5
                 Chisq_best = chisqs[sort_Chisq[0]]
                 Chisq_last= chisqs[sort_Chisq[count_n-1]]
@@ -67,19 +99,30 @@ for idx in [31, 32, 56]:
                 for i in sort_Chisq[:count_n]:
                     weight[i] = np.exp(-1/2. * (chisqs[i]-Chisq_best)/(Chisq_best* inf_alp))
             fit_run = fit_run_list[sort_Chisq[0]]
-            fit_run.plot_final_qso_fit(target_ID = target_id+'-'+filt)
+            if idx == '35' and filt == 'F444W':  #!!!
+                fit_run = fit_run_list[sort_Chisq[3]]
+            if idx == '0' and filt == 'F444W':  #!!!
+                fit_run = fit_run_list[sort_Chisq[1]]
+            fit_run.plot_final_qso_fit(target_ID = target_id+'$-$'+filt)
+            # target_id = 'SDSS1420+5300'
+            # fit_run.savename = 'outcomes/'+'ID' + idx + '_' + filt
+            # fit_run.plot_final_qso_fit(target_ID = target_id+'$-$'+filt, save_plot= True)
             
-            prop_name = 'n_sersic'
+            prop_name = 'R_sersic'
+            # all_values = [fit_run_list[i].final_result_ps[0][prop_name] for i in range(len(fit_run_list))]
             all_values = [fit_run_list[i].final_result_galaxy[0][prop_name] for i in range(len(fit_run_list))]
             weighted_value = np.sum(np.array(all_values)*weight) / np.sum(weight)
             rms_value = np.sqrt(np.sum((np.array(all_values)-weighted_value)**2*weight) / np.sum(weight))
             
+            result.append([filt, fit_run.fitting_specify_class.zp, weighted_value, rms_value])
+            
             host_flux = fit_run.final_result_galaxy[0]['flux_within_frame']
             AGN_flux = fit_run.final_result_ps[0]['flux_within_frame']
             ratio = host_flux/(host_flux+AGN_flux)
+            print(fit_run.final_result_galaxy)
             print(prop_name, round(weighted_value,2), '+-', round(rms_value,2))
             print('Chisqs top 2', round(chisqs[sort_Chisq[0]],2), round(chisqs[sort_Chisq[1]],2))
-            print_s ='idx: '+ item[0]+' '+item[1]+' ratio: ' + str(round(ratio,2)) +" OK? \n\n\n"
+            print_s =filt +' ratio: ' + str(round(ratio,2)) + "\n\n\n"
             print(fit_files[sort_Chisq[0]])
             print(print_s)
             # hold = input(print_s)
