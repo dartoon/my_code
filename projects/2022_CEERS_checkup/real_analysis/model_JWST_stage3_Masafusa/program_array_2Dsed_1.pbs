@@ -1,11 +1,11 @@
 #!/bin/bash
-#PBS -N sed_2d
+#PBS -N sed_2d_1
 #PBS -o /home/xuheng.ding/Astro/my_code/projects/2022_CEERS_checkup/real_analysis/model_JWST_stage3_Masafusa/pbs/
 #PBS -e /home/xuheng.ding/Astro/my_code/projects/2022_CEERS_checkup/real_analysis/model_JWST_stage3_Masafusa/pbs/
 #PBS -l nodes=1:ppn=1
 #PBS -l walltime=01:50:00
 #PBS -l mem=200mb
-#PBS -J 1-5000:1
+#PBS -J 5000-10610:1
 #PBS -u xuheng.ding
 #PBS -m ae
 #PBS -V
