@@ -13,7 +13,8 @@ import pickle
 from functions_for_result import esti_smass, load_prop, load_info
 import glob
 import os # Delete xfile.txt
-
+import matplotlib
+matplotlib.use('TkAgg')
 import sys
 count = int(sys.argv[1]) - 1 # 1 - 10610
 flag = int(sys.argv[2])
