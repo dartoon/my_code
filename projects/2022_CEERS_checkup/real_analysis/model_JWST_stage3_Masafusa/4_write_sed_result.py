@@ -17,7 +17,7 @@ steller_files = glob.glob('esti_smass/20220902*/SFH_*.fits')
 steller_files.sort()
 for steller_file in steller_files:
     hdul = pyfits.open(steller_file)
-    count = steller_file.split('20220830')[1].split('/')[0]
+    count = steller_file.split('20220902')[1].split('/')[0]
     info = hdul[0].header 
     smass = info['Mstel_50']
     sfr = info['SFR_50']
