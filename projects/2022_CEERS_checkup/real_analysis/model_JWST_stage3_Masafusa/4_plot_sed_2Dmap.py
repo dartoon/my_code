@@ -103,8 +103,9 @@ for i in range(len(run_filt_list)):
 target_id, z = load_info(idx)
 import pickle
 from matplotlib.colors import LogNorm      
-sed_2d_info = pickle.load(open('sed_2d_info_bin4.pkl','rb'))
-f = open("sed_2d_result_bin4.txt","r")
+bin_info = '_bin2'
+sed_2d_info = pickle.load(open('sed_2d_info{0}.pkl'.format(bin_info),'rb'))
+f = open("sed_2d_result{0}.txt".format(bin_info),"r")
 string = f.read()
 lines = string.split('\n')   # Split in to \n
 size = int(np.sqrt(len(sed_2d_info)))
@@ -175,12 +176,16 @@ rgb_default = make_lupton_rgb(image_list[0][1:-1,1:-1], image_list[1][1:-1,1:-1]
                               image_list[2][1:-1,1:-1], Q=8, stretch=0.2)
 # plt.imshow(rgb_default, origin='lower')
 # plt.show()
+if bin_info != '':
+    dvd_info = int(bin_info[-1])
+else:
+    dvd_info = 1
 
 from galight.tools.measure_tools import mask_obj
 from photutils import EllipticalAperture
-aper = EllipticalAperture([len(smass_image)/2, len(smass_image)/2], 45/4, 45/4, theta=0)
+aper = EllipticalAperture([len(smass_image)/2, len(smass_image)/2], 45/dvd_info, 45/dvd_info, theta=0)
 mask1 = 1- mask_obj(smass_image, [aper])[0]
-aper = EllipticalAperture([len(smass_image)/2, len(smass_image)/2], 4/4, 4/4, theta=0)
+aper = EllipticalAperture([len(smass_image)/2, len(smass_image)/2], 4/dvd_info, 4/dvd_info, theta=0)
 mask2 = mask_obj(smass_image, [aper])[0]
 mask = mask1 * mask2
 
@@ -266,7 +271,7 @@ target_id, z = load_info(idx = 1)
 z = float(z)
 
 deltaPix = fit_run_dict['F356W'].fitting_specify_class.deltaPix
-deltaPix = deltaPix * 4
+deltaPix = deltaPix * dvd_info
 from astropy.cosmology import FlatLambdaCDM
 cosmo = FlatLambdaCDM(H0=70, Om0=0.3)
 scale_relation = cosmo.angular_diameter_distance(z).value * 10**3 * (1/3600./180.*np.pi)  #Kpc/arc

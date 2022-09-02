@@ -51,7 +51,7 @@ for i_filt, filt in enumerate(filt_list):
     scale_list = [1] * len(prf_list)
     grids = 20  
     norm_pix = 3 
-    if_annuli=False
+    if_annuli=True
     y_log=False
     x_gridspace = None
     hide_axes=False
@@ -95,11 +95,11 @@ for i_filt, filt in enumerate(filt_list):
     axs[_i][_j].tick_params(which='minor', length=4, color='r', direction='in')
     axs[_i][_j].text(2, 1.6,filt, fontsize=25)
     if _i == 0:
-        axs[_i][_j].set_xlim([1.7, 7.5])
+        axs[_i][_j].set_xlim([1.7, 6])
         axs[_i][_j].set_ylim([0.1, 1.8])
     if _i == 1:
         axs[_i][_j].set_xlim([1.7, 5.9])
-        axs[_i][_j].set_ylim([0.3, 1.8])
+        axs[_i][_j].set_ylim([0.1, 1.8])
     
     if _i == 1:
         axs[_i][_j].set_xlabel("Pixels", fontsize=20)

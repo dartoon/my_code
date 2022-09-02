@@ -22,6 +22,8 @@ flag = int(sys.argv[2])
 idx = 1
 target_id, z = load_info(idx)
 sed_2d_info = pickle.load(open('sed_2d_info_bin2.pkl','rb'))
+
+#%%
 mag_dict = sed_2d_info[count][2]
 esti_smass(ID = '20220903'+str(int(count)), mags_dict = mag_dict, z = z, flag = flag, if_run_gsf=True)
 folder = 'esti_smass/20220903'+str(count)

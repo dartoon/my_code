@@ -107,7 +107,9 @@ run_idx_list = [l_idx] + [i for i in range(len(use_filt)) if i != l_idx]
 image_list = [None] * len(use_filt)
 for i in run_idx_list:
     fit_run = fit_run_list[i]
-    img_org = fit_run.flux_2d_out['data-Point Source'] - np.sum(fit_run.image_host_list[1:], axis = 0 )
+    img_org = fit_run.flux_2d_out['data-Point Source'] 
+    if len(fit_run.image_host_list) == 3:
+        img_org = img_org - fit_run.image_host_list[1]
     # img_org = fit_run.flux_2d_out['model']
     if shift_center == True:
         if hasattr(fit_run, 'final_result_ps'):
@@ -145,7 +147,7 @@ for i, image in enumerate(image_list):
 image_list = [image_list[i] * 10 ** (-0.4*(zp_list[i]-zp_list[0])) for i in range(3) ]
     
 from galight.tools.astro_tools import plt_fits_color
-# pickle.dump(image_list, open('color_image'+'.pkl', 'wb'))  
+pickle.dump(image_list, open('color_image'+'.pkl', 'wb'))  
 
 plt_fits_color(image_list, Q=8, stretch=0.2)
 

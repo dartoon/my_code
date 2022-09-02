@@ -93,6 +93,7 @@ for i in range(len(files)):
 if_printshow = True
 result= []
 for count in range(len(collect_info)):
+# for count in [5]:
     item = collect_info[count]
     fit_run_list = []
     idx, filt= item
@@ -121,12 +122,17 @@ for count in range(len(collect_info)):
     for i in sort_Chisq[:count_n]:
         weight[i] = np.exp(-1/2. * (chisqs[i]-Chisq_best)/(Chisq_best* inf_alp))
     fit_run = fit_run_list[sort_Chisq[0]]
-    # fit_run.plot_final_qso_fit(target_ID = 'SDSS_0'+'-'+filt)
+    fit_run.plot_final_qso_fit(target_ID = 'SDSS_0'+'-'+filt)
+    # print(fit_run.final_result_galaxy[0]['magnitude'], fit_run.reduced_Chisq)
     
-    # prop_name = 'n_sersic'
-    # all_values = [fit_run_list[i].final_result_galaxy[0][prop_name] for i in range(len(fit_run_list))]
-    # weighted_value = np.sum(np.array(all_values)*weight) / np.sum(weight)
-    # rms_value = np.sqrt(np.sum((np.array(all_values)-weighted_value)**2*weight) / np.sum(weight))
+    x_shift = -(fit_run.final_result_galaxy[0]['center_x']  - fit_run.final_result_ps[0]['ra_image']) / fit_run.fitting_specify_class.deltaPix
+    y_shift = (fit_run.final_result_galaxy[0]['center_y']  - fit_run.final_result_ps[0]['dec_image']) / fit_run.fitting_specify_class.deltaPix
+    print(filt, round(x_shift[0],3), round(y_shift[0],3))
+    
+    prop_name = 'magnitude'
+    all_values = [fit_run_list[i].final_result_galaxy[0][prop_name] for i in range(len(fit_run_list))]
+    weighted_value = np.sum(np.array(all_values)*weight) / np.sum(weight)
+    rms_value = np.sqrt(np.sum((np.array(all_values)-weighted_value)**2*weight) / np.sum(weight))
     
     # if filt == 'F444W':
     #     if fit_run.fitting_specify_class.data_process_class.target_pos[0] < 5000: #module A
@@ -162,7 +168,7 @@ for count in range(len(collect_info)):
     # print(filt, "{0:.5f} {1:.5f}".format(-fit_run.final_result_galaxy[1]['center_x'], fit_run.final_result_galaxy[1]['center_y']))
     # fit_run.model_plot()
     # print(filt, fit_run.final_result_ps[0]['flux_within_frame'], fit_run.final_result_ps[0]['point_amp'])
-    print(filt, fit_run.final_result_ps[0]['flux_within_frame']+ fit_run.final_result_galaxy[0]['flux_within_frame'] )
+    # print(filt, fit_run.final_result_ps[0]['flux_within_frame']+ fit_run.final_result_galaxy[0]['flux_within_frame'] )
     # print('Chisqs top 2', round(chisqs[idx_counts[0]],2), round(chisqs[idx_counts[1]],2))
     # print(fit_files[idx_counts[0]])
     
