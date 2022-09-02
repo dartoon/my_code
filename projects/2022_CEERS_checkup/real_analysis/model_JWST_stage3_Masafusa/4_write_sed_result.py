@@ -12,7 +12,7 @@ import matplotlib.pyplot as plt
 import glob
 write_file =  open('sed_2d_result_bin4.txt','w')
 write_file.write("count_i, smass, sfr, m_age, l_age, AV \n")
-steller_files = glob.glob('esti_smass/20220830*/SFH_*.fits')
+steller_files = glob.glob('esti_smass/20220902*/SFH_*.fits')
 
 steller_files.sort()
 for steller_file in steller_files:
