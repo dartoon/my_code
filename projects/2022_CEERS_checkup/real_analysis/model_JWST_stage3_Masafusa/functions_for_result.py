@@ -10,10 +10,11 @@ import numpy as np
 import astropy.io.fits as pyfits
 import matplotlib.pyplot as plt
 import os, glob
-from gsf import gsf
 import shutil 
 import pickle
 
+name_list = {1:'SDSS1420+5300A', 2: 'SDSS1420+5300B', 0: 'SDSS1419+5254', 
+              51: 'AEGIS 477', 35: 'AEGIS 482'}
 
 def load_info(idx):
     f = open("../model_JWST_stage3_Masafusa/target_idx_info.txt","r")
@@ -123,7 +124,9 @@ hst_filt_id = {'F606W': '4', 'F814W':'6', 'F105W':'202', 'F125W':'203', 'F140W':
 jwst_filt_id = {'F115W': '352', 'F150W': '353', 'F200W': '354', 
            'F277W': '355', 'F356W': '356', 'F444W': '357', 'F410M': '362'}
 
-def esti_smass(ID, mags_dict, z, folder = 'esti_smass/', flag = 0, if_run_gsf=True):
+def esti_smass(ID, mags_dict, z, folder = 'esti_smass/', flag = 0, if_run_gsf=True, band_as_upper = [],
+               mag_err = []):
+    from gsf import gsf
     ID = ID
     z = z
     #%reate a cat file
@@ -142,14 +145,14 @@ def esti_smass(ID, mags_dict, z, folder = 'esti_smass/', flag = 0, if_run_gsf=Tr
         text_temp = text_temp + ' F{0} E{0}'.format(filt_id[key])
         filterIDs = filterIDs + ','+filt_id[key]
         mags.append(mags_dict[key])
-        if key in hst_filt_id.keys():
+        if key in hst_filt_id.keys() or key in band_as_upper:
             if_hst.append(True)
         else:
             if_hst.append(False)
     filterIDs = filterIDs[1:]
     text_temp = text_temp + "\n"
-    
-    mag_err = [0.1] * len(mags)
+    if mag_err == []:
+        mag_err = [0.2] * len(mags)
     fnu = [10 ** ((mags[i]-25)/(-2.5)) for i in range(len(mags))]
     fnu_up = [10 ** ((mags[i]-mag_err[i]-25)/(-2.5)) for i in range(len(mags))]
     fnu_dw = [10 ** ((mags[i]+mag_err[i]-25)/(-2.5)) for i in range(len(mags))]

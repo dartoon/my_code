@@ -38,9 +38,11 @@ remove_id = [24, 55]
 # for idx in [0, 1, 2, 35, 51]:  #z_spec > 1.6, QSO 
 result_list = []
 target_ID_list = []
-filt = 'F200W'
-if_plot = True
-for idx in [1,2,0,51,35]:  #z_spec > 1.6
+filt = 'F444W'
+cal_CAS = True
+if_plot = False
+# for idx in [1,2,0,51,35]:  #z_spec > 1.6
+for idx in [35,0,2,51,1]:  #z_spec > 1.6
 # for idx in [1]:  #z_spec > 1.6
     result = []
     files = glob.glob('../*/*fit_material/data_process_idx{0}_*_psf*.pkl'.format(idx))
@@ -133,13 +135,17 @@ for idx in [1,2,0,51,35]:  #z_spec > 1.6
             correct = 0.9272488 / 0.811
             mag_correct = +2.5*np.log10(correct)
         fit_run.final_result_galaxy[0]['magnitude'] = fit_run.final_result_galaxy[0]['magnitude'] + mag_correct
-
-    CAS_class = CAS(fit_run, seg_cal_reg = 'or', obj_id=0, rm_ps=True, rm_obj=True)
-    cas = CAS_class.cal_CAS(mask_type='segm',extend=1, if_plot=False, radius=35)
-    # print('asymmetry:', cas[0])
-    # print('smoothness (by abs diff and pos diff):', cas[1])
-    # print('concentration:', cas[2])
-    # print('Gini:', cas[3])
+    
+    if cal_CAS == True:
+    
+        CAS_class = CAS(fit_run, seg_cal_reg = 'or', obj_id=0, rm_ps=True, rm_obj=True)
+        cas = CAS_class.cal_CAS(mask_type='segm',extend=1, if_plot=False, radius=35)
+        # print('asymmetry:', cas[0])
+        # print('smoothness (by abs diff and pos diff):', cas[1])
+        # print('concentration:', cas[2])
+        # print('Gini:', cas[3])
+    else:
+        cas = 0, [0,0], 0
     result.append([fit_run.reduced_Chisq, ratio * 100, fit_run.final_result_galaxy[0]['R_sersic'],
                    fit_run.final_result_galaxy[0]['n_sersic'], fit_run.final_result_galaxy[0]['magnitude'],
                    cas[2], cas[1][0], cas[0]])
@@ -153,7 +159,7 @@ for idx in [1,2,0,51,35]:  #z_spec > 1.6
 
 #%%print:
 prop_list = ['$\chi ^2$ (Reduced)', 'host-total flux ratio', 'Reff ($\\arcsec$)',
-             '\sersic\ $n$', 'magnitude', 'concentration', 'asymmetry','smoothness']
+             '\sersic\ $n$', 'host mag', 'concentration', 'asymmetry','smoothness']
 digt_list = [2, 1, 3, 1, 2, 2,2,2]
 for i in range(len(result_list[0])):
     print_material = [result_list[j][i] for j in range(len(result_list)) ]

@@ -41,7 +41,9 @@ run_filt_list = [l_band] + [filt_list[i] for i in range(len(filt_list)) if filt_
 image_list = [None] * len(run_filt_list)
 for i, filt in enumerate(run_filt_list):
     fit_run = fit_run_dict[filt]
-    img_org = fit_run.flux_2d_out['data-Point Source'] - np.sum(fit_run.image_host_list[1:],axis=0 )
+    img_org = fit_run.flux_2d_out['data-Point Source'] #- np.sum(fit_run.image_host_list[1:],axis=0 )
+    if len(fit_run.image_host_list) == 3:
+        img_org = img_org - fit_run.image_host_list[1]
     deltaPix = fit_run.fitting_specify_class.deltaPix
     # img_org = fit_run.flux_2d_out['model']
     if shift_center == True:
@@ -64,8 +66,13 @@ for i, filt in enumerate(run_filt_list):
         img_show = zoom(img_org, ratio)
     else:
         img_show  = img_org
+        
+    img_show = zoom(img_show, 0.25)
+        
     if len(img_show)/2 == int(len(img_show)/2):
         img_show = zoom(img_show, len(img_show)/(len(img_show)+1))
+        
+    img_show = img_show/np.sum(img_show) * np.sum(img_org)
     image_list[i] = img_show
     print(filt,'finish')
     
@@ -125,44 +132,47 @@ for i in range(len(sed_image[0])):
                 mag_result[filt] = mag
         sed_2d_info.append([i, j, mag_result])
 import pickle      
-# pickle.dump(sed_2d_info, open('sed_2d_info.pkl', 'wb'))
-#%%
-sed_2d_info = pickle.load(open('sed_2d_info.pkl','rb'))
-count = 100
-mag_dict = sed_2d_info[count][2]
-esti_smass(ID = '20220830'+str(count), mags_dict = mag_dict, z = z, flag = 1, if_run_gsf=True)
-import glob
-import os # Delete xfile.txt
-folder = 'esti_smass/20220830'+str(count)
-spec_file = glob.glob(folder+'/gsf_spec_*.fits')[0]
-hdul_spec = pyfits.open(spec_file)
-info_spec = hdul_spec[1].header
+pickle.dump(sed_2d_info, open('sed_2d_info_bin4.pkl', 'wb'))
 
-write_file = open(folder + '/gsf_spec_header.txt','w') 
-write_file.write(str(info_spec))
-write_file.close()
-rm_file = glob.glob(folder+'/gsf_spec_*.fits') + glob.glob(folder + '/SPEC*png') + glob.glob(folder+'/*asdf') 
-for file in rm_file:
-    os.remove(file)
-steller_file = glob.glob(folder+'/SFH_*.fits')[0]
-hdul = pyfits.open(steller_file)
-info = hdul[0].header 
-smass = info['Mstel_50']
-sfr = info['SFR_50']
-m_age = info['T_MW_50']
-l_age = info['T_LW_50']
-AV = info['AV_50']
-filename = 'sed_2d_result.txt'
-if_file = glob.glob(filename)
-if if_file == []:
-    write_file =  open(filename,'w')
-    write_file.write("count_i, smass, sfr, m_age, l_age, AV \n")
-else:
-    write_file =  open(filename,'r+') 
-    write_file.read()
-write_file.write("{0} {1} {2} {3} {4} {5}".format(count, smass, sfr, m_age, l_age, AV))
-write_file.write("\n")
-write_file.close()
+
+# #%%
+# # sed_2d_info = pickle.load(open('sed_2d_info.pkl','rb'))
+# # count = 100
+# # mag_dict = sed_2d_info[count][2]
+# # esti_smass(ID = '202208'+str(count), mags_dict = mag_dict, z = z, flag = 1, if_run_gsf=True)
+# import glob
+# import os # Delete xfile.txt
+# # folder = 'esti_smass/202208'+str(count)
+# folder = 'esti_smass/2022081'
+# spec_file = glob.glob(folder+'/gsf_spec_*.fits')[0]
+# hdul_spec = pyfits.open(spec_file)
+# info_spec = hdul_spec[1].header
+
+# write_file = open(folder + '/gsf_spec_header.txt','w') 
+# write_file.write(str(info_spec))
+# write_file.close()
+# rm_file = glob.glob(folder+'/gsf_spec_*.fits') + glob.glob(folder + '/SPEC*png') + glob.glob(folder+'/*asdf') 
+# for file in rm_file:
+#     os.remove(file)
+# steller_file = glob.glob(folder+'/SFH_*.fits')[0]
+# hdul = pyfits.open(steller_file)
+# info = hdul[0].header 
+# smass = info['Mstel_50']
+# sfr = info['SFR_50']
+# m_age = info['T_MW_50']
+# l_age = info['T_LW_50']
+# AV = info['AV_50']
+# filename = 'sed_2d_result.txt'
+# if_file = glob.glob(filename)
+# if if_file == []:
+#     write_file =  open(filename,'w')
+#     write_file.write("count_i, smass, sfr, m_age, l_age, AV \n")
+# else:
+#     write_file =  open(filename,'r+') 
+#     write_file.read()
+# write_file.write("{0} {1} {2} {3} {4} {5}".format(count, smass, sfr, m_age, l_age, AV))
+# write_file.write("\n")
+# write_file.close()
 
 # spec_file = glob.glob('esti_smass/2022081/gsf_spec_*.fits')[0]
 # hdul_spec = pyfits.open(spec_file)

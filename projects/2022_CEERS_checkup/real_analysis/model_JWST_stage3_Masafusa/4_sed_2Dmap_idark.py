@@ -16,15 +16,15 @@ import os # Delete xfile.txt
 import matplotlib
 matplotlib.use('Agg')
 import sys
-count = int(sys.argv[1]) - 1 # 1 - 10610
+count = int(sys.argv[1]) - 1 # 1 - 625
 flag = int(sys.argv[2])
 
 idx = 1
 target_id, z = load_info(idx)
-sed_2d_info = pickle.load(open('sed_2d_info.pkl','rb'))
+sed_2d_info = pickle.load(open('sed_2d_info_bin4.pkl','rb'))
 mag_dict = sed_2d_info[count][2]
-esti_smass(ID = '20220830'+str(int(count)), mags_dict = mag_dict, z = z, flag = flag, if_run_gsf=True)
-folder = 'esti_smass/20220830'+str(count)
+esti_smass(ID = '20220902'+str(int(count)), mags_dict = mag_dict, z = z, flag = flag, if_run_gsf=True)
+folder = 'esti_smass/20220902'+str(count)
 spec_file = glob.glob(folder+'/gsf_spec_*.fits')[0]
 hdul_spec = pyfits.open(spec_file)
 info_spec = hdul_spec[1].header
@@ -43,7 +43,7 @@ sfr = info['SFR_50']
 m_age = info['T_MW_50']
 l_age = info['T_LW_50']
 AV = info['AV_50']
-filename = 'sed_2d_result.txt'
+filename = 'sed_2d_result_bin4.txt'
 if_file = glob.glob(filename)
 if if_file == []:
     write_file =  open(filename,'w')

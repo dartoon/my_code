@@ -232,10 +232,12 @@ if relation == 0:
 #    m_cut = [(results[:,3]>10) * (results[:,3]<11.5)][0]
 #    fit_red = opt.curve_fit(lfit, results[:,3][z_cut* red_galaxy * m_cut],np.log10(Reff_kpc[z_cut * red_galaxy * m_cut]))
 #    plt.plot(mstar_line, 10**(lfit(mstar_line, fit_red[0][0],fit_red[0][1])), 'r',linewidth=3)
-    plt.plot(mstar_line, 10**(logR_mstar(mstar_line,logA=0.155 , alpha=0.76)), 'r',linewidth=3)
+    # plt.plot(mstar_line, 10**(logR_mstar(mstar_line,logA=0.155 , alpha=0.76)), 'r',linewidth=3) #At z ~1.5
+    plt.plot(mstar_line, 10**(logR_mstar(mstar_line,logA=-0.05 , alpha=0.76)), 'r',linewidth=3) #At z~2.5
     
     mstar_line = np.linspace(9,11.5,20)
-    plt.plot(mstar_line, 10**(logR_mstar(mstar_line,logA=0.675 , alpha=0.23)), 'b',linewidth=3)   
+    # plt.plot(mstar_line, 10**(logR_mstar(mstar_line,logA=0.675 , alpha=0.23)), 'b',linewidth=3)   #At z ~1.5
+    plt.plot(mstar_line, 10**(logR_mstar(mstar_line,logA=0.55 , alpha=0.23)), 'b',linewidth=3)     #At z~2.5
     
     mstar_line = np.linspace(9,11.5,20)
 #    plt.plot(mstar_line, 10**(0.54+ 0.57*(mstar_line-11.)), 'r--',linewidth=2,alpha=0.8)
@@ -306,37 +308,36 @@ host_flux_ACS = np.asarray(host_flux_ACS)
 #cl.set_label('filter flux ratio, WFC3 / ACS',rotation=270,size=30)
 #cl.ax.get_yaxis().labelpad=35     #the distance of the colorbar titel from bar
 #cl.ax.tick_params(labelsize=30)
-if relation == 0:
-    f1 =folder + '/M_BH_relation/data/Bennert+2011_local.txt'
-    b11_l = np.loadtxt(f1)[:,1:]  #0 redshift; 1 M*; 2 BH mass;
-    b11_local_Reff = b11_l[:,8]
+f1 =folder + '/M_BH_relation/data/Bennert+2011_local.txt'
+b11_l = np.loadtxt(f1)[:,1:]  #0 redshift; 1 M*; 2 BH mass;
+b11_local_Reff = b11_l[:,8]
 #    b11_local_mstar = b11_l[:,4]
-    b11_local_mstar = b11_l[:,9]  #!!! Change to total mass
+b11_local_mstar = b11_l[:,9]  #!!! Change to total mass
 #    plt.scatter(b11_local_mstar,b11_local_Reff,s=180, c ='black',
 #                marker="o",zorder=100, vmin=0.5, vmax=5, edgecolors='white', label='local AGN (VB2011)')     
-    for i in range(len(Mstar)):
-        if Reffs[i]-0.1 < 0.009:
-            plt.arrow(Mstar[i], ID_Reff_kpc[i], 0, -0.3, length_includes_head=True,
-                  head_width=0.08, head_length=0.05, zorder=102, color='black', linewidth=1.2)
+for i in range(len(Mstar)):
+    if Reffs[i]-0.1 < 0.009:
+        plt.arrow(Mstar[i], ID_Reff_kpc[i], 0, -0.3, length_includes_head=True,
+              head_width=0.08, head_length=0.05, zorder=102, color='black', linewidth=1.2)
    
-    log_Rerr = (np.log10(ID_Reff_kpc)-np.log10(ID_Reff_kpc-ID_Reff_kpc_e))
-    low_err = ID_Reff_kpc - 10**(np.log10(ID_Reff_kpc)-log_Rerr)
-    up_err = 10**(np.log10(ID_Reff_kpc)+log_Rerr) - ID_Reff_kpc
-    p1 = plt.scatter(Mstar[in_list],ID_Reff_kpc[in_list], s=580, linewidth=1.2, c ='tomato',
-                marker="*",zorder=101, vmin=0.5, vmax=5, edgecolors='black', cmap=cmap_r)    
-    plt.errorbar(Mstar[in_list],ID_Reff_kpc[in_list],
-                 yerr=  [low_err[in_list],
-                         up_err[in_list]],
-#                 yerr= 10**(np.log10(ID_Reff_kpc)-np.log10(ID_Reff_kpc-ID_Reff_kpc_e)) [host_flux_ACS>0],
-                 color='k',ecolor='k', fmt='.',markersize=1, zorder = 99)  
-    
-    p2 = plt.scatter(Mstar[out_list],ID_Reff_kpc[out_list], s=100, linewidth=1.2, c =indexs[out_list],
-                marker="D",zorder=101, vmin=0.5, vmax=5, edgecolors='black', cmap=cmap_r)    
-    plt.errorbar(Mstar[out_list],ID_Reff_kpc[out_list],
-                 yerr=  [low_err[out_list],
-                         up_err[out_list]],
-#                 yerr= 10**(np.log10(ID_Reff_kpc)-np.log10(ID_Reff_kpc-ID_Reff_kpc_e)) [host_flux_ACS>0],
-                 color='k',ecolor='k', fmt='.',markersize=1, zorder = 99)  
+log_Rerr = (np.log10(ID_Reff_kpc)-np.log10(ID_Reff_kpc-ID_Reff_kpc_e))
+low_err = ID_Reff_kpc - 10**(np.log10(ID_Reff_kpc)-log_Rerr)
+up_err = 10**(np.log10(ID_Reff_kpc)+log_Rerr) - ID_Reff_kpc
+# p1 = plt.scatter(Mstar[in_list],ID_Reff_kpc[in_list], s=580, linewidth=1.2, c ='tomato',
+#             marker="*",zorder=101, vmin=0.5, vmax=5, edgecolors='black', cmap=cmap_r)    
+# plt.errorbar(Mstar[in_list],ID_Reff_kpc[in_list],
+#              yerr=  [low_err[in_list],
+#                      up_err[in_list]],
+# #                 yerr= 10**(np.log10(ID_Reff_kpc)-np.log10(ID_Reff_kpc-ID_Reff_kpc_e)) [host_flux_ACS>0],
+#              color='k',ecolor='k', fmt='.',markersize=1, zorder = 99)  
+
+p2 = plt.scatter(Mstar,ID_Reff_kpc, s=100, linewidth=1.2, c =indexs,
+            marker="D",zorder=101, vmin=0.5, vmax=5, edgecolors='black', cmap=cmap_r)    
+# plt.errorbar(Mstar,ID_Reff_kpc,
+#              yerr=  [low_err,
+#                      up_err],
+# #                 yerr= 10**(np.log10(ID_Reff_kpc)-np.log10(ID_Reff_kpc-ID_Reff_kpc_e)) [host_flux_ACS>0],
+#              color='k',ecolor='k', fmt='.',markersize=1, zorder = 99)  
     
 #    plt.scatter(Mstar[host_flux_ACS<0],ID_Reff_kpc[host_flux_ACS<0],s=200, linewidth=2, c =indexs[host_flux_ACS<0],
 #                marker="D",zorder=101, vmin=0.5, vmax=5, edgecolors='black',cmap=cmap_r)
@@ -345,48 +346,16 @@ if relation == 0:
 #                         up_err[host_flux_ACS<0]],                 
 ##             yerr= (np.log10(ID_Reff_kpc)-np.log10(ID_Reff_kpc-ID_Reff_kpc_e))[host_flux_ACS<0],
 #             color='k',ecolor='k', fmt='.',markersize=1, zorder = 99)  
-elif relation ==1:
-    plt.scatter(Mstar[host_flux_ACS>0],(host_flux_WFC3/host_flux_ACS)[host_flux_ACS>0],s=680, c =(host_flux_WFC3/host_flux_ACS)[host_flux_ACS>0],
-                marker="*",zorder=100, vmin=0, vmax=7, edgecolors='white')
-    
-elif relation ==2:
-    plt.scatter(Mstar[host_flux_ACS>0],indexs[host_flux_ACS>0],s=680, c =(host_flux_WFC3/host_flux_ACS)[host_flux_ACS>0],
-                marker="*",zorder=100, vmin=0, vmax=7, edgecolors='white')
-    plt.scatter(Mstar[host_flux_ACS<0],indexs[host_flux_ACS<0],s=180, c ='black',
-                marker="s",zorder=99, vmin=0, vmax=7, edgecolors='white') 
-    
-elif relation ==3:
-    plt.scatter(np.log10(ID_Reff_kpc)[host_flux_ACS>0],indexs[host_flux_ACS>0],s=680, c =(host_flux_WFC3/host_flux_ACS)[host_flux_ACS>0],
-                marker="*",zorder=100, vmin=0, vmax=7, edgecolors='white')
-    plt.errorbar(np.log10(ID_Reff_kpc)[host_flux_ACS>0],indexs[host_flux_ACS>0],
-             xerr= (np.log10(ID_Reff_kpc)-np.log10(ID_Reff_kpc-ID_Reff_kpc_e))[host_flux_ACS>0],
-             color='k',ecolor='orange', fmt='.',markersize=1, zorder = 10)    
-    plt.scatter(np.log10(ID_Reff_kpc)[host_flux_ACS<0],indexs[host_flux_ACS<0],s=180, c ='black',
-                marker="s",zorder=99, vmin=0, vmax=7, edgecolors='white') 
-    plt.errorbar(np.log10(ID_Reff_kpc)[host_flux_ACS<0],indexs[host_flux_ACS<0],
-             xerr= (np.log10(ID_Reff_kpc)-np.log10(ID_Reff_kpc-ID_Reff_kpc_e))[host_flux_ACS<0],
-             color='k',ecolor='orange', fmt='.',markersize=1, zorder = 10)  
-elif relation ==4:
-    plt.scatter(zs[host_flux_ACS>0], np.log10(ID_Reff_kpc)[host_flux_ACS>0],s=680, c =(host_flux_WFC3/host_flux_ACS)[host_flux_ACS>0],
-                marker="*",zorder=100, vmin=0, vmax=7, edgecolors='white')
-    plt.errorbar(zs[host_flux_ACS>0], np.log10(ID_Reff_kpc)[host_flux_ACS>0],
-             yerr= (np.log10(ID_Reff_kpc)-np.log10(ID_Reff_kpc-ID_Reff_kpc_e))[host_flux_ACS>0],
-             color='k',ecolor='orange', fmt='.',markersize=1, zorder = 10)    
-    plt.scatter(zs[host_flux_ACS<0], np.log10(ID_Reff_kpc)[host_flux_ACS<0],s=180, c ='black',
-                marker="s",zorder=99, vmin=0, vmax=7, edgecolors='white') 
-    plt.errorbar(zs[host_flux_ACS<0], np.log10(ID_Reff_kpc)[host_flux_ACS<0],
-             yerr= (np.log10(ID_Reff_kpc)-np.log10(ID_Reff_kpc-ID_Reff_kpc_e))[host_flux_ACS<0],
-             color='k',ecolor='orange', fmt='.',markersize=1, zorder = 10)  
 #%%
 #Load M for 
-from functions_for_result import load_prop
+from functions_for_result import load_prop, name_list
 JWST_smass = []
 JWST_z = []
 JWST_Reff = []
 JWST_n = []
 idx_list = [1,2,0,51,35]
 for idx in idx_list:  #z_spec > 1.6
-    steller_file = glob.glob('esti_smass/202208'+str(idx)+'/SFH_*.fits')[0]
+    steller_file = glob.glob('esti_smass/20220901_'+str(idx)+'/SFH_*.fits')[0]
     hdul = pyfits.open(steller_file)
     info = hdul[0].header 
     JWST_smass.append( float(info['Mstel_50']) )
@@ -411,64 +380,44 @@ JWST_z = np.array(JWST_z)
 JWST_Reff = np.array(JWST_Reff)
 da=1/(1+JWST_z)*c*vec_EE(JWST_z)/h0   #in Mpc
 JWST_Reff_kpc = da * 10 **3 * (JWST_Reff/3600./180.*np.pi)
-p_jwst = plt.scatter(JWST_smass, JWST_Reff_kpc, s=980, linewidth=1.2, c =JWST_n,
-            marker="o",zorder=101, vmin=0.5, vmax=5, edgecolors='black', cmap=cmap_r)   
+jwst_p = p_jwst = plt.scatter(JWST_smass, JWST_Reff_kpc, s=880, linewidth=2.2, c =JWST_n,
+            marker="H",zorder=201, vmin=0.5, vmax=5, edgecolors='black', cmap=cmap_r)   
+
+plt.arrow(JWST_smass[1], JWST_Reff_kpc[1], 0, -0.2, length_includes_head=True,
+      head_width=0.08, head_length=0.05, zorder=102, color='black', linewidth=1.2)
+
 for i,idx in enumerate(idx_list): 
-    plt.text(JWST_smass[i]+0.1, JWST_Reff_kpc[i], str(idx), fontsize = 21 )   
+    plt.text(JWST_smass[i]-0.4, JWST_Reff_kpc[i]*1.2, name_list[idx], fontsize = 21, zorder =202,
+             bbox={'facecolor': 'white', 'alpha': 0.5, 'pad': 3})   
 print('esti_smass/202208*/SPEC_*_spec.png')
 #%%    
-plt.xlim([9.0, 11.7])
+plt.xlim([8.5, 11.7])
 plt.xlabel("log (M$_*$; units of M$_{\odot}$)",fontsize=35)
 plt.tick_params(labelsize=25)
 #plt.legend(loc='upper right',fontsize=21,numpoints=1)
 from matplotlib.legend_handler import HandlerTuple
-plt.legend([c1, c2, (p1, p2)], ['CANDELS galaxy, star-forming', 'CANDELS galaxy, quiescent', 'our AGN sample, 1.2<z<1.7'],
-               handler_map={tuple: HandlerTuple(ndivide=None)},loc='upper right',fontsize=21,numpoints=1)
-if relation ==0:
-    plt.ylabel(r"R$_{\rm eff}$ (kpc)",fontsize=35)
+plt.legend([c1, c2, p2, jwst_p], ['CANDELS galaxy, star-forming', 'CANDELS galaxy, quiescent', 
+                                  'Ding2022 AGN sample, 1.2<z<1.7', 'This work, 1.6<z<3.5'],
+               handler_map={tuple: HandlerTuple(ndivide=None)},loc='upper left',fontsize=21,numpoints=1)
+plt.ylabel(r"R$_{\rm eff}$ (kpc)",fontsize=35)
 #    plt.title(r"M$_*$ - R$_{eff}$ relation, sample redshift range {0}".format(z_range), fontsize = 25)
 #    plt.title(r"M$_*$ - R$_{\rm eff}$ relation"+', sample redshift range {0}'.format(z_range), fontsize = 25)
-    plt.ylim([0.3, 31.5])
+plt.ylim([0.3, 20.5])
 #    labels = [item.get_text() for item in ax.get_yticklabels()]
 #    labels[1] = 'Testing'
 #    ax.set_xticklabels(labels)
-    plt.yscale('log')
-    ax.tick_params(axis='both', which='major', length=12 , width = 2)
-    ax.tick_params(axis='y', which='minor', length=7, width=2)
-    ax.tick_params(axis='y', which='major', length=12, width=2)
-    ax.tick_params(axis='both', which='both', direction='in')
-    cbar = plt.colorbar()
-    cbar.ax.tick_params(labelsize=20)
-    cbar.ax.set_ylabel('Sersic index', rotation=270, fontsize = 25, labelpad=25)
-    cbar.ax.tick_params(axis='both', which='both', direction='in')
-    cbar.ax.tick_params(axis='y', which='major', length=7, width=2)
-#    plt.savefig('Mstar-Reff.pdf')
+plt.yscale('log')
+ax.tick_params(axis='both', which='major', length=12 , width = 2)
+ax.tick_params(axis='y', which='minor', length=7, width=2)
+ax.tick_params(axis='y', which='major', length=12, width=2)
+ax.tick_params(axis='both', which='both', direction='in')
+cbar = plt.colorbar()
+cbar.ax.tick_params(labelsize=20)
+cbar.ax.set_ylabel('Sersic index', rotation=270, fontsize = 25, labelpad=25)
+cbar.ax.tick_params(axis='both', which='both', direction='in')
+cbar.ax.tick_params(axis='y', which='major', length=7, width=2)
+plt.savefig('outcomes/Mstar-Reff.png')
 #    plt.savefig('Mstar-Reff_z{0}-{1}.pdf'.format(z_range[0],z_range[1]))
-elif relation ==1:
-    plt.ylabel("filter flux ratio, WFC3 / ACS",fontsize=35)
-    plt.title('$M_* -$ color relation, sample redshift range {0}'.format(z_range), fontsize = 25)
-    plt.ylim([0, 20])
-#    plt.savefig('Mstar-color{0}-{1}_Reff.pdf'.format(z_range[0],z_range[1]))
-elif relation ==2:
-    plt.ylabel("Sersic index",fontsize=35)
-    plt.title('$M_* - $Sersic index relation, sample redshift range {0}'.format(z_range), fontsize = 25)
-    plt.ylim([0, 7])
-#    plt.savefig('Mstar-Sersic_n{0}-{1}_color.pdf'.format(z_range[0],z_range[1]))
-elif relation ==3:
-    plt.xlabel("log$(Reff)$ (kpc)",fontsize=35)
-    plt.ylabel("Sersic index",fontsize=35)
-    plt.title('$Reff - $Sersic index relation, sample redshift range {0}'.format(z_range), fontsize = 25)
-    plt.xlim([-0.5, 1.5])
-    plt.ylim([0, 8])
-#    plt.savefig('Reff-Sersic_n{0}-{1}_color.pdf'.format(z_range[0],z_range[1]))
-elif relation ==4:
-    plt.xlabel("z",fontsize=35)
-    plt.ylabel("log$(Reff)$ (kpc)",fontsize=35)
-    plt.title('$z- Reff$ relation, sample redshift range {0}'.format(z_range), fontsize = 25)
-    plt.xlim([1., 2])
-    plt.ylim([-0.5, 1.5])
-    plt.savefig('Reff-z_{0}-{1}_color.pdf'.format(z_range[0],z_range[1]))
-
 #cl.ax.tick_params(labelsize=15)   #the labe size
 plt.show()
 

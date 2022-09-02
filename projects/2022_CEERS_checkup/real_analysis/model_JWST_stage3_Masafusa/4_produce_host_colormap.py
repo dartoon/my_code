@@ -76,7 +76,7 @@ for idx in [1]:  #z_spec > 1.6
                     weight[i] = np.exp(-1/2. * (chisqs[i]-Chisq_best)/(Chisq_best* inf_alp))
             fit_run = _fit_run_list[sort_Chisq[0]]
             fit_run_list.append(fit_run)
-            fit_run.plot_final_qso_fit(target_ID = target_id+'-'+filt)
+            # fit_run.plot_final_qso_fit(target_ID = target_id+'-'+filt)
             prop_name = 'n_sersic'
             all_values = [_fit_run_list[i].final_result_galaxy[0][prop_name] for i in range(len(_fit_run_list))]
             weighted_value = np.sum(np.array(all_values)*weight) / np.sum(weight)
@@ -90,6 +90,9 @@ for idx in [1]:  #z_spec > 1.6
             print(fit_files[sort_Chisq[0]])
             print(print_s)
             # hold = input(print_s)
+
+zp_list = [fit_run_list[i].zp for i in range(3)]
+
 #%%
 from scipy.ndimage import zoom
 shift_center = True
@@ -104,7 +107,7 @@ run_idx_list = [l_idx] + [i for i in range(len(use_filt)) if i != l_idx]
 image_list = [None] * len(use_filt)
 for i in run_idx_list:
     fit_run = fit_run_list[i]
-    img_org = fit_run.flux_2d_out['data-Point Source']
+    img_org = fit_run.flux_2d_out['data-Point Source'] - np.sum(fit_run.image_host_list[1:], axis = 0 )
     # img_org = fit_run.flux_2d_out['model']
     if shift_center == True:
         if hasattr(fit_run, 'final_result_ps'):
@@ -122,6 +125,8 @@ for i in run_idx_list:
             ct = int(len(img_org)/2) - np.max(shift) - 1 
             img_org =  img_org[ new_pos[1] - ct:new_pos[1] + ct+1, new_pos[0] - ct:new_pos[0] + ct +1 ]
     img_show = zoom(img_org, ratio_list[i])
+    img_show = img_show/np.sum(img_show)*np.sum(img_org)
+    print(np.sum(img_org), np.sum(img_show))
     # if len(img_show)/2 != int(len(img_show)/2):
     #     img_show = zoom(img_org, len(img_org)/(len(img_org)-1))
     # plt_fits(img_show)
@@ -136,7 +141,12 @@ for i, image in enumerate(image_list):
     # image[image<0] = 1.e-8
     # image = 2.5*np.log10(image)
     image_list[i] = image
+    
+image_list = [image_list[i] * 10 ** (-0.4*(zp_list[i]-zp_list[0])) for i in range(3) ]
+    
 from galight.tools.astro_tools import plt_fits_color
+# pickle.dump(image_list, open('color_image'+'.pkl', 'wb'))  
+
 plt_fits_color(image_list, Q=8, stretch=0.2)
 
 # from astropy.visualization import make_lupton_rgb

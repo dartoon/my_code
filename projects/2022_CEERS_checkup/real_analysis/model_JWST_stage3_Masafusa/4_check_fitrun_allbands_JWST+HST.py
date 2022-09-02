@@ -26,23 +26,23 @@ remove_id = [24, 55]
 #!!! 51 aegis_477 214.87073 52.833117 2.317 2.136
 
 #### 29 aegis_465 214.74245 52.826187 -99.0 3.019 #Photoz>3
-#### 53 aegis_495 214.87124 52.845067 -99.0 3.422 #Photoz>3
+#### 53 aegis_495 214.87124 52.845067 -99.0 3.422 #Photoz>3  #!!! In CEERS
+#### 57 aegis_511 214.89561 52.856516  !!! In CEERS
+#### 39 aegis_525 214.85389 52.861419  !!! In CEERS
+#### 41 aegis_532 214.8506 52.866459  !!! In CEERS
 
 # for idx in range(1,2):
 # for idx in [31, 32, 56]:   #JWST PS position corrected
 # for idx in [0, 2, 8, 28, 35, 51]:  #z_spec > 2
 # for idx in [29, 53]:  #z_spec > 2
 
-
 result = []
-# for idx in [0, 1, 2, 35, 51]:  #z_spec > 1.6, QSO 
-for idx in [35]:  #z_spec > 1.6
-# for idx in [2]:  #z_spec > 1.6
+for idx in [35, 53, 57, 39, 41]:  #CEERS
     if idx in remove_id:
         continue
     else:
-        files = glob.glob('../*/*fit_material/data_process_idx{0}_*_psf*.pkl'.format(idx))
-        # files = glob.glob('./*fit_material/data_process_idx{0}_*_psf*.pkl'.format(idx))
+        # files = glob.glob('../*/*fit_material/data_process_idx{0}_*_psf*.pkl'.format(idx))
+        files = glob.glob('./*fit_material/data_process_idx{0}_*_psf*.pkl'.format(idx))
         files.sort()
         # file_ACS = glob.glob('../model_HST_material/material/data_process+apertures_{0}_ACS.pkl'.format(idx))
         # file_WFC= glob.glob('../model_HST_material/material/data_process+apertures_{0}_IR.pkl'.format(idx))
@@ -104,9 +104,12 @@ for idx in [35]:  #z_spec > 1.6
             if idx == '0' and filt == 'F444W':  #!!!
                 fit_run = fit_run_list[sort_Chisq[1]]
             fit_run.plot_final_qso_fit(target_ID = target_id+'$-$'+filt)
-            # target_id = 'SDSS1420+5300'
+            
+            # name_list = {1:'SDSS1420+5300A', 2: 'SDSS1420+5300B', 0: 'SDSS1419+5254', 
+            #              51: 'aegis_477', 35: 'aegis_482'}
+            # target_id = name_list[int(idx)]
             # fit_run.savename = 'outcomes/'+'ID' + idx + '_' + filt
-            # fit_run.plot_final_qso_fit(target_ID = target_id+'$-$'+filt, save_plot= True)
+            # fit_run.plot_final_qso_fit(target_ID = target_id+'  '+filt, save_plot= True)
             
             prop_name = 'R_sersic'
             # all_values = [fit_run_list[i].final_result_ps[0][prop_name] for i in range(len(fit_run_list))]
@@ -126,4 +129,4 @@ for idx in [35]:  #z_spec > 1.6
             print(fit_files[sort_Chisq[0]])
             print(print_s)
             # hold = input(print_s)
-        hold = input("idx {0} above, OK?\n\n".format(idx))
+        # hold = input("idx {0} above, OK?\n\n".format(idx))
