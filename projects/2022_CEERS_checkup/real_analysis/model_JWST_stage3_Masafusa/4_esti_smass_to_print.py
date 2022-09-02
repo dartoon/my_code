@@ -15,17 +15,17 @@ import glob
 # ID, mags, z = 'idx0', 
 # 1,2,0,51,35
 # folder = '202209' #Consider only JWST
-folder = '20220901' #Consider a 0.4 mag error
+folder = '20220902' #Consider a 0.4 mag error
 # folder = 'F814W_upper20220901' #Consider a 0.4 mag error
-rerun = False
+rerun = True
 # idx = [1,2,0,51,35]
 
-for idx in [35,0,2,51,1]:
-# for idx in [1]:
+# for idx in [35,0,2,51,1]:
+for idx in [1]:
     target_id, z = load_info(idx)
     if rerun == True:
-        root_folder = '../*/*'  #Include HST
-        # root_folder = './*'
+        # root_folder = '../*/*'  #Include HST
+        root_folder = './*'
         mag_result = load_prop(idx, root_folder = root_folder)
         if idx ==1 and 'F814W' in mag_result.keys():
             mag_result['F814W'] += -2.5*np.log10(5) 

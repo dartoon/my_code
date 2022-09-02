@@ -15,10 +15,10 @@ from functions_for_result import esti_smass, load_prop, load_info, name_list
 import matplotlib as mat
 mat.rcParams['font.family'] = 'STIXGeneral'
 
-folder = '20220901'
+folder = '20220902'
 
 
-idx = 2
+idx = 1
 
 _, z = load_info(idx)
 target_id = name_list[idx]

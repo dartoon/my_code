@@ -10,14 +10,14 @@ import numpy as np
 import astropy.io.fits as pyfits
 import matplotlib.pyplot as plt
 import glob
-write_file =  open('sed_2d_result_bin4.txt','w')
+write_file =  open('sed_2d_result_bin2.txt','w')
 write_file.write("count_i, smass, sfr, m_age, l_age, AV \n")
-steller_files = glob.glob('esti_smass/20220902*/SFH_*.fits')
+steller_files = glob.glob('esti_smass/20220903*/SFH_*.fits')
 
 steller_files.sort()
 for steller_file in steller_files:
     hdul = pyfits.open(steller_file)
-    count = steller_file.split('20220902')[1].split('/')[0]
+    count = steller_file.split('20220903')[1].split('/')[0]
     info = hdul[0].header 
     smass = info['Mstel_50']
     sfr = info['SFR_50']

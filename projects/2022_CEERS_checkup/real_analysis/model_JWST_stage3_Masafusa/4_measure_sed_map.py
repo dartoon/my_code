@@ -67,7 +67,7 @@ for i, filt in enumerate(run_filt_list):
     else:
         img_show  = img_org
         
-    img_show = zoom(img_show, 0.25)
+    img_show = zoom(img_show, 0.5)
         
     if len(img_show)/2 == int(len(img_show)/2):
         img_show = zoom(img_show, len(img_show)/(len(img_show)+1))
@@ -132,7 +132,7 @@ for i in range(len(sed_image[0])):
                 mag_result[filt] = mag
         sed_2d_info.append([i, j, mag_result])
 import pickle      
-pickle.dump(sed_2d_info, open('sed_2d_info_bin4.pkl', 'wb'))
+pickle.dump(sed_2d_info, open('sed_2d_info_bin2.pkl', 'wb'))
 
 
 # #%%

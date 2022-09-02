@@ -101,16 +101,17 @@ for i in range(len(run_filt_list)):
 #%%
 #     # host_residual_list = fit_run.
 target_id, z = load_info(idx)
-smass_image = np.zeros_like(image)
-sfr_image = np.zeros_like(image)
-age_image = np.zeros_like(image)
-AV_image = np.zeros_like(image)
 import pickle
 from matplotlib.colors import LogNorm      
-sed_2d_info = pickle.load(open('sed_2d_info.pkl','rb'))
-f = open("sed_2d_result.txt","r")
+sed_2d_info = pickle.load(open('sed_2d_info_bin4.pkl','rb'))
+f = open("sed_2d_result_bin4.txt","r")
 string = f.read()
 lines = string.split('\n')   # Split in to \n
+size = int(np.sqrt(len(sed_2d_info)))
+smass_image = np.zeros([size,size])
+sfr_image =  np.zeros([size,size])
+age_image =  np.zeros([size,size])
+AV_image = np.zeros([size,size])
 for ct, line in enumerate(lines[1:-1]):
     if len(line.split(' ')) < 4:
         continue
@@ -177,9 +178,9 @@ rgb_default = make_lupton_rgb(image_list[0][1:-1,1:-1], image_list[1][1:-1,1:-1]
 
 from galight.tools.measure_tools import mask_obj
 from photutils import EllipticalAperture
-aper = EllipticalAperture([len(smass_image)/2, len(smass_image)/2], 45, 45, theta=0)
+aper = EllipticalAperture([len(smass_image)/2, len(smass_image)/2], 45/4, 45/4, theta=0)
 mask1 = 1- mask_obj(smass_image, [aper])[0]
-aper = EllipticalAperture([len(smass_image)/2, len(smass_image)/2], 4, 4, theta=0)
+aper = EllipticalAperture([len(smass_image)/2, len(smass_image)/2], 4/4, 4/4, theta=0)
 mask2 = mask_obj(smass_image, [aper])[0]
 mask = mask1 * mask2
 
@@ -200,7 +201,7 @@ mat.rcParams['font.family'] = 'STIXGeneral'
 # norm = LogNorm(vmin=4.5, vmax=8)#np.max(img[~np.isnan(img)]))
 
 
-im_0 = axs[0].imshow(rgb_default , norm=None, origin='lower', vmin=6, vmax=8.1) 
+im_0 = axs[0].imshow(rgb_default , norm=None, origin='lower') 
 axs[0].text(5,90,'F444W+F277W+F150W', c = 'white', fontsize = 16) 
 # ticks = [5, 6, 7, 8]
 cbar = fig.colorbar(im_0, ax=axs[0],pad=0.01, shrink=0.95, #orientation="horizontal", 
@@ -212,7 +213,7 @@ cbar.remove()
 from galight.tools.plot_tools import scale_bar
 scale_bar(axs[0], len(rgb_default), dist=1/deltaPix, text='   1"~3.75kpc', color='white')
 
-im_1 = axs[1].imshow(smass_image * mask, norm=None, origin='lower', vmin=6, vmax=8.1, cmap = my_cmap) 
+im_1 = axs[1].imshow(smass_image * mask, norm=None, origin='lower', vmin=7, vmax=9.1, cmap = my_cmap) 
 # ticks = [5, 6, 7, 8]
 cbar = fig.colorbar(im_1, ax=axs[1],pad=0.01, shrink=0.95, #orientation="horizontal", 
                   aspect=15)#, ticks=ticks)
@@ -220,7 +221,7 @@ cbar.set_label('M$_*$ (logM$_{\odot}$)', fontsize=20) #, rotation=270)
 cbar.ax.tick_params(labelsize=20)
 
 # norm = LogNorm(vmin=0.001, vmax=0.01)#np.max(img[~np.isnan(img)]))
-im_2 = axs[2].imshow(sfr_image * mask, norm=None, origin='lower', cmap = my_cmap, vmin = -4, vmax =-2.1)  
+im_2 = axs[2].imshow(sfr_image * mask, norm=None, origin='lower', cmap = my_cmap, vmin = -3, vmax =-1)  
 # ticks = [2.e-3, 6.e-3]
 cbar = fig.colorbar(im_2, ax=axs[2],pad=0.01, shrink=0.95,  #orientation="horizontal", 
                   aspect=15) #, ticks=ticks)
@@ -265,6 +266,7 @@ target_id, z = load_info(idx = 1)
 z = float(z)
 
 deltaPix = fit_run_dict['F356W'].fitting_specify_class.deltaPix
+deltaPix = deltaPix * 4
 from astropy.cosmology import FlatLambdaCDM
 cosmo = FlatLambdaCDM(H0=70, Om0=0.3)
 scale_relation = cosmo.angular_diameter_distance(z).value * 10**3 * (1/3600./180.*np.pi)  #Kpc/arc
@@ -291,8 +293,8 @@ def cal_sfr_dens(img, annuli = [], if_plot=False, sum_way = 'sum'):
         plt.show()
     return img_dens
 
-# annuli = [1, 2.7]  #kpc
-annuli = [2.7, 8]  #kpc
+annuli = [1, 2.7]  #kpc
+# annuli = [2.7, 8]  #kpc
 print( round(cal_sfr_dens(sfr, annuli=annuli, if_plot=True),3 ), 'M_sun/yr/kpc^2' )
 print( round(cal_sfr_dens(age_image, annuli=annuli, if_plot=False,
                           sum_way = 'ave'),3 ), 'Gyr' )
