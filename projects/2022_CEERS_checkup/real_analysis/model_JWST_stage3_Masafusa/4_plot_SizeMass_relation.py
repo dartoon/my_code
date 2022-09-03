@@ -32,124 +32,6 @@ vec_EE=np.vectorize(EE)
 
 folder = '/Users/Dartoon/Astro/Projects/QSO_decomposition/' #'/Comparsion/'
 
-# #The COSMOS files in http://www.mpia.de/homes/vdwel/candels.html by van der Wel et al. (2012).
-# #   NUMBER         RA        DEC          f        mag       dmag         re        dre          n         dn          q         dq         pa        dpa          sn
-# file_galfit_COSMOS =  np.loadtxt(folder+'/Comparsion/CANDELS_catalog/CANDELS_data/cos_2epoch_wfc3_f160w_060mas_v1.0_galfit.cat')
-# galfit_COSMOS_loc = file_galfit_COSMOS[:,[1,2]]  #RA, DEC
-# galfit_COSMOS = file_galfit_COSMOS[:,[4,6,8,3]] # mag, re, n, flag
-# ##The data from 3D HST: https://3dhst.research.yale.edu/Data.php  (PHOTOMETRY)
-# file_stellar_COSMOS = np.loadtxt(folder+'/Comparsion/CANDELS_catalog/CANDELS_data/cosmos_3dhst.v4.1.cat')
-# stellar_COSMOS_loc = file_stellar_COSMOS[:,[3,4]]  # RA, DEC
-# stellar_COSMOS_flux_ap = file_stellar_COSMOS[:,[69,51,39]]  # flux, F140w, F125w, F814w.
-# stellar_COSMOS = np.loadtxt(folder+'/Comparsion/CANDELS_catalog/CANDELS_data/cosmos_3dhst.v4.1.fout')[:,[1,6,8]]  # redshift, stellar mass, star formation rate
-# color_COSMOS = np.loadtxt(folder+'/Comparsion/CANDELS_catalog/CANDELS_data/cosmos_3dhst.v4.1.cats/RF_colors/cosmos_3dhst.v4.1.master.RF')[:,[3, 7, 9]] #Johnson_U, Johnson_V, 2MASS/J,
-# ## Check if they are in a same field.
-# #plt.plot(galfit_COSMOS_loc[:,0], galfit_COSMOS_loc[:,1],'.')
-# #plt.plot(stellar_COSMOS_loc[:,0], stellar_COSMOS_loc[:,1],'r.')
-# #plt.show()
-
-# ####Extended on 2019/10/26 with the other 4 fields: AEGIS, Good_N, Good_S, UDS.
-# file_galfit_AEGIS = np.loadtxt(folder+'/Comparsion/CANDELS_catalog/CANDELS_data/egs_2epoch_wfc3_f160w_060mas_v0.8_galfit.cat')
-# galfit_AEGIS_loc = file_galfit_AEGIS[:,[1,2]]  #RA, DEC
-# galfit_AEGIS = file_galfit_AEGIS[:,[4,6,8,3]] # mag, re, n, flag
-# file_stellar_AEGIS = np.loadtxt(folder+'/Comparsion/CANDELS_catalog/CANDELS_data/aegis_3dhst.v4.1.cats/Catalog/aegis_3dhst.v4.1.cat')
-# stellar_AEGIS_loc = file_stellar_AEGIS[:,[3,4]]  # RA, DEC
-# stellar_AEGIS_flux_ap = file_stellar_AEGIS[:,[69,51,39]]  # flux, (F140w, F125w, F814w. filter is not checked, copy from COSMOS line)
-# stellar_AEGIS = np.loadtxt(folder+'/Comparsion/CANDELS_catalog/CANDELS_data/aegis_3dhst.v4.1.cats/Fast/aegis_3dhst.v4.1.fout')[:,[1,6,8]]  # redshift, stellar mass, star formation rate
-# color_AEGIS = np.loadtxt(folder+'/Comparsion/CANDELS_catalog/CANDELS_data/aegis_3dhst.v4.1.cats/RF_colors/aegis_3dhst.v4.1.master.RF')[:,[3, 7, 9]] #Johnson_U, Johnson_V, 2MASS/J,
-# #plt.plot(galfit_AEGIS_loc[:,0], galfit_AEGIS_loc[:,1],'.')
-# #plt.plot(stellar_AEGIS_loc[:,0], stellar_AEGIS_loc[:,1],'r.')
-# #plt.show()
-
-# file_galfit_gn = np.loadtxt(folder+'/Comparsion/CANDELS_catalog/CANDELS_data/gn_all_candels_wfc3_f160w_060mas_v0.8_galfit.cat')
-# galfit_gn_loc = file_galfit_gn[:,[1,2]]  #RA, DEC
-# galfit_gn = file_galfit_gn[:,[4,6,8,3]] # mag, re, n, flag
-# file_stellar_gn = np.loadtxt(folder+'/Comparsion/CANDELS_catalog/CANDELS_data/goodsn_3dhst.v4.1.cats/Catalog/goodsn_3dhst.v4.1.cat')
-# stellar_gn_loc = file_stellar_gn[:,[3,4]]  # RA, DEC
-# stellar_gn_flux_ap = file_stellar_gn[:,[69,51,39]]  # flux, (F140w, F125w, F814w. filter is not checked, copy from COSMOS line)
-# stellar_gn = np.loadtxt(folder+'/Comparsion/CANDELS_catalog/CANDELS_data/goodsn_3dhst.v4.1.cats/Fast/goodsn_3dhst.v4.1.fout')[:,[1,6,8]]  # redshift, stellar mass, star formation rate
-# color_gn = np.loadtxt(folder+'/Comparsion/CANDELS_catalog/CANDELS_data/goodsn_3dhst.v4.1.cats/RF_colors/goodsn_3dhst.v4.1.master.RF')[:,[3, 7, 9]] #Johnson_U, Johnson_V, 2MASS/J,
-
-# #plt.plot(galfit_gn_loc[:,0], galfit_gn_loc[:,1],'.')
-# #plt.plot(stellar_gn_loc[:,0], stellar_gn_loc[:,1],'r.')
-# #plt.show()
-
-# file_galfit_gs = np.loadtxt(folder+'/Comparsion/CANDELS_catalog/CANDELS_data/gs_all_candels_ers_udf_f160w_v0.5_galfit.cat')
-# galfit_gs_loc = file_galfit_gs[:,[1,2]]  #RA, DEC
-# galfit_gs = file_galfit_gs[:,[4,6,8,3]] # mag, re, n, flag
-# file_stellar_gs = np.loadtxt(folder+'/Comparsion/CANDELS_catalog/CANDELS_data/goodss_3dhst.v4.1.cats/Catalog/goodss_3dhst.v4.1.cat')
-# stellar_gs_loc = file_stellar_gs[:,[3,4]]  # RA, DEC
-# stellar_gs_flux_ap = file_stellar_gs[:,[69,51,39]]  # flux, (F140w, F125w, F814w. filter is not checked, copy from COSMOS line)
-# stellar_gs = np.loadtxt(folder+'/Comparsion/CANDELS_catalog/CANDELS_data/goodss_3dhst.v4.1.cats/Fast/goodss_3dhst.v4.1.fout')[:,[1,6,8]]  # redshift, stellar mass, star formation rate
-# color_gs = np.loadtxt(folder+'/Comparsion/CANDELS_catalog/CANDELS_data/goodss_3dhst.v4.1.cats/RF_colors/goodss_3dhst.v4.1.master.RF')[:,[3, 7, 9]] #Johnson_U, Johnson_V, 2MASS/J,
-# #plt.plot(galfit_gs_loc[:,0], galfit_gs_loc[:,1],'.')
-# #plt.plot(stellar_gs_loc[:,0], stellar_gs_loc[:,1],'r.')
-# #plt.show()
-
-# file_galfit_uds = np.loadtxt(folder+'/Comparsion/CANDELS_catalog/CANDELS_data/uds_2epoch_wfc3_f160w_060mas_v0.3_galfit.cat')
-# galfit_uds_loc = file_galfit_uds[:,[1,2]]  #RA, DEC
-# galfit_uds = file_galfit_uds[:,[4,6,8,3]] # mag, re, n, flag
-# file_stellar_uds = np.loadtxt(folder+'/Comparsion/CANDELS_catalog/CANDELS_data/uds_3dhst.v4.2.cats/Catalog/uds_3dhst.v4.2.cat')
-# stellar_uds_loc = file_stellar_uds[:,[3,4]]  # RA, DEC
-# stellar_uds_flux_ap = file_stellar_uds[:,[69,51,39]]  # flux, (F140w, F125w, F814w. filter is not checked, copy from COSMOS line)
-# stellar_uds = np.loadtxt(folder+'/Comparsion/CANDELS_catalog/CANDELS_data/uds_3dhst.v4.2.cats/Fast/uds_3dhst.v4.2.fout')[:,[1,6,8]]  # redshift, stellar mass, star formation rate
-# color_uds = np.loadtxt(folder+'/Comparsion/CANDELS_catalog/CANDELS_data/uds_3dhst.v4.2.cats/RF_colors/uds_3dhst.v4.2.master.RF')[:,[3, 7, 9]] #Johnson_U, Johnson_V, 2MASS/J,
-# #plt.plot(galfit_uds_loc[:,0], galfit_uds_loc[:,1],'.')
-# #plt.plot(stellar_uds_loc[:,0], stellar_uds_loc[:,1],'r.')
-# #plt.show()
-
-# galfit_loc = np.concatenate((galfit_COSMOS_loc, galfit_AEGIS_loc, galfit_gn_loc, galfit_gs_loc, galfit_uds_loc))
-# galfit = np.concatenate((galfit_COSMOS, galfit_AEGIS, galfit_gn, galfit_gs, galfit_uds))
-# stellar_loc = np.concatenate((stellar_COSMOS_loc, stellar_AEGIS_loc, stellar_gn_loc, stellar_gs_loc, stellar_uds_loc))
-# stellar_flux_ap = np.concatenate((stellar_COSMOS_flux_ap, stellar_AEGIS_flux_ap, stellar_gn_flux_ap, stellar_gs_flux_ap,stellar_uds_flux_ap))
-# stellar = np.concatenate((stellar_COSMOS, stellar_AEGIS, stellar_gn, stellar_gs,stellar_uds))
-# color = np.concatenate((color_COSMOS, color_AEGIS, color_gn, color_gs,color_uds))
-
-#%% Summary the data and Combin them
-# def find_ind(inp_list, inp_ind, find_list):
-#     diff = np.sqrt(np.sum((find_list-inp_list[inp_ind])**2,axis=1)) * 3600 # Their difference in arcsec
-#     out_ind = np.where(diff==diff.min())[0][0]
-#     if diff.min() < 0.15:
-#         return out_ind, diff.min()
-#     else:
-#         return None, diff.min()
-# #print find_ind(galfit_loc, 0, stellar_loc)
-    
-# lists = []
-# gal_list = range(len(galfit_loc))
-# for i in gal_list:
-#     find_dex, min_diff = find_ind(galfit_loc, i, stellar_loc)
-#     if find_dex is not None:
-#         lists.append([i, find_dex])
-        
-# results= []  #Re, Stellar
-# for i in range(len(lists)):
-#     result0 = stellar[lists[i][1]][0]     #Redshift
-#     result1 = galfit[lists[i][0]][1]      #Reff(arcsec)
-#     result2 = galfit[lists[i][0]][2]      #Sersic n
-#     result3 = stellar[lists[i][1]][1]     #Stellar_mass
-#     result4 = galfit[lists[i][0]][3]      #flag
-#     result5 = stellar[lists[i][1]][2]     #Star formation rate
-#     result6 = stellar_flux_ap[lists[i][1]][0] #F140w
-#     result7 = stellar_flux_ap[lists[i][1]][1] #F125w.
-#     result8 = stellar_flux_ap[lists[i][1]][2] #F814w
-#     result9 = color[lists[i][1]]
-#     results.append([result0, result1, result2, result3, result4, result5, result6, result7, result8, result9])  #Redshift, Reff(arcsec), Sersic_n, Stellar_mass, flag, SFR
-# results = np.asarray(results)
-
-# #Clean up the sample
-# results = results[results[:,0] != -1] # Flag as good
-# results = results[results[:,1] != -999.0]
-# results = results[results[:,3] != 0] # Flag as good
-# results = results[np.nan_to_num(results[:,5]) != -99]
-# results = results[np.nan_to_num(results[:,5]) != 0]
-# results = results[np.nan_to_num(results[:,3]) != -1]
-# results = results[np.nan_to_num(results[:,3]) != 0]
-
-# results = results[(results[:,8]) != -99]
-# results = results[(results[:,7]) != -99]
-# results = results[(results[:,8]) != 0]
-# results = results[(results[:,7]) != 0]
 import pickle
 # pickle.dump(results, open('size_mass_CANDELS_result.pkl', 'wb'))
 results = pickle.load(open('size_mass_CANDELS_result.pkl','rb'))
@@ -355,7 +237,7 @@ JWST_Reff = []
 JWST_n = []
 idx_list = [1,2,0,51,35]
 for idx in idx_list:  #z_spec > 1.6
-    steller_file = glob.glob('esti_smass/20220901_'+str(idx)+'/SFH_*.fits')[0]
+    steller_file = glob.glob('esti_smass/20220901'+str(idx)+'/SFH_*.fits')[0]
     hdul = pyfits.open(steller_file)
     info = hdul[0].header 
     JWST_smass.append( float(info['Mstel_50']) )
@@ -389,7 +271,6 @@ plt.arrow(JWST_smass[1], JWST_Reff_kpc[1], 0, -0.2, length_includes_head=True,
 for i,idx in enumerate(idx_list): 
     plt.text(JWST_smass[i]-0.4, JWST_Reff_kpc[i]*1.2, name_list[idx], fontsize = 21, zorder =202,
              bbox={'facecolor': 'white', 'alpha': 0.5, 'pad': 3})   
-print('esti_smass/202208*/SPEC_*_spec.png')
 #%%    
 plt.xlim([8.5, 11.7])
 plt.xlabel("log (M$_*$; units of M$_{\odot}$)",fontsize=35)

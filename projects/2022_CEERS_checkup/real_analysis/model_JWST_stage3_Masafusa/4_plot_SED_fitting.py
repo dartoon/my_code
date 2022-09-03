@@ -15,10 +15,10 @@ from functions_for_result import esti_smass, load_prop, load_info, name_list
 import matplotlib as mat
 mat.rcParams['font.family'] = 'STIXGeneral'
 
-folder = '20220902'
-
-
-idx = 1
+# folder = '202209' #0.2 mag no HST.
+# folder = '20220901_' #Not HST
+folder = '20220901' #HST upper limit
+idx = 2
 
 _, z = load_info(idx)
 target_id = name_list[idx]
@@ -159,17 +159,16 @@ for i, fid in enumerate(filt_id[::-1]):
 
 # plt.text( (xmax-xmin)*0.7, (ymax-ymin)*0.53, 'stellar population with:', fontsize=17)
 plt.text( (xmax-xmin)*0.6, (ymax-ymin)*0.53, 'z={0}'.format(z), fontsize=17)
-plt.text( (xmax-xmin)*0.6, (ymax-ymin)*0.43, 'age=[{1:.3f}, {0:.3f}, {2:.3f}]  Gyr'.format(age, age_l, age_h), fontsize=17)
-plt.text( (xmax-xmin)*0.6, (ymax-ymin)*0.33, "SFR=[{1:.3f} {0:.3f} {2:.3f}]".format(sfr, sfr_l, sfr_h) + r" M$_{\rm \odot}$/yr ", fontsize=17)
-# plt.text( (xmax-xmin)*0.6, (ymax-ymin)*0.25, r"M$_{\rm \odot}$/yr ", fontsize=17)
-# plt.text( (xmax-xmin)*0.7, (ymax-ymin)*0.25, r"$24.13\substack{+1.17\\\\-0.55}$", fontsize=17)
-# plt.text( (xmax-xmin)*0.8, (ymax-ymin)*0.37, 'Z$_*$/Z$_\odot$={0}'.format(mel), fontsize=17)
+# plt.text( (xmax-xmin)*0.6, (ymax-ymin)*0.43, 'age=[{1:.3f}, {0:.3f}, {2:.3f}]  Gyr'.format(age, age_l, age_h), fontsize=17)
+# plt.text( (xmax-xmin)*0.6, (ymax-ymin)*0.33, "SFR=[{1:.3f} {0:.3f} {2:.3f}]".format(sfr, sfr_l, sfr_h) + r" M$_{\rm \odot}$/yr ", fontsize=17)
+plt.text( (xmax-xmin)*0.6, (ymax-ymin)*0.43, 'age=[{1:.1f}$-${2:.1f}]  Gyr'.format(age, age_l, age_h), fontsize=17)
+plt.text( (xmax-xmin)*0.6, (ymax-ymin)*0.33, "SFR=[{1:.1f}$-${2:.1f}]".format(sfr, sfr_l, sfr_h) + r" M$_{\rm \odot}$/yr ", fontsize=17)
 plt.legend(prop={'size':15}, ncol=2, loc = 1)
 plt.tick_params(labelsize=20)
 plt.xlabel("um",fontsize=27)
 plt.ylabel(r"f$_\lambda$ 10$^{\rm" + " -{0}}}$ erg/s/cm$^2$/$\AA$".format(unit.split('e-')[1][:2]),fontsize=27)
 plt.title(target_id,fontsize=27)
-plt.savefig('outcomes/idx{0}_sed.pdf'.format(idx))
+# plt.savefig('outcomes/idx{0}_sed.pdf'.format(idx))
 # #plt.yticks([])
 
 

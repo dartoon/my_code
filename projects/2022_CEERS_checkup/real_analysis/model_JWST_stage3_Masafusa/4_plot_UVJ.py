@@ -17,7 +17,13 @@ matt.rcParams['font.family'] = 'STIXGeneral'
 # folder = '202209' #Consider only JWST
 # idx = [1,2,0,51,35]
 
-folder = '202209' #Consider a 0.4 mag error
+# #0.2 mag error
+# folder = '202209' #Not HST
+
+# #0.4 mag error
+# folder = '20220901_' #Not HST
+folder = '20220901' #HST upper limit
+
 from functions_for_result import esti_smass, load_prop, load_info, name_list
 
 color = []
@@ -34,8 +40,14 @@ for idx in [1,2,0,51,35]:
 
 color = np.array(color)
 
-plt.figure(figsize=(9, 9))
-plt.scatter(color[:,0], color[:,1],
+plt.figure(figsize=(11,11))
+
+empty = np.array([True, False, True, False, False])
+confrim = empty==False
+plt.scatter(color[:,0][empty], color[:,1][empty],s=280,marker="H",
+            # c='darkred',s=280,marker="o",zorder=1, vmin=0.5, vmax=5, edgecolors='white')
+             facecolors='none', edgecolors='darkred', linewidths=2)
+plt.scatter(color[:,0][confrim], color[:,1][confrim],
             c='darkred',s=280,marker="H",zorder=1, vmin=0.5, vmax=5, edgecolors='black')
 
 for i in range(len(target_id_list)):

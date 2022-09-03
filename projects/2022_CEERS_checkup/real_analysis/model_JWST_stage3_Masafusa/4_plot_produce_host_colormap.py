@@ -16,7 +16,8 @@ import glob
 remove_id = [24, 55]
 # use_filt = ['F444W', 'F410M', 'F356W', 'F277W', 'F200W', 'F150W', 'F115W', 'F160W' ,'F125W' ,'F814W', 'F606W']
 
-use_filt = ['F444W',  'F277W', 'F150W']
+# use_filt = ['F356W',  'F277W', 'F150W']
+use_filt = ['F444W',  'F277W', 'F150W']   
 fit_run_list = []
 
 for idx in [1]:  #z_spec > 1.6
@@ -96,7 +97,7 @@ zp_list = [fit_run_list[i].zp for i in range(3)]
 #%%
 from scipy.ndimage import zoom
 shift_center = True
-l_idx = 2
+l_idx = 0
 deltaPix_list = np.array([fit_run_list[i].fitting_specify_class.deltaPix for i in range(len(fit_run_list))])
 ratio_list = deltaPix_list/np.max(deltaPix_list)
 image_list = []
@@ -107,6 +108,7 @@ run_idx_list = [l_idx] + [i for i in range(len(use_filt)) if i != l_idx]
 image_list = [None] * len(use_filt)
 for i in run_idx_list:
     fit_run = fit_run_list[i]
+    # img_org = fit_run.flux_2d_out['data'] 
     img_org = fit_run.flux_2d_out['data-Point Source'] 
     if len(fit_run.image_host_list) == 3:
         img_org = img_org - fit_run.image_host_list[1]
@@ -126,13 +128,17 @@ for i in run_idx_list:
             new_pos = pos + shift + int(len(img_org)/2) #!!!
             ct = int(len(img_org)/2) - np.max(shift) - 1 
             img_org =  img_org[ new_pos[1] - ct:new_pos[1] + ct+1, new_pos[0] - ct:new_pos[0] + ct +1 ]
+    print(ratio_list[i])
     img_show = zoom(img_org, ratio_list[i])
+    print(img_show.shape)
+    if len(img_show)/2 != int(len(img_show)/2):
+        img_show = zoom(img_show, len(img_show)/(len(img_show)-1))
     img_show = img_show/np.sum(img_show)*np.sum(img_org)
-    print(np.sum(img_org), np.sum(img_show))
-    # if len(img_show)/2 != int(len(img_show)/2):
-    #     img_show = zoom(img_org, len(img_org)/(len(img_org)-1))
-    # plt_fits(img_show)
+    print(use_filt[i])
+    plt_fits(img_show)
+    print(i)
     image_list[i] = img_show
+#%%
 size = np.min([len(image_list[i]) for i in range(len(image_list)) ])
 for i, image in enumerate(image_list):
     ct = int((len(image) -  size)/2)
@@ -147,9 +153,8 @@ for i, image in enumerate(image_list):
 image_list = [image_list[i] * 10 ** (-0.4*(zp_list[i]-zp_list[0])) for i in range(3) ]
     
 from galight.tools.astro_tools import plt_fits_color
-pickle.dump(image_list, open('color_image'+'.pkl', 'wb'))  
-
-plt_fits_color(image_list, Q=8, stretch=0.2)
+pickle.dump(image_list, open('color_image_quasar'+'.pkl', 'wb'))  
+plt_fits_color(image_list, Q=7, stretch=0.3)
 
 # from astropy.visualization import make_lupton_rgb
 # rgb_default = make_lupton_rgb(image_list[0], image_list[1], image_list[2], Q=8, stretch=0.2)

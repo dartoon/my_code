@@ -100,7 +100,7 @@ def total_compare(flux_list_2d, label_list_2d,
             ax_l[i].get_yaxis().set_visible(False)
         ax_l[i].get_xaxis().set_visible(False)
         deltaPix = deltaPix_list[i]
-        scale_bar(ax_l[i], frame_size, dist=1/deltaPix, text='1"', color = 'white')
+        scale_bar(ax_l[i], frame_size, dist=0.5/deltaPix, text='0.5"', color = 'white')
         ticks= np.array([1.e-4, 1.e-3, 1.e-2,1.e-1,0, 10])
         cb_i = f.colorbar(im_i, ax=ax_l[i], shrink=0.48, pad=0.01,  orientation="horizontal", 
                           aspect=15, ticks=ticks)
@@ -110,11 +110,11 @@ def total_compare(flux_list_2d, label_list_2d,
         
         if z != None:
             ax_l[i].text(frame_size*0.65, frame_size*0.05, 'z={0}'.format(z),fontsize=fontsize, 
-                         weight='bold', color='gold', bbox={'facecolor': 'white', 'alpha': 0.4, 'pad': 3})
+                         weight='bold', color='white', bbox={'facecolor': 'gold', 'alpha': 0.6, 'pad': 3})
         
         if i == 0:
-            ax_l[i].text(frame_size*0.4, frame_size*0.9, target_ID,fontsize=fontsize, 
-                         weight='bold', color='gold',  bbox={'facecolor': 'white', 'alpha': 0.4, 'pad': 3})
+            ax_l[i].text(frame_size*0.5, frame_size*0.9, target_ID,fontsize=fontsize, 
+                         weight='bold', color='white',  bbox={'facecolor': 'gold', 'alpha': 0.6, 'pad': 3})
     #Plot normalized residual map:
     norm_residual = flux_list_2d[-1]
     plt.subplots_adjust(wspace=-0.5, hspace=0)

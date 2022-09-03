@@ -37,7 +37,7 @@ remove_id = [24, 55]
 # for idx in [29, 53]:  #z_spec > 2
 
 result = []
-for idx in [35, 53, 57, 39, 41]:  #CEERS
+for idx in [1]:  #CEERS
     if idx in remove_id:
         continue
     else:
