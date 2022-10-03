@@ -22,7 +22,8 @@ matt.rcParams['font.family'] = 'STIXGeneral'
 
 # #0.4 mag error
 # folder = '20220901_' #Not HST
-folder = '20220901' #HST upper limit
+# folder = '20220901' #HST upper limit
+folder = '20220906' #mag error based on PSF lib
 
 from functions_for_result import esti_smass, load_prop, load_info, name_list
 
@@ -44,18 +45,19 @@ plt.figure(figsize=(11,11))
 
 empty = np.array([True, False, True, False, False])
 confrim = empty==False
-plt.scatter(color[:,0][empty], color[:,1][empty],s=280,marker="H",
+# empty = np.array([True, False, False, False, False])
+plt.scatter(color[:,0][empty], color[:,1][empty],s=880,marker="H",
             # c='darkred',s=280,marker="o",zorder=1, vmin=0.5, vmax=5, edgecolors='white')
-             facecolors='none', edgecolors='darkred', linewidths=2)
-plt.scatter(color[:,0][confrim], color[:,1][confrim],
-            c='darkred',s=280,marker="H",zorder=1, vmin=0.5, vmax=5, edgecolors='black')
+             facecolors='white', edgecolors='black', linewidths=2, zorder=4, alpha =0.8)
+jwst_p = plt.scatter(color[:,0][confrim], color[:,1][confrim],
+            c='lightskyblue',s=880,marker="H",zorder=2, vmin=0.5, vmax=5, edgecolors='black')
 
 for i in range(len(target_id_list)):
-    if target_id_list[i] == 'AEGIS 477':
-        plt.text(color[i,0]+0.1, color[i,1]-0.1,target_id_list[i],  fontsize = 21, zorder =2,
-                 bbox={'facecolor': 'white', 'alpha': 0.5, 'pad': 3})   
-    else:
-        plt.text(color[i,0]+0.1, color[i,1],target_id_list[i],  fontsize = 21, zorder =2,
+    if target_id_list[i] == 'SDSS1419':
+        plt.text(color[i,0]-0.6, color[i,1]+0.1,target_id_list[i],  fontsize = 21, zorder =2,
+                  bbox={'facecolor': 'white', 'alpha': 0.5, 'pad': 3})   
+    if target_id_list[i] != 'SDSS1419':
+        plt.text(color[i,0]+0.15, color[i,1],target_id_list[i],  fontsize = 21, zorder =2,
                  bbox={'facecolor': 'white', 'alpha': 0.5, 'pad': 3})   
     
 #plt.title('', fontsize=27)
@@ -109,8 +111,14 @@ plt.ylabel("U$-$V",fontsize=27)
 plt.tick_params(labelsize=20)
 plt.xlim([-1,3])
 plt.ylim([0,2.5])
-plt.savefig('outcomes/UVJ.png')
+plt.tick_params(labelsize=25)
+# from matplotlib.legend_handler import HandlerTuple
+plt.legend([c1, c2, jwst_p], ['CANDELS galaxy, star-forming', 'CANDELS galaxy, quiescent', 
+                              'This work, 1.6<z<3.5'],
+               loc='upper left',fontsize=21,numpoints=1)
+
 #plt.legend(scatterpoints=1,numpoints=1,loc=2,prop={'size':28},ncol=2,handletextpad=0)
+plt.savefig('outcomes/UVJ.png')
 plt.show()
 # # 
 # steller_file = glob.glob('esti_smass/'+folder+str(idx)+'/gsf_spec_*.fits')[0]

@@ -168,14 +168,31 @@ mags = np.array(load_mag(ID, folder = folder)[0])
 Reffs = np.array(load_re(ID, folder = folder))[:,0]
 Reffs_e = np.array(load_re(ID, folder = folder))[:,1]
 indexs = np.array(load_n(ID, folder = folder))[:,0]
+from load_result import load_host_p
+Mstar = load_host_p(ID, folder = folder)[1]
+
+for i in range(len(zs)):
+    zs_ = zs[i]
+    if zs_> 1.44:
+        filt_wave = 14000
+        key = 140
+    else:
+        filt_wave = 12500
+        key = 125
+    wave_rest = 5000
+    wave = filt_wave / (1+zs_)
+    z_p = int(key)/50  -1
+    Reff_filt = Reffs[i]
+    vdep = -0.35 + 0.12 * zs_ - 0.25 * np.log10( 10 ** Mstar[i] / 10**10)
+    Reff_5000 = Reff_filt * ((1+zs_)/(1+z_p)) ** vdep
+    Reffs[i] = Reff_5000
+
 
 dl=(1+zs)*c*vec_EE(zs)/h0 *10**6   #in pc
 da=1/(1+zs)*c*vec_EE(zs)/h0   #in Mpc
 ID_Reff_kpc = da * 10 **3 * (Reffs/3600./180.*np.pi)
 ID_Reff_kpc_e = da * 10 **3 * ((Reffs_e)/3600./180.*np.pi)
 
-from load_result import load_host_p
-Mstar = load_host_p(ID, folder = folder)[1]
 host_flux_WFC3 = np.array(load_flux(ID, folder = folder, flt = 'WFC3'))[:,0]
 host_flux_ACS = []
 for i in range(len(ID)):
@@ -198,7 +215,7 @@ b11_local_mstar = b11_l[:,9]  #!!! Change to total mass
 #    plt.scatter(b11_local_mstar,b11_local_Reff,s=180, c ='black',
 #                marker="o",zorder=100, vmin=0.5, vmax=5, edgecolors='white', label='local AGN (VB2011)')     
 for i in range(len(Mstar)):
-    if Reffs[i]-0.1 < 0.009:
+    if Reffs[i]-0.1 < 0.009 and zs[i]>1.6:
         plt.arrow(Mstar[i], ID_Reff_kpc[i], 0, -0.3, length_includes_head=True,
               head_width=0.08, head_length=0.05, zorder=102, color='black', linewidth=1.2)
    
@@ -213,7 +230,7 @@ up_err = 10**(np.log10(ID_Reff_kpc)+log_Rerr) - ID_Reff_kpc
 # #                 yerr= 10**(np.log10(ID_Reff_kpc)-np.log10(ID_Reff_kpc-ID_Reff_kpc_e)) [host_flux_ACS>0],
 #              color='k',ecolor='k', fmt='.',markersize=1, zorder = 99)  
 
-p2 = plt.scatter(Mstar,ID_Reff_kpc, s=100, linewidth=1.2, c =indexs,
+p2 = plt.scatter(Mstar[zs>1.6],ID_Reff_kpc[zs>1.6], s=170, linewidth=1.2, c =indexs[zs>1.6],
             marker="D",zorder=101, vmin=0.5, vmax=5, edgecolors='black', cmap=cmap_r)    
 # plt.errorbar(Mstar,ID_Reff_kpc,
 #              yerr=  [low_err,
@@ -230,47 +247,109 @@ p2 = plt.scatter(Mstar,ID_Reff_kpc, s=100, linewidth=1.2, c =indexs,
 #             color='k',ecolor='k', fmt='.',markersize=1, zorder = 99)  
 #%%
 #Load M for 
+
+hst_filt_id = {'F606W': '4', 'F814W':'6', 'F105W':'202', 'F125W':'203', 'F140W':'204', 'F160W':'205'}
+jwst_filt_id = {'F115W': '352', 'F150W': '353', 'F200W': '354', 
+           'F277W': '355', 'F356W': '356', 'F444W': '357', 'F410M': '362'}
+
+filt_wave_dic = {'F115W': 11623.89, 'F150W': 15104.23, 'F200W': 20028.15, 
+           'F277W': 27844.64, 'F356W': 35934.49, 'F444W': 44393.50, 'F410M': 40886.55}
+
+filter_id = hst_filt_id | jwst_filt_id
+ivd = {v: k for k, v in filter_id.items()}
+
 from functions_for_result import load_prop, name_list
-JWST_smass = []
+JWST_smass, JWST_smass_low, JWST_smass_high= [],[],[]
 JWST_z = []
-JWST_Reff = []
+JWST_Reff,JWST_Reff_err = [],[]
 JWST_n = []
 idx_list = [1,2,0,51,35]
 for idx in idx_list:  #z_spec > 1.6
     steller_file = glob.glob('esti_smass/20220901'+str(idx)+'/SFH_*.fits')[0]
     hdul = pyfits.open(steller_file)
     info = hdul[0].header 
-    JWST_smass.append( float(info['Mstel_50']) )
-    JWST_z.append( float(info['ZMC_50']) )
+    z = float(info['ZMC_50'])
+    smass = float(info['Mstel_50'])
+    JWST_smass.append( smass )
+    JWST_smass_low.append( float(info['Mstel_50']) - float(info['Mstel_16']) )
+    JWST_smass_high.append( float(info['Mstel_84']) - float(info['Mstel_50']) )
+    JWST_z.append( z )
     fit_run_dict = load_prop(idx=idx, prop_name = 'fit_run', root_folder='./*')
     Reff, chisq, n = [], [] ,[]
+    Reff_filt_list = []
     for key in fit_run_dict.keys():
-        Reff.append(fit_run_dict[key].final_result_galaxy[0]['R_sersic'])
+        filt_wave = filt_wave_dic[key]
+        wave_rest = 5000
+        wave = filt_wave / (1+z)
+        z_p = int(key[1:4])/50  -1
+        Reff_filt = fit_run_dict[key].final_result_galaxy[0]['R_sersic']
+        vdep = -0.35 + 0.12 * z - 0.25 * np.log10( 10 ** smass / 10**10)
+        Reff_5000 = Reff_filt * ((1+z)/(1+z_p)) ** vdep
+        Reff_filt_list.append(Reff_filt)
+        # if z<2:
+        # print(key, z, ((1+z)/(1+z_p)) ** vdep )
+        Reff.append(Reff_5000)
         n.append(fit_run_dict[key].final_result_galaxy[0]['n_sersic'])
         chisq.append(fit_run_dict[key].reduced_Chisq)
+    # if z<2:
+    #     print(Reff)
+    
+    sample_cat_file = glob.glob('esti_smass/20220901'+str(idx)+'/sample.cat')[0]
+    f = open(sample_cat_file,"r")
+    string = f.read()
+    lines = string.split('\n')   # Split in to \n
+    line = lines[0]
+    filt_id = line.split('F')[1:]
+    filt_id = [filt_id[i].split(' ')[0] for i in range(len(filt_id))]
+    
     Reff = np.array(Reff)
     n = np.array(n)
     chisq = np.array(chisq)
     # Reff = [fit_run_list[i].final for i in range(len(fit_run_list))]
     # chisq = np.array(list(load_prop(idx=idx, prop_name = 'chisq', root_folder='./*').values()))
     # n = np.array(list(load_prop(idx=idx, prop_name = 'n_sersic', root_folder='./*').values()))
-    JWST_Reff.append(np.median(Reff))
+    re_id = np.where( abs(Reff_filt_list - np.median(Reff_filt_list)) == np.min(abs(Reff_filt_list - np.median(Reff_filt_list)) ) )[0][0]
+    JWST_Reff.append(Reff[re_id])
+    JWST_Reff_err.append( np.std(Reff) )
     JWST_n.append(np.median(n) )
     # JWST_Reff.append( Reff[chisq==np.min(chisq)][0] )
     # JWST_n.append( n[chisq==np.min(chisq)][0] )
 JWST_z = np.array(JWST_z)
 JWST_Reff = np.array(JWST_Reff)
+JWST_Reff_err = np.array(JWST_Reff_err)
 da=1/(1+JWST_z)*c*vec_EE(JWST_z)/h0   #in Mpc
 JWST_Reff_kpc = da * 10 **3 * (JWST_Reff/3600./180.*np.pi)
-jwst_p = p_jwst = plt.scatter(JWST_smass, JWST_Reff_kpc, s=880, linewidth=2.2, c =JWST_n,
+JWST_Reff_kpc_err = da * 10 **3 * (JWST_Reff_err/3600./180.*np.pi)
+JWST_smass = np.array(JWST_smass)
+JWST_smass_low = np.array(JWST_smass_low)
+JWST_smass_high = np.array(JWST_smass_high)
+JWST_Reff_kpc = np.array(JWST_Reff_kpc)
+JWST_n = np.array(JWST_n)
+
+show = np.array([True, True, True, True, True])
+jwst_p = p_jwst = plt.scatter(JWST_smass[show], JWST_Reff_kpc[show], s=880, linewidth=2.2, c =JWST_n[show],
             marker="H",zorder=201, vmin=0.5, vmax=5, edgecolors='black', cmap=cmap_r)   
+
+show = np.array([True, True, True, True, True])
+JWST_Reff_kpc_err[1] = 0.001
+plt.errorbar(JWST_smass[show], JWST_Reff_kpc[show], 
+             xerr=[JWST_smass_low[show],JWST_smass_high[show]], yerr=JWST_Reff_kpc_err[show], color='black', linewidth=3.2, 
+             ecolor='black', fmt='.',zorder=200,markersize=1)
+
 
 plt.arrow(JWST_smass[1], JWST_Reff_kpc[1], 0, -0.2, length_includes_head=True,
       head_width=0.08, head_length=0.05, zorder=102, color='black', linewidth=1.2)
 
-for i,idx in enumerate(idx_list): 
-    plt.text(JWST_smass[i]-0.4, JWST_Reff_kpc[i]*1.2, name_list[idx], fontsize = 21, zorder =202,
-             bbox={'facecolor': 'white', 'alpha': 0.5, 'pad': 3})   
+
+# for i,idx in enumerate(idx_list): 
+for i in range(len(idx_list)):
+    idx = idx_list[i]
+    if idx != 51:
+        plt.text(JWST_smass[i]-0.5, JWST_Reff_kpc[i]*1.2, name_list[idx], fontsize = 21, zorder =202,
+                 bbox={'facecolor': 'white', 'alpha': 0.5, 'pad': 3})   
+    elif idx == 51:
+        plt.text(JWST_smass[i]+0.1, JWST_Reff_kpc[i]/1.2, name_list[idx], fontsize = 21, zorder =202,
+                 bbox={'facecolor': 'white', 'alpha': 0.5, 'pad': 3})   
 #%%    
 plt.xlim([8.5, 11.7])
 plt.xlabel("log (M$_*$; units of M$_{\odot}$)",fontsize=35)
@@ -278,9 +357,9 @@ plt.tick_params(labelsize=25)
 #plt.legend(loc='upper right',fontsize=21,numpoints=1)
 from matplotlib.legend_handler import HandlerTuple
 plt.legend([c1, c2, p2, jwst_p], ['CANDELS galaxy, star-forming', 'CANDELS galaxy, quiescent', 
-                                  'Ding2022 AGN sample, 1.2<z<1.7', 'This work, 1.6<z<3.5'],
+                                  'Ding 2020 AGN sample, 1.6<z<1.7', 'This work, 1.6<z<3.5'],
                handler_map={tuple: HandlerTuple(ndivide=None)},loc='upper left',fontsize=21,numpoints=1)
-plt.ylabel(r"R$_{\rm eff}$ (kpc)",fontsize=35)
+plt.ylabel(r"R$_{\rm eff, maj}$ (kpc)",fontsize=35)
 #    plt.title(r"M$_*$ - R$_{eff}$ relation, sample redshift range {0}".format(z_range), fontsize = 25)
 #    plt.title(r"M$_*$ - R$_{\rm eff}$ relation"+', sample redshift range {0}'.format(z_range), fontsize = 25)
 plt.ylim([0.3, 20.5])

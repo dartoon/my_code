@@ -35,9 +35,9 @@ remove_id = [24, 55]
 # for idx in [31, 32, 56]:   #JWST PS position corrected
 # for idx in [0, 2, 8, 28, 35, 51]:  #z_spec > 2
 # for idx in [29, 53]:  #z_spec > 2
-
+from functions_for_result import name_list
 result = []
-for idx in [1]:  #CEERS
+for idx in [0]:  #CEERS
     if idx in remove_id:
         continue
     else:
@@ -106,12 +106,13 @@ for idx in [1]:  #CEERS
             fit_run.plot_final_qso_fit(target_ID = target_id+'$-$'+filt)
             
             # name_list = {1:'SDSS1420+5300A', 2: 'SDSS1420+5300B', 0: 'SDSS1419+5254', 
-            #              51: 'aegis_477', 35: 'aegis_482'}
+            #               51: 'aegis_477', 35: 'aegis_482'}
+
             # target_id = name_list[int(idx)]
             # fit_run.savename = 'outcomes/'+'ID' + idx + '_' + filt
             # fit_run.plot_final_qso_fit(target_ID = target_id+'  '+filt, save_plot= True)
             
-            prop_name = 'R_sersic'
+            prop_name = 'magnitude'
             # all_values = [fit_run_list[i].final_result_ps[0][prop_name] for i in range(len(fit_run_list))]
             all_values = [fit_run_list[i].final_result_galaxy[0][prop_name] for i in range(len(fit_run_list))]
             weighted_value = np.sum(np.array(all_values)*weight) / np.sum(weight)

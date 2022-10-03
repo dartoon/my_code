@@ -18,17 +18,18 @@ mat.rcParams['font.family'] = 'STIXGeneral'
 # folder = '202209' #0.2 mag no HST.
 # folder = '20220901_' #Not HST
 # folder = '20220901' #HST upper limit
+# idx = 51
 
-folder = '20220906' #mag error bar from top 5 PSF
-
-# for idx in [1,51,2,0,35]:  #z from low to high
-idx = 51
-
-target_id = name_list[idx]
-folder = 'esti_smass/'+folder+str(idx)
+# folder = '20220904' 
+# target_id = name_list[idx]
+# folder = 'esti_smass/'+folder+str(idx)
 
 
-print(idx)
+folder = 'fit_one_target/F140M_20220904101/' #
+# folder = 'fit_one_target/F140Mupper_20220904101/' #
+# folder = 'esti_smass/20220904101/' #
+idx = 101
+
 steller_file = glob.glob(folder+'/SFH_*.fits')[0]
 hdul = pyfits.open(steller_file)
 info = hdul[0].header 
@@ -53,6 +54,7 @@ print('sfr_h', sfr_h)
 print('age', age)
 print('age_l', age_l)
 print('age_h', age_h)
+
 print('AV', float(info['AV_50']) )
 print('SSFR', round(float(info['SFR_50']) - float(info['Mstel_50']) ,3) )
 # print("open",'esti_smass/'+folder+str(idx), '/' )
@@ -128,7 +130,7 @@ for i, fid in enumerate(filt_id[::-1]):
         lam = lam/10000.
         yerr_l = fnu_err/fnu
         plt.scatter(lam, flambda, c='r', zorder=100,  s=180)
-        plt.errorbar(lam, flambda, yerr=yerr_l*flambda,fmt='.',color='red',markersize=1, zorder =100, linewidth=2)
+        plt.errorbar(lam, flambda, yerr=yerr_l*flambda,fmt='.',color='gray',markersize=1, zorder =90, linewidth=2)
     if fnu == 0:
         mag = -2.5*np.log10(fnu_err) + 25
         flambda = 10**(-0.4*(mag+2.402+5.0*np.log10(lam))) * 10**float(unit.split('e-')[1][:2])
@@ -139,7 +141,7 @@ for i, fid in enumerate(filt_id[::-1]):
         
     f_array = np.vstack((wave, f_50)).T
     filt_flam = cal_filt_flam(f_array , f_fil[:,1:])    
-    plt.scatter(lam, filt_flam, marker="d", zorder =90,  s=280, facecolors='none', edgecolors='blue', linewidths=2)
+    plt.scatter(lam, filt_flam, marker="d", zorder =98,  s=280, facecolors='none', edgecolors='blue', linewidths=2)
     
     flambda_list.append(flambda)
         
@@ -163,32 +165,22 @@ for i, fid in enumerate(filt_id[::-1]):
     f_fil = np.loadtxt('../../../../template/gsf_temp/filter/{0}.fil'.format(fid))
     top = f_50.max()
     f_fil[:,2] = f_fil[:,2]/f_fil[:,2].max() * (ymax-ymin) * 0.1
-    plt.plot(f_fil[1:,1]/10000., f_fil[1:,2], label='{0}'.format(ivd[fid]))
+    plt.plot(f_fil[1:,1]/10000., f_fil[1:,2], label='{0} response'.format(ivd[fid]))
 
 # plt.text( (xmax-xmin)*0.7, (ymax-ymin)*0.53, 'stellar population with:', fontsize=17)
-plt.text( (xmax-xmin)*0.6, (ymax-ymin)*0.63, 'z: {0}'.format(z), fontsize=17)
-# plt.text( (xmax-xmin)*0.6, (ymax-ymin)*0.43, 'age:  [{1:.3f}, {0:.3f}, {2:.3f}]  Gyr'.format(age, age_l, age_h), fontsize=17)
-# plt.text( (xmax-xmin)*0.6, (ymax-ymin)*0.33, "SFR:  [{1:.3f} {0:.3f} {2:.3f}]".format(sfr, sfr_l, sfr_h) + r" M$_{\rm \odot}$/yr ", fontsize=17)
-plt.text( (xmax-xmin)*0.6, (ymax-ymin)*0.57, 'M$_*$: [{1:.2f}, {0:.2f}, {2:.2f}] log'.format(smass, smass_l, smass_h)+r"M$_{\rm \odot}$", fontsize=17)
-print('M$_*$:  [{1:.2f}, {0:.2f} ,{2:.2f}]'.format(smass, smass_l, smass_h))
-if '{0:.1f}'.format(age_l) == '0.0':
-    plt.text( (xmax-xmin)*0.6, (ymax-ymin)*0.51, r'age: [$\leftarrow${2:.1f}]  Gyr'.format(age, age_l, age_h), fontsize=17)
-    print(r'age:  [$\leftarrow${2:.1f}]  Gyr'.format(age, age_l, age_h))
-else:
-    plt.text( (xmax-xmin)*0.6, (ymax-ymin)*0.51, 'age: [{1:.1f}$-${2:.1f}]  Gyr'.format(age, age_l, age_h), fontsize=17)
-    print('age:  [{1:.1f}$-${2:.1f}]  Gyr'.format(age, age_l, age_h))
-if '{0:.1f}'.format(sfr_l) == '0.0':
-    plt.text( (xmax-xmin)*0.6, (ymax-ymin)*0.45, r"SFR: [$\leftarrow${2:.1f}]".format(sfr, sfr_l, sfr_h) + r" M$_{\rm \odot}$/yr ", fontsize=17)
-    print("[$\leftarrow${2:.1f}]".format(sfr, sfr_l, sfr_h) + r" M$_{\rm \odot}$/yr ")
-else:
-    plt.text( (xmax-xmin)*0.6, (ymax-ymin)*0.44, "SFR: [{1:.1f}$-${2:.1f}]".format(sfr, sfr_l, sfr_h) + r" M$_{\rm \odot}$/yr ", fontsize=17)
-    print("SFR:  [{1:.1f}$-${2:.1f}]".format(sfr, sfr_l, sfr_h) + r" M$_{\rm \odot}$/yr ")
+plt.text( (xmax-xmin)*0.6, (ymax-ymin)*0.63, 'z={0}'.format(z), fontsize=17)
+# plt.text( (xmax-xmin)*0.6, (ymax-ymin)*0.43, 'age=[{1:.3f}, {0:.3f}, {2:.3f}]  Gyr'.format(age, age_l, age_h), fontsize=17)
+# plt.text( (xmax-xmin)*0.6, (ymax-ymin)*0.33, "SFR=[{1:.3f} {0:.3f} {2:.3f}]".format(sfr, sfr_l, sfr_h) + r" M$_{\rm \odot}$/yr ", fontsize=17)
+print( "[{0:.1f}$-${1:.1f}]".format(float(info['Mstel_16']), float(info['Mstel_84'])) )
+plt.text( (xmax-xmin)*0.6, (ymax-ymin)*0.57, 'stellar mass =[{1:.1f},{0:.1f},{2:.1f}]  log'.format(smass, smass_l, smass_h)+r" M$_{\rm \odot}$", fontsize=17)
+plt.text( (xmax-xmin)*0.6, (ymax-ymin)*0.51, 'age=[{1:.1f},{0:.1f},{2:.1f}]  Gyr'.format(age, age_l, age_h), fontsize=17)
+plt.text( (xmax-xmin)*0.6, (ymax-ymin)*0.45, "SFR=[{1:.1f},{0:.1f},{2:.1f}]".format(sfr, sfr_l, sfr_h) + r" M$_{\rm \odot}$/yr ", fontsize=17)
 plt.legend(prop={'size':15}, ncol=2, loc = 1)
 plt.tick_params(labelsize=20)
-plt.xlabel(r"$\lambda$ (um)",fontsize=27)
+plt.xlabel("um",fontsize=27)
 plt.ylabel(r"f$_\lambda$ 10$^{\rm" + " -{0}}}$ erg/s/cm$^2$/$\AA$".format(unit.split('e-')[1][:2]),fontsize=27)
-plt.title(target_id,fontsize=27)
-plt.savefig('outcomes/idx{0}_sed.pdf'.format(idx))
+# plt.title(target_id,fontsize=27)
+# plt.savefig('outcomes/idx{0}_sed.pdf'.format(idx))
 # #plt.yticks([])
 
 

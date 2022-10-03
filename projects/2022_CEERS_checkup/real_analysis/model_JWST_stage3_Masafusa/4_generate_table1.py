@@ -13,6 +13,7 @@ import pickle
 import os
 import glob
 from galight.tools.asymmetry_tools import CAS
+from functions_for_result import load_info
 
 remove_id = [24, 55]
 
@@ -37,16 +38,22 @@ remove_id = [24, 55]
 
 # for idx in [0, 1, 2, 35, 51]:  #z_spec > 1.6, QSO 
 result_list = []
+rms_result_list = []
 target_ID_list = []
+z_list = []
 filt = 'F444W'
-cal_CAS = True
+cal_CAS = False
 if_plot = False
 # for idx in [1,2,0,51,35]:  #z_spec > 1.6
-for idx in [35,0,2,51,1]:  #z_spec > 1.6
+# for idx in [35,0,2,51,1]:  #z_spec > 1.6
+for idx in [1,51,2,0,35]:  #z from low to high
 # for idx in [1]:  #z_spec > 1.6
     result = []
-    files = glob.glob('../*/*fit_material/data_process_idx{0}_*_psf*.pkl'.format(idx))
+    rms_result = []
+    files = glob.glob('../*/fit_material/data_process_idx{0}_*_psf*.pkl'.format(idx))
     files.sort()
+    
+    # files = files[]
     # file_ACS = glob.glob('../model_HST_material/material/data_process+apertures_{0}_ACS.pkl'.format(idx))
     # file_WFC= glob.glob('../model_HST_material/material/data_process+apertures_{0}_IR.pkl'.format(idx))
     # file_JWST = glob.glob('../model_JWST_stage3_Masafusa/material/data_process+apertures_{0}.pkl'.format(idx))
@@ -71,7 +78,8 @@ for idx in [35,0,2,51,1]:  #z_spec > 1.6
     string = f.read()
     lines = string.split('\n')   # Split in to \n
     target_id = [lines[i].split(' ')[1] for i in range(len(lines)) if lines[i].split(' ')[0] == str(idx)][0]
-    
+    _, z = load_info(idx)
+    z_list.append(float(z))
     fit_run_list = []
     idx = idx_info
     # idx, filt= item
@@ -90,30 +98,31 @@ for idx in [35,0,2,51,1]:  #z_spec > 1.6
     target_ID_list.append(target_id)
     if fit_files == []:
         result_list.append([-99]*8)
+        rms_result_list.append([-99]*8)
         continue
     # if 'HST_material' in fit_files[0]:
     #     weight = np.zeros(len(chisqs))
     #     weight[sort_Chisq[0]] = 1
     # elif 'JWST_stage3' in fit_files[0]:
-    #     count_n = 5
-    #     Chisq_best = chisqs[sort_Chisq[0]]
-    #     Chisq_last= chisqs[sort_Chisq[count_n-1]]
-    #     inf_alp = (Chisq_last-Chisq_best) / (2*2.* Chisq_best)
-    #     weight = np.zeros(len(chisqs))
-    #     for i in sort_Chisq[:count_n]:
-    #         weight[i] = np.exp(-1/2. * (chisqs[i]-Chisq_best)/(Chisq_best* inf_alp))
-    # prop_name = 'R_sersic'
-    # # all_values = [fit_run_list[i].final_result_ps[0][prop_name] for i in range(len(fit_run_list))]
-    # all_values = [fit_run_list[i].final_result_galaxy[0][prop_name] for i in range(len(fit_run_list))]
-    # weighted_value = np.sum(np.array(all_values)*weight) / np.sum(weight)
-    # rms_value = np.sqrt(np.sum((np.array(all_values)-weighted_value)**2*weight) / np.sum(weight))
-    
-    
     fit_run = fit_run_list[sort_Chisq[0]]
     if idx == '35' and filt == 'F444W':  #!!!
         fit_run = fit_run_list[sort_Chisq[3]]
+        chisqs[sort_Chisq[0]] = 99
+        chisqs[sort_Chisq[1]] = 99
+        chisqs[sort_Chisq[2]] = 99
     if idx == '0' and filt == 'F444W':  #!!!
         fit_run = fit_run_list[sort_Chisq[1]]
+        chisqs[sort_Chisq[0]] = 99
+        
+    count_n = 5
+    Chisq_best = chisqs[sort_Chisq[0]]
+    Chisq_last= chisqs[sort_Chisq[count_n-1]]
+    inf_alp = (Chisq_last-Chisq_best) / (2*2.* Chisq_best)
+    weight = np.zeros(len(chisqs))
+    for i in sort_Chisq[:count_n]:
+        weight[i] = np.exp(-1/2. * (chisqs[i]-Chisq_best)/(Chisq_best* inf_alp))
+            
+        
     if if_plot == True:
         fit_run.plot_final_qso_fit(target_ID = target_id+'$-$'+filt)
     host_flux = fit_run.final_result_galaxy[0]['flux_within_frame']
@@ -137,7 +146,6 @@ for idx in [35,0,2,51,1]:  #z_spec > 1.6
         fit_run.final_result_galaxy[0]['magnitude'] = fit_run.final_result_galaxy[0]['magnitude'] + mag_correct
     
     if cal_CAS == True:
-    
         CAS_class = CAS(fit_run, seg_cal_reg = 'or', obj_id=0, rm_ps=True, rm_obj=True)
         cas = CAS_class.cal_CAS(mask_type='segm',extend=1, if_plot=False, radius=35)
         # print('asymmetry:', cas[0])
@@ -146,9 +154,32 @@ for idx in [35,0,2,51,1]:  #z_spec > 1.6
         # print('Gini:', cas[3])
     else:
         cas = 0, [0,0], 0
-    result.append([fit_run.reduced_Chisq, ratio * 100, fit_run.final_result_galaxy[0]['R_sersic'],
-                   fit_run.final_result_galaxy[0]['n_sersic'], fit_run.final_result_galaxy[0]['magnitude'],
-                   cas[2], cas[1][0], cas[0]])
+    result.append([ratio * 100, fit_run.final_result_galaxy[0]['R_sersic'],
+                   fit_run.final_result_galaxy[0]['n_sersic'], fit_run.final_result_galaxy[0]['magnitude'], fit_run.reduced_Chisq])
+    
+    result.append([ratio * 100, fit_run.final_result_galaxy[0]['R_sersic'],
+                   fit_run.final_result_galaxy[0]['n_sersic'], fit_run.final_result_galaxy[0]['magnitude'], fit_run.reduced_Chisq])
+    
+    
+    prop_names = ['ratio', 'R_sersic', 'n_sersic', 'magnitude']
+    for prop_name in prop_names:
+        if prop_name == 'ratio':
+            # host_flux = fit_run.final_result_galaxy[0]['flux_within_frame']
+            # AGN_flux = fit_run.final_result_ps[0]['flux_within_frame']
+            # ratio = host_flux/(host_flux+AGN_flux)
+            all_values = [ fit_run_list[i].final_result_galaxy[0]['flux_within_frame']/(fit_run_list[i].final_result_galaxy[0]['flux_within_frame']\
+                             +fit_run_list[i].final_result_ps[0]['flux_within_frame']) for i in range(len(fit_run_list))]
+            weighted_value = np.sum(np.array(all_values)*weight) / np.sum(weight)
+            rms_value = np.sqrt(np.sum((np.array(all_values)-weighted_value)**2*weight) / np.sum(weight)) * 100
+            
+        else:
+            # all_values = [fit_run_list[i].final_result_ps[0][prop_name] for i in range(len(fit_run_list))]
+            all_values = [fit_run_list[i].final_result_galaxy[0][prop_name] for i in range(len(fit_run_list))]
+            weighted_value = np.sum(np.array(all_values)*weight) / np.sum(weight)
+            rms_value = np.sqrt(np.sum((np.array(all_values)-weighted_value)**2*weight) / np.sum(weight))
+        rms_result.append(rms_value)
+    
+                   # cas[2], cas[1][0], cas[0]])
     # print(prop_name, round(weighted_value,2), '+-', round(rms_value,2))
     # print('Chisqs top 2', round(chisqs[sort_Chisq[0]],2), round(chisqs[sort_Chisq[1]],2))
     # print_s =filt +' ratio: ' + str(round(ratio,2)) + "\n\n\n"
@@ -156,20 +187,80 @@ for idx in [35,0,2,51,1]:  #z_spec > 1.6
     # print(print_s)
     # hold = input(print_s)
     result_list.append(result[0])
+    rms_result_list.append(rms_result)
 
 #%%print:
-prop_list = ['$\chi ^2$ (Reduced)', 'host-total flux ratio', 'Reff ($\\arcsec$)',
-             '\sersic\ $n$', 'host mag', 'concentration', 'asymmetry','smoothness']
-digt_list = [2, 1, 3, 1, 2, 2,2,2]
-for i in range(len(result_list[0])):
+# print(len(files)-3)
+prop_list = ['host-total flux ratio', 'Reff ($\\arcsec$)',
+             '\sersic\ $n$', 'host mag', '$\chi ^2$ (Reduced)']
+            # 'concentration', 'asymmetry','smoothness'][:5]
+digt_list = [1, 3, 1, 2, 2,]
+# Reff = 'arcsec'
+# Reff = 'kpc'
+
+import copy
+from astropy.cosmology import FlatLambdaCDM
+cosmo = FlatLambdaCDM(H0=70, Om0=0.3)
+for i in range(len(result_list[0])):  #i is row, j is col (target)
     print_material = [result_list[j][i] for j in range(len(result_list)) ]
+    print_material_ = copy.deepcopy(print_material)
+    if i != 4:
+        print_material_err = [rms_result_list[j][i] for j in range(len(rms_result_list)) ]
+    print_material_err_ = copy.deepcopy(print_material_err)
+    if i == 3:
+        for j in range(len(print_material_err)):
+            if print_material_err[j]<0.15:
+                print_material_err[j] = 0.15
+    
+    prop_list[1] = 'Reff (kpc)'
+    digt_list[1] = 2
+    if i == 1:
+        for j in range(len(result_list)):
+            if print_material[j] >0:
+                z = z_list[j]
+                scale_relation = cosmo.angular_diameter_distance(z).value * 10**3 * (1/3600./180.*np.pi)  #Kpc/arc
+                print_material[j] = print_material[j] * scale_relation
+                print_material_err[j] = print_material_err[j] * scale_relation
+            
+    print_s_ = '& '
     print_s = '& '
     for j in range(len(print_material)):
         if j != 0:
             print_s = print_s + ' & '
-        if i != 1:
+            print_s_ = print_s_ + ' & '
+        if i != 0 and i!=4:
+            if i == 1 and print_material_[j]<0.062 and print_material[j]>0:
+                if print_material_[j] + print_material_err_[j] > 0.09:
+                    mid = print_material[j] + print_material_err[j]/2
+                    err = print_material_err[j]/2
+                    print_s = print_s + str(round(mid,digt_list[i])) + '$\pm$' + str(round(err,digt_list[i]))
+                    print_s_ = print_s_ + str(round(print_material_[j] + print_material_err_[j]/2,3))\
+                                + '$\pm$' + str(round(print_material_err_[j]/2,3))
+                else:
+                    print_s = print_s +  str(round(print_material[j],digt_list[i])) + '$\leftarrow$'
+                    print_s_ = print_s_  +  str(round(print_material_[j],3)) + '$\leftarrow$'
+            elif i == 2 and print_material[j]>8.9:
+                if print_material[j] - print_material_err[j] <6.5:
+                    mid = print_material[j] - print_material_err[j]/2
+                    err = print_material_err[j]/2
+                    print_s = print_s + str(round(mid,digt_list[i])) + '$\pm$' + str(round(err,digt_list[i]))
+                else:
+                    print_s = print_s + r"$\rightarrow$" + str(round(print_material[j],digt_list[i]))
+            elif i == 2 and print_material[j]<0.32 and print_material[j]>0:
+                if print_material[j] + print_material_err[j] > 0.5:
+                    mid = print_material[j] + print_material_err[j]/2
+                    err = print_material_err[j]/2
+                    print_s = print_s + str(round(mid,digt_list[i])) + '$\pm$' + str(round(err,digt_list[i]))
+                else:
+                    print_s = print_s +  str(round(print_material[j],digt_list[i])) + '$\leftarrow$'
+            else:
+                print_s = print_s + str(round(print_material[j],digt_list[i])) + '$\pm$' + str(round(print_material_err[j],digt_list[i]))
+                print_s_ = print_s_ + str(round(print_material_[j],3)) + '$\pm$' + str(round(print_material_err_[j],3))
+        elif i == 0:
+            print_s = print_s + str(round(print_material[j],digt_list[i]))+'\%' '$\pm$' + str(round(print_material_err[j],digt_list[i]))+'\%'
+        elif i == 4:
             print_s = print_s + str(round(print_material[j],digt_list[i]))
-        elif i == 1:
-            print_s = print_s + str(round(print_material[j],digt_list[i])) + '\% '
     print_s = print_s + '\\\\'
+    if i ==1:
+        print('Reff ($\\arcsec$)', print_s_+ '\\\\')
     print(prop_list[i], print_s)

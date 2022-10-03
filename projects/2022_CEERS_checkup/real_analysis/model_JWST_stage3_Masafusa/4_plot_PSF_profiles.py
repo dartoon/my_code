@@ -93,18 +93,22 @@ for i_filt, filt in enumerate(filt_list):
     axs[_i][_j].tick_params(which='both', width=2, direction='in')
     axs[_i][_j].tick_params(which='major', length=7, direction='in')
     axs[_i][_j].tick_params(which='minor', length=4, color='r', direction='in')
-    axs[_i][_j].text(2, 1.6,filt, fontsize=25)
+    axs[_i][_j].text(4.9, 2.0,filt, fontsize=25)
     if _i == 0:
-        axs[_i][_j].set_xlim([1.7, 6])
-        axs[_i][_j].set_ylim([0.1, 1.8])
+        axs[_i][_j].set_xlim([1.4, 6.9])
+        axs[_i][_j].set_ylim([0.04, 2.5])
     if _i == 1:
-        axs[_i][_j].set_xlim([1.7, 5.9])
-        axs[_i][_j].set_ylim([0.1, 1.8])
+        axs[_i][_j].set_xlim([1.4, 6.9])
+        axs[_i][_j].set_ylim([0.04, 2.5])
     
     if _i == 1:
         axs[_i][_j].set_xlabel("Pixels", fontsize=20)
     if _j == 0:
-        axs[_i][_j].set_ylabel("Scaled Surface Brightness", fontsize=17)
+        axs[_i][_j].set_ylabel("Scaled SB (annuli)", fontsize=17)
+    if _j > 0:
+        # axs[_i][_j].axes.yaxis.set_visible(False)
+        # plt.grid(which="minor")
+        axs[_i][_j].set_yticklabels([])
     if x_gridspace == 'log':
         axs[_i][_j].set_xscale('log')
         # plt.xlim(1.3, ) 
@@ -112,12 +116,13 @@ for i_filt, filt in enumerate(filt_list):
     # plt.grid(which="minor")
     # plt.legend(prop={'size':15},ncol=2)
     plt.tick_params(labelsize=20)
-    axs[_i][_j].tick_params(labelsize=20)        
-    if hide_axes == True:
-        axs[_i][_j].axes.xaxis.set_visible(False)
-        axs[_i][_j].axes.yaxis.set_visible(False)
+    axs[_i][_j].tick_params(labelsize=20)      
+    
+    # if hide_axes == True:
+    #     axs[_i][_j].axes.xaxis.set_visible(False)
+    #     axs[_i][_j].axes.yaxis.set_visible(False)
         
-axs[0][2].legend(prop={'size':15},ncol=2, bbox_to_anchor=(0.95, 0.15))
+axs[0][2].legend(prop={'size':15},ncol=2, bbox_to_anchor=(0.98, 0.15))
 
 # plt.tick_params(labelsize=20)        
 axs[0][3].axes.xaxis.set_visible(False)

@@ -3,8 +3,8 @@
 #
 # params for MCMC
 #
-NMC		300 # interation of MCMC    #Run after redshift MCMC
-NWALK		100 #number of walker
+NMC		500 # interation of MCMC    #Run after redshift MCMC
+NWALK		150 #number of walker
 NMCZ		5	#MCMC interation for redshift.  #First run in the MCMC
 NWALKZ		2  #walkers for redshift
 TAU0		-1 # in Gyr for tau; Randomly taken when MCMC.  IGNORE
@@ -29,7 +29,7 @@ AGE			0.01,0.03,0.1,0.3,1.0,3.0,10.0  #!!! 0.01,0.03,0.1,0.3,0.5,0.7,1.0,2.0,3.0
 #ZMAX		0.0 # Max metalicity
 #ZMIN		0.0 # Min metalicity
 #DELZ		0.0  # Should be smaller than the gap between ZMAX and ZMIN.
-ZFIX		0.0 # logZ/Zsun
+ZFIX		metaltemp # logZ/Zsun
 ZEVOL		0 # Evolution in Z; 1=yes, 0=no.
 #AVFIX		0.0 #
 AVMIN		0.0 # Minimum Av (Dust Attenuation) in mag.

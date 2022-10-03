@@ -134,36 +134,36 @@ for count in range(len(collect_info)):
     weighted_value = np.sum(np.array(all_values)*weight) / np.sum(weight)
     rms_value = np.sqrt(np.sum((np.array(all_values)-weighted_value)**2*weight) / np.sum(weight))
     
-    # if filt == 'F444W':
-    #     if fit_run.fitting_specify_class.data_process_class.target_pos[0] < 5000: #module A
-    #         correct = 0.44157708 / 0.343
-    #         mag_correct = +2.5*np.log10(correct)
-    #     if fit_run.fitting_specify_class.data_process_class.target_pos[0] > 5000: #module B
-    #         correct = 0.3899884 / 0.335
-    #         mag_correct = +2.5*np.log10(correct)
-    # elif filt == 'F410M':
-    #     if fit_run.fitting_specify_class.data_process_class.target_pos[0] < 5000:
-    #         correct = 0.9355298 / 0.832
-    #         mag_correct = +2.5*np.log10(correct)
-    #     if fit_run.fitting_specify_class.data_process_class.target_pos[0] > 5000:
-    #         correct = 0.9272488 / 0.811
-    #         mag_correct = +2.5*np.log10(correct)
-    # else:
-    #     mag_correct = 0
+    if filt == 'F444W':
+        if fit_run.fitting_specify_class.data_process_class.target_pos[0] < 5000: #module A
+            correct = 0.44157708 / 0.343
+            mag_correct = +2.5*np.log10(correct)
+        if fit_run.fitting_specify_class.data_process_class.target_pos[0] > 5000: #module B
+            correct = 0.3899884 / 0.335
+            mag_correct = +2.5*np.log10(correct)
+    elif filt == 'F410M':
+        if fit_run.fitting_specify_class.data_process_class.target_pos[0] < 5000:
+            correct = 0.9355298 / 0.832
+            mag_correct = +2.5*np.log10(correct)
+        if fit_run.fitting_specify_class.data_process_class.target_pos[0] > 5000:
+            correct = 0.9272488 / 0.811
+            mag_correct = +2.5*np.log10(correct)
+    else:
+        mag_correct = 0
     # print(filt, mag_correct)
             
     # prop_name = 'magnitude'
     # all_values = [fit_run_list[i].final_result_galaxy[1][prop_name] for i in range(len(fit_run_list))]
     # #AGN + HOST
-    # prop_name = 'flux_within_frame'
-    # all_values = [-2.5*np.log10(np.sum(fit_run_list[i].final_result_galaxy[0][prop_name] 
-    #                           + fit_run_list[i].final_result_ps[0][prop_name])) + fit_run.zp  for i in range(len(fit_run_list))]
-    # all_values = [fit_run_list[i].final_result_ps[0][prop_name] for i in range(len(fit_run_list))]
+    prop_name = 'magnitude'
+    all_values = [-2.5*np.log10(np.sum(fit_run_list[i].final_result_galaxy[0][prop_name] 
+                              + fit_run_list[i].final_result_ps[0][prop_name])) + fit_run.zp  for i in range(len(fit_run_list))]
+    all_values = [fit_run_list[i].final_result_ps[0][prop_name] for i in range(len(fit_run_list))]
     
-    # weighted_value = np.sum(np.array(all_values)*weight) / np.sum(weight)
-    # rms_value = np.sqrt(np.sum((np.array(all_values)-weighted_value)**2*weight) / np.sum(weight))
+    weighted_value = np.sum(np.array(all_values)*weight) / np.sum(weight)
+    rms_value = np.sqrt(np.sum((np.array(all_values)-weighted_value)**2*weight) / np.sum(weight))
     
-    # result.append([filt, fit_run.fitting_specify_class.zp, weighted_value+mag_correct, rms_value])
+    result.append([filt, fit_run.fitting_specify_class.zp, weighted_value+mag_correct, rms_value])
     # Print position
     # print(filt, "{0:.5f} {1:.5f}".format(-fit_run.final_result_galaxy[1]['center_x'], fit_run.final_result_galaxy[1]['center_y']))
     # fit_run.model_plot()

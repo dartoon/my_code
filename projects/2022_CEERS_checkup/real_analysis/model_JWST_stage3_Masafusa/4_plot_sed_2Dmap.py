@@ -167,27 +167,54 @@ for i in range(len(smass_image)):
 # cmap_r = matplotlib.cm.get_cmap('RdBu_r')
 
 #%%
-         
 from astropy.visualization import make_lupton_rgb
+image_list_qso = pickle.load(open('color_image_quasar'+'.pkl','rb'))   #use_filt = ['F444W',  'F277W', 'F150W']
+rgb_default_qso = make_lupton_rgb(image_list_qso[0][1:-1,1:-1], image_list_qso[1][1:-1,1:-1], 
+                              image_list_qso[2][1:-1,1:-1], Q=10, stretch=0.4)
 image_list = pickle.load(open('color_image'+'.pkl','rb'))   #use_filt = ['F444W',  'F277W', 'F150W']
 rgb_default = make_lupton_rgb(image_list[0][1:-1,1:-1], image_list[1][1:-1,1:-1], 
                               image_list[2][1:-1,1:-1], Q=8, stretch=0.2)
-image_list_qso = pickle.load(open('color_image_quasar'+'.pkl','rb'))   #use_filt = ['F444W',  'F277W', 'F150W']
-rgb_default_qso = make_lupton_rgb(image_list_qso[0][1:-1,1:-1], image_list_qso[1][1:-1,1:-1], 
-                              image_list_qso[2][1:-1,1:-1], Q=8, stretch=0.2)
 # plt.imshow(rgb_default, origin='lower')
 # plt.show()
 if bin_info != '':
     dvd_info = int(bin_info[-1])
 else:
     dvd_info = 1
+    
+rad1, rad2 = 4, 8
+rad0 = 2
+target_id, z = load_info(idx = 1)
+z = float(z)
+deltaPix = fit_run_dict['F356W'].fitting_specify_class.deltaPix
+_deltaPix = deltaPix * dvd_info  #The true Pixel size after binning 
+from astropy.cosmology import FlatLambdaCDM
+cosmo = FlatLambdaCDM(H0=70, Om0=0.3)
+scale_relation = cosmo.angular_diameter_distance(z).value * 10**3 * (1/3600./180.*np.pi)  #Kpc/arc
+kpc_per_pixel = scale_relation * _deltaPix  #kpc/pixel
 
 from galight.tools.measure_tools import mask_obj
 from photutils import EllipticalAperture
-aper = EllipticalAperture([len(smass_image)/2, len(smass_image)/2], 45/dvd_info, 45/dvd_info, theta=0)
+aper = EllipticalAperture([len(smass_image)/2, len(smass_image)/2], 45/dvd_info, 
+                          45/dvd_info, theta=0)
+#45/dvd_info / kpc_per_pixel, outer region.
 mask1 = 1- mask_obj(smass_image, [aper])[0]
-aper = EllipticalAperture([len(smass_image)/2, len(smass_image)/2], 4/dvd_info, 4/dvd_info, theta=0)
+aper = EllipticalAperture([len(smass_image)/2, len(smass_image)/2], 
+                          round(rad0/kpc_per_pixel), round(rad0/kpc_per_pixel), theta=0)
 mask2 = mask_obj(smass_image, [aper])[0]
+
+
+aper27 = EllipticalAperture([len(smass_image)/2, len(smass_image)/2], round(rad1/kpc_per_pixel), 
+                          round(rad1/kpc_per_pixel), theta=0)
+aper80 = EllipticalAperture([len(smass_image)/2, len(smass_image)/2], round(rad2/kpc_per_pixel), 
+                          round(rad2/kpc_per_pixel), theta=0)
+
+aper_ = EllipticalAperture([len(image_list[0])/2-1, len(image_list[0])/2-1], 
+                          round(rad0/kpc_per_pixel * 2), round(rad0/kpc_per_pixel * 2), theta=0)
+aper27_ = EllipticalAperture([len(image_list[0])/2-1, len(image_list[0])/2-1], 
+                          round(rad1/kpc_per_pixel * 2), round(rad1/kpc_per_pixel * 2), theta=0)
+aper80_ = EllipticalAperture([len(image_list[0])/2-1, len(image_list[0])/2-1], 
+                          round(rad2/kpc_per_pixel * 2), round(rad2/kpc_per_pixel * 2), theta=0)
+
 mask = mask1 * mask2
 
 lowmass_mask = (smass_image>6.) * mask
@@ -197,8 +224,12 @@ lowmass_mask[lowmass_mask==0] = np.nan
 
 import matplotlib, copy
 colorname = None #'gist_heat'
+my_cmap_mass = copy.copy(matplotlib.cm.get_cmap('afmhot')) # copy the default cmap
+my_cmap_mass.set_bad('white')
 my_cmap = copy.copy(matplotlib.cm.get_cmap('RdBu_r')) # copy the default cmap
 my_cmap.set_bad('white')
+my_cmap_ = copy.copy(matplotlib.cm.get_cmap('RdBu')) # copy the default cmap
+my_cmap_.set_bad('white')
 
 _row = 1
 fig, (axs) = plt.subplots(_row, 5, figsize=(15, 4))
@@ -206,45 +237,83 @@ import matplotlib as mat
 mat.rcParams['font.family'] = 'STIXGeneral'
 # norm = LogNorm(vmin=4.5, vmax=8)#np.max(img[~np.isnan(img)]))
 
-
 im_0 = axs[0].imshow(rgb_default_qso , norm=None, origin='lower') 
+axs[0].text(5, 5, 'SDSS1420A',fontsize=14, 
+             weight='bold', color='white', bbox={'facecolor': 'gold', 'alpha': 0.6, 'pad': 3})
+
 axs[0].text(1,83,'F444W+F277W+F150W\nquasar', c = 'white', fontsize = 15) 
 # ticks = [5, 6, 7, 8]
 # cbar = fig.colorbar(im_0, ax=axs[0],pad=0.01, shrink=0.95, #orientation="horizontal", 
 #                   aspect=15)#, ticks=ticks)
-
+c_list = 'white'
 im_0 = axs[1].imshow(rgb_default , norm=None, origin='lower') 
 axs[1].text(1,83,'host\nF444W+F277W+F150W\nhost galaxy', c = 'white', fontsize = 15) 
-# ticks = [5, 6, 7, 8]
+ticks = [5, 6, 7, 8]
+aper_.plot(color= c_list,
+              lw=1.0, label = 'comp {0}'.format(i), axes = axs[0], alpha =0.6)
+aper27_.plot(color= c_list,
+              lw=1.0, label = 'comp {0}'.format(i), axes = axs[0], alpha =0.6)
+aper80_.plot(color= c_list,
+              lw=1.0, label = 'comp {0}'.format(i), axes = axs[0], alpha =0.6)
+# aper_.plot(color= c_list,
+#               lw=1.0, label = 'comp {0}'.format(i), axes = axs[1], alpha =0.3)
+# aper27_.plot(color= c_list,
+#               lw=1.0, label = 'comp {0}'.format(i), axes = axs[1], alpha =0.3)
+# aper80_.plot(color= c_list,
+#               lw=1.0, label = 'comp {0}'.format(i), axes = axs[1], alpha =0.3)
+
 cbar = fig.colorbar(im_0, ax=axs[1],pad=0.01, shrink=0.95, #orientation="horizontal", 
                   aspect=15)#, ticks=ticks)
 cbar.set_label('M$_*$ (logM$_{\odot}$)', fontsize=20) #, rotation=270)
 cbar.ax.tick_params(labelsize=20)
 cbar.remove()
 
-from galight.tools.plot_tools import scale_bar
-scale_bar(axs[1], len(rgb_default), dist=1/deltaPix, text='   1"~3.75kpc', color='white')
 
-im_1 = axs[2].imshow(smass_image * mask, norm=None, origin='lower', vmin=7, vmax=9.1, cmap = my_cmap) 
-# ticks = [5, 6, 7, 8]
+def scale_bar(ax, d, dist=1/0.1, text='1"', color='black', fontsize=15):
+    p0 = d - d /4. - dist/3*2
+    p1 = 3 * d / 20.
+    ax.plot([p0, p0 + dist], [p1, p1], linewidth=2, color=color)
+    ax.text(p0 + dist, p1/2 - 0.02 * d, text, fontsize=fontsize, color=color, ha='center')
+        
+scale_bar(axs[0], len(rgb_default),  dist=0.24/deltaPix, text='2kpc~0.24"', color='white')
+
+scale_bar(axs[1], len(rgb_default),  dist=0.24/deltaPix, text='2kpc~0.24"', color='white')
+
+# c_list = np.random.uniform(0, 1), np.random.uniform(0, 1), np.random.uniform(0, 1)
+
+
+im_1 = axs[2].imshow(smass_image * mask, norm=None, origin='lower', vmin=7, vmax=9.8, cmap = my_cmap_mass) 
+aper27.plot(color= c_list,
+              lw=1.5, label = 'comp {0}'.format(i), axes = axs[2],alpha =0.7)
+aper80.plot(color= c_list,
+              lw=1.5, label = 'comp {0}'.format(i), axes = axs[2],alpha =0.7)
 cbar = fig.colorbar(im_1, ax=axs[2],pad=0.01, shrink=0.95, orientation="horizontal", 
                   aspect=15)#, ticks=ticks)
 cbar.set_label('M$_*$ (logM$_{\odot}$)', fontsize=20) #, rotation=270)
 cbar.ax.tick_params(labelsize=20)
 
 # norm = LogNorm(vmin=0.001, vmax=0.01)#np.max(img[~np.isnan(img)]))
-im_2 = axs[3].imshow(sfr_image * mask, norm=None, origin='lower', cmap = my_cmap, vmin = -3, vmax =-1)  
-# ticks = [2.e-3, 6.e-3]
+im_2 = axs[3].imshow(sfr_image * mask, norm=None, origin='lower', cmap = my_cmap_, vmin = -3, vmax =-1)  
+aper27.plot(color= c_list,
+              lw=2.5, label = 'comp {0}'.format(i), axes = axs[3])
+aper80.plot(color= c_list,
+              lw=2.5, label = 'comp {0}'.format(i), axes = axs[3])
+
 cbar = fig.colorbar(im_2, ax=axs[3],pad=0.01, shrink=0.95,  orientation="horizontal", 
                   aspect=15) #, ticks=ticks)
 cbar.set_label('SFR (logM$_{\odot}$/yr)', fontsize=20) #, rotation=270)
 cbar.ax.tick_params(labelsize=20)
 
 im_2 = axs[4].imshow(age_image * mask , norm=None, vmin=0.8, vmax=2.6, origin='lower', cmap = my_cmap) 
+aper27.plot(color= c_list,
+              lw=2.5, label = 'comp {0}'.format(i), axes = axs[4])
+aper80.plot(color= c_list,
+              lw=2.5, label = 'comp {0}'.format(i), axes = axs[4])
 cbar = fig.colorbar(im_2, ax=axs[4],pad=0.01, shrink=0.95,  orientation="horizontal", 
                    aspect=15) #, ticks=ticks)
 cbar.set_label('age (Gyr)', fontsize=20) #, rotation=270)
 cbar.ax.tick_params(labelsize=20)
+
 
 # im_4 = axs[2].imshow( (sfr_image - smass_image) * mask, norm=None, 
 #                      vmin = -10.5, vmax = -8.5,
@@ -275,14 +344,6 @@ plt.savefig('outcomes/SED_map.pdf')
 plt.show()  
 
 #%%
-target_id, z = load_info(idx = 1)
-z = float(z)
-deltaPix = fit_run_dict['F356W'].fitting_specify_class.deltaPix
-_deltaPix = deltaPix * dvd_info
-from astropy.cosmology import FlatLambdaCDM
-cosmo = FlatLambdaCDM(H0=70, Om0=0.3)
-scale_relation = cosmo.angular_diameter_distance(z).value * 10**3 * (1/3600./180.*np.pi)  #Kpc/arc
-kpc_per_pixel = scale_relation * _deltaPix  #kpc/pixel
 
 sfr = 10**sfr_image  #from log(M_sun) to M_sun
 
@@ -305,18 +366,33 @@ def cal_sfr_dens(img, annuli = [], if_plot=False, sum_way = 'sum'):
         plt.show()
     return img_dens
 
-# annuli = [1, 2.7]  #kpc
-annuli = [2.7, 8]  #kpc
-print( round(cal_sfr_dens(sfr, annuli=annuli, if_plot=False),3 ), 'M_sun/yr/kpc^2' )
-print( round(cal_sfr_dens(age_image, annuli=annuli, if_plot=False,
-                          sum_way = 'ave'),3 ), 'Gyr' )
+annuli_1 = [rad0, rad1]  #kpc
+annuli_2 = [rad1, rad2]  #kpc
+# annuli = [2, 3.7]  #kpc
+# annuli = [3.7, 8]  #kpc
+for annuli in [annuli_1, annuli_2]:
+    print('annuli:', annuli, '(kpc)')
+    # print( round(cal_sfr_dens(sfr, annuli=annuli, if_plot=False),3 ), 'M_sun/yr/kpc^2' )
+    # print( round(cal_sfr_dens(age_image, annuli=annuli, if_plot=False,
+    #                           sum_way = 'ave'),3 ), 'Gyr' )
+    print( round(cal_sfr_dens(sfr_image - smass_image, annuli=annuli, if_plot=False,
+                              sum_way = 'ave'),3 ) , r'1/yr' )
 
-#%%
-# check sfr_image[22, 31]
-x, y = 22, 31
-# x, y = 31, 22
-print(x, y, sfr_image[x, y]) #Actually y, x.
-for i in range(len(sed_2d_info)):
-    if sed_2d_info[i][0] == x and sed_2d_info[i][1] == y:
-        print(i)
+# plt.imshow((sfr_image - smass_image) * mask, norm=None, 
+#                       vmin = -10.5, vmax = -8.5,
+#                       origin='lower', cmap = my_cmap)
+# cbar = plt.colorbar(pad=0.1, shrink=0.95,  orientation="horizontal", 
+#                   aspect=15) #, ticks=ticks)
+# cbar.set_label('sSFR (logM$_{\odot}$/yr)', fontsize=20) #, rotation=270)
+# cbar.ax.tick_params(labelsize=20)
+# plt.axis('off')
+
+# #%%
+# # check sfr_image[22, 31]
+# x, y = 22, 31
+# # x, y = 31, 22
+# print(x, y, sfr_image[x, y]) #Actually y, x.
+# for i in range(len(sed_2d_info)):
+#     if sed_2d_info[i][0] == x and sed_2d_info[i][1] == y:
+#         print(i)
     

@@ -55,14 +55,14 @@ if refit == True:
 
 
 #%%
-# for idx in [0]:
-for idx in [0, 1, 2, 35, 51]:
+for idx in [2]:
+# for idx in [0, 1, 2, 35, 51]:
     target_id, z = load_info(idx)
     fit_run_dict = load_prop(idx, root_folder = './*', prop_name='fit_run')
     dirct_Reff = []
     refit_Reff = []
-    prop = 'R_sersic'
-    # prop = 'n_sersic'
+    # prop = 'R_sersic'
+    prop = 'n_sersic'
     # prop = 'magnitude'
     # prop = 'flux_within_frame'
     plt.figure(figsize=(6,6))

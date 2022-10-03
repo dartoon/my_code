@@ -20,7 +20,7 @@ remove_id = [24, 55]
 use_filt = ['F444W',  'F277W', 'F150W']   
 fit_run_list = []
 
-for idx in [1]:  #z_spec > 1.6
+for idx in [51]:  #z_spec > 1.6
     if idx in remove_id:
         continue
     else:
@@ -153,7 +153,7 @@ for i, image in enumerate(image_list):
 image_list = [image_list[i] * 10 ** (-0.4*(zp_list[i]-zp_list[0])) for i in range(3) ]
     
 from galight.tools.astro_tools import plt_fits_color
-pickle.dump(image_list, open('color_image_quasar'+'.pkl', 'wb'))  
+# pickle.dump(image_list, open('color_image_quasar'+'.pkl', 'wb'))  
 plt_fits_color(image_list, Q=7, stretch=0.3)
 
 # from astropy.visualization import make_lupton_rgb

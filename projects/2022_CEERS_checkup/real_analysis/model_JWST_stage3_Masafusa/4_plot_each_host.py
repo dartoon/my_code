@@ -16,7 +16,7 @@ from matplotlib.colors import LogNorm
 
 # ID, mags, z = 'idx0', 
 # 1,2,0,51,35
-idx = 35
+idx = 51
 # root_folder = '../*/*'  #Include HST
 root_folder = './*'  #Not include HST
 fit_run_dict = load_prop(idx, root_folder = root_folder, prop_name='fit_run')
@@ -31,7 +31,7 @@ for filt in use_filt:
     image_list.append(data)
     image_list.append(host)
     label.append(filt+'\ndata')
-    label.append(filt+'\nhost (data-AGN)')
+    label.append(filt+'\nhost (data-quasar)')
     deltaPix_list.append(fit_run.fitting_specify_class.deltaPix)
     deltaPix_list.append(fit_run.fitting_specify_class.deltaPix)
 
@@ -83,6 +83,11 @@ def total_compare(flux_list_2d, label_list_2d,
     """
     # norm = LogNorm() #ImageNormalize(stretch=SqrtStretch())
     cl_num = len(flux_list_2d)
+    left, width = .25, .5
+    bottom, height = .25, .5
+    right = left + width
+    top = bottom + height
+    
     f = plt.figure(0, figsize=(6.5+ (cl_num-1)*3.5,4))    
     ax_l = [plt.subplot2grid((6,cl_num), (0,i), rowspan=6) for i in range(len(flux_list_2d))] #The image plot
     if cmap == None:
@@ -109,12 +114,15 @@ def total_compare(flux_list_2d, label_list_2d,
                      weight='bold', color='white')
         
         if z != None:
-            ax_l[i].text(frame_size*0.65, frame_size*0.05, 'z={0}'.format(z),fontsize=fontsize, 
+            ax_l[i].text(frame_size*0.95, frame_size*0.05, 'z={0}'.format(z),fontsize=fontsize, 
+                         ha='right', va='bottom',
                          weight='bold', color='white', bbox={'facecolor': 'gold', 'alpha': 0.6, 'pad': 3})
         
         if i == 0:
-            ax_l[i].text(frame_size*0.5, frame_size*0.9, target_ID,fontsize=fontsize, 
+            ax_l[i].text(frame_size*0.95, frame_size*0.95, target_ID,fontsize=fontsize, 
+                         ha='right', va='top',
                          weight='bold', color='white',  bbox={'facecolor': 'gold', 'alpha': 0.6, 'pad': 3})
+
     #Plot normalized residual map:
     norm_residual = flux_list_2d[-1]
     plt.subplots_adjust(wspace=-0.5, hspace=0)
