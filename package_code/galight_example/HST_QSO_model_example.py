@@ -42,7 +42,7 @@ data_process.find_PSF(radius = 30, user_option = True, if_filter=True, nearyby_o
 #%%
 # from galight.tools.measure_tools import stack_PSF
 # epsf = stack_PSF(data_process.fov_image, data_process.PSF_pos_list, psf_size=len(data_process.PSF_list[0]))
-data_process.stack_PSF()
+# data_process.stack_PSF()
 
 #%%
 data_process.profiles_compare(norm_pix = 5, if_annuli=False, y_log = False, radius = 60,
