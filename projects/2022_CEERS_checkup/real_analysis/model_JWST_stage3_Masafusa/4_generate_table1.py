@@ -41,7 +41,7 @@ result_list = []
 rms_result_list = []
 target_ID_list = []
 z_list = []
-filt = 'F444W'
+filt = 'F160W'
 cal_CAS = False
 if_plot = False
 # for idx in [1,2,0,51,35]:  #z_spec > 1.6
@@ -155,13 +155,17 @@ for idx in [1,51,2,0,35]:  #z from low to high
     else:
         cas = 0, [0,0], 0
     result.append([ratio * 100, fit_run.final_result_galaxy[0]['R_sersic'],
-                   fit_run.final_result_galaxy[0]['n_sersic'], fit_run.final_result_galaxy[0]['magnitude'], fit_run.reduced_Chisq])
+                   fit_run.final_result_galaxy[0]['n_sersic'], fit_run.final_result_galaxy[0]['magnitude'], 
+                   -2.5*np.log10(10**(-0.4*(fit_run.final_result_galaxy[0]['magnitude'])) + 10**(-0.4*(fit_run.final_result_ps[0]['magnitude'])) ), 
+                   fit_run.reduced_Chisq])
     
-    result.append([ratio * 100, fit_run.final_result_galaxy[0]['R_sersic'],
-                   fit_run.final_result_galaxy[0]['n_sersic'], fit_run.final_result_galaxy[0]['magnitude'], fit_run.reduced_Chisq])
+    # result.append([ratio * 100, fit_run.final_result_galaxy[0]['R_sersic'],
+    #                fit_run.final_result_galaxy[0]['n_sersic'], fit_run.final_result_galaxy[0]['magnitude'], 
+    #                -2.5*np.log10(10**(-0.4*(fit_run.final_result_galaxy[0]['magnitude'])) + 10**(-0.4*(fit_run.final_result_ps[0]['magnitude'])) ), 
+    #                fit_run.reduced_Chisq])
     
     
-    prop_names = ['ratio', 'R_sersic', 'n_sersic', 'magnitude']
+    prop_names = ['ratio', 'R_sersic', 'n_sersic', 'magnitude', 'totmagnitude']
     for prop_name in prop_names:
         if prop_name == 'ratio':
             # host_flux = fit_run.final_result_galaxy[0]['flux_within_frame']
@@ -171,7 +175,12 @@ for idx in [1,51,2,0,35]:  #z from low to high
                              +fit_run_list[i].final_result_ps[0]['flux_within_frame']) for i in range(len(fit_run_list))]
             weighted_value = np.sum(np.array(all_values)*weight) / np.sum(weight)
             rms_value = np.sqrt(np.sum((np.array(all_values)-weighted_value)**2*weight) / np.sum(weight)) * 100
-            
+        elif prop_name == 'totmagnitude':
+            all_values = [-2.5*np.log10(10**(-0.4*(fit_run_list[i].final_result_galaxy[0]['magnitude'])) + 10**(-0.4*(fit_run_list[i].final_result_ps[0]['magnitude'])) ) 
+                          for i in range(len(fit_run_list))]
+            weighted_value = np.sum(np.array(all_values)*weight) / np.sum(weight)
+            rms_value = np.sqrt(np.sum((np.array(all_values)-weighted_value)**2*weight) / np.sum(weight))
+        
         else:
             # all_values = [fit_run_list[i].final_result_ps[0][prop_name] for i in range(len(fit_run_list))]
             all_values = [fit_run_list[i].final_result_galaxy[0][prop_name] for i in range(len(fit_run_list))]
@@ -192,9 +201,9 @@ for idx in [1,51,2,0,35]:  #z from low to high
 #%%print:
 # print(len(files)-3)
 prop_list = ['host-total flux ratio', 'Reff ($\\arcsec$)',
-             '\sersic\ $n$', 'host mag', '$\chi ^2$ (Reduced)']
+             '\sersic\ $n$', 'host mag', 'total mag', '$\chi ^2$ (Reduced)']
             # 'concentration', 'asymmetry','smoothness'][:5]
-digt_list = [1, 3, 1, 2, 2,]
+digt_list = [1, 3, 1, 2, 3,2]
 # Reff = 'arcsec'
 # Reff = 'kpc'
 
@@ -204,7 +213,7 @@ cosmo = FlatLambdaCDM(H0=70, Om0=0.3)
 for i in range(len(result_list[0])):  #i is row, j is col (target)
     print_material = [result_list[j][i] for j in range(len(result_list)) ]
     print_material_ = copy.deepcopy(print_material)
-    if i != 4:
+    if i != 5:
         print_material_err = [rms_result_list[j][i] for j in range(len(rms_result_list)) ]
     print_material_err_ = copy.deepcopy(print_material_err)
     if i == 3:
@@ -228,7 +237,7 @@ for i in range(len(result_list[0])):  #i is row, j is col (target)
         if j != 0:
             print_s = print_s + ' & '
             print_s_ = print_s_ + ' & '
-        if i != 0 and i!=4:
+        if i != 0 and i!=5:
             if i == 1 and print_material_[j]<0.062 and print_material[j]>0:
                 if print_material_[j] + print_material_err_[j] > 0.09:
                     mid = print_material[j] + print_material_err[j]/2
@@ -258,7 +267,7 @@ for i in range(len(result_list[0])):  #i is row, j is col (target)
                 print_s_ = print_s_ + str(round(print_material_[j],3)) + '$\pm$' + str(round(print_material_err_[j],3))
         elif i == 0:
             print_s = print_s + str(round(print_material[j],digt_list[i]))+'\%' '$\pm$' + str(round(print_material_err[j],digt_list[i]))+'\%'
-        elif i == 4:
+        elif i == 5:
             print_s = print_s + str(round(print_material[j],digt_list[i]))
     print_s = print_s + '\\\\'
     if i ==1:

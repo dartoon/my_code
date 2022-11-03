@@ -19,11 +19,11 @@ lines = string.split('\n')   # Split in to \n
 result_folder = 'fit_result/'
 lines = lines[1:]
 remove_id = [24, 55]
-cid = 0
+cid = 10
 
 # files = glob.glob('material/data_process+apertures_*.pkl')
 # files.sort()
-for idx in range(cid,cid+10):
+for idx in range(cid,cid+1):
     if idx in remove_id:
         continue
     line = lines[idx]

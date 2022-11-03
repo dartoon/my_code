@@ -125,6 +125,8 @@ zp_list = {'F606W':26.489, 'F814W':25.937, 'F105W':26.264,
 fit_run_all = []
 aper = com_aper_l[0]
 for i, filt in enumerate(filters):
+    
+    #Take the PSF from the otherband fitting:
     fit_files = glob.glob('fit_material/fit_run_idx48_{0}*.pkl'.format(filt))
     fit_run_list = []
     for k in range(len(fit_files)):
@@ -135,12 +137,14 @@ for i, filt in enumerate(filters):
     _fit_run = fit_run_list[sort_Chisq[0]]
     psf = _fit_run.fitting_specify_class.data_process_class.PSF_list[0]
     
+    #Use PSF to run:
     data_process = data_process_list[i]
     data_process.zp = zp_list[filt]
     aper.positions = np.array([32, 50])
     aper.a, aper.b = 3, 3
     data_process.apertures = []
     data_process.PSF_list = [psf]
+    psf[psf<0] = 0
     fit_sepc = FittingSpecify(data_process)
     target_stamp = data_process.target_stamp
     ps_pos = np.where(target_stamp == np.max(target_stamp))
@@ -158,12 +162,23 @@ for i, filt in enumerate(filters):
     fit_run_all.append(fit_run)
     # filt = data_process.filt
     # pickle.dump(fit_run , open('fit_material/'+'fit_run_idx{2}_{0}_psf{1}.pkl'.format(filt, i, idx), 'wb'))
-# pickle.dump([filters, fit_run_all] , open('run_z5_target.pkl', 'wb'))
+pickle.dump([filters, fit_run_all] , open('run_z5_target.pkl', 'wb'))
+
+#%%
+from galight.tools.measure_tools import esti_bgkstd
+from galight.tools.measure_tools import detect_obj, mask_obj
+run_z5_target = pickle.load(open('run_z5_target.pkl','rb'))
+filters, fit_run_all = run_z5_target
 from galight.tools.measure_tools import measure_FWHM
 for i in range(len(filters)):
+    data_process = fit_run_all[i].fitting_specify_class.data_process_class
+    apertures, segm_deblend, mask_apertures, tbl  = detect_obj(data_process.target_stamp)
+    flux = tbl['kron_flux'][0]
+    print(-2.5*np.log10(flux) + zp_list[filters[i]])
+    # data_process = fit_run_all
     # print(filters[i], fit_run_all[i].final_result_ps[0]['magnitude'])
     # print(filters[i], np.mean(measure_FWHM(fit_run_all[i].fitting_specify_class.data_process_class.PSF_list[0])))
-    print(filters[i], fit_run_all[i].final_result_galaxy[0]['magnitude'])
+    # print(filters[i], fit_run_all[i].final_result_galaxy[0]['magnitude'])
     
 
 

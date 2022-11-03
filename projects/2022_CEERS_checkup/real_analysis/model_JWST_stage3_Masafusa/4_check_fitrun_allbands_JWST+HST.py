@@ -37,7 +37,7 @@ remove_id = [24, 55]
 # for idx in [29, 53]:  #z_spec > 2
 from functions_for_result import name_list
 result = []
-for idx in [0]:  #CEERS
+for idx in range(10, 21):  #CEERS
     if idx in remove_id:
         continue
     else:
@@ -69,13 +69,26 @@ for idx in [0]:  #CEERS
         lines = string.split('\n')   # Split in to \n
         target_id = [lines[i].split(' ')[1] for i in range(len(lines)) if lines[i].split(' ')[0] == str(idx)][0]
         
+        f = open("./material/target_info.txt","r")
+        string_1 = f.read()
+        lines_ = string_1.split('\n')   # Split in to \n
+        spec_z = [lines_[i].split(' ')[3] for i in range(len(lines_)) if lines_[i].split(' ')[0] == target_id][0]
+        photo_z = [lines_[i].split(' ')[4] for i in range(len(lines_)) if lines_[i].split(' ')[0] == target_id][0]
+        
+        if float(spec_z) >0:
+            z_str = 'spec_z=' + spec_z
+        else:
+            z_str = 'photo=' + photo_z
+        
+        filters = [filters[0], filters[-1]]
+        
         for count in range(len(filters)):
             fit_run_list = []
             idx = idx_info
             filt = filters[count]
             # idx, filt= item
-            fit_files = glob.glob('./*fit_material/fit_run_idx{0}_{1}_*.pkl'.format(idx, filt))+\
-                        glob.glob('../model_HST_material/fit_material/fit_run_idx{0}_{1}_*.pkl'.format(idx, filt))
+            fit_files = glob.glob('./*fit_material/fit_run_idx{0}_{1}_*.pkl'.format(idx, filt))#+\
+                        # glob.glob('../model_HST_material/fit_material/fit_run_idx{0}_{1}_*.pkl'.format(idx, filt))
             fit_files.sort()
             warn_strs = ['F115W_psf6', 'F150W_psf7', 'F277W_psf2']
             for warn_str in warn_strs:
@@ -103,9 +116,11 @@ for idx in [0]:  #CEERS
                 fit_run = fit_run_list[sort_Chisq[3]]
             if idx == '0' and filt == 'F444W':  #!!!
                 fit_run = fit_run_list[sort_Chisq[1]]
-            fit_run.plot_final_qso_fit(target_ID = target_id+'$-$'+filt)
             
-            # name_list = {1:'SDSS1420+5300A', 2: 'SDSS1420+5300B', 0: 'SDSS1419+5254', 
+            fit_run.savename = 'fit_collection/{0}_{1}_{2}.pdf'.format(idx, target_id, filt)
+            fit_run.plot_final_qso_fit(target_ID = target_id+'$-$'+filt + z_str, save_plot = True)
+            
+            # name_list = {1:'SDSS1420+5300A', 2: 'SDSS1420+5300B', 0: 'SDSS1419+5w254', 
             #               51: 'aegis_477', 35: 'aegis_482'}
 
             # target_id = name_list[int(idx)]

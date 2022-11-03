@@ -22,7 +22,7 @@ mat.rcParams['font.family'] = 'STIXGeneral'
 folder = '20220906' #mag error bar from top 5 PSF
 
 # for idx in [1,51,2,0,35]:  #z from low to high
-idx = 51
+idx = 35
 
 target_id = name_list[idx]
 folder = 'esti_smass/'+folder+str(idx)
@@ -166,22 +166,22 @@ for i, fid in enumerate(filt_id[::-1]):
     plt.plot(f_fil[1:,1]/10000., f_fil[1:,2], label='{0}'.format(ivd[fid]))
 
 # plt.text( (xmax-xmin)*0.7, (ymax-ymin)*0.53, 'stellar population with:', fontsize=17)
-plt.text( (xmax-xmin)*0.6, (ymax-ymin)*0.63, 'z: {0}'.format(z), fontsize=17)
+plt.text( (xmax-xmin)*0.57, (ymax-ymin)*0.63, 'z: {0}'.format(z), fontsize=17)
 # plt.text( (xmax-xmin)*0.6, (ymax-ymin)*0.43, 'age:  [{1:.3f}, {0:.3f}, {2:.3f}]  Gyr'.format(age, age_l, age_h), fontsize=17)
 # plt.text( (xmax-xmin)*0.6, (ymax-ymin)*0.33, "SFR:  [{1:.3f} {0:.3f} {2:.3f}]".format(sfr, sfr_l, sfr_h) + r" M$_{\rm \odot}$/yr ", fontsize=17)
-plt.text( (xmax-xmin)*0.6, (ymax-ymin)*0.57, 'M$_*$: [{1:.2f}, {0:.2f}, {2:.2f}] log'.format(smass, smass_l, smass_h)+r"M$_{\rm \odot}$", fontsize=17)
+plt.text( (xmax-xmin)*0.57, (ymax-ymin)*0.57, r"M$_*$: [{1:.2f}$\leftarrow${0:.2f}$\rightarrow${2:.2f}] log".format(smass, smass_l, smass_h)+r"M$_{\rm \odot}$", fontsize=17)
 print('M$_*$:  [{1:.2f}, {0:.2f} ,{2:.2f}]'.format(smass, smass_l, smass_h))
 if '{0:.1f}'.format(age_l) == '0.0':
-    plt.text( (xmax-xmin)*0.6, (ymax-ymin)*0.51, r'age: [$\leftarrow${2:.1f}]  Gyr'.format(age, age_l, age_h), fontsize=17)
+    plt.text( (xmax-xmin)*0.57, (ymax-ymin)*0.51, r'age: [$\leftarrow${2:.1f}]  Gyr'.format(age, age_l, age_h), fontsize=17)
     print(r'age:  [$\leftarrow${2:.1f}]  Gyr'.format(age, age_l, age_h))
 else:
-    plt.text( (xmax-xmin)*0.6, (ymax-ymin)*0.51, 'age: [{1:.1f}$-${2:.1f}]  Gyr'.format(age, age_l, age_h), fontsize=17)
+    plt.text( (xmax-xmin)*0.57, (ymax-ymin)*0.51, 'age: [{1:.1f}$-${2:.1f}]  Gyr'.format(age, age_l, age_h), fontsize=17)
     print('age:  [{1:.1f}$-${2:.1f}]  Gyr'.format(age, age_l, age_h))
 if '{0:.1f}'.format(sfr_l) == '0.0':
-    plt.text( (xmax-xmin)*0.6, (ymax-ymin)*0.45, r"SFR: [$\leftarrow${2:.1f}]".format(sfr, sfr_l, sfr_h) + r" M$_{\rm \odot}$/yr ", fontsize=17)
+    plt.text( (xmax-xmin)*0.57, (ymax-ymin)*0.45, r"SFR: [$\leftarrow${2:.1f}]".format(sfr, sfr_l, sfr_h) + r" M$_{\rm \odot}$/yr ", fontsize=17)
     print("[$\leftarrow${2:.1f}]".format(sfr, sfr_l, sfr_h) + r" M$_{\rm \odot}$/yr ")
 else:
-    plt.text( (xmax-xmin)*0.6, (ymax-ymin)*0.44, "SFR: [{1:.1f}$-${2:.1f}]".format(sfr, sfr_l, sfr_h) + r" M$_{\rm \odot}$/yr ", fontsize=17)
+    plt.text( (xmax-xmin)*0.57, (ymax-ymin)*0.44, "SFR: [{1:.1f}$-${2:.1f}]".format(sfr, sfr_l, sfr_h) + r" M$_{\rm \odot}$/yr ", fontsize=17)
     print("SFR:  [{1:.1f}$-${2:.1f}]".format(sfr, sfr_l, sfr_h) + r" M$_{\rm \odot}$/yr ")
 plt.legend(prop={'size':15}, ncol=2, loc = 1)
 plt.tick_params(labelsize=20)
