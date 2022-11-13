@@ -17,10 +17,10 @@ idx = 0
 from target_info import target_info
 info = target_info[str(idx)]
 target_id, RA, Dec, z = info['target_id'], info['RA'], info['Dec'], info['z']
-run_folder = 'stage3_second_half/' #!!!
+run_folder = 'stage3_all_largecut/' #!!!
 
 # for filt in ['F356W', 'F150W'] :
-for filt in ['F150W'] :
+for filt in ['F356W'] :
     data_process = pickle.load(open(run_folder+'material/data_process_idx{0}_{1}.pkl'.format(idx, filt),'rb'))
     # print(data_process.target_stamp[40,40])
     filt = data_process.filt

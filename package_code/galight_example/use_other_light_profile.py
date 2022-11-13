@@ -33,6 +33,8 @@ data_process = DataProcess(fov_image = fov_image, fov_noise_map = err_data, targ
                            pos_type = 'wcs', header = header,
                           rm_bkglight = True, if_plot=False, zp = zp)
 
+data_process.deltaPix = 1
+
 data_process.generate_target_materials(radius=None, create_mask = False, nsigma=2.8,
                                       exp_sz= 1.2, npixels = 15, if_plot=True)
 
@@ -43,24 +45,38 @@ data_process.checkout() #Check if all the materials is known.
 #%%Start to produce the class and params for lens fitting.
 from galight.fitting_specify import FittingSpecify
 fit_sepc = FittingSpecify(data_process)
-fit_sepc.prepare_fitting_seq(point_source_num = 1, supersampling_factor=3,
-                              extend_source_model = ['SERSIC_ELLIPSE', 'SERSIC_ELLIPSE', 'GAUSSIAN_ELLIPSE'])#, fix_n_list= [[0,4]], fix_center_list = [[0,0]])
-# fit_sepc.plot_fitting_sets()
+fit_sepc.prepare_fitting_seq(point_source_num = 0, supersampling_factor=3,
+                               extend_source_model = ['LINEAR_ELLIPSE', 'LINEAR_ELLIPSE', 'LINEAR_ELLIPSE'],
+                              apertures_center_focus = False)#, fix_n_list= [[0,4]], fix_center_list = [[0,0]])
+# # fit_sepc.plot_fitting_sets()
 fit_sepc.build_fitting_seq()
-fit_sepc.kwargs_params['lens_light_model'][0][-1]['sigma'] = fit_sepc.kwargs_params['lens_light_model'][0][-1].pop('R_sersic')
-fit_sepc.kwargs_params['lens_light_model'][1][-1]['sigma'] = fit_sepc.kwargs_params['lens_light_model'][1][-1].pop('R_sersic')
-fit_sepc.kwargs_params['lens_light_model'][3][-1]['sigma'] = fit_sepc.kwargs_params['lens_light_model'][3][-1].pop('R_sersic')
-fit_sepc.kwargs_params['lens_light_model'][4][-1]['sigma'] = fit_sepc.kwargs_params['lens_light_model'][4][-1].pop('R_sersic')
+fit_sepc.kwargs_params['lens_light_model'][0][-1]['k'] = fit_sepc.kwargs_params['lens_light_model'][0][-1].pop('R_sersic')
+fit_sepc.kwargs_params['lens_light_model'][1][-1]['k'] = fit_sepc.kwargs_params['lens_light_model'][1][-1].pop('R_sersic')
+fit_sepc.kwargs_params['lens_light_model'][3][-1]['k'] = fit_sepc.kwargs_params['lens_light_model'][3][-1].pop('R_sersic')
+fit_sepc.kwargs_params['lens_light_model'][4][-1]['k'] = fit_sepc.kwargs_params['lens_light_model'][4][-1].pop('R_sersic')
+
+fit_sepc.kwargs_params['lens_light_model'][0][-2]['k'] = fit_sepc.kwargs_params['lens_light_model'][0][-2].pop('R_sersic')
+fit_sepc.kwargs_params['lens_light_model'][1][-2]['k'] = fit_sepc.kwargs_params['lens_light_model'][1][-2].pop('R_sersic')
+fit_sepc.kwargs_params['lens_light_model'][3][-2]['k'] = fit_sepc.kwargs_params['lens_light_model'][3][-2].pop('R_sersic')
+fit_sepc.kwargs_params['lens_light_model'][4][-2]['k'] = fit_sepc.kwargs_params['lens_light_model'][4][-2].pop('R_sersic')
+
+fit_sepc.kwargs_params['lens_light_model'][0][-3]['k'] = fit_sepc.kwargs_params['lens_light_model'][0][-3].pop('R_sersic')
+fit_sepc.kwargs_params['lens_light_model'][1][-3]['k'] = fit_sepc.kwargs_params['lens_light_model'][1][-3].pop('R_sersic')
+fit_sepc.kwargs_params['lens_light_model'][3][-3]['k'] = fit_sepc.kwargs_params['lens_light_model'][3][-3].pop('R_sersic')
+fit_sepc.kwargs_params['lens_light_model'][4][-3]['k'] = fit_sepc.kwargs_params['lens_light_model'][4][-3].pop('R_sersic')
 
 
 #%%Setting the fitting method and run.
 from galight.fitting_process import FittingProcess
-fit_run = FittingProcess(fit_sepc, savename = 'HSC_QSO', fitting_level='norm')
-fit_run.run(algorithm_list = ['PSO'], setting_list=[None])
-fit_run.plot_all()
+fit_run = FittingProcess(fit_sepc)
+fit_run.run(algorithm_list = ['PSO','PSO','PSO'], fitting_level=['norm','deep','deep'])
+fit_run.plot_final_galaxy_fit()
 # fit_run.dump_result()
 # print(fit_run.final_result_galaxy[0])
 
+#%%
+plt.imshow(fit_run.image_host_list[1], origin='lower')
+plt.show()
 # #%%
 # import pickle
 # #links of file https://drive.google.com/file/d/1jE_6pZeDTHgXwmd2GW28fCRuPaQo8I61/view?usp=sharing

@@ -66,7 +66,8 @@ for i in range(5):
     fit_run.plot_final_qso_fit(target_ID =target_id)
     filt = _data_process.filt
     pickle.dump(fit_run , open(filename, 'wb'))
-    
+    fit_run.savename = 'figures/run_with_mask'
+    fit_run.plot_final_qso_fit(save_plot=True, target_ID = 'Fit with a central mask')
     # # fit_run.fitting_specify_class.
     # host_flux = fit_run.final_result_galaxy[0]['flux_within_frame']
     # AGN_flux = fit_run.final_result_ps[0]['flux_within_frame'] 

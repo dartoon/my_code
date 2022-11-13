@@ -23,17 +23,25 @@ run_folder = 'stage3_second_half/' #!!!
 z_str = str(z)
 
 # filters = ['F150W', 'F356W']
-filters = ['F150W']
-
+filters = ['F356W']
+import copy, matplotlib
 for top_psf_id in [0]:
     for count in range(len(filters)):
         fit_run_list = []
         # idx = idx_info
         filt = filters[count]
+        
+        if filt == 'F150W' :
+            cmap = 'inferno'
+        else:
+            cmap = 'gist_heat'
+        my_cmap = copy.copy(matplotlib.cm.get_cmap(cmap)) # copy the default cmap
+        my_cmap.set_bad('black')
+
         PSF_lib_files = glob.glob(run_folder+'material/*'+filt[:-1]+'*_PSF_Library_idx{0}.pkl'.format(idx))[0]
         # idx, filt= item
         # fit_files = glob.glob(run_folder+'*fit_material*/fit_run_withcentralMask_idx{0}_{1}_FOV*.pkl'.format(idx, filt))#+\
-        fit_files = glob.glob(run_folder+'*fit_material*/fit_run_idx{0}_{1}_FOV*.pkl'.format(idx, filt))#+\
+        fit_files = glob.glob(run_folder+'*fit_material*/fit_run_idx{0}_{1}_*.pkl'.format(idx, filt))#+\
         fit_files.sort()
         for i in range(len(fit_files)):
             fit_run_list.append(pickle.load(open(fit_files[i],'rb')))
@@ -41,7 +49,8 @@ for top_psf_id in [0]:
         sort_Chisq = chisqs.argsort()  
         print('idx', idx, filt, "Total PSF NO.", 'chisq',chisqs[sort_Chisq[top_psf_id]], len(sort_Chisq), fit_files[sort_Chisq[top_psf_id]])
         fit_run = fit_run_list[sort_Chisq[top_psf_id]]
-        fit_run.plot_final_qso_fit(target_ID = target_id+'$-$'+filt + z_str, save_plot = True)
+        fit_run.savename = 'figures/' + fit_run.savename+'_'+filt
+        fit_run.plot_final_qso_fit(target_ID = target_id+'$-$'+filt, save_plot = True, cmap = my_cmap)
         count_n = 5
         Chisq_best = chisqs[sort_Chisq[top_psf_id]]
         Chisq_last= chisqs[sort_Chisq[count_n-1]]
@@ -50,20 +59,15 @@ for top_psf_id in [0]:
         for i in sort_Chisq[:count_n]:
             weight[i] = np.exp(-1/2. * (chisqs[i]-Chisq_best)/(Chisq_best* inf_alp))
         
-        # fit_run.savename = 'fit_collection/{0}_{1}_{2}.pdf'.format(idx, target_id, filt)
-        
-        # target_id = name_list[int(idx)]
-        # fit_run.savename = 'outcomes/'+'ID' + idx + '_' + filt
-        # fit_run.plot_final_qso_fit(target_ID = target_id+'  '+filt, save_plot= True)
         
         prop_name = 'magnitude'
-        # all_values = [fit_run_list[i].final_result_ps[0][prop_name] for i in range(len(fit_run_list))]
-        all_values = [fit_run_list[i].final_result_galaxy[0][prop_name] for i in range(len(fit_run_list))]
+        all_values = [fit_run_list[i].final_result_ps[0][prop_name] for i in range(len(fit_run_list))]
+        # all_values = [fit_run_list[i].final_result_galaxy[0][prop_name] for i in range(len(fit_run_list))]
         weighted_value = np.sum(np.array(all_values)*weight) / np.sum(weight)
         rms_value = np.sqrt(np.sum((np.array(all_values)-weighted_value)**2*weight) / np.sum(weight))
         
-    #     # result.append([filt, fit_run.fitting_specify_class.zp, weighted_value, rms_value])
         
+    #     # result.append([filt, fit_run.fitting_specify_class.zp, weighted_value, rms_value])
         host_flux = fit_run.final_result_galaxy[0]['flux_within_frame']
         AGN_flux = fit_run.final_result_ps[0]['flux_within_frame']
         ratio = host_flux/(host_flux+AGN_flux)

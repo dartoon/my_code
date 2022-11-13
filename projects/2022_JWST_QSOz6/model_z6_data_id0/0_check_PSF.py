@@ -13,7 +13,7 @@ import matplotlib.pyplot as plt
 
 import glob, pickle
 run_folder = 'stage3_all*/' #!!!
-filt = 'F356W'
+filt = 'F150W'
 idx = 0
 PSF_lib_files = glob.glob(run_folder+'material/*'+filt[:-1]+'*_PSF_Library_idx{0}.pkl'.format(idx))[0]
 PSF_list, PSF_list_clean, PSF_RA_DEC_list, PSF_from_file_list = pickle.load(open(PSF_lib_files,'rb'))

@@ -22,6 +22,10 @@ from galight.tools.plot_tools import plot_data_apertures_point
 from galight.tools.cutout_tools import cutout
 import warnings
 warnings.filterwarnings("ignore")
+
+import sys
+sys.path.insert(0,'../model_z6_data_id0/')
+
 from target_info import target_info
 from galight.tools.astro_tools import plt_fits, plt_many_fits
 #%%
@@ -29,10 +33,10 @@ data_type = 'all'
 filt = 'F356W'
 file_NO = 0
 
-idx = 0
-folder = '/Users/Dartoon/Downloads/z6JWSTNIRcam/NIRCam_J2255_stage3_{0}/bkg_removed'.format(data_type)
+idx = 1
 info = target_info[str(idx)]
 target_id, RA, Dec, z = info['target_id'], info['RA'], info['Dec'], info['z']
+folder = '/Users/Dartoon/Downloads/z6JWSTNIRcam/NIRCam_{1}_stage3_{0}/bkg_removed'.format(data_type, target_id[:5])
 # jwst_all_filenames = glob.glob(folder+'/*{0}*{1}*.fits'.format(target_id[:5], filts[0]))
 jwst_all_filenames = glob.glob(folder+'/*{0}*.fits'.format(filt))
 jwst_all_filenames.sort()
@@ -46,10 +50,28 @@ elif data_type == 'half':
         run_folder = 'stage3_second_half/'
 result_folder = run_folder + 'fit_result/'
 
+
 #%%Demonstrate the local envs.
 import copy, matplotlib
 from matplotlib.colors import LogNorm
-my_cmap = copy.copy(matplotlib.cm.get_cmap('gist_heat')) # copy the default cmap
+# cmap = ['binary', 'gist_yarg', 'gist_gray', 'gray', 'bone', 'pink',
+#             'spring', 'summer', 'autumn', 'winter', 'cool', 'Wistia',
+#             'hot', 'afmhot', 'gist_heat', 'copper']
+
+# cmap = ['winter','summer','afmhot','spring', 'autumn', 'gist_heat','hot' ]
+
+if filt == 'F150W' :
+    cmap = 'inferno'
+else:
+    cmap = 'gist_heat'
+# cmap = 'cubehelix'
+    # cmap = 'gist_stern'
+# else:
+# cmap = 'gnuplot'
+# cmap = 'gnuplot2'
+# cmap = 'magma'
+# cmap = 'CMRmap'
+my_cmap = copy.copy(matplotlib.cm.get_cmap(cmap)) # copy the default cmap
 my_cmap.set_bad('black')
 
 def coordinate_arrows(ax, d, header, color='white', arrow_size=0.02):
@@ -115,7 +137,7 @@ data_process.generate_target_materials(radius=400 * expsize, create_mask = False
 # plt_fits(data_process.target_stamp)
 data_process.apertures = []
 # data_process.plot_aperture()
-fig, ax = plt.subplots(figsize=(12,12))
+fig, ax = plt.subplots(figsize=(12,12))  #!!!
 vmin = 1.e-3
 if filt == 'F150W':
     vmax = data_process.target_stamp.max()/3 
@@ -126,35 +148,46 @@ frame_size = len(data_process.target_stamp)
 
 d = frame_size
 color = 'white'
-text='10"'
-dist=10/data_process.deltaPix
+text='5"'
+dist=5/data_process.deltaPix
 p0 = d / 15.
-ax.plot([p0, p0 + dist], [p0, p0], linewidth=3, color=color)
-ax.text(p0 + dist / 2., p0 + 0.02 * d, text, fontsize=25, color=color, ha='center')
+ax.plot([p0 + d / 15., p0 + dist + d / 15.], [p0, p0], linewidth=3, color=color)
+ax.text(p0 + dist / 2.  + d / 15., p0 + 0.02 * d , text, fontsize=25, color=color, ha='center')
 
 angle = 0 / 180 * np.pi
 coordinate_arrows(ax, frame_size, header=header, arrow_size=0.03)
-ax.set_xlim(0,1350)
 ax.set_ylim(0,800)
-ax.arrow(98, 280, 0,-70,
-         head_width=20, head_length=15, fc=color, ec=color, linewidth=1.2)
-ax.text(90., 290, 'PSF-star', fontsize=18, color=color, ha='center')
 if filt == 'F150W':
-    circle1 = plt.Circle((100, 160),30, color='white', fill=False, linewidth=2)
-    circle2 = plt.Circle((400., 400),15, color='white', fill=False, linewidth=2)
-    circle3 = plt.Circle((445., 365),20, color='white', fill=False, linewidth=2)
-    circle4 = plt.Circle((452., 325), 15, color='white', fill=False, linewidth=2)
+    circle1 = plt.Circle((38, 95),40, color='white', fill=False, linewidth=2)
+    circle2 = plt.Circle((400., 400),20, color='white', fill=False, linewidth=1, alpha = 1)
+    # circle3 = plt.Circle((445., 365),20, color='white', fill=False, linewidth=2, alpha = 0.7)
 if filt == 'F356W':
-    circle1 = plt.Circle((110, 160),30, color='white', fill=False, linewidth=2)
-    circle2 = plt.Circle((400., 400),25, color='white', fill=False, linewidth=2)
-    circle3 = plt.Circle((445., 365),25, color='white', fill=False, linewidth=2)
-    circle4 = plt.Circle((452., 325), 20, color='white', fill=False, linewidth=2)
+    circle1 = plt.Circle((50, 100),40, color='white', fill=False, linewidth=2)
+    circle2 = plt.Circle((400., 400),35, color='white', fill=False, linewidth=1, alpha = 1)
+    # circle3 = plt.Circle((445., 365),25, color='white', fill=False, linewidth=2, alpha = 0.7)
+ax.text(160., 240, 'PSF-star', fontsize=18, color=color, ha='center')
 ax.add_patch(circle1)
 ax.set_xticks([])
 ax.set_yticks([])
 from mpl_toolkits.axes_grid1.inset_locator import zoomed_inset_axes
 from mpl_toolkits.axes_grid1.inset_locator import mark_inset
-axins = zoomed_inset_axes(ax, 2.6, loc = 'upper right') # loc='center right')
+
+if filt == 'F356W':
+    ax.arrow(148, 230, -60,-80,
+             head_width=20, head_length=15, fc=color, ec=color, linewidth=1.2)
+    ax.set_xlim(0,1220)
+    axins = zoomed_inset_axes(ax, 1.9, loc = 'upper right') # loc='center right')
+    loc1, loc2 = 2,3
+    pso1, pso2 = 350., 430
+else:
+    ax.arrow(148, 230, -60,-80,
+             head_width=20, head_length=15, fc=color, ec=color, linewidth=1.2)
+    ax.set_xlim(-420,-420+1220)
+    axins = zoomed_inset_axes(ax, 1.9, loc = 'lower left') # loc='center right')
+    loc1, loc2 = 1,4
+    pso1, pso2 = 360., 420
+    
+axins.text(pso1, pso2, 'quasar', fontsize=20, color=color, ha='center')
 axins.imshow(data_process.target_stamp, origin='lower', cmap=my_cmap, norm=LogNorm(vmin=vmin, vmax=vmax))#, vmin=vmin, vmax=vmax)
 axins.set_xlim(300, 500)
 axins.set_ylim(300, 500)
@@ -166,21 +199,17 @@ axins.plot([320, 320 + dist], [320, 320], linewidth=3, color=color)
 axins.text(320 + dist / 2., 320 + 0.01 * d, text, fontsize=25, color=color, ha='center')
 
 
-axins.text(410., 430, 'quasar', fontsize=20, color=color, ha='center')
 axins.add_patch(circle2)
-axins.text(475., 380, 'obj1', fontsize=20, color=color, ha='center')
-axins.add_patch(circle3)
-axins.text(485., 320, 'obj2', fontsize=20, color=color, ha='center')
-axins.add_patch(circle4)
-
+# axins.text(478., 380, 'obj1', fontsize=20, color=color, ha='center')
+# axins.add_patch(circle3)
 
 ax.text(d*0.2, d*0.8, target_id + '\n'+filt, fontsize=25, color=color, ha='center')
 
 axins.set_xticks([])
 axins.set_yticks([])
 
-mark_inset(ax, axins, loc1=2, loc2=4, fc="none", ec="0.5", linewidth=2.2)
+mark_inset(ax, axins, loc1=loc1, loc2=loc2, fc="none", ec="0.6", linewidth=2.2)
 ax.set(frame_on=False)  # New
 
-plt.savefig('figures/field_overview{0}.pdf'.format(filt))
+plt.savefig('figures/field_overview{0}_{1}.pdf'.format(filt,target_id[:5]) ,bbox_inches='tight')
 plt.show()

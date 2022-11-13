@@ -117,4 +117,5 @@ fit_sepc.prepare_fitting_seq(point_source_num = 1, supersampling_factor = 3)
 # fit_sepc.plot_fitting_sets()
 fit_run = FittingProcess(fit_sepc, savename = 'PSFfitPSF')
 fit_run.run(algorithm_list = ['PSO','PSO', 'PSO'], fitting_level=['norm','deep', 'deep'])
-fit_run.plot_final_qso_fit(target_ID ='PSFfitPSF')
+fit_run.savename = 'figures/' + 'PSF_fit_PSF'+'_'+filt 
+fit_run.plot_final_qso_fit(target_ID ='PSF fit the other PSF', save_plot=True)

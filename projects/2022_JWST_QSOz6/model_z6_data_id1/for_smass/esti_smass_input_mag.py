@@ -12,11 +12,12 @@ import matplotlib.pyplot as plt
 from functions_for_result import esti_smass
 import glob
 
-# ID, mags, z = 'idx0', 
-# 1,2,0,51,35
-# folder = '202209' #0.2 mag no HST.
-# folder = '20220901_' #Not HST
-folder = '20220904' #HST upper limit
+# folder = '20221103' #metallicity considered with nebular lines
+# folder = '20221104' #No lines; mel -1
+# folder = '20221105' #No lines; mel -2.5
+# folder = '20221105' #No lines; mel -2.5
+# folder = '20221107' #Increase AV 1 for obj 1
+folder = '20221108' #FIX n =1 result
 rerun = False
 # idx = [1,2,0,51,35]
 # F115W 26.852 \pm 0.044
@@ -27,22 +28,29 @@ rerun = False
 # F410M 24.724 \pm 0.128
 # F444W 25.152 \pm 0.139
 
-mag_result = {'F150W': 27, 'F410M': 24.73}
+# mag_result = {'F150W': 26.1, 'F356W': 24.70} #QSO host
+# mag_result = {'F150W': 22.85, 'F356W': 21.49} #obj1
+mag_result = {'F356W': 23.23, 'F150W': 25.75} #obj2
+# mag_result = {'F150W': 26.23, 'F356W': 26.36} #obj3
 # del mag_result['F410M']
 
-idx = 101
-target_id = '101', 
-z = 6.3
-# target_id, z = load_info(idx)
+target_id = 'J2236'
+# idx = 101 #no emission line, fix mel as -1
+# idx = 102 #With emission line, fix mel as -1
+# idx = 103 #no emission line, fix mel as -2.5
+idx = 104 #With emission line, fix mel as -2.5
+# idx, target_id = 201,  'obj1'
+# idx, target_id = 202,  'obj2'
+# idx, target_id = 203,  'obj3'
+z = 6.4
 import time
 t1 = time.time()
 print('Run estimate')
-band_as_upper = ['F150W']
-esti_smass(ID = folder+str(idx), mags_dict = mag_result, z = z, flag = 0, 
-            if_run_gsf=True, band_as_upper = band_as_upper, metallicity=-3.3979,
-            mag_err=[0.2]*len(mag_result), just_run = False)
+band_as_upper = []
+esti_smass(ID = folder+str(idx), mags_dict = mag_result, z = z, flag = 1, 
+            if_run_gsf=True, band_as_upper = band_as_upper, metallicity=-2.5,
+            mag_err=[0.1]*len(mag_result), just_run = False)
 t2 = time.time()
-
 
 print(idx)
 steller_file = glob.glob('esti_smass/'+folder+str(idx)+'/SFH_*.fits')[0]

@@ -18,28 +18,32 @@ from galight.tools.astro_tools import plt_fits
 from galight.tools.measure_tools import measure_bkg
 import pickle
 
-run_folder = 'stage3_second_half/' #!!!
-filt = 'F150W'
+run_folder = 'stage3_all/' #!!!
+filt = 'F356W'
 # dp_files = glob.glob('fit_material_second_smFOV/data_process_idx0_*F150W*.pkl')
 # dp_files = glob.glob('fit_material_second_smFOV/data_process_idx0_F356W_FOVpsf2.pkl')
-dp_files = glob.glob(run_folder+'fit_material/data_process_idx0_{0}_FOVpsf*.pkl'.format(filt))
-dp_files.sort()
+import sys
+sys.path.insert(0,'../model_z6_data_id0/')
 
-idx = 0
+idx = 1
 from target_info import target_info
 info = target_info[str(idx)]
 target_id, RA, Dec, z = info['target_id'], info['RA'], info['Dec'], info['z']
 
+from galight.tools.measure_tools import mask_obj
+
+dp_files = glob.glob(run_folder+'fit_material/data_process_idx{1}_{0}_FOVpsf*.pkl'.format(filt, idx))
+dp_files.sort()
+
 #%%
 # for i in [0]:
-for i in range(9):
-# for i in range(8,16):
-# for i in range(16,24):
-# for i in range(24, 30):
-# for i in range(30, len(dp_files)):
+for i in range(len(dp_files)):
     file = dp_files[i]
     print(file)
-    filename = dp_files[i].replace('data_process', 'fit_run')[:-4]+'_{0}.pkl'.format(i)
+    filename = dp_files[i].replace('data_process', 'fit_run_withcentralMask')[:-4]+'_{0}.pkl'.format(i)
+    if len(glob.glob(filename))>0:
+        continue
+    
     idx = file.split('idx')[1].split('_')[0]
     target_id = target_id
     _data_process = pickle.load(open(file,'rb'))
@@ -49,18 +53,17 @@ for i in range(9):
     _data_process.PSF_list[-1] = psf
     _data_process.noise_map = np.nan_to_num(_data_process.noise_map, nan=1000)
     
-    # if int(idx) in [31, 32, 56]:
-    #     ps_pos = np.where(_data_process.target_stamp == _data_process.target_stamp.max())
-    #     ps_pos = (ps_pos[0][0] - _data_process.radius, ps_pos[1][0] - _data_process.radius)
-    #     ps_pos = [ps_pos[1], ps_pos[0]]
-    # else:
-    #     ps_pos = _data_process.apertures[0].positions - _data_process.radius
+    apr = _data_process.apertures[0]
+    apr.a, apr.b = 3, 3
+    apr.positions[0], apr.positions[1] = len(_data_process.target_mask)/2 +1 , len(_data_process.target_mask)/2 +1
+    mask = mask_obj(_data_process.target_mask, [apr])[0]
+    _data_process.target_mask = mask
     
     fit_sepc = FittingSpecify(_data_process)
     fit_sepc.prepare_fitting_seq(point_source_num = 1, supersampling_factor = 3)
                                   # ps_pix_center_list = [ps_pos]  ) #, fix_n_list= [[0,4],[1,1]])
     fit_sepc.kwargs_params['lens_light_model'][3][0]['R_sersic'] = 0.06
-    # fit_sepc.kwargs_params['lens_light_model'][4][0]['R_sersic'] = 0.6
+    fit_sepc.kwargs_params['lens_light_model'][4][0]['R_sersic'] = 1.
     # fit_sepc.kwargs_constraints['linear_solver'] = False
     fit_sepc.plot_fitting_sets()
     fit_run = FittingProcess(fit_sepc, savename = target_id)

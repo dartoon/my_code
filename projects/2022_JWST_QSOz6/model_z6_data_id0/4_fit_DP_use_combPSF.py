@@ -18,8 +18,8 @@ from galight.tools.astro_tools import plt_fits
 from galight.tools.measure_tools import measure_bkg
 import pickle
 
-run_folder = 'stage3_second_half/' #!!!
-filt = 'F150W'
+run_folder = 'stage3_all/' #!!!
+filt = 'F356W'
 
 dp_files = glob.glob(run_folder  + 'fit_material/data_process_idx0_*{0}*CombPsfs*.pkl'.format(filt) ) 
 dp_files.sort()
@@ -56,6 +56,7 @@ for i in range(len(dp_files)):
     fit_sepc.prepare_fitting_seq(point_source_num = 1, supersampling_factor = 3)
                                   # ps_pix_center_list = [ps_pos]  ) #, fix_n_list= [[0,4],[1,1]])
     fit_sepc.kwargs_params['lens_light_model'][3][0]['R_sersic'] = 0.06
+    fit_sepc.kwargs_params['lens_light_model'][4][0]['R_sersic'] = 1.
     # fit_sepc.kwargs_constraints['linear_solver'] = False
     fit_sepc.plot_fitting_sets()
     fit_run = FittingProcess(fit_sepc, savename = target_id)

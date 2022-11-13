@@ -72,7 +72,7 @@ def esti_smass(ID, mags_dict, z, folder = 'esti_smass/', flag = 0, if_run_gsf=Tr
         write_file.close()
     
         #Create a input file
-        f = open("../../../../template/gsf_JWSTNIRCam_temp/sample_template.input","r")
+        f = open("../../gsf_temp/gsf_JWSTNIRCam/sample_template.input","r")
         string = f.read()
         string = string.replace("idname", str(int(ID)))
         string = string.replace("zinfo", str(z))
