@@ -38,7 +38,7 @@ for count in range(len(collect_info)):
     item = collect_info[count]
     fit_run_list = []
     idx, filt= item
-    fit_files = glob.glob(run_folder+'fit_material/fit_run_idx{0}_{1}_*FOVpsf*.pkl'.format(idx, filt))
+    fit_files = glob.glob(run_folder+'fit_material/fit_run_fixn1__idx{0}_{1}_*FOVpsf*.pkl'.format(idx, filt))
     fit_files.sort()
     
     for i in range(len(fit_files)):

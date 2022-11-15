@@ -23,7 +23,7 @@ idx = 1
 run_folder = 'stage3_all/' #!!!
 
 # for filt in ['F356W', 'F150W'] :
-for filt in ['F356W'] :
+for filt in ['F150W'] :
     data_process = pickle.load(open(run_folder+'material/data_process_idx{0}_{1}.pkl'.format(idx, filt),'rb'))
     # print(data_process.target_stamp[40,40])
     filt = data_process.filt

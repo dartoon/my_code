@@ -16,10 +16,11 @@ sys.path.insert(0,'../')
 
 # folder = '20221103' #metallicity considered with nebular lines
 # folder = '20221105' #No lines; age as 0.5 Gyr and mel as -2.5
-folder = '20221105' #No lines; mel -2.5
+# folder = '20221105' #No lines; mel -2.5
 # folder = '20221106' #with lines; mel -2.5
 # folder = '20221106' #More flexible for obj1
 # folder = '20221109' #No lines; mel -1
+folder = '20221115' #fix mel as -1, age as 0.5
 
 
 fitidx = 0
@@ -207,6 +208,7 @@ else:
     plt.text( (xmax-xmin)*0.07, (ymax-ymin)*0.61, 'age fixed as {0:.1f} Gyr'.format(age, age_l, age_h), fontsize=17)
     print('age:  [{1:.1f}$-${2:.1f}]  Gyr'.format(age, age_l, age_h))
 plt.text( (xmax-xmin)*0.07, (ymax-ymin)*0.51, 'metalicity fixed as {0:.1f} logZ/'.format(mel) + r"Z$_{\rm \odot}$", fontsize=17)    
+plt.text( (xmax-xmin)*0.07, (ymax-ymin)*0.71, 'Av fixed as 1.0', fontsize=17)    
 # if '{0:.1f}'.format(sfr_l) == '0.0':
 #     plt.text( (xmax-xmin)*0.07, (ymax-ymin)*0.75, r"SFR: [$\leftarrow${2:.1f}]".format(sfr, sfr_l, sfr_h) + r" M$_{\rm \odot}$/yr ", fontsize=17)
 #     print("[$\leftarrow${2:.1f}]".format(sfr, sfr_l, sfr_h) + r" M$_{\rm \odot}$/yr ")

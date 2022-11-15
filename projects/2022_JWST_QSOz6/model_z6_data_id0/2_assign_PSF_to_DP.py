@@ -17,7 +17,7 @@ idx = 0
 from target_info import target_info
 info = target_info[str(idx)]
 target_id, RA, Dec, z = info['target_id'], info['RA'], info['Dec'], info['z']
-run_folder = 'stage3_all_largecut/' #!!!
+run_folder = 'stage3_all/' #!!!
 
 # for filt in ['F356W', 'F150W'] :
 for filt in ['F356W'] :

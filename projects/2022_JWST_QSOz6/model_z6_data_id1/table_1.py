@@ -32,7 +32,7 @@ from astropy.cosmology import LambdaCDM, FlatLambdaCDM
 cosmo1 = LambdaCDM(70 * (u.km/u.s/u.Mpc), 0.3, 0.7)
 arc_per_kpc = cosmo1.arcsec_per_kpc_proper(z).value
 # filters = ['F150W', 'F356W']
-filters = ['F356W']
+filters = ['F150W']
 import copy, matplotlib
 for top_psf_id in [0]:
     for count in range(len(filters)):
@@ -128,5 +128,5 @@ for top_psf_id in [0]:
         # print('Position Offset:', round(dis[0],3), 'pixel, ', round(dis[0],2), 'kpc')
         print('Position offset', "{0:.2f}$\pm${1:.2f}".format(weighted_value, rms_value))
 
-# data_process = fit_run.fitting_specify_class.data_process_class
-# print(-2.5*np.log10(data_process.tbl['kron_flux'][data_process.tbl['label']==0]) + data_process.zp)
+data_process = fit_run.fitting_specify_class.data_process_class
+print(-2.5*np.log10(data_process.tbl['kron_flux'][data_process.tbl['label']==0]) + data_process.zp)

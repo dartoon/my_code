@@ -22,11 +22,12 @@ sys.path.insert(0,'../model_z6_data_id0/')
 filters =  ['F150','F356']
 
 data_type = 'all'
-filt = filters[0] #!!!
+filt = filters[1] #!!!
 
 file_NO = 0  #!!!
 
-folder = '/Users/Dartoon/Downloads/z6JWSTNIRcam/NIRCam_J2236_stage3_{0}/bkg_removed'.format(data_type)
+# folder = '/Users/Dartoon/Downloads/z6JWSTNIRcam/NIRCam_J2236_stage3_{0}/bkg_removed'.format(data_type)
+folder = '../NIRCam_data/Nov14/bkg_removed/' 
 idx = 1
 from target_info import target_info
 info = target_info[str(idx)]
@@ -40,7 +41,7 @@ target_pos = 339.1857947085765, 0.5490648434896199
 
 
 #%%
-filter_files= glob.glob(folder+'/*{0}*.fits'.format(filt))  #For NIRCam
+filter_files= glob.glob(folder+'*{0}*{1}*_rmbkg.fits'.format(target_id[:5], filt))  #For NIRCam
 filter_files.sort()
 
 from galight.tools.cutout_tools import psf_clean

@@ -32,7 +32,7 @@ target_id, RA, Dec, z = info['target_id'], info['RA'], info['Dec'], info['z']
 
 #%%
 # for i in [0]:
-for i in range(9):
+for i in range(len(dp_files)):
 # for i in range(8,16):
 # for i in range(16,24):
 # for i in range(24, 30):

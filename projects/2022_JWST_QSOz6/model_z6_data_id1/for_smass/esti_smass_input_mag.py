@@ -17,7 +17,8 @@ import glob
 # folder = '20221105' #No lines; mel -2.5
 # folder = '20221105' #No lines; mel -2.5
 # folder = '20221107' #Increase AV 1 for obj 1
-folder = '20221108' #FIX n =1 result
+# folder = '20221108' #FIX n =1 result
+folder = '20221115' #FIX n =1 result
 rerun = False
 # idx = [1,2,0,51,35]
 # F115W 26.852 \pm 0.044
@@ -30,15 +31,16 @@ rerun = False
 
 # mag_result = {'F150W': 26.1, 'F356W': 24.70} #QSO host
 # mag_result = {'F150W': 22.85, 'F356W': 21.49} #obj1
-mag_result = {'F356W': 23.23, 'F150W': 25.75} #obj2
+mag_result = {'F356W': 23.23, 'F150W': 25.63} #obj2
 # mag_result = {'F150W': 26.23, 'F356W': 26.36} #obj3
 # del mag_result['F410M']
 
 target_id = 'J2236'
 # idx = 101 #no emission line, fix mel as -1
+idx = 101 #no emission line, fix mel as -1
 # idx = 102 #With emission line, fix mel as -1
 # idx = 103 #no emission line, fix mel as -2.5
-idx = 104 #With emission line, fix mel as -2.5
+# idx = 104 #With emission line, fix mel as -2.5
 # idx, target_id = 201,  'obj1'
 # idx, target_id = 202,  'obj2'
 # idx, target_id = 203,  'obj3'
@@ -47,8 +49,8 @@ import time
 t1 = time.time()
 print('Run estimate')
 band_as_upper = []
-esti_smass(ID = folder+str(idx), mags_dict = mag_result, z = z, flag = 1, 
-            if_run_gsf=True, band_as_upper = band_as_upper, metallicity=-2.5,
+esti_smass(ID = folder+str(idx), mags_dict = mag_result, z = z, flag = 0, 
+            if_run_gsf=True, band_as_upper = band_as_upper, metallicity=-1.0,
             mag_err=[0.1]*len(mag_result), just_run = False)
 t2 = time.time()
 

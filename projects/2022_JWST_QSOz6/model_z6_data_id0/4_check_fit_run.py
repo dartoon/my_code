@@ -18,8 +18,8 @@ target_id, RA, Dec, z = info['target_id'], info['RA'], info['Dec'], info['z']
 
 # files = glob.glob('./*fit_material*sm*/data_process_idx{0}_*_psf*.pkl'.format(idx))
 # files.sort()
-# run_folder = 'stage3_*/' #!!!
-run_folder = 'stage3_second_half/' #!!!
+run_folder = 'stage3_all/' #!!!
+# run_folder = 'stage3_second_half/' #!!!
 z_str = str(z)
 
 # filters = ['F150W', 'F356W']

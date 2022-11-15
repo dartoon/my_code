@@ -22,18 +22,18 @@ data_type = 'all'
 filt = filters[0] #!!!
 file_NO = 0  #!!!
 
-folder = '/Users/Dartoon/Downloads/z6JWSTNIRcam/NIRCam_J2255_stage3_{0}/bkg_removed'.format(data_type)
 idx = 0
 from target_info import target_info
 info = target_info[str(idx)]
 target_id, RA, Dec, z = info['target_id'], info['RA'], info['Dec'], info['z']
 
+folder = '../NIRCam_data/Nov14/bkg_removed/' 
 from astropy.coordinates import SkyCoord
 from astropy import units as u
 pos = SkyCoord('{0} {1}'.format(RA, Dec), unit=(u.hourangle, u.deg))
 target_pos = np.array([pos.ra.degree, pos.dec.degree])
 #%%
-filter_files= glob.glob(folder+'/*{0}*.fits'.format(filt))  #For NIRCam
+filter_files= glob.glob(folder+'*{0}*{1}*_rmbkg.fits'.format(target_id[:5], filt))  #For NIRCam
 filter_files.sort()
 
 from galight.tools.cutout_tools import psf_clean
@@ -145,7 +145,7 @@ if clean_up == True:
     final_PSF_RA_DEC_list = [PSF_RA_DEC_list[i] for i in range(len(PSF_RA_DEC_list)) if i not in final_rm_list]
     final_PSF_RA_DEC_is_QSO = [PSF_RA_DEC_list[i] for i in range(len(PSF_RA_DEC_list)) if i in idx_is_QSO]
     final_PSF_from_file_list = [PSF_from_list[i] for i in range(len(PSF_from_list)) if i not in final_rm_list]
-    # plt_many_fits(final_PSF_list_clean)
+    plt_many_fits(final_PSF_list_clean)
 pickle.dump([final_PSF_list, final_PSF_list_clean, final_PSF_RA_DEC_list, final_PSF_from_file_list],
             open(run_folder+'material/'+filt+'_PSF_Library_idx{0}.pkl'.format(idx), 'wb'))
 #%%

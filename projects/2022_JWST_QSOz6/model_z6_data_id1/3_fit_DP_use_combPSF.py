@@ -19,7 +19,7 @@ from galight.tools.measure_tools import measure_bkg
 import pickle
 
 run_folder = 'stage3_all/' #!!!
-filt = 'F150W'
+filt = 'F356W'
 
 import sys
 sys.path.insert(0,'../model_z6_data_id0/')

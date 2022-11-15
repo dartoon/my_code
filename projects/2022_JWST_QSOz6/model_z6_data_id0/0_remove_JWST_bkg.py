@@ -13,9 +13,9 @@ import glob
 import pickle
 filters =  ['F150','F356']
 
-folder = '/Users/Dartoon/Downloads/z6JWSTNIRcam/NIRCam_J2255_stage3_half'
+folder = '../NIRCam_data/Nov14/'
 
-filt = filters[0] #!!!
+filt = filters[1] #!!!
 
 idx = 0
 from target_info import target_info

@@ -19,7 +19,8 @@ sys.path.insert(0,'../../model_z6_data_id0/')
 # folder = '20221104' #No lines; mel -1
 # folder = '20221105' #No lines; mel -2.5
 # folder = '20221106' #with lines; mel -2.5
-folder = '20221108' #More flexible for obj1
+# folder = '20221108' #More flexible for obj1
+folder = '20221115' #More flexible for obj1
 
 
 fitidx = 1
@@ -194,7 +195,7 @@ plt.xlim(0.25, 6)
 plt.ylim(0., np.max(flambda_list)*2.0)
 xmin, xmax, ymin, ymax = plt.axis()
 
-for i, fid in enumerate(filt_id):
+for i, fid in enumerate(filt_id[::-1]):
     f_fil = np.loadtxt('../../../../template/gsf_temp/filter/{0}.fil'.format(fid))
     top = f_50.max()
     f_fil[:,2] = f_fil[:,2]/f_fil[:,2].max() * (ymax-ymin) * 0.1

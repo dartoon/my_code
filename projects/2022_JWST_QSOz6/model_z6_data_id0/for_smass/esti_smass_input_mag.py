@@ -17,10 +17,11 @@ import glob
 # folder = '20221105' #No lines; mel -2.5
 # folder = '20221105' #No lines; mel -2.5
 # folder = '20221106' #Increase AV 1 for obj 1
-folder = '20221109' #fix mel as -1, age as 0.2
+# folder = '20221109' #fix mel as -1, age as 0.2
+folder = '20221115' #fix mel as -1, age as 0.5, dust = 1.0
 rerun = False
 
-mag_result = {'F150W': 26.1, 'F356W': 24.70} #QSO host
+mag_result = {'F150W': 26.1, 'F356W': 24.80} #QSO host
 
 # mag_result = {'F150W': 22.85, 'F356W': 21.49} #obj1
 # mag_result = {'F150W': 24.64, 'F356W': 23.55} #obj2

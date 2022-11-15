@@ -25,7 +25,7 @@ run_folder = 'stage3_all/' #!!!
 z_str = str(z)
 
 # filters = ['F150W', 'F356W']
-filters = ['F150W']
+filters = ['F356W']
 import copy, matplotlib
 for top_psf_id in [0]:
     for count in range(len(filters)):

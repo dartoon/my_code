@@ -32,10 +32,9 @@ sys.path.insert(0,'../model_z6_data_id0/')
 
 
 data_type = 'all' 
-filt = ['F150W','F356W'][1]
+filt = ['F150W','F356W'][0]
 file_NO = 0
 
-# fov = 'large'
 fov = 'norm'
 
 idx = 1
@@ -43,9 +42,11 @@ from target_info import target_info
 info = target_info[str(idx)]
 target_id, RA, Dec, z = info['target_id'], info['RA'], info['Dec'], info['z']
 
-folder = '/Users/Dartoon/Downloads/z6JWSTNIRcam/NIRCam_{1}_stage3_{0}/bkg_removed'.format(data_type, target_id[:5])
+# folder = '/Users/Dartoon/Downloads/z6JWSTNIRcam/NIRCam_{1}_stage3_{0}/bkg_removed'.format(data_type, target_id[:5])
+folder = '../NIRCam_data/Nov14/bkg_removed/' 
+
 # jwst_all_filenames = glob.glob(folder+'/*{0}*{1}*.fits'.format(target_id[:5], filts[0]))
-jwst_all_filenames = glob.glob(folder+'/*{0}*.fits'.format(filt))
+jwst_all_filenames = glob.glob(folder+'*{0}*{1}*_rmbkg.fits'.format(target_id[:5], filt))  #For NIRCam
 jwst_all_filenames.sort()
 file = jwst_all_filenames[file_NO]
 if data_type == 'all':
@@ -61,6 +62,11 @@ elif data_type == 'half':
         run_folder = 'stage3_second_half/'
 
 result_folder = run_folder + 'fit_result/'
+
+if filt == 'F356W':
+    radius = 45
+elif filt == 'F150W':
+    radius = 25
 #%%
 cut_kernel = None #After pos correct then, do the nearest_obj_center
 # filts = ['F356W', 'F150W']
@@ -87,7 +93,7 @@ for filt in [filt]:
                                    if_plot=False, zp = zp, exptime= exp_map, 
                                    fov_noise_map = None)
     
-    data_process.generate_target_materials(radius=45 * expsize, create_mask = False, nsigma=1.5, 
+    data_process.generate_target_materials(radius=radius * expsize, create_mask = False, nsigma=1.5, 
                                             cut_kernel = None, if_select_obj=False,
                                           exp_sz= 1.2, npixels = 60 * expsize, if_plot=False)
     

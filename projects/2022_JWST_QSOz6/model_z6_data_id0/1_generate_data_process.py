@@ -33,16 +33,17 @@ data_type = 'all'
 filt = 'F356W'
 file_NO = 0
 
-fov = 'large'
+fov = 'small'
 
 idx = 0
-folder = '/Users/Dartoon/Downloads/z6JWSTNIRcam/NIRCam_J2255_stage3_{0}/bkg_removed'.format(data_type)
+# folder = '/Users/Dartoon/Downloads/z6JWSTNIRcam/NIRCam_J2255_stage3_{0}/bkg_removed'.format(data_type)
+folder = '../NIRCam_data/Nov14/bkg_removed/' 
 from target_info import target_info
 info = target_info[str(idx)]
 target_id, RA, Dec, z = info['target_id'], info['RA'], info['Dec'], info['z']
 
 # jwst_all_filenames = glob.glob(folder+'/*{0}*{1}*.fits'.format(target_id[:5], filts[0]))
-jwst_all_filenames = glob.glob(folder+'/*{0}*.fits'.format(filt))
+jwst_all_filenames = glob.glob(folder+'*{0}*{1}*_rmbkg.fits'.format(target_id[:5], filt))  #For NIRCam
 jwst_all_filenames.sort()
 file = jwst_all_filenames[file_NO]
 if data_type == 'all':
@@ -58,6 +59,19 @@ elif data_type == 'half':
         run_folder = 'stage3_second_half/'
 
 result_folder = run_folder + 'fit_result/'
+
+if filt == 'F356W':
+    if fov == 'large':
+        radius = 80
+    else:
+        radius = 35
+elif filt == 'F150W':
+    if fov == 'large':
+        radius = 40
+    else:
+        radius = 26
+
+
 #%%
 cut_kernel = None #After pos correct then, do the nearest_obj_center
 # filts = ['F356W', 'F150W']
@@ -84,22 +98,25 @@ for filt in [filt]:
                                    if_plot=False, zp = zp, exptime= exp_map, 
                                    fov_noise_map = None)
     
-    data_process.generate_target_materials(radius=80 * expsize, create_mask = False, nsigma=1.5, 
+    data_process.generate_target_materials(radius=radius * expsize, create_mask = False, nsigma=1.5, 
                                             cut_kernel = None, if_select_obj=False,
                                           exp_sz= 1.2, npixels = 60 * expsize, if_plot=False)
     
     # data_process.apertures = []
     data_process.apertures[0].theta = 0
     data_process.apertures[0].b = data_process.apertures[0].b/2
-    data_process.apertures[0].positions[0] = data_process.apertures[0].positions[0] - 1.5
+    if _fitsFile[0].header['CHANNEL'] == 'LONG':
+        data_process.apertures[0].positions[0] = data_process.apertures[0].positions[0] - 1.5
+    if _fitsFile[0].header['CHANNEL'] != 'LONG':
+        data_process.apertures[0].positions[0] = data_process.apertures[0].positions[0] - 1.5/2
     del data_process.fov_image
     del data_process.exptime
     
     #%%
     
-    ap = data_process.apertures[2]
-    data_process.apertures[2] = data_process.apertures[3]
-    data_process.apertures[3] = ap
+    # ap = data_process.apertures[2]
+    # data_process.apertures[2] = data_process.apertures[3]
+    # data_process.apertures[3] = ap
     print(target_id, filt, 'apertures', len(data_process.apertures) )
     data_process.filt = filt
     data_process.file = file

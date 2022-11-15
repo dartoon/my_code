@@ -30,11 +30,12 @@ filt = 'F150W'
 file_NO = 0
 
 idx = 0
-folder = '/Users/Dartoon/Downloads/z6JWSTNIRcam/NIRCam_J2255_stage3_{0}/bkg_removed'.format(data_type)
+# folder = '/Users/Dartoon/Downloads/z6JWSTNIRcam/NIRCam_J2255_stage3_{0}/bkg_removed'.format(data_type)
+folder = folder = '../NIRCam_data/Nov14/bkg_removed/' 
 info = target_info[str(idx)]
 target_id, RA, Dec, z = info['target_id'], info['RA'], info['Dec'], info['z']
 # jwst_all_filenames = glob.glob(folder+'/*{0}*{1}*.fits'.format(target_id[:5], filts[0]))
-jwst_all_filenames = glob.glob(folder+'/*{0}*.fits'.format(filt))
+jwst_all_filenames = glob.glob(folder+'*{0}*{1}*_rmbkg.fits'.format(target_id[:5], filt))  #For NIRCam
 jwst_all_filenames.sort()
 file = jwst_all_filenames[file_NO]
 if data_type == 'all':

@@ -19,7 +19,7 @@ from galight.tools.measure_tools import measure_bkg
 import pickle
 
 run_folder = 'stage3_all/' #!!!
-filt = 'F150W'
+filt = 'F356W'
 # dp_files = glob.glob('fit_material_second_smFOV/data_process_idx0_*F150W*.pkl')
 # dp_files = glob.glob('fit_material_second_smFOV/data_process_idx0_F356W_FOVpsf2.pkl')
 import sys
