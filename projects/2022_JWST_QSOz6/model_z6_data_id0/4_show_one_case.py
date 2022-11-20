@@ -41,8 +41,8 @@ for top_psf_id in [0]:
         # PSF_lib_files = glob.glob(run_folder+'material/*'+filt[:-1]+'*_PSF_Library_idx{0}.pkl'.format(idx))[0]
         # idx, filt= item
         # fit_files = glob.glob(run_folder+'*fit_material*/fit_run_withcentralMask_idx{0}_{1}_FOV*.pkl'.format(idx, filt))#+\
-        # fit_files = glob.glob(run_folder+'*fit_material*/fit_run_idx{0}_{1}_*.pkl'.format(idx, filt))#+\
-        fit_files = glob.glob(run_folder+'*fit_material*/fit_run_idx0_F356W_FOVpsf2_?.pkl') 
+        fit_files = glob.glob(run_folder+'*fit_material*/fit_run_idx{0}_{1}_*.pkl'.format(idx, filt))#+\
+        # fit_files = glob.glob(run_folder+'*fit_material*/fit_run_idx0_F356W_FOVpsf2_?.pkl') 
         fit_files.sort()
         for i in range(len(fit_files)):
             fit_run_list.append(pickle.load(open(fit_files[i],'rb')))
@@ -50,6 +50,6 @@ for top_psf_id in [0]:
         sort_Chisq = chisqs.argsort()  
         print('idx', idx, filt, "Total PSF NO.", 'chisq',chisqs[sort_Chisq[top_psf_id]], len(sort_Chisq), fit_files[sort_Chisq[top_psf_id]])
         fit_run = fit_run_list[sort_Chisq[top_psf_id]]
-        fit_run.savename = 'figures/' + fit_run.savename+'_'+filt
-        fit_run.plot_final_qso_fit(target_ID = target_id+'$-$'+filt, save_plot = True, cmap = my_cmap)
+        # fit_run.savename = 'figures/' + fit_run.savename+'_'+filt
+        # fit_run.plot_final_qso_fit(target_ID = target_id+'$-$'+filt, save_plot = False, cmap = my_cmap)
         print(fit_run.final_result_galaxy)

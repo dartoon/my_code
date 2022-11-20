@@ -178,14 +178,14 @@ if filt == 'F356W':
     ax.arrow(108, 280, 0,-60,
              head_width=20, head_length=15, fc=color, ec=color, linewidth=1.2)
     ax.set_xlim(0,1220)
-    axins = zoomed_inset_axes(ax, 1.9, loc = 'upper right') # loc='center right')
-    loc1, loc2 = 2,3
+    axins = zoomed_inset_axes(ax, 2.3, loc = 'center right', bbox_to_anchor=(0,0,800,1200) )
+    loc1, loc2 = 2,4
 else:
     ax.arrow(98, 280, 0,-70,
              head_width=20, head_length=15, fc=color, ec=color, linewidth=1.2)
-    loc1, loc2 = 1,4
+    loc1, loc2 = 2,4
     ax.set_xlim(-420,-420+1220)
-    axins = zoomed_inset_axes(ax, 1.9, loc = 'lower left') # loc='center right')
+    axins = zoomed_inset_axes(ax, 2.3, loc = 'center left', bbox_to_anchor=(72,0,0,520) )
     
 axins.imshow(data_process.target_stamp, origin='lower', cmap=my_cmap, norm=LogNorm(vmin=vmin, vmax=vmax))#, vmin=vmin, vmax=vmax)
 axins.set_xlim(300, 500)
@@ -216,5 +216,5 @@ axins.set_yticks([])
 mark_inset(ax, axins, loc1=loc1, loc2=loc2, fc="none", ec="0.6", linewidth=2.2)
 ax.set(frame_on=False)  # New
 
-plt.savefig('figures/field_overview{0}.pdf'.format(filt) ,bbox_inches='tight')
+plt.savefig('figures/field_overview{0}.pdf'.format(filt))
 plt.show()

@@ -30,13 +30,15 @@ from target_info import target_info
 from galight.tools.astro_tools import plt_fits, plt_many_fits
 #%%
 data_type = 'all' 
-filt = 'F356W'
+filt = 'F150W'
+# filt = 'F356W'
 file_NO = 0
 
 idx = 1
 info = target_info[str(idx)]
 target_id, RA, Dec, z = info['target_id'], info['RA'], info['Dec'], info['z']
-folder = '/Users/Dartoon/Downloads/z6JWSTNIRcam/NIRCam_{1}_stage3_{0}/bkg_removed'.format(data_type, target_id[:5])
+# folder = '/Users/Dartoon/Downloads/z6JWSTNIRcam/NIRCam_{1}_stage3_{0}/bkg_removed'.format(data_type, target_id[:5])
+folder = '../NIRCam_data/Nov14/bkg_removed/' 
 # jwst_all_filenames = glob.glob(folder+'/*{0}*{1}*.fits'.format(target_id[:5], filts[0]))
 jwst_all_filenames = glob.glob(folder+'/*{0}*.fits'.format(filt))
 jwst_all_filenames.sort()
@@ -176,15 +178,15 @@ if filt == 'F356W':
     ax.arrow(148, 230, -60,-80,
              head_width=20, head_length=15, fc=color, ec=color, linewidth=1.2)
     ax.set_xlim(0,1220)
-    axins = zoomed_inset_axes(ax, 1.9, loc = 'upper right') # loc='center right')
-    loc1, loc2 = 2,3
+    axins = zoomed_inset_axes(ax, 2.3, loc = 'center right', bbox_to_anchor=(0,0,800,1200) )
+    loc1, loc2 = 2,4
     pso1, pso2 = 350., 430
 else:
     ax.arrow(148, 230, -60,-80,
              head_width=20, head_length=15, fc=color, ec=color, linewidth=1.2)
     ax.set_xlim(-420,-420+1220)
-    axins = zoomed_inset_axes(ax, 1.9, loc = 'lower left') # loc='center right')
-    loc1, loc2 = 1,4
+    axins = zoomed_inset_axes(ax, 2.3, loc = 'center left', bbox_to_anchor=(72,0,0,520) )
+    loc1, loc2 = 2,4
     pso1, pso2 = 360., 420
     
 axins.text(pso1, pso2, 'quasar', fontsize=20, color=color, ha='center')
