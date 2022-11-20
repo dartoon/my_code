@@ -30,7 +30,7 @@ def load_info(idx):
     spec_z = [lines1[i].split(' ')[3] for i in range(1, len(lines1)) if lines1[i].split(' ')[0] == target_id][0]
     return target_id, spec_z
 
-def load_prop(idx, root_folder = './', if_plot=False, prop_name = 'magnitude'):
+def load_prop(idx, root_folder = './', if_plot=False, prop_name = 'magnitude', path = None):
     result = {}
     files = glob.glob(root_folder+'fit_material/data_process_idx{0}_*_psf*.pkl'.format(idx))
     files.sort()
@@ -49,7 +49,10 @@ def load_prop(idx, root_folder = './', if_plot=False, prop_name = 'magnitude'):
     if 'F606W' in filters:
         filters = ['F606W'] + [filters[i] for i in range(len(filters)) if filters[i]!='F606W' ]
         
-    f = open("../model_JWST_stage3_Masafusa/target_idx_info.txt","r")
+    if path is None:
+        f = open("../model_JWST_stage3_Masafusa/target_idx_info.txt","r")
+    else:
+        f = open(path,"r")
     string = f.read()
     lines = string.split('\n')   # Split in to \n
     target_id = [lines[i].split(' ')[1] for i in range(len(lines)) if lines[i].split(' ')[0] == str(idx)][0]

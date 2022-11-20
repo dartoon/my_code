@@ -103,6 +103,13 @@ for top_psf_id in [0]:
         weighted_value = np.sum(np.array(all_values)*weight) / np.sum(weight)
         rms_value = np.sqrt(np.sum((np.array(all_values)-weighted_value)**2*weight) / np.sum(weight))
         print('total magnitude', prop_name, "{0:.3f}$\pm${1:.3f}".format(weighted_value, rms_value))
+        
+        
+        prop_name = 'q'
+        all_values = [fit_run_list[i].final_result_galaxy[0][prop_name] for i in range(len(fit_run_list))]
+        weighted_value = np.sum(np.array(all_values)*weight) / np.sum(weight)
+        rms_value = np.sqrt(np.sum((np.array(all_values)-weighted_value)**2*weight) / np.sum(weight))
+        print('host', prop_name, "{0:.3f}$\pm${1:.3f}".format(weighted_value, rms_value))
 
         if 'large' in run_folder:
             for ii in [1,2]:

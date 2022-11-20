@@ -32,7 +32,7 @@ from astropy.cosmology import LambdaCDM, FlatLambdaCDM
 cosmo1 = LambdaCDM(70 * (u.km/u.s/u.Mpc), 0.3, 0.7)
 arc_per_kpc = cosmo1.arcsec_per_kpc_proper(z).value
 # filters = ['F150W', 'F356W']
-filters = ['F150W']
+filters = ['F356W']
 import copy, matplotlib
 for top_psf_id in [0]:
     for count in range(len(filters)):
@@ -107,6 +107,12 @@ for top_psf_id in [0]:
         weighted_value = np.sum(np.array(all_values)*weight) / np.sum(weight)
         rms_value = np.sqrt(np.sum((np.array(all_values)-weighted_value)**2*weight) / np.sum(weight))
         print('total magnitude', "{0:.2f}$\pm${1:.2f}".format(weighted_value, rms_value))
+
+        prop_name = 'q'
+        all_values = [fit_run_list[i].final_result_galaxy[0][prop_name] for i in range(len(fit_run_list))]
+        weighted_value = np.sum(np.array(all_values)*weight) / np.sum(weight)
+        rms_value = np.sqrt(np.sum((np.array(all_values)-weighted_value)**2*weight) / np.sum(weight))
+        print('host', prop_name, "{0:.3f}$\pm${1:.3f}".format(weighted_value, rms_value))
 
         # if 'large' in run_folder:
         #     for ii in [1,2]:

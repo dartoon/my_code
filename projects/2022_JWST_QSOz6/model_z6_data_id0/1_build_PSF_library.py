@@ -19,7 +19,7 @@ from galight.tools.astro_tools import plt_many_fits
 filters =  ['F150','F356']
 
 data_type = 'all'
-filt = filters[0] #!!!
+filt = filters[1] #!!!
 file_NO = 0  #!!!
 
 idx = 0

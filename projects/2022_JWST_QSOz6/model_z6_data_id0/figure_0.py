@@ -26,7 +26,8 @@ from target_info import target_info
 from galight.tools.astro_tools import plt_fits, plt_many_fits
 #%%
 data_type = 'all' 
-filt = 'F150W'
+filt = 'F356W'
+# filt = 'F150W'
 file_NO = 0
 
 idx = 0
