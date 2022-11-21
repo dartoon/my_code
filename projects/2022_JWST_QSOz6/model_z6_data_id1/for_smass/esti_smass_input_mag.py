@@ -29,10 +29,7 @@ rerun = False
 # F410M 24.724 \pm 0.128
 # F444W 25.152 \pm 0.139
 
-# mag_result = {'F150W': 26.1, 'F356W': 24.70} #QSO host
-# mag_result = {'F150W': 22.85, 'F356W': 21.49} #obj1
-mag_result = {'F356W': 23.23, 'F150W': 25.63} #obj2
-# mag_result = {'F150W': 26.23, 'F356W': 26.36} #obj3
+mag_result = {'F356W': 23.23, 'F150W': 25.63}
 # del mag_result['F410M']
 
 target_id = 'J2236'

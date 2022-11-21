@@ -20,7 +20,8 @@ sys.path.insert(0,'../')
 # folder = '20221106' #with lines; mel -2.5
 # folder = '20221106' #More flexible for obj1
 # folder = '20221109' #No lines; mel -1
-folder = '20221115' #fix mel as -1, age as 0.5
+# folder = '20221115' #fix mel as -1, age as 0.5
+folder = '20221120' #
 
 
 fitidx = 0
@@ -28,7 +29,7 @@ from target_info import target_info
 info = target_info[str(fitidx)]
 target_id, RA, Dec, z = info['target_id'], info['RA'], info['Dec'], info['z']
 
-idx = 101  #our target
+idx = 10100  #our target
 # idx, target_id = 201,  'obj1'
 # idx, target_id = 202,  'obj2'
 # idx, target_id = 203,  'obj3'
@@ -208,7 +209,7 @@ else:
     plt.text( (xmax-xmin)*0.07, (ymax-ymin)*0.61, 'age fixed as {0:.1f} Gyr'.format(age, age_l, age_h), fontsize=17)
     print('age:  [{1:.1f}$-${2:.1f}]  Gyr'.format(age, age_l, age_h))
 plt.text( (xmax-xmin)*0.07, (ymax-ymin)*0.51, 'metalicity fixed as {0:.1f} logZ/'.format(mel) + r"Z$_{\rm \odot}$", fontsize=17)    
-plt.text( (xmax-xmin)*0.07, (ymax-ymin)*0.71, 'Av fixed as 1.0', fontsize=17)    
+plt.text( (xmax-xmin)*0.07, (ymax-ymin)*0.71, 'Av fixed as {0:.1f}'.format(float(info['AV_50'])) , fontsize=17)    
 # if '{0:.1f}'.format(sfr_l) == '0.0':
 #     plt.text( (xmax-xmin)*0.07, (ymax-ymin)*0.75, r"SFR: [$\leftarrow${2:.1f}]".format(sfr, sfr_l, sfr_h) + r" M$_{\rm \odot}$/yr ", fontsize=17)
 #     print("[$\leftarrow${2:.1f}]".format(sfr, sfr_l, sfr_h) + r" M$_{\rm \odot}$/yr ")
@@ -222,7 +223,7 @@ plt.tick_params(labelsize=20)
 plt.xlabel(r"$\lambda$ (um)",fontsize=27)
 plt.ylabel(r"f$_\lambda$ 10$^{\rm" + " -{0}}}$ erg/s/cm$^2$/$\AA$".format(unit.split('e-')[1][:2]),fontsize=27)
 plt.title(target_id,fontsize=27)
-plt.savefig('../figures/{0}_SED_map.pdf'.format(target_id[:5]))
+# plt.savefig('../figures/{0}_SED_map.pdf'.format(target_id[:5]))
 # #plt.yticks([])
 
 

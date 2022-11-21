@@ -26,7 +26,7 @@ ax2 = ax1.twiny()
 # HSC: rest 5000 A
 size, z, _ = stats.binned_statistic(d['z'], d['rkpc'], bins=np.arange(0.15, 1.0, 0.15),
                                     statistic='median')
-ax1.plot(z[:-1], size, 'k', label='HSC (Li+21)')
+ax1.plot(z[:-1], size, 'k', label='HSC (Li+21)', linewidth=3)
 
 size_16, z, _ = stats.binned_statistic(d['z'], d['rkpc'], bins=np.arange(0.15, 1.0, 0.15),
                                     statistic=percentile16)
@@ -35,15 +35,15 @@ size_84, z, _ = stats.binned_statistic(d['z'], d['rkpc'], bins=np.arange(0.15, 1
 ax1.fill_between(z[:-1], size_16, size_84, alpha=0.25)
 
 # JWST ceers
-ax1.scatter(1.646, 4.05, color='tab:orange', marker='v') #F150
-ax1.scatter(2.317, 1.45, color='tab:orange', marker='v') #F160
-ax1.scatter(2.588, 1.11, color='tab:orange', marker='v') #F160
-ax1.scatter(3.442, 1.18, color='tab:orange', marker='v') #F200
-ax1.scatter(3.465, 1.17, color='tab:orange', label='CEERS (Ding+22)', marker='v') #F200
+ax1.scatter(1.646, 4.05, color='tab:orange', marker='v',s=160) #F150
+ax1.scatter(2.317, 1.45, color='tab:orange', marker='v',s=160) #F160
+ax1.scatter(2.588, 1.11, color='tab:orange', marker='v',s=160) #F160
+ax1.scatter(3.442, 1.18, color='tab:orange', marker='v',s=160) #F200
+ax1.scatter(3.465, 1.17, color='tab:orange', label='CEERS (Ding+22)', marker='v',s=160) #F200
 
 # JWST SHELLQs: F356W
-ax1.scatter(6.34, 1.87, label='This Work', marker='*', s=200, color='r')
-ax1.scatter(6.40, 0.75, marker='*', s=200, color='r')
+ax1.scatter(6.34, 1.87, label='This Work', marker='*', s=400, color='r')
+ax1.scatter(6.40, 0.75, marker='*', s=400, color='r')
 
 # HST: rest 5000 A
 hst_size = np.array([1.17873376, 0.85913774, 3.62829472, 1.95819451, 4.36564811,
@@ -59,7 +59,7 @@ hst_z = np.array([1.63 , 1.301, 1.667, 1.447, 1.326, 1.57 , 1.552, 1.567, 1.618,
        1.325, 1.411, 1.276, 1.412, 1.585, 1.551, 1.516, 1.6  , 1.483,
        1.626, 1.337, 1.272, 1.445, 1.664])
 
-ax1.scatter(hst_z, hst_size, color='tab:cyan', label='HST (Ding+20)')
+ax1.scatter(hst_z, hst_size, color='tab:cyan', s=60, label='HST (Ding+20)')
 ax1.set_xlabel('$z$', fontsize=30)
 ax1.set_ylabel(u'$R_{\mathrm{eff, maj}}$ (kpc)', fontsize=30)
 # u'log($R_{\mathrm{eff, circ.}}$, units of kpc)
@@ -67,7 +67,8 @@ ax1.set_ylabel(u'$R_{\mathrm{eff, maj}}$ (kpc)', fontsize=30)
 ax1.tick_params(labelsize=20)
 # BlueTides: Sersic radius, F356W
 blue = Table.read('bluetides.txt', format='ascii')
-ax1.scatter([7.0]*len(blue), blue['size_sersic'], label='BlueTides (Marshall+19)', marker='^', color='gray', facecolor='None')
+# ax1.scatter([7.0]*len(blue), blue['size_sersic'], label='BlueTides (Marshall+19)',  s= 100,
+#             marker='^', color='black', facecolor='None',alpha=0.6)
 ax1.set_xlim(-0.1, 7.5)
 
 # galaxy
@@ -76,15 +77,15 @@ mowla_z = np.array([0.25, 0.75, 1.25, 1.75, 2.25, 2.75])
 sf = 6.3*(1+mowla_z)**(-0.5)  # 10.25 < logM* < 10.75
 qs = 4.1*(1+mowla_z)**(-1.1)
 
-ax1.plot(mowla_z, sf, label='SF galaxy (Mowla+19)', color='b', linestyle='dashed')
-ax1.plot(mowla_z, qs, label='QS galaxy (Mowla+19)', color='r', linestyle='dashdot')
+ax1.plot(mowla_z, sf, label='SF galaxy (Mowla+19)', color='b', linestyle='dashed', linewidth=3)
+ax1.plot(mowla_z, qs, label='QS galaxy (Mowla+19)', color='r', linestyle='dashdot', linewidth=3)
 
 plt.tick_params(labelsize=20)
 
 # Allen+17: F160W
 allen_z = np.arange(1, 7.1, 0.1)
 sf = 7.07*(1+allen_z)**(-0.89)  # logM* > 10
-ax1.plot(allen_z, sf, label='SF galaxy (Allen+17)', color='gray', linestyle='dotted')
+ax1.plot(allen_z, sf, label='SF galaxy (Allen+17)', color='gray', linestyle='dotted', linewidth=3)
 
 # look back time
 lookback = cosmo.lookback_time(np.arange(0, 8, 2))

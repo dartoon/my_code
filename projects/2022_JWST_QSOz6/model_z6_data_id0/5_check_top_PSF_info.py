@@ -18,7 +18,7 @@ import copy
 run_folder = 'stage3_all/' #!!!
 
 
-filt = 'F356W'
+filt = 'F150W'
 files = glob.glob(run_folder+'fit_material/data_process_idx0_*{0}*_*FOVpsf*.pkl'.format(filt))
 files.sort()
 collect_info = []

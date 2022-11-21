@@ -84,6 +84,8 @@ def coordinate_arrows(ax, d, header, color='white', arrow_size=0.02):
     xx_dec, yy_dec = wcs.all_world2pix([[res_ra0, res_dec0+2/3600]], 1)[0]
     xx_ra_t, yy_ra_t = wcs.all_world2pix([[res_ra0+3.2/3600, res_dec0]], 1)[0]
     xx_dec_t, yy_dec_t = wcs.all_world2pix([[res_ra0, res_dec0+3.5/3600]], 1)[0]
+    
+    print((xx_dec - xx_), (yy_dec - yy_))
 
     ax.arrow(xx_ * deltaPix, yy_ * deltaPix, (xx_ra - xx_) * deltaPix, (yy_ra - yy_) * deltaPix,
              head_width=arrow_size * d, head_length=arrow_size * d, fc=color, ec=color, linewidth=1.2)

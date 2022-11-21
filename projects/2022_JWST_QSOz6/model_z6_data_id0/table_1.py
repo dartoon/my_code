@@ -109,7 +109,22 @@ for top_psf_id in [0]:
         all_values = [fit_run_list[i].final_result_galaxy[0][prop_name] for i in range(len(fit_run_list))]
         weighted_value = np.sum(np.array(all_values)*weight) / np.sum(weight)
         rms_value = np.sqrt(np.sum((np.array(all_values)-weighted_value)**2*weight) / np.sum(weight))
-        print('host', prop_name, "{0:.3f}$\pm${1:.3f}".format(weighted_value, rms_value))
+        print('host', prop_name, "{0:.2f}$\pm${1:.2f}".format(weighted_value, rms_value))
+        
+        header = fit_run.fitting_specify_class.data_process_class.header
+        from astropy.wcs import WCS
+        wcs = WCS(header)
+        ra0, dec0 = 100, 100
+        res_ra0, res_dec0 = wcs.all_pix2world([(100, 100)], 1)[0]
+        xx_, yy_ = ra0, dec0
+        xx_dec, yy_dec = wcs.all_world2pix([[res_ra0, res_dec0+2/3600]], 1)[0]
+        # print((xx_dec - xx_), (yy_dec - yy_))
+        N_angle = np.arctan((xx_dec - xx_)/(yy_dec - yy_)) * 180/np.pi
+        prop_name = 'phi_G'
+        all_values = [fit_run_list[i].final_result_galaxy[0][prop_name] * 180/np.pi for i in range(len(fit_run_list))]
+        weighted_value = np.sum(np.array(all_values)*weight) / np.sum(weight)
+        rms_value = np.sqrt(np.sum((np.array(all_values)-weighted_value)**2*weight) / np.sum(weight))
+        print('host', prop_name, "{0:.1f}$\pm${1:.1f}".format(90-N_angle+weighted_value, rms_value))
 
         if 'large' in run_folder:
             for ii in [1,2]:
