@@ -101,7 +101,7 @@ pathspec @ file:///home/conda/feedstock_root/build_artifacts/pathspec_1626613672
 pexpect @ file:///home/conda/feedstock_root/build_artifacts/pexpect_1602535608087/work
 photutils==1.4.0
 pickleshare @ file:///home/conda/feedstock_root/build_artifacts/pickleshare_1602536217715/work
-Pillow==9.1.1
+Pillow==9.3.0
 platformdirs @ file:///home/conda/feedstock_root/build_artifacts/platformdirs_1645298319244/work
 pluggy @ file:///Users/runner/miniforge3/conda-bld/pluggy_1648772670518/work
 prometheus-client==0.14.1
