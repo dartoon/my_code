@@ -31,8 +31,8 @@ target_id, RA, Dec, z = info['target_id'], info['RA'], info['Dec'], info['z']
 
 from galight.tools.measure_tools import mask_obj
 
-# for i in [0]:
-for i in range(5):
+for i in [4]:
+# for i in range(5):
 # for i in range(8,16):
 # for i in range(16,24):
 # for i in range(24, 30):

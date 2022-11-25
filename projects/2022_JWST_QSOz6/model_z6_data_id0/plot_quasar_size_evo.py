@@ -12,7 +12,7 @@ def percentile16(x):
 def percentile84(x):
     return np.percentile(x, 84)
 
-d = Table.read('HSC_sdss_li21.ascii', format='ascii')
+d = Table.read('figures/Junyao_quasar_size/HSC_sdss_li21.ascii', format='ascii')
 
 
 import matplotlib as matt
@@ -26,13 +26,16 @@ ax2 = ax1.twiny()
 # HSC: rest 5000 A
 size, z, _ = stats.binned_statistic(d['z'], d['rkpc'], bins=np.arange(0.15, 1.0, 0.15),
                                     statistic='median')
-ax1.plot(z[:-1], size, 'k', label='HSC (Li+21)', linewidth=3)
 
 size_16, z, _ = stats.binned_statistic(d['z'], d['rkpc'], bins=np.arange(0.15, 1.0, 0.15),
                                     statistic=percentile16)
 size_84, z, _ = stats.binned_statistic(d['z'], d['rkpc'], bins=np.arange(0.15, 1.0, 0.15),
                                     statistic=percentile84)
 ax1.fill_between(z[:-1], size_16, size_84, alpha=0.25)
+
+# JWST SHELLQs: F356W
+ax1.scatter(6.34, 1.87, label='This Work', marker='*', s=400, color='r')
+ax1.scatter(6.40, 0.75, marker='*', s=400, color='r')
 
 # JWST ceers
 ax1.scatter(1.646, 4.05, color='tab:orange', marker='v',s=160) #F150
@@ -42,9 +45,6 @@ ax1.scatter(2.588, 1.11, color='tab:orange', marker='v',s=160) #F160
 ax1.scatter(3.4, 1.18, color='tab:orange', marker='v',s=160) #F200  #Modify acc to shift 
 ax1.scatter(3.465, 1.17, color='tab:orange', label='CEERS (Ding+22)', marker='v',s=160) #F200
 
-# JWST SHELLQs: F356W
-ax1.scatter(6.34, 1.87, label='This Work', marker='*', s=400, color='r')
-ax1.scatter(6.40, 0.75, marker='*', s=400, color='r')
 
 # HST: rest 5000 A
 hst_size = np.array([1.17873376, 0.85913774, 3.62829472, 1.95819451, 4.36564811,
@@ -61,13 +61,14 @@ hst_z = np.array([1.63 , 1.301, 1.667, 1.447, 1.326, 1.57 , 1.552, 1.567, 1.618,
        1.626, 1.337, 1.272, 1.445, 1.664])
 
 ax1.scatter(hst_z, hst_size, color='tab:cyan', s=60, label='HST (Ding+20)')
-ax1.set_xlabel('$z$', fontsize=30)
-ax1.set_ylabel(u'$R_{\mathrm{eff, maj.,}}$$_{5000 \AA}$, (kpc)', fontsize=30)
+ax1.set_xlabel('z', fontsize=30)
+ax1.set_ylabel(u'$R_{\mathrm{eff, maj.,}}$$_{5000~\AA}$, (kpc)', fontsize=30)
 # u'log($R_{\mathrm{eff, circ.}}$, units of kpc)
+ax1.plot(z[:-1], size, 'k', label='HSC (Li+21)', linewidth=3)
 
 ax1.tick_params(labelsize=20)
 # BlueTides: Sersic radius, F356W
-blue = Table.read('bluetides.txt', format='ascii')
+blue = Table.read('figures/Junyao_quasar_size/bluetides.txt', format='ascii')
 # ax1.scatter([7.0]*len(blue), blue['size_sersic'], label='BlueTides (Marshall+19)',  s= 100,
 #             marker='^', color='black', facecolor='None',alpha=0.6)
 ax1.set_xlim(-0.1, 7.5)
@@ -102,4 +103,4 @@ plt.tick_params(labelsize=20)
 
 ax1.legend(frameon=True, fontsize=16)
 
-fig.savefig('../quasar_host_size.pdf')
+fig.savefig('./figures/quasar_host_size.pdf')

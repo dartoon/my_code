@@ -62,20 +62,23 @@ for steller_file in steller_files:
     age_h = round(10**float(info['T_MW_84']),3) 
     mel = round(float(info['Z_MW_50']),1) 
     Av = round(float(info['AV_50']),1) 
-
+    Muv = round(info_muv['MUV50'],2)
+    
     # print('Av, mel, Age, M*', info['AV_50'], mel, age, smass)
-    result.append([Av, mel, age, smass])
+    result.append([Av, mel, age, smass, Muv])
 
 
-Av_list = [0.1,0.3,0.5,0.7,1]
+# Av_list = [0.1,0.3,0.5,0.7,1]
+Av_list = [0.3,0.5,0.7]
 Mel_list = [-1, -0.7, -0.3]
 
-print('Av, mel, Age, M*')
+print('Av, mel, Age, M*, Muv')
 for i, Mel in enumerate(Mel_list):
     for j,Av in enumerate(Av_list):
         for k in range(len(result)):
             if result[k][0] == Av and result[k][1] == Mel:
                 print(result[k])
+                
 
 # print('redshift', float(info['ZMC_50']))
 # print('smass', float(info['Mstel_50']) )

@@ -20,7 +20,9 @@ sys.path.insert(0,'../../model_z6_data_id0/')
 # folder = '20221105' #No lines; mel -2.5
 # folder = '20221106' #with lines; mel -2.5
 # folder = '20221108' #More flexible for obj1
-folder = '20221115' #More flexible for obj1
+# folder = '20221115' #More flexible for obj1
+folder = '20221120' #The extended
+# folder = '20221122' #The extended
 
 
 fitidx = 1
@@ -29,7 +31,8 @@ info = target_info[str(fitidx)]
 target_id, RA, Dec, z = info['target_id'], info['RA'], info['Dec'], info['z']
 
 
-idx = 101  #our target
+# idx = 101
+idx = 10112  #our target
 # idx, target_id = 201,  'obj1'
 # idx, target_id = 202,  'obj2'
 # idx, target_id = 203,  'obj3'
@@ -57,8 +60,8 @@ import astropy.io.fits as pyfits
 import matplotlib.pyplot as plt
 import glob
 
-import matplotlib as mat
-mat.rcParams['font.family'] = 'STIXGeneral'
+# import matplotlib as mat
+# mat.rcParams['font.family'] = 'STIXGeneral'
 
 # folder = '202209' #0.2 mag no HST.
 # folder = '20220901_' #Not HST
@@ -115,7 +118,6 @@ def cal_filt_flam(array_spec, fil):
     filt_flam = int_flux/ int_filt   
     return filt_flam
 #%%
-
 spec1d_file = glob.glob(folder+'/gsf_spec*.fits')[0]
 spec1d = pyfits.open(spec1d_file)  
 name_spec = spec1d[1].columns
@@ -130,9 +132,9 @@ plt.figure(figsize=(10, 6))
 
 # array_spec[:,2] =  array_spec[:,2]/ array_spec[:,2].max() * 2.65
 
-plt.plot(wave/10000., f_16, 'gray', alpha=0.4)
+# plt.plot(wave/10000., f_16, 'gray', alpha=0.4)
 plt.plot(wave/10000., f_50, 'black', alpha=0.7)
-plt.plot(wave/10000., f_84, 'gray', alpha=0.4)
+# plt.plot(wave/10000., f_84, 'gray', alpha=0.4)
 
 hst_filt_id = {'F606W': '4', 'F814W':'6', 'F105W':'202', 'F125W':'203', 'F140W':'204', 'F160W':'205'}
 
@@ -179,20 +181,12 @@ for i, fid in enumerate(filt_id[::-1]):
     
     flambda_list.append(flambda)
         
-        
-# fnu = np.array([316.14340, 329.82858, 17.06660, 44.70776])
-# lam = np.array([13971.05, 15418.99, 5373.10, 8084.25])
-# yerr_l = np.array([155.291/562.887, 155.291/562.887, 155.291/562.887, 155.291/562.887])
-# mag = -2.5*np.log10(fnu) + 25
-# flambda = 10**(-0.4*(mag+2.402+5.0*np.log10(lam))) * 10**17
-# lam = lam/10000.
-# plt.scatter(lam, flambda, c='r', zorder =100)
-# plt.errorbar(lam, flambda, yerr=yerr_l*flambda,fmt='.',color='gray',markersize=1, zorder =90)
 
 
 # #plt.plot(sov_jwst_f144w_fil[:,0]/10000., sov_jwst_f144w_fil[:,1], label='NIRCam F444W response curve')
 plt.xlim(0.25, 6)
-plt.ylim(0., np.max(flambda_list)*2.0)
+plt.ylim(0., 0.88)
+# plt.ylim(0., np.max(flambda_list)*2.0)
 xmin, xmax, ymin, ymax = plt.axis()
 
 for i, fid in enumerate(filt_id[::-1]):
@@ -201,19 +195,32 @@ for i, fid in enumerate(filt_id[::-1]):
     f_fil[:,2] = f_fil[:,2]/f_fil[:,2].max() * (ymax-ymin) * 0.1
     plt.plot(f_fil[1:,1]/10000., f_fil[1:,2], label='{0}'.format(ivd[fid]))
 
-plt.text( (xmax-xmin)*0.05, (ymax-ymin)*0.93, 'z: {0}'.format(z), fontsize=17)
-plt.text( (xmax-xmin)*0.05, (ymax-ymin)*0.87, r"M$_*$: [{1:.2f}$\leftarrow${0:.2f}$\rightarrow${2:.2f}]".format(smass, smass_l, smass_h), fontsize=17)
-plt.text( (xmax-xmin)*0.05, (ymax-ymin)*0.80, "M$_{uv}$: "+ r"[{1:.2f}$\leftarrow${0:.2f}$\rightarrow${2:.2f}]".format(info_muv['MUV50'], info_muv['MUV84'], info_muv['MUV16']), fontsize=17)
-print('M$_*$:  [{1:.2f}, {0:.2f} ,{2:.2f}]'.format(smass, smass_l, smass_h))
-if '{0:.1f}'.format(age_l) == '0.0':
-    plt.text( (xmax-xmin)*0.07, (ymax-ymin)*0.61, r'age: [$\leftarrow${2:.1f}]  Gyr'.format(age, age_l, age_h), fontsize=17)
-    print(r'age:  [$\leftarrow${2:.1f}]  Gyr'.format(age, age_l, age_h))
-else:
-    # plt.text( (xmax-xmin)*0.07, (ymax-ymin)*0.61, 'age inferred as {0:.1f} Gyr'.format(age, age_l, age_h), fontsize=17)
-    plt.text( (xmax-xmin)*0.07, (ymax-ymin)*0.61, r'age inferred as [{1:.2f}$\leftarrow${0:.2f}$\rightarrow${2:.2f}] Gyr'.format(age, age_l, age_h), fontsize=17)
-    print('age:  [{1:.1f}$-${2:.1f}]  Gyr'.format(age, age_l, age_h))
-print('M$_U_V$:  [{1:.2f}, {0:.2f} ,{2:.2f}]'.format( info_muv['MUV50'], info_muv['MUV84'], info_muv['MUV16'] ))
-plt.text( (xmax-xmin)*0.07, (ymax-ymin)*0.51, 'metalicity fixed as {0:.1f} logZ/'.format(mel) + r"Z$_{\rm \odot}$", fontsize=17)    
+z = 6.40
+# plt.text( (xmax-xmin)*005, (ymax-ymin)*0.87, r"M$_*$: [{1:.2f}$\leftarrow${0:.2f}$\rightarrow${2:.2f}]".format(smass, smass_l, smass_h), fontsize=17)
+# plt.text( (xmax-xmin)*0.05, (ymax-ymin)*0.80, "M$_{uv}$: "+ r"[{1:.2f}$\leftarrow${0:.2f}$\rightarrow${2:.2f}]".format(info_muv['MUV50'], info_muv['MUV84'], info_muv['MUV16']), fontsize=17)
+# plt.text( (xmax-xmin)*0.07, (ymax-ymin)*0.93, 'z: {0:.2f}'.format(z), fontsize=17)
+# plt.text( (xmax-xmin)*0.07, (ymax-ymin)*0.87, r"M$_*$: {0:.2f}".format(smass), fontsize=17)
+# plt.text( (xmax-xmin)*0.07, (ymax-ymin)*0.80, "M$_{uv}$: "+ r"{0:.2f}".format(info_muv['MUV50']), fontsize=17)
+# print('M$_*$:  [{1:.2f}, {0:.2f} ,{2:.2f}]'.format(smass, smass_l, smass_h))
+# print('Muv:  [{1:.2f}, {0:.2f} ,{2:.2f}]'.format(info_muv['MUV50'], info_muv['MUV84'], info_muv['MUV16']))
+# if age_l!= age:
+#     plt.text( (xmax-xmin)*0.07, (ymax-ymin)*0.61, r'age: [$\leftarrow${2:.1f}]  Gyr'.format(age, age_l, age_h), fontsize=17)
+#     print(r'age:  [$\leftarrow${2:.1f}]  Gyr'.format(age, age_l, age_h))
+# else:
+#     plt.text( (xmax-xmin)*0.07, (ymax-ymin)*0.61, 'age fixed as {0:.1f} Gyr'.format(age, age_l, age_h), fontsize=17)
+#     print('age:  [{1:.1f}$-${2:.1f}]  Gyr'.format(age, age_l, age_h))
+# print(r"{1:.2f}$\leftarrow${0:.2f}$\rightarrow${2:.2f}".format(info_muv['MUV50'], info_muv['MUV84'], info_muv['MUV16']))
+# plt.text( (xmax-xmin)*0.07, (ymax-ymin)*0.95, r"M$_*$ = {0:.2f}".format(smass), fontsize=17)
+# plt.text( (xmax-xmin)*0.07, (ymax-ymin)*0.88, "M$_{uv}$ = "+ r"{0:.2f}".format(info_muv['MUV50']), fontsize=17)
+# plt.text( (xmax-xmin)*0.07, (ymax-ymin)*0.81, 'age = {0:.1f} Gyr'.format(age, age_l, age_h), fontsize=17)
+# plt.text( (xmax-xmin)*0.07, (ymax-ymin)*0.74, 'Av = {0:.1f} (fixed)'.format(float(info['AV_50'])) , fontsize=17)    
+# plt.text( (xmax-xmin)*0.07, (ymax-ymin)*0.67, 'metallicity = {0:.1f} logZ/'.format(mel) + r"Z$_{\rm \odot}$ (fixed)", fontsize=17)    
+plt.text( (xmax-xmin)*0.07, (ymax-ymin)*0.95, r"log M$_*$ = {0:.2f}".format(smass), fontsize=17)
+plt.text( (xmax-xmin)*0.07, (ymax-ymin)*0.88, "M$\mathrm{_{uv}}$ = "+ r"{0:.2f}".format(info_muv['MUV50']), fontsize=17)
+plt.text( (xmax-xmin)*0.07, (ymax-ymin)*0.81, 'age = {0:.1f} Gyr'.format(age, age_l, age_h), fontsize=17)
+plt.text( (xmax-xmin)*0.07, (ymax-ymin)*0.74, r'A$\mathrm{_{V}}$'+ r'= {0:.1f} (fixed)'.format(float(info['AV_50'])) , fontsize=17)    
+plt.text( (xmax-xmin)*0.07, (ymax-ymin)*0.67, r"log Z/Z$_{\rm \odot}$" + r" = {0:.1f} (fixed)".format(mel), fontsize=17)  
+
 # if '{0:.1f}'.format(sfr_l) == '0.0':
 #     plt.text( (xmax-xmin)*0.07, (ymax-ymin)*0.75, r"SFR: [$\leftarrow${2:.1f}]".format(sfr, sfr_l, sfr_h) + r" M$_{\rm \odot}$/yr ", fontsize=17)
 #     print("[$\leftarrow${2:.1f}]".format(sfr, sfr_l, sfr_h) + r" M$_{\rm \odot}$/yr ")
@@ -222,12 +229,12 @@ plt.text( (xmax-xmin)*0.07, (ymax-ymin)*0.51, 'metalicity fixed as {0:.1f} logZ/
 #     print("SFR:  [{1:.1f}$-${2:.1f}]".format(sfr, sfr_l, sfr_h) + r" M$_{\rm \odot}$/yr ")
 # plt.text( (xmax-xmin)*0.07, (ymax-ymin)*0.74, "SFR: [{1:.1f}$-${2:.1f}]".format(sfr, sfr_l, sfr_h) + r" M$_{\rm \odot}$/yr ", fontsize=17)
     
-plt.legend(prop={'size':15}, ncol=2, loc = 1)
+plt.legend(prop={'size':18}, ncol=2, loc = 1)
 plt.tick_params(labelsize=20)
-plt.xlabel(r"$\lambda$ (um)",fontsize=27)
-plt.ylabel(r"f$_\lambda$ 10$^{\rm" + " -{0}}}$ erg/s/cm$^2$/$\AA$".format(unit.split('e-')[1][:2]),fontsize=27)
-plt.title(target_id,fontsize=27)
-plt.savefig('../figures/{0}_SED_map.pdf'.format(target_id[:5]))
+plt.xlabel(r"$\lambda$ ($\mu$m)",fontsize=25)
+plt.ylabel(r"f$_\lambda$  (10$^{\rm" + " -{0}}}$".format(unit.split('e-')[1][:2])+" erg s$^{-1}$ cm$^{-2}$$\mathrm{\AA}^{-1}$)",fontsize=25)
+plt.title(target_id,fontsize=27, y=1.02) 
+plt.savefig('../../model_z6_data_id0/figures/{0}_SED_map.pdf'.format(target_id[:5]))
 # #plt.yticks([])
 
 

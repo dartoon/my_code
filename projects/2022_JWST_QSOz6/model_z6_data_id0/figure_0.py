@@ -25,9 +25,9 @@ warnings.filterwarnings("ignore")
 from target_info import target_info
 from galight.tools.astro_tools import plt_fits, plt_many_fits
 #%%
-data_type = 'all' 
-filt = 'F356W'
-# filt = 'F150W'
+# data_type = 'all' 
+# filt = 'F356W'
+filt = 'F150W'
 file_NO = 0
 
 idx = 0
@@ -39,13 +39,14 @@ target_id, RA, Dec, z = info['target_id'], info['RA'], info['Dec'], info['z']
 jwst_all_filenames = glob.glob(folder+'*{0}*{1}*_rmbkg.fits'.format(target_id[:5], filt))  #For NIRCam
 jwst_all_filenames.sort()
 file = jwst_all_filenames[file_NO]
-if data_type == 'all':
-    run_folder = 'stage3_{0}/'.format(data_type)
-elif data_type == 'half':
-    if file_NO == 0:
-        run_folder = 'stage3_first_half/'
-    if file_NO == 1:
-        run_folder = 'stage3_second_half/'
+run_folder = 'stage3_all/'
+# if data_type == 'all':
+#     run_folder = 'stage3_{0}/'.format(data_type)
+# elif data_type == 'half':
+#     if file_NO == 0:
+#         run_folder = 'stage3_first_half/'
+#     if file_NO == 1:
+#         run_folder = 'stage3_second_half/'
 result_folder = run_folder + 'fit_result/'
 
 
@@ -169,7 +170,7 @@ if filt == 'F356W':
     circle3 = plt.Circle((445., 365),25, color='white', fill=False, linewidth=2, alpha = 0.7)
     circle4 = plt.Circle((452., 325), 20, color='white', fill=False, linewidth=2, alpha = 0.7)
     circle5 = plt.Circle((456., 418), 15, color='white', fill=False, linewidth=2, alpha = 0.7)
-ax.text(90., 290, 'PSF-star', fontsize=18, color=color, ha='center')
+ax.text(90., 290, 'PSF-star', fontsize=24, color=color, ha='center')
 ax.add_patch(circle1)
 ax.set_xticks([])
 ax.set_yticks([])
@@ -200,17 +201,22 @@ axins.plot([320, 320 + dist], [320, 320], linewidth=3, color=color)
 axins.text(320 + dist / 2., 320 + 0.01 * d, text, fontsize=25, color=color, ha='center')
 
 
-axins.text(380., 430, 'quasar', fontsize=20, color=color, ha='center')
+axins.text(380., 430, 'quasar', fontsize=30, color=color, ha='center')
 axins.add_patch(circle2)
-axins.text(478., 380, 'obj1', fontsize=20, color=color, ha='center')
+axins.text(478., 380, '#1', fontsize=30, color=color, ha='center')
 axins.add_patch(circle3)
-axins.text(415., 320, 'obj2', fontsize=20, color=color, ha='center')
+axins.text(485., 320, '#2', fontsize=30, color=color, ha='center')
 axins.add_patch(circle4)
 # axins.text(485., 420, 'obj3', fontsize=20, color=color, ha='center')
 # axins.add_patch(circle5)
 
+ax.text(d*0.2, d*0.85, filt, fontsize=35, color=color, ha='center')
 
-ax.text(d*0.2, d*0.8, target_id + '\n'+filt, fontsize=25, color=color, ha='center')
+if filt =='F356W':
+    ax.text(d*0.475, d*1.05, target_id, fontsize=45, color='black', ha='center')
+# if filt =='F150W':
+#     ax.text(d*0.52, d*1.05, target_id, fontsize=45, color='black', ha='center')
+
 
 axins.set_xticks([])
 axins.set_yticks([])
@@ -218,5 +224,5 @@ axins.set_yticks([])
 mark_inset(ax, axins, loc1=loc1, loc2=loc2, fc="none", ec="0.6", linewidth=2.2)
 ax.set(frame_on=False)  # New
 
-plt.savefig('figures/field_overview{0}.pdf'.format(filt))
+# plt.savefig('figures/field_overview{0}.pdf'.format(filt))
 plt.show()

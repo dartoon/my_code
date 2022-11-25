@@ -25,15 +25,15 @@ FILTER		filterIDs #
 #
 # Params for SED
 #
-AGE			0.01,0.03,0.1,0.3,1.0 #!!! 0.01,0.03,0.1,0.3,0.5,0.7,1.0,2.0,3.0 #I only select one value
-#ZMAX		0.0 # Max metalicity
-#ZMIN		0.0 # Min metalicity
-#DELZ		0.0  # Should be smaller than the gap between ZMAX and ZMIN.
+AGE			0.7 #!!! 0.01,0.03,0.1,0.3,0.5,0.7,1.0,2.0,3.0 #I only select one value
+#ZMAX		-0.3 # Max metalicity
+#ZMIN		-0.7 # Min metalicity
+#DELZ		0.1  # Should be smaller than the gap between ZMAX and ZMIN.
 ZFIX		metaltemp # logZ/Zsun
 ZEVOL		0 # Evolution in Z; 1=yes, 0=no.
-#AVFIX		0.0 #
-AVMIN		0 # Minimum Av (Dust Attenuation) in mag.
-AVMAX		4 # Maximum Av (Dust Attenuation) in mag.
+AVFIX		0.5 #
+#AVMIN		0.3 # Minimum Av (Dust Attenuation) in mag.
+#AVMAX		1.0 # Maximum Av (Dust Attenuation) in mag.
 F_ZMC         0 # redshift as a free parameter in mcmc.
 NIMF		1 # Choice of IMF. 0=Salpeter, 1=Chabrier, 2=Kroupa, 3=van Dokkum, 4=Dave, 5=tabulated, specified in imf.dat file located in the data directory.
 #NDIM		22 # ndim  = int(1 + len(age) * 2) # dust + age + Z(age)

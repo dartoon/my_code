@@ -32,7 +32,7 @@ from astropy.cosmology import LambdaCDM, FlatLambdaCDM
 cosmo1 = LambdaCDM(70 * (u.km/u.s/u.Mpc), 0.3, 0.7)
 arc_per_kpc = cosmo1.arcsec_per_kpc_proper(z).value
 # filters = ['F150W', 'F356W']
-filters = ['F150W']
+filters = ['F356W']
 import copy, matplotlib
 for top_psf_id in [0]:
     for count in range(len(filters)):
@@ -138,6 +138,18 @@ for top_psf_id in [0]:
         #         weighted_value = np.sum(np.array(all_values)*weight) / np.sum(weight)
         #         rms_value = np.sqrt(np.sum((np.array(all_values)-weighted_value)**2*weight) / np.sum(weight))
         #         print('obj'+str(ii), prop_name, "{0:.2f}$\pm${1:.2f}".format(weighted_value, rms_value))
+        dis = []
+        for i in range(len(fit_run_list)):
+            _fit_run = fit_run_list[i]
+            _fit_run.cal_astrometry()
+            dis.append( np.sqrt(np.sum(np.array(_fit_run.final_result_galaxy[0]['position_xy']) - 
+                           np.array(_fit_run.final_result_ps[0]['position_xy'] ))**2) * deltaPix)
+        all_values = np.array(dis)
+        weighted_value = np.sum(np.array(all_values)*weight) / np.sum(weight)
+        rms_value = np.sqrt(np.sum((np.array(all_values)-weighted_value)**2*weight) / np.sum(weight))
+        # print('Position Offset:', round(dis[0],3), 'pixel, ', round(dis[0],2), 'kpc')
+        print('positional offset (")', "{0:.2f}$\pm${1:.2f}".format(weighted_value, rms_value))
+
         dis = []
         for i in range(len(fit_run_list)):
             _fit_run = fit_run_list[i]

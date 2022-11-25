@@ -18,7 +18,7 @@ import glob
 # folder = '20221105' #No lines; mel -2.5
 # folder = '20221107' #Increase AV 1 for obj 1
 # folder = '20221108' #FIX n =1 result
-folder = '20221115' #FIX n =1 result
+folder = '20221122' #FIX n =1 result
 rerun = False
 # idx = [1,2,0,51,35]
 # F115W 26.852 \pm 0.044
@@ -47,7 +47,7 @@ t1 = time.time()
 print('Run estimate')
 band_as_upper = []
 esti_smass(ID = folder+str(idx), mags_dict = mag_result, z = z, flag = 0, 
-            if_run_gsf=True, band_as_upper = band_as_upper, metallicity=-1.0,
+            if_run_gsf=True, band_as_upper = band_as_upper, #metallicity=-1.0,
             mag_err=[0.1]*len(mag_result), just_run = False)
 t2 = time.time()
 
