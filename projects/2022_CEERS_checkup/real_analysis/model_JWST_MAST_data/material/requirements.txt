@@ -18,7 +18,7 @@ black @ file:///home/conda/feedstock_root/build_artifacts/black-recipe_164849933
 bleach @ file:///home/conda/feedstock_root/build_artifacts/bleach_1649361991009/work
 brotlipy @ file:///Users/runner/miniforge3/conda-bld/brotlipy_1648854210220/work
 cdshealpix==0.6.1
-certifi==2022.5.18.1
+certifi==2022.12.7
 cffi @ file:///Users/runner/miniforge3/conda-bld/cffi_1636046170920/work
 chardet @ file:///Users/runner/miniforge3/conda-bld/chardet_1649184153366/work
 charset-normalizer @ file:///home/conda/feedstock_root/build_artifacts/charset-normalizer_1644853463426/work
