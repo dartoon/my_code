@@ -13,4 +13,4 @@
 
 cd /home/xuheng.ding/Astro/my_code/projects/2022_CEERS_checkup/real_analysis/2d_SED_AEGIS_683/
 source activate gsf
-python 4_sed_2Dmap_idark.py $PBS_ARRAY_INDEX 1
+python 2_sed_2Dmap_idark.py $PBS_ARRAY_INDEX 1
