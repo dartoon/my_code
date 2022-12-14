@@ -12,18 +12,20 @@ import matplotlib.pyplot as plt
 import glob
 write_file =  open('sed_2d_result_bin2.txt','w')
 write_file.write("count_i, smass, sfr, m_age, l_age, AV \n")
-steller_files = glob.glob('esti_smass/20220903*/SFH_*.fits')
+steller_files = glob.glob('esti_smass/20221213*/SFH_*.fits')
 
 steller_files.sort()
+print(len(steller_files))
 for steller_file in steller_files:
     hdul = pyfits.open(steller_file)
-    count = steller_file.split('20220903')[1].split('/')[0]
+    count = steller_file.split('20221213')[1].split('/')[0]
     info = hdul[0].header 
     smass = info['Mstel_50']
     sfr = info['SFR_50']
     m_age = info['T_MW_50']
     l_age = info['T_LW_50']
     AV = info['AV_50']
-    write_file.write("{0} {1} {2} {3} {4} {5}".format(count, smass, sfr, m_age, l_age, AV))
-    write_file.write("\n")
-write_file.close()
+    print(steller_file)
+#     write_file.write("{0} {1} {2} {3} {4} {5}".format(count, smass, sfr, m_age, l_age, AV))
+#     write_file.write("\n")
+# write_file.close()
