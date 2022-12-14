@@ -25,7 +25,6 @@ for steller_file in steller_files:
     m_age = info['T_MW_50']
     l_age = info['T_LW_50']
     AV = info['AV_50']
-    print(steller_file)
-#     write_file.write("{0} {1} {2} {3} {4} {5}".format(count, smass, sfr, m_age, l_age, AV))
-#     write_file.write("\n")
-# write_file.close()
+    write_file.write("{0} {1} {2} {3} {4} {5}".format(count, smass, sfr, m_age, l_age, AV))
+    write_file.write("\n")
+write_file.close()
