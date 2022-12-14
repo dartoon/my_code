@@ -90,7 +90,8 @@ def total_compare(flux_list_2d, label_list_2d,
             ax_l[i].get_yaxis().set_visible(False)
         ax_l[i].get_xaxis().set_visible(False)
         deltaPix = deltaPix_list[i]
-        scale_bar(ax_l[i], frame_size, dist=0.5/deltaPix, text='0.5"', color = color)
+        if i == 0:
+            scale_bar(ax_l[i], frame_size, dist=0.5/deltaPix, text='0.5"', color = color)
         # if i == 0:
         #     ax_l[0].text(frame_size*0.25, frame_size*0.09, "~2.8kpc",fontsize=20, 
         #                  color='white')
@@ -122,7 +123,7 @@ def total_compare(flux_list_2d, label_list_2d,
                          ha='right', va='top',
                          weight='bold', color='white',  bbox={'facecolor': 'gold', 'alpha': 0.6, 'pad': 3})
    
-    ax_l[2].scatter(ps_x, ps_y, marker= 'x', c='lightblue', s = 80)
+    # ax_l[1].scatter(ps_x, ps_y, marker= 'x', c='lightblue', s = 80)
     # if not (filt =='F150W' and idx ==0):
     #     ax_l[2].scatter(host_x, host_y, marker= '+', c='lightblue', s= 100)
     # from matplotlib.patches import Rectangle
@@ -178,12 +179,38 @@ for top_psf_id in [0]:
         # fit_run.savename = 'figures/' + fit_run.savename+'_'+filt
         # fit_run.plot_final_qso_fit(target_ID = filt, save_plot = True, cmap = my_cmap)
 fit_run.cal_astrometry()
-ps_x, ps_y = np.array(fit_run.final_result_ps[0]['position_xy']) + len(fit_run.image_host_list[0])/2
-host_x, host_y = np.array(fit_run.final_result_galaxy[0]['position_xy']) + len(fit_run.image_host_list[0])/2
 
-label = list(fit_run.flux_2d_out.keys())
-image_list = [fit_run.flux_2d_out[label[i]] for i in range(len(label)) ]
-label[2] = "data$-$point source"
+#%%
+folder = '../NIRCam_data/Nov14/bkg_removed/' 
+from target_info import target_info
+info = target_info[str(idx)]
+target_id, RA, Dec, z = info['target_id'], info['RA'], info['Dec'], info['z']
+data_file = glob.glob(folder+'*{0}*{1}*_rmbkg.fits'.format(target_id[:5], filt))[0]  #For NIRCam
+_fitsFile = pyfits.open(data_file)
+fov_image = _fitsFile[1].data # check the back grounp
+_fov_image = copy.deepcopy(fov_image)
+fit_run.targets_subtraction(sub_qso_list = [0], org_fov_data = _fov_image)
+
+
+# label = ['data', 'data$-$quasar']
+label = ['', '']
+image_list = []
+radius = 90
+from galight.tools.cutout_tools import cutout
+image_list.append( cutout(image = fov_image, 
+                          center = fit_run.fitting_specify_class.data_process_class.target_pos, 
+                          radius=radius) )
+image_list.append(  cutout(image = fit_run.fov_image_targets_sub, 
+                           center = fit_run.fitting_specify_class.data_process_class.target_pos, 
+                          radius=radius) )
+
+#%%
+# ps_x, ps_y = np.array(fit_run.final_result_ps[0]['position_xy']) + radius
+# host_x, host_y = np.array(fit_run.final_result_galaxy[0]['position_xy']) + radius
+
+# label = list(fit_run.flux_2d_out.keys())
+# image_list = [fit_run.flux_2d_out[label[i]] for i in range(len(label)) ]
+# label[2] = "data$-$point source"
 fig = total_compare(image_list, label, [fit_run.fitting_specify_class.deltaPix]*4, 
                     target_ID=None, z=None,)
-fig.savefig('figures/{1}_{0}_qso_final_plot.pdf'.format(filt,target_id))
+fig.savefig('figures/larger_FOV_{1}_{0}_data_and_host.pdf'.format(filt,target_id))

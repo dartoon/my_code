@@ -20,7 +20,7 @@ sys.path.insert(0,'../../model_z6_data_id0/')
 # folder = '20221105' #No lines; mel -2.5
 # folder = '20221106' #with lines; mel -2.5
 # folder = '20221108' #More flexible for obj1
-# folder = '20221115' #More flexible for obj1
+# folder = '20221115' #The one used in the very first version.
 folder = '20221120' #The extended
 # folder = '20221122' #The extended
 
