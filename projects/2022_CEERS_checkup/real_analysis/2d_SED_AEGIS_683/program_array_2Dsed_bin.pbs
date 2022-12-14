@@ -1,0 +1,16 @@
+#!/bin/bash
+#PBS -N sed_2d
+#PBS -o /home/xuheng.ding/Astro/my_code/projects/2022_CEERS_checkup/real_analysis/2d_SED_AEGIS_683/pbs/
+#PBS -e /home/xuheng.ding/Astro/my_code/projects/2022_CEERS_checkup/real_analysis/2d_SED_AEGIS_683/pbs/
+#PBS -l nodes=1:ppn=1
+#PBS -l walltime=01:50:00
+#PBS -l mem=200mb
+#PBS -J 1-2809:1
+#PBS -u xuheng.ding
+#PBS -m ae
+#PBS -V
+#PBS -q tiny
+
+cd /home/xuheng.ding/Astro/my_code/projects/2022_CEERS_checkup/real_analysis/2d_SED_AEGIS_683/
+source activate gsf
+python 4_sed_2Dmap_idark.py $PBS_ARRAY_INDEX 1
