@@ -15,7 +15,7 @@ write_file.write("count_i, smass, sfr, m_age, l_age, AV \n")
 steller_files = glob.glob('esti_smass/20221213*/SFH_*.fits')
 
 steller_files.sort()
-print(len(steller_files))
+# print(len(steller_files))
 for steller_file in steller_files:
     hdul = pyfits.open(steller_file)
     count = steller_file.split('20221213')[1].split('/')[0]

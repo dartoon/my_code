@@ -11,12 +11,13 @@ import astropy.io.fits as pyfits
 import matplotlib.pyplot as plt
 from functions_for_result import esti_smass, load_prop, load_info
 from scipy.ndimage import zoom
-
+import sys
+sys.path.insert(0, '../model_JWST_stage3_Masafusa/')
 # ID, mags, z = 'idx0', 
 # 1,2,0,51,35
-idx = 1
+idx = 20
 # root_folder = '../*/*'  #Include HST
-root_folder = './*'  #Not include HST
+root_folder = '../model_JWST_stage3_Masafusa/'  #Not include HST
 fit_run_dict = load_prop(idx, root_folder = root_folder, prop_name='fit_run')
 filt_list = list(fit_run_dict.keys())
 # host_residual_list = []
@@ -138,33 +139,33 @@ for i in range(len(smass_image)):
         
 #%%
 
-# norm = None  
-# norm = LogNorm(vmin=4.5, vmax=8)#np.max(img[~np.isnan(img)]))
-# plt.imshow(smass_image, norm=norm, origin='lower' ) 
-# plt.colorbar()
-# plt.show()
+norm = None  
+norm = LogNorm(vmin=4.5, vmax=8)#np.max(img[~np.isnan(img)]))
+plt.imshow(smass_image, norm=norm, origin='lower' ) 
+plt.colorbar()
+plt.show()
 
-# norm = LogNorm(vmin=0.003, vmax=0.1)#np.max(img[~np.isnan(img)]))
-# plt.imshow(sfr_image, norm=norm, origin='lower' ) 
-# plt.colorbar()
-# plt.show()
-
-
-# norm = LogNorm(vmin=0.002, vmax=3)#np.max(img[~np.isnan(img)]))
-# plt.imshow(age_image, norm=norm, origin='lower' ) 
-# plt.colorbar()
-# plt.show()
+norm = LogNorm(vmin=0.003, vmax=0.1)#np.max(img[~np.isnan(img)]))
+plt.imshow(sfr_image, origin='lower' ) 
+plt.colorbar()
+plt.show()
 
 
-# # norm = LogNorm(vmin=0.001, vmax=3)#np.max(img[~np.isnan(img)]))
-# norm = None
-# plt.imshow(AV_image, norm=norm, origin='lower' ) 
-# plt.colorbar()
-# plt.show()
+norm = LogNorm(vmin=0.002, vmax=3)#np.max(img[~np.isnan(img)]))
+plt.imshow(age_image, norm=norm, origin='lower' ) 
+plt.colorbar()
+plt.show()
 
 
-# import matplotlib
-# cmap_r = matplotlib.cm.get_cmap('RdBu_r')
+# norm = LogNorm(vmin=0.001, vmax=3)#np.max(img[~np.isnan(img)]))
+norm = None
+plt.imshow(AV_image, norm=norm, origin='lower' ) 
+plt.colorbar()
+plt.show()
+
+
+import matplotlib
+cmap_r = matplotlib.cm.get_cmap('RdBu_r')
 
 #%%
 from astropy.visualization import make_lupton_rgb
@@ -174,8 +175,10 @@ rgb_default_qso = make_lupton_rgb(image_list_qso[0][1:-1,1:-1], image_list_qso[1
 image_list = pickle.load(open('color_image'+'.pkl','rb'))   #use_filt = ['F444W',  'F277W', 'F150W']
 rgb_default = make_lupton_rgb(image_list[0][1:-1,1:-1], image_list[1][1:-1,1:-1], 
                               image_list[2][1:-1,1:-1], Q=8, stretch=0.2)
-# plt.imshow(rgb_default, origin='lower')
-# plt.show()
+plt.imshow(rgb_default, origin='lower')
+plt.show()
+
+#%%
 if bin_info != '':
     dvd_info = int(bin_info[-1])
 else:
@@ -232,26 +235,26 @@ my_cmap_ = copy.copy(matplotlib.cm.get_cmap('RdBu')) # copy the default cmap
 my_cmap_.set_bad('white')
 
 
-import imageio
-filename_list = []
-plt.figure(figsize=(11, 11))
-plt.title("F444W+F277W+F150W", fontsize=35)
-plt.imshow(rgb_default_qso , norm=None, origin='lower') 
-plt.axis('off')
-plt.savefig('gifs/SDSS1420A_color.png')#, dpi=1200)
-plt.close()
-plt.figure(figsize=(11, 11))
-plt.title("F444W+F277W+F150W", fontsize=35)
-plt.imshow(rgb_default , norm=None, origin='lower') 
-plt.axis('off')
-plt.savefig('gifs/SDSS1420A_color_host.png')#, dpi=1200)
-plt.close()
+# import imageio
+# filename_list = []
+# plt.figure(figsize=(11, 11))
+# plt.title("F444W+F277W+F150W", fontsize=35)
+# plt.imshow(rgb_default_qso , norm=None, origin='lower') 
+# plt.axis('off')
+# plt.savefig('gifs/SDSS1420A_color.png')#, dpi=1200)
+# plt.close()
+# plt.figure(figsize=(11, 11))
+# plt.title("F444W+F277W+F150W", fontsize=35)
+# plt.imshow(rgb_default , norm=None, origin='lower') 
+# plt.axis('off')
+# plt.savefig('gifs/SDSS1420A_color_host.png')#, dpi=1200)
+# plt.close()
 
-filename_list = ['gifs/SDSS1420A_color.png', 'gifs/SDSS1420A_color_host.png']
-with imageio.get_writer('gifs/qso_to_host.gif', mode='I', fps=1) as writer:
-    for filename in filename_list:
-        image = imageio.imread(filename)
-        writer.append_data(image)
+# filename_list = ['gifs/SDSS1420A_color.png', 'gifs/SDSS1420A_color_host.png']
+# with imageio.get_writer('gifs/qso_to_host.gif', mode='I', fps=1) as writer:
+#     for filename in filename_list:
+#         image = imageio.imread(filename)
+#         writer.append_data(image)
 
 # #%%
 # _row = 1

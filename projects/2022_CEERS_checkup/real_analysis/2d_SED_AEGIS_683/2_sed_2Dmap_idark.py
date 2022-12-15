@@ -16,10 +16,10 @@ import os # Delete xfile.txt
 import matplotlib
 matplotlib.use('Agg')
 import sys
-count = int(sys.argv[1]) - 1 # 1 - 2809
-flag = int(sys.argv[2])
-# count = 1200 # 1 - 2809
-# flag = 0
+# count = int(sys.argv[1]) - 1 # 1 - 2809
+# flag = int(sys.argv[2])
+count = 1200 # 1 - 2809
+flag = 0
 
 idx = 20
 target_id, z = load_info(idx)
@@ -27,19 +27,22 @@ z = 1.959
 sed_2d_info = pickle.load(open('sed_2d_info_bin2.pkl','rb'))
 
 #%%
-mag_dict = sed_2d_info[count][2]
-esti_smass(ID = '20221213'+str(int(count)), mags_dict = mag_dict, z = z, flag = flag, if_run_gsf=True)
 folder = 'esti_smass/20221213'+str(count)
-spec_file = glob.glob(folder+'/gsf_spec_*.fits')[0]
-hdul_spec = pyfits.open(spec_file)
-info_spec = hdul_spec[1].header
+mag_dict = sed_2d_info[count][2]
 
-write_file = open(folder + '/gsf_spec_header.txt','w') 
-write_file.write(str(info_spec))
-write_file.close()
-rm_file = glob.glob(folder+'/gsf_spec_*.fits') + glob.glob(folder + '/SPEC*corner*png') + glob.glob(folder+'/*asdf') 
-for file in rm_file:
-    os.remove(file)
+#%%
+if glob.glob(folder+'/SFH_*.fits') == []:
+    esti_smass(ID = '20221213'+str(int(count)), mags_dict = mag_dict, z = z, flag = flag, if_run_gsf=True)
+    spec_file = glob.glob(folder+'/gsf_spec_*.fits')[0]
+    hdul_spec = pyfits.open(spec_file)
+    info_spec = hdul_spec[1].header
+    
+    write_file = open(folder + '/gsf_spec_header.txt','w') 
+    write_file.write(str(info_spec))
+    write_file.close()
+    rm_file = glob.glob(folder+'/gsf_spec_*.fits') + glob.glob(folder + '/SPEC*corner*png') + glob.glob(folder+'/*asdf') 
+    for file in rm_file:
+        os.remove(file)
 # steller_file = glob.glob(folder+'/SFH_*.fits')[0]
 # hdul = pyfits.open(steller_file)
 # info = hdul[0].header 

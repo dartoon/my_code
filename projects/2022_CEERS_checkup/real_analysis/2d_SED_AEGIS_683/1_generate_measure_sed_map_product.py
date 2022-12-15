@@ -39,43 +39,47 @@ from galight.tools.astro_tools import plt_fits
 run_filt_list = [l_band] + [filt_list[i] for i in range(len(filt_list)) if filt_list[i] != l_band]
 
 
+#%% #!!! Consider the size and the alignment issue.
+size = 55  #For LW it is 56*4 and for SW it is 56*2
 image_list = [None] * len(run_filt_list)
-for i, filt in enumerate(run_filt_list):
+ratio_list = []
+for i, filt in enumerate(run_filt_list[:]):
     fit_run = fit_run_dict[filt]
-    img_org = fit_run.flux_2d_out['data-Point Source'] #- np.sum(fit_run.image_host_list[1:],axis=0 )
+    img_org = fit_run.flux_2d_out['data'] #- np.sum(fit_run.image_host_list[1:],axis=0 )
     if len(fit_run.image_host_list) == 3:
         img_org = img_org - fit_run.image_host_list[1]
     deltaPix = fit_run.fitting_specify_class.deltaPix
-    # img_org = fit_run.flux_2d_out['model']
+    print(filt)
+    #Check the host ratio is all >98%. So, no quasar subtraction:
+    # print(np.sum(fit_run.image_ps_list[0]) / (np.sum(fit_run.image_ps_list[0])+ np.sum(fit_run.image_host_list[0]) ))
+    # plt_fits(img_org)
     ratio = fit_run.fitting_specify_class.deltaPix/l_deltaPix 
+    ratio_list.append(ratio)
+    if ratio>0.8:
+        pos = np.where(img_org[:45,:60].max() == img_org)
+        pos = [pos[0][0], pos[1][0]]
+        cut_size = size *2
+        x_bot = pos[0] - 20 
+        y_bot = pos[1] - 35 
+    elif ratio<0.8:
+        pos = np.where(img_org[:50,:80].max() == img_org)
+        pos = [pos[0][0], pos[1][0]]
+        cut_size = size *4
+        x_bot = pos[0] - 20 * 2 
+        y_bot = pos[1] - 35 * 2
+    img_org = img_org[x_bot:x_bot+cut_size,y_bot:y_bot+cut_size]
+    plt_fits(img_org)
+    print(pos)
     if ratio <0.98:
         img_show = zoom(img_org, 0.5)
     else:
         img_show  = img_org
         
     img_show = zoom(img_show, 0.5)
-        
-    # if len(img_show)/2 == int(len(img_show)/2):
-    #     img_show = zoom(img_show, len(img_show)/(len(img_show)+1))
-        
+    
     img_show = img_show/np.sum(img_show) * np.sum(img_org)
     image_list[i] = img_show
     print(filt,'finish', img_show.shape)
-    
-size = np.min([len(image_list[i]) for i in range(len(image_list)) ])
-for i, image in enumerate(image_list):
-    ct = int((len(image) -  size)/2)
-    if ct != 0:
-        image_comp = image[ct:-ct, ct:-ct]
-    else:
-        image_comp = image
-    pos = np.where(image_comp[:15,:25].max() == image_comp)
-    pos = [pos[0][0]+ct, pos[1][0]+ct]
-    image_list[i] = image[pos[0]-10:(pos[0]-10)+53,pos[1]-16:(pos[1]-16)+53]
-    print(run_filt_list[i], image_list[i].shape, ':')
-    print(pos)
-    # plt_fits(image)
-    # plt_fits(image_list[i])
     
 
 #%%
@@ -123,7 +127,25 @@ for i in range(len(sed_image[0])):
         sed_2d_info.append([i, j, mag_result])
 import pickle      
 pickle.dump(sed_2d_info, open('sed_2d_info_bin2.pkl', 'wb'))
+#%%
 
+images = []
+filts = []
+zp_list = []
+for i in [-1, -3, 1]:  #['F356W', 'F200W', 'F115W', 'F150W', 'F277W', 'F410M', 'F444W']
+    filts.append(run_filt_list[i])
+    zp_list.append(zp_dict[run_filt_list[i]])
+    images.append(image_list[i])
+
+    
+from galight.tools.astro_tools import plt_fits_color
+import pickle
+pickle.dump(image_list, open('color_image_quasar'+'.pkl', 'wb'))  
+images = [images[i] * 10 ** (-0.4*(zp_list[i]-zp_list[0])) for i in range(len(images)) ]
+for i in range(len(images)):
+    plt_fits(images[i], vmin=0.001, vmax=2.5)
+
+plt_fits_color(images, Q=7, stretch=0.3)
 
 # #%%
 # # sed_2d_info = pickle.load(open('sed_2d_info.pkl','rb'))
