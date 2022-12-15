@@ -16,10 +16,10 @@ import os # Delete xfile.txt
 import matplotlib
 matplotlib.use('Agg')
 import sys
-# count = int(sys.argv[1]) - 1 # 1 - 2809
-# flag = int(sys.argv[2])
-count = 1200 # 1 - 2809
-flag = 0
+count = int(sys.argv[1]) - 1 # 1 - 2809
+flag = int(sys.argv[2])
+# count = 1200 # 1 - 2809
+# flag = 0
 
 idx = 20
 target_id, z = load_info(idx)
