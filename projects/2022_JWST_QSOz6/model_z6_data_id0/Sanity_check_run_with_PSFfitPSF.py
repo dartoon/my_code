@@ -40,15 +40,13 @@ PSF_lib_files = glob.glob(run_folder+'material/*'+filt[:-1]+'*_PSF_Library_idx{0
 PSF_list, PSF_list_clean, PSF_RA_DEC_list, PSF_from_file_list = pickle.load(open(PSF_lib_files,'rb'))
 
 
-idx = 0
+# idx = 0
 # folder = '/Users/Dartoon/Downloads/z6JWSTNIRcam/NIRCam_J2255_stage3_{0}/bkg_removed'.format(data_type)
 # folder = '/Users/Dartoon/Downloads/z6JWSTNIRcam/NIRCam_J2255_stage3_{0}/bkg_removed'.format(data_type)
 folder = '../NIRCam_data/Nov14/bkg_removed'
 from target_info import target_info
 info = target_info[str(idx)]
-target_id, RA, Dec, z = info['target_id'], info['RA'], info['Dec'], info['z']
 
-# jwst_all_filenames = glob.glob(folder+'/*{0}*{1}*.fits'.format(target_id[:5], filts[0]))
 jwst_all_filenames = glob.glob(folder+'/*J2255*{0}*.fits'.format(filt))
 jwst_all_filenames.sort()
 file = jwst_all_filenames[file_NO]

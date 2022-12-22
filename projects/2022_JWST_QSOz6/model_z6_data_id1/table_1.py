@@ -32,7 +32,7 @@ from astropy.cosmology import LambdaCDM, FlatLambdaCDM
 cosmo1 = LambdaCDM(70 * (u.km/u.s/u.Mpc), 0.3, 0.7)
 arc_per_kpc = cosmo1.arcsec_per_kpc_proper(z).value
 # filters = ['F150W', 'F356W']
-filters = ['F356W']
+filters = ['F150W']
 import copy, matplotlib
 for top_psf_id in [0]:
     for count in range(len(filters)):
@@ -44,7 +44,8 @@ for top_psf_id in [0]:
         # idx, filt= item
         # fit_files = glob.glob(run_folder+'*fit_material*/fit_run_withcentralMask_idx{0}_{1}_FOV*.pkl'.format(idx, filt))#+\
         # fit_files = glob.glob(run_folder+'*fit_material*/fit_run_idx{0}_{1}_*.pkl'.format(idx, filt))#+\
-        fit_files = glob.glob(run_folder+'*fit_material*/fit_run_fixn1__idx{0}_{1}_FOV*.pkl'.format(idx, filt))#+\
+        fit_files = glob.glob(run_folder+'*fit_material*/fit_run_fixn1__idx{0}_{1}_*.pkl'.format(idx, filt))#+\
+        # fit_files = glob.glob(run_folder+'*fit_material*/fit_run_fixn1__idx{0}_{1}_FOV*.pkl'.format(idx, filt))#+\
         fit_files.sort()
         for i in range(len(fit_files)):
             fit_run_list.append(pickle.load(open(fit_files[i],'rb')))

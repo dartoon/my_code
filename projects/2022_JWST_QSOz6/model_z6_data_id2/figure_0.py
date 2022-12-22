@@ -30,15 +30,15 @@ from target_info import target_info
 from galight.tools.astro_tools import plt_fits, plt_many_fits
 #%%
 data_type = 'all' 
-filt = 'F356W'
-# filt = 'F150W'
+# filt = 'F356W'
+filt = 'F150W'
 file_NO = 0
 
-idx = 1
+idx = 2
 info = target_info[str(idx)]
 target_id, RA, Dec, z = info['target_id'], info['RA'], info['Dec'], info['z']
 # folder = '/Users/Dartoon/Downloads/z6JWSTNIRcam/NIRCam_{1}_stage3_{0}/bkg_removed'.format(data_type, target_id[:5])
-folder = '../NIRCam_data/Nov14/bkg_removed/' 
+folder = '../NIRCam_data/*/bkg_removed/' 
 # jwst_all_filenames = glob.glob(folder+'/*{0}*{1}*.fits'.format(target_id[:5], filts[0]))
 jwst_all_filenames = glob.glob(folder+'/*{0}*.fits'.format(filt))
 jwst_all_filenames.sort()
@@ -81,6 +81,7 @@ def coordinate_arrows(ax, d, header, color='white', arrow_size=0.02):
     d0 = d / 12.
     deltaPix = 1
     ra0, dec0 = (d - 2*d0) / deltaPix, d0 / deltaPix
+    dec0 = dec0*2
     res_ra0, res_dec0 = wcs.all_pix2world([(ra0, dec0)], 1)[0]
     xx_, yy_ = ra0, dec0
     
@@ -91,7 +92,7 @@ def coordinate_arrows(ax, d, header, color='white', arrow_size=0.02):
 
     ax.arrow(xx_ * deltaPix, yy_ * deltaPix, (xx_ra - xx_) * deltaPix, (yy_ra - yy_) * deltaPix,
              head_width=arrow_size * d, head_length=arrow_size * d, fc=color, ec=color, linewidth=1.2)
-    ax.text(xx_ra_t * deltaPix, yy_ra_t * deltaPix, "E", color=color, fontsize=22, ha='center')
+    ax.text(xx_ra_t * deltaPix-15, yy_ra_t * deltaPix, "E", color=color, fontsize=22, ha='center')
     ax.arrow(xx_ * deltaPix, yy_ * deltaPix, (xx_dec - xx_) * deltaPix, (yy_dec - yy_) * deltaPix,
              head_width=arrow_size * d, head_length=arrow_size * d, fc
              =color, ec=color, linewidth=1.2)
@@ -159,31 +160,17 @@ ax.text(p0 + dist / 2.  + d / 15., p0 + 0.02 * d , text, fontsize=25, color=colo
 angle = 0 / 180 * np.pi
 coordinate_arrows(ax, frame_size, header=header, arrow_size=0.03)
 ax.set_ylim(0,800)
-if filt == 'F150W':
-    circle1 = plt.Circle((38, 95),32, color='white', fill=False, linewidth=2)
-    circle2 = plt.Circle((400., 400),20, color='white', fill=False, linewidth=1, alpha = 1)
-    # circle3 = plt.Circle((445., 365),20, color='white', fill=False, linewidth=2, alpha = 0.7)
-if filt == 'F356W':
-    circle1 = plt.Circle((50, 100),40, color='white', fill=False, linewidth=2)
-    circle2 = plt.Circle((400., 400),35, color='white', fill=False, linewidth=1, alpha = 1)
-    # circle3 = plt.Circle((445., 365),25, color='white', fill=False, linewidth=2, alpha = 0.7)
-ax.text(160., 240, 'PSF-star', fontsize=24, color=color, ha='center')
-ax.add_patch(circle1)
 ax.set_xticks([])
 ax.set_yticks([])
 from mpl_toolkits.axes_grid1.inset_locator import zoomed_inset_axes
 from mpl_toolkits.axes_grid1.inset_locator import mark_inset
 
 if filt == 'F356W':
-    ax.arrow(148, 230, -60,-80,
-             head_width=20, head_length=15, fc=color, ec=color, linewidth=1.2)
     ax.set_xlim(0,1220)
     axins = zoomed_inset_axes(ax, 2.3, loc = 'center right', bbox_to_anchor=(0,0,800,1200) )
     loc1, loc2 = 2,4
     pso1, pso2 = 350., 430
 else:
-    ax.arrow(148, 230, -60,-80,
-             head_width=20, head_length=15, fc=color, ec=color, linewidth=1.2)
     ax.set_xlim(-420,-420+1220)
     axins = zoomed_inset_axes(ax, 2.3, loc = 'center left', bbox_to_anchor=(72,0,0,520) )
     loc1, loc2 = 2,4
@@ -201,7 +188,6 @@ axins.plot([320, 320 + dist], [320, 320], linewidth=3, color=color)
 axins.text(320 + dist / 2., 320 + 0.01 * d, text, fontsize=25, color=color, ha='center')
 
 
-axins.add_patch(circle2)
 # axins.text(478., 380, 'obj1', fontsize=20, color=color, ha='center')
 # axins.add_patch(circle3)
 

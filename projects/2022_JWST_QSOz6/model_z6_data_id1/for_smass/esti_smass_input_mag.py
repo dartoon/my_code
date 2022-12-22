@@ -18,7 +18,7 @@ import glob
 # folder = '20221105' #No lines; mel -2.5
 # folder = '20221107' #Increase AV 1 for obj 1
 # folder = '20221108' #FIX n =1 result
-folder = '20221122' #FIX n =1 result
+folder = '20221220' #FIX n =1 result
 rerun = False
 # idx = [1,2,0,51,35]
 # F115W 26.852 \pm 0.044
@@ -34,20 +34,22 @@ mag_result = {'F356W': 23.23, 'F150W': 25.63}
 
 target_id = 'J2236'
 # idx = 101 #no emission line, fix mel as -1
-idx = 101 #no emission line, fix mel as -1
+# idx = 101 #no emission line, fix mel as -1
 # idx = 102 #With emission line, fix mel as -1
 # idx = 103 #no emission line, fix mel as -2.5
 # idx = 104 #With emission line, fix mel as -2.5
 # idx, target_id = 201,  'obj1'
 # idx, target_id = 202,  'obj2'
 # idx, target_id = 203,  'obj3'
+idx = 4 #no emission line, fix mel as -1
+
 z = 6.4
 import time
 t1 = time.time()
 print('Run estimate')
 band_as_upper = []
 esti_smass(ID = folder+str(idx), mags_dict = mag_result, z = z, flag = 0, 
-            if_run_gsf=True, band_as_upper = band_as_upper, #metallicity=-1.0,
+            if_run_gsf=True, band_as_upper = band_as_upper, metallicity=-0.7,
             mag_err=[0.1]*len(mag_result), just_run = False)
 t2 = time.time()
 

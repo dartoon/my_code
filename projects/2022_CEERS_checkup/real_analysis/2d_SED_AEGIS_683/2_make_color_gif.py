@@ -167,72 +167,72 @@ plt.show()
 import matplotlib
 cmap_r = matplotlib.cm.get_cmap('RdBu_r')
 
-#%%
-from astropy.visualization import make_lupton_rgb
-image_list_qso = pickle.load(open('color_image_quasar'+'.pkl','rb'))   #use_filt = ['F444W',  'F277W', 'F150W']
-rgb_default_qso = make_lupton_rgb(image_list_qso[0][1:-1,1:-1], image_list_qso[1][1:-1,1:-1], 
-                              image_list_qso[2][1:-1,1:-1], Q=10, stretch=0.4)
-image_list = pickle.load(open('color_image'+'.pkl','rb'))   #use_filt = ['F444W',  'F277W', 'F150W']
-rgb_default = make_lupton_rgb(image_list[0][1:-1,1:-1], image_list[1][1:-1,1:-1], 
-                              image_list[2][1:-1,1:-1], Q=8, stretch=0.2)
-plt.imshow(rgb_default, origin='lower')
-plt.show()
+# #%%
+# from astropy.visualization import make_lupton_rgb
+# image_list_qso = pickle.load(open('color_image_quasar'+'.pkl','rb'))   #use_filt = ['F444W',  'F277W', 'F150W']
+# rgb_default_qso = make_lupton_rgb(image_list_qso[0][1:-1,1:-1], image_list_qso[1][1:-1,1:-1], 
+#                               image_list_qso[2][1:-1,1:-1], Q=10, stretch=0.4)
+# image_list = pickle.load(open('color_image'+'.pkl','rb'))   #use_filt = ['F444W',  'F277W', 'F150W']
+# rgb_default = make_lupton_rgb(image_list[0][1:-1,1:-1], image_list[1][1:-1,1:-1], 
+#                               image_list[2][1:-1,1:-1], Q=8, stretch=0.2)
+# plt.imshow(rgb_default, origin='lower')
+# plt.show()
 
-#%%
-if bin_info != '':
-    dvd_info = int(bin_info[-1])
-else:
-    dvd_info = 1
+# #%%
+# if bin_info != '':
+#     dvd_info = int(bin_info[-1])
+# else:
+#     dvd_info = 1
     
-rad1, rad2 = 4, 8
-rad0 = 2
-target_id, z = load_info(idx = 1)
-z = float(z)
-deltaPix = fit_run_dict['F356W'].fitting_specify_class.deltaPix
-_deltaPix = deltaPix * dvd_info  #The true Pixel size after binning 
-from astropy.cosmology import FlatLambdaCDM
-cosmo = FlatLambdaCDM(H0=70, Om0=0.3)
-scale_relation = cosmo.angular_diameter_distance(z).value * 10**3 * (1/3600./180.*np.pi)  #Kpc/arc
-kpc_per_pixel = scale_relation * _deltaPix  #kpc/pixel
+# rad1, rad2 = 4, 8
+# rad0 = 2
+# target_id, z = load_info(idx = 1)
+# z = float(z)
+# deltaPix = fit_run_dict['F356W'].fitting_specify_class.deltaPix
+# _deltaPix = deltaPix * dvd_info  #The true Pixel size after binning 
+# from astropy.cosmology import FlatLambdaCDM
+# cosmo = FlatLambdaCDM(H0=70, Om0=0.3)
+# scale_relation = cosmo.angular_diameter_distance(z).value * 10**3 * (1/3600./180.*np.pi)  #Kpc/arc
+# kpc_per_pixel = scale_relation * _deltaPix  #kpc/pixel
 
-from galight.tools.measure_tools import mask_obj
-from photutils import EllipticalAperture
-aper = EllipticalAperture([len(smass_image)/2, len(smass_image)/2], 45/dvd_info, 
-                          45/dvd_info, theta=0)
-#45/dvd_info / kpc_per_pixel, outer region.
-mask1 = 1- mask_obj(smass_image, [aper])[0]
-aper = EllipticalAperture([len(smass_image)/2, len(smass_image)/2], 
-                          round(rad0/kpc_per_pixel), round(rad0/kpc_per_pixel), theta=0)
-mask2 = mask_obj(smass_image, [aper])[0]
+# from galight.tools.measure_tools import mask_obj
+# from photutils import EllipticalAperture
+# aper = EllipticalAperture([len(smass_image)/2, len(smass_image)/2], 45/dvd_info, 
+#                           45/dvd_info, theta=0)
+# #45/dvd_info / kpc_per_pixel, outer region.
+# mask1 = 1- mask_obj(smass_image, [aper])[0]
+# aper = EllipticalAperture([len(smass_image)/2, len(smass_image)/2], 
+#                           round(rad0/kpc_per_pixel), round(rad0/kpc_per_pixel), theta=0)
+# mask2 = mask_obj(smass_image, [aper])[0]
 
 
-aper27 = EllipticalAperture([len(smass_image)/2, len(smass_image)/2], round(rad1/kpc_per_pixel), 
-                          round(rad1/kpc_per_pixel), theta=0)
-aper80 = EllipticalAperture([len(smass_image)/2, len(smass_image)/2], round(rad2/kpc_per_pixel), 
-                          round(rad2/kpc_per_pixel), theta=0)
+# aper27 = EllipticalAperture([len(smass_image)/2, len(smass_image)/2], round(rad1/kpc_per_pixel), 
+#                           round(rad1/kpc_per_pixel), theta=0)
+# aper80 = EllipticalAperture([len(smass_image)/2, len(smass_image)/2], round(rad2/kpc_per_pixel), 
+#                           round(rad2/kpc_per_pixel), theta=0)
 
-aper_ = EllipticalAperture([len(image_list[0])/2-1, len(image_list[0])/2-1], 
-                          round(rad0/kpc_per_pixel * 2), round(rad0/kpc_per_pixel * 2), theta=0)
-aper27_ = EllipticalAperture([len(image_list[0])/2-1, len(image_list[0])/2-1], 
-                          round(rad1/kpc_per_pixel * 2), round(rad1/kpc_per_pixel * 2), theta=0)
-aper80_ = EllipticalAperture([len(image_list[0])/2-1, len(image_list[0])/2-1], 
-                          round(rad2/kpc_per_pixel * 2), round(rad2/kpc_per_pixel * 2), theta=0)
+# aper_ = EllipticalAperture([len(image_list[0])/2-1, len(image_list[0])/2-1], 
+#                           round(rad0/kpc_per_pixel * 2), round(rad0/kpc_per_pixel * 2), theta=0)
+# aper27_ = EllipticalAperture([len(image_list[0])/2-1, len(image_list[0])/2-1], 
+#                           round(rad1/kpc_per_pixel * 2), round(rad1/kpc_per_pixel * 2), theta=0)
+# aper80_ = EllipticalAperture([len(image_list[0])/2-1, len(image_list[0])/2-1], 
+#                           round(rad2/kpc_per_pixel * 2), round(rad2/kpc_per_pixel * 2), theta=0)
 
-mask = mask1 * mask2
+# mask = mask1 * mask2
 
-lowmass_mask = (smass_image>6.) * mask
+# lowmass_mask = (smass_image>6.) * mask
 
-mask[mask==0] = np.nan
-lowmass_mask[lowmass_mask==0] = np.nan
+# mask[mask==0] = np.nan
+# lowmass_mask[lowmass_mask==0] = np.nan
 
-import matplotlib, copy
-colorname = None #'gist_heat'
-my_cmap_mass = copy.copy(matplotlib.cm.get_cmap('afmhot')) # copy the default cmap
-my_cmap_mass.set_bad('white')
-my_cmap = copy.copy(matplotlib.cm.get_cmap('RdBu_r')) # copy the default cmap
-my_cmap.set_bad('white')
-my_cmap_ = copy.copy(matplotlib.cm.get_cmap('RdBu')) # copy the default cmap
-my_cmap_.set_bad('white')
+# import matplotlib, copy
+# colorname = None #'gist_heat'
+# my_cmap_mass = copy.copy(matplotlib.cm.get_cmap('afmhot')) # copy the default cmap
+# my_cmap_mass.set_bad('white')
+# my_cmap = copy.copy(matplotlib.cm.get_cmap('RdBu_r')) # copy the default cmap
+# my_cmap.set_bad('white')
+# my_cmap_ = copy.copy(matplotlib.cm.get_cmap('RdBu')) # copy the default cmap
+# my_cmap_.set_bad('white')
 
 
 # import imageio

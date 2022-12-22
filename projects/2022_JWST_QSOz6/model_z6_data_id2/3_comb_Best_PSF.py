@@ -17,7 +17,8 @@ import copy
 
 run_folder = 'stage3_all/' #!!!
 filt = 'F150W'
-files = glob.glob(run_folder+'fit_material/data_process_idx1_*{0}*_*FOVpsf*.pkl'.format(filt))
+idx = 2
+files = glob.glob(run_folder+'fit_material/data_process_idx{1}_*{0}*_*FOVpsf*.pkl'.format(filt,idx))
 files.sort()
 collect_info = []
 for i in range(len(files)):
@@ -28,17 +29,13 @@ for i in range(len(files)):
     if this_info not in collect_info:
         collect_info.append(this_info)
 
-# - [ ] F115W_psf6 is QSO (idx 2). [136, 137, 139]
-# - [ ] F150W_psf7 is QSO (idx 2).
-# - [ ] F277W_psf2 is QSO (idx 2).
-
 #%%
 if_printshow = False
 for count in range(len(collect_info)):
     item = collect_info[count]
     fit_run_list = []
     idx, filt= item
-    fit_files = glob.glob(run_folder+'fit_material/fit_run_fixn1__idx{0}_{1}_*FOVpsf*.pkl'.format(idx, filt))
+    fit_files = glob.glob(run_folder+'fit_material/fit_run_idx{0}_{1}_*FOVpsf*.pkl'.format(idx, filt))
     fit_files.sort()
     
     for i in range(len(fit_files)):
@@ -56,16 +53,16 @@ for count in range(len(collect_info)):
         _data_process.stack_PSF(if_plot = False, tool = 'psfr')
         if ct >8:
             ct = 'all'
-        pickle.dump(_data_process , open(run_folder+'fit_material/'+'data_process_fixn1__idx{0}_{2}_CombPsfsNO_{1}.pkl'.format(idx, ct, filt), 'wb'))
+        pickle.dump(_data_process , open(run_folder+'fit_material/'+'data_process_idx{0}_{2}_CombPsfsNO_{1}.pkl'.format(idx, ct, filt), 'wb'))
         
-    if if_printshow==True:
-        fit_run = fit_run_list[idx_counts[0]]
-        fit_run.plot_final_qso_fit()
-        host_flux = fit_run.final_result_galaxy[0]['flux_within_frame']
-        AGN_flux = fit_run.final_result_ps[0]['flux_within_frame']
-        ratio = host_flux/(host_flux+AGN_flux)
-        print('count', count)
-        print('Chisqs top 2', round(chisqs[idx_counts[0]],2), round(chisqs[idx_counts[1]],2))
-        print_s ='idx: '+ item[0]+' '+item[1]+' ratio: ' + str(round(ratio,2)) +" OK?"
-        print(fit_files[idx_counts[0]])
-        hold = input(print_s)
+    # if if_printshow==True:
+    #     fit_run = fit_run_list[idx_counts[0]]
+    #     fit_run.plot_final_qso_fit()
+    #     host_flux = fit_run.final_result_galaxy[0]['flux_within_frame']
+    #     AGN_flux = fit_run.final_result_ps[0]['flux_within_frame']
+    #     ratio = host_flux/(host_flux+AGN_flux)
+    #     print('count', count)
+    #     print('Chisqs top 2', round(chisqs[idx_counts[0]],2), round(chisqs[idx_counts[1]],2))
+    #     print_s ='idx: '+ item[0]+' '+item[1]+' ratio: ' + str(round(ratio,2)) +" OK?"
+    #     print(fit_files[idx_counts[0]])
+    #     hold = input(print_s)

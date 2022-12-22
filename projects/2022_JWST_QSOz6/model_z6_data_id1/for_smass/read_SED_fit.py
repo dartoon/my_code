@@ -21,8 +21,9 @@ sys.path.insert(0,'../../model_z6_data_id0/')
 # folder = '20221106' #with lines; mel -2.5
 # folder = '20221108' #More flexible for obj1
 # folder = '20221115' #The one used in the very first version.
-folder = '20221120' #The extended
+# folder = '20221120' #The one show in paper
 # folder = '20221122' #The extended
+folder = '20221220' #Test emission lines with different ages.
 
 
 fitidx = 1
@@ -32,7 +33,7 @@ target_id, RA, Dec, z = info['target_id'], info['RA'], info['Dec'], info['z']
 
 
 # idx = 101
-idx = 10112  #our target
+idx = 4  #our target
 # idx, target_id = 201,  'obj1'
 # idx, target_id = 202,  'obj2'
 # idx, target_id = 203,  'obj3'
@@ -217,9 +218,10 @@ z = 6.40
 # plt.text( (xmax-xmin)*0.07, (ymax-ymin)*0.67, 'metallicity = {0:.1f} logZ/'.format(mel) + r"Z$_{\rm \odot}$ (fixed)", fontsize=17)    
 plt.text( (xmax-xmin)*0.07, (ymax-ymin)*0.95, r"log M$_*$ = {0:.2f}".format(smass), fontsize=17)
 plt.text( (xmax-xmin)*0.07, (ymax-ymin)*0.88, "M$\mathrm{_{uv}}$ = "+ r"{0:.2f}".format(info_muv['MUV50']), fontsize=17)
-plt.text( (xmax-xmin)*0.07, (ymax-ymin)*0.81, 'age = {0:.1f} Gyr'.format(age, age_l, age_h), fontsize=17)
+plt.text( (xmax-xmin)*0.07, (ymax-ymin)*0.81, 'age = {0:.1f} Gyr (fixed)'.format(age, age_l, age_h), fontsize=17)
 plt.text( (xmax-xmin)*0.07, (ymax-ymin)*0.74, r'A$\mathrm{_{V}}$'+ r'= {0:.1f} (fixed)'.format(float(info['AV_50'])) , fontsize=17)    
 plt.text( (xmax-xmin)*0.07, (ymax-ymin)*0.67, r"log Z/Z$_{\rm \odot}$" + r" = {0:.1f} (fixed)".format(mel), fontsize=17)  
+# plt.text( (xmax-xmin)*0.07, (ymax-ymin)*0.57, r"SFR" + r" = {0:.1f} (fixed)".format(mel), fontsize=17)  
 
 # if '{0:.1f}'.format(sfr_l) == '0.0':
 #     plt.text( (xmax-xmin)*0.07, (ymax-ymin)*0.75, r"SFR: [$\leftarrow${2:.1f}]".format(sfr, sfr_l, sfr_h) + r" M$_{\rm \odot}$/yr ", fontsize=17)
