@@ -11,7 +11,7 @@ import astropy.io.fits as pyfits
 import matplotlib.pyplot as plt
 import glob, pickle
 
-idx = 2
+idx = 4
 
 import sys
 sys.path.insert(0, '../model_z6_data_id0/')
@@ -26,9 +26,9 @@ run_folder = 'stage3_all/' #!!!
 z_str = str(z)
 
 # filters = ['F150W', 'F356W']
-filters = ['F150W']
+filters = ['F356W']
 import copy, matplotlib
-for top_psf_id in range(1):
+for top_psf_id in range(3):
     for count in range(len(filters)):
         fit_run_list = []
         # idx = idx_info
@@ -43,8 +43,8 @@ for top_psf_id in range(1):
 
         PSF_lib_files = glob.glob(run_folder+'material/*'+filt[:-1]+'*_PSF_Library_idx{0}.pkl'.format(idx))[0]
         # idx, filt= item
-        # fit_files = glob.glob(run_folder+'*fit_material*/fit_run_withcentralMask_idx{0}_{1}_FOV*.pkl'.format(idx, filt))#+\
         fit_files = glob.glob(run_folder+'*fit_material*/fit_run_idx{0}_{1}_*.pkl'.format(idx, filt))#+\
+        fit_files = [fit_files[i] for i in range(len(fit_files)) if '_IncludeOtherID' not in fit_files[i] and 'useidx' not in fit_files[i]]
         fit_files.sort()
         for i in range(len(fit_files)):
             fit_run_list.append(pickle.load(open(fit_files[i],'rb')))
@@ -64,8 +64,8 @@ for top_psf_id in range(1):
         
         
         prop_name = 'magnitude'
-        all_values = [fit_run_list[i].final_result_ps[0][prop_name] for i in range(len(fit_run_list))]
-        # all_values = [fit_run_list[i].final_result_galaxy[0][prop_name] for i in range(len(fit_run_list))]
+        # all_values = [fit_run_list[i].final_result_ps[0][prop_name] for i in range(len(fit_run_list))]
+        all_values = [fit_run_list[i].final_result_galaxy[0][prop_name] for i in range(len(fit_run_list))]
         weighted_value = np.sum(np.array(all_values)*weight) / np.sum(weight)
         rms_value = np.sqrt(np.sum((np.array(all_values)-weighted_value)**2*weight) / np.sum(weight))
         
