@@ -12,7 +12,7 @@ import matplotlib.pyplot as plt
 import glob
 
 import sys
-sys.path.insert(0,'../')
+sys.path.insert(0,'../../model_z6_data_id0')
 
 folder = '20221120' #
 
@@ -32,6 +32,7 @@ idx = 101  #Age free
 
 folder = 'esti_smass/'+folder+str(idx)
 steller_files = glob.glob(folder+'*/gsf_spec_*.fits')
+
 
 result = []
 for steller_file in steller_files:

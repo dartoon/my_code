@@ -30,14 +30,14 @@ warnings.filterwarnings("ignore")
 
 
 data_type = 'all' 
-filt = 'F356W'
+filt = 'F150W'
 file_NO = 0
 
 fov = 'small'
 
 idx = 0
 # folder = '/Users/Dartoon/Downloads/z6JWSTNIRcam/NIRCam_J2255_stage3_{0}/bkg_removed'.format(data_type)
-folder = '../NIRCam_data/Nov14/bkg_removed/' 
+folder = '../NIRCam_data/Jan14/bkg_removed/' 
 from target_info import target_info
 info = target_info[str(idx)]
 target_id, RA, Dec, z = info['target_id'], info['RA'], info['Dec'], info['z']
@@ -69,7 +69,7 @@ elif filt == 'F150W':
     if fov == 'large':
         radius = 40
     else:
-        radius = 26
+        radius = 40
 
 
 #%%

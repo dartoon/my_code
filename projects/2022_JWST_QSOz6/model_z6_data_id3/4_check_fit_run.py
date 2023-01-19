@@ -26,9 +26,9 @@ run_folder = 'stage3_all/' #!!!
 z_str = str(z)
 
 # filters = ['F150W', 'F356W']
-filters = ['F356W']
+filters = ['F150W']
 import copy, matplotlib
-for top_psf_id in range(1):
+for top_psf_id in range(3):
 # for top_psf_id in [0]:
     fit_run_list = []
     # idx = idx_info
@@ -45,7 +45,7 @@ for top_psf_id in range(1):
     # idx, filt= item
     # fit_files = glob.glob(run_folder+'*fit_material*/fit_run_idx{0}_{1}_*.pkl'.format(idx, filt))#+\
     fit_files = glob.glob(run_folder+'*fit_material*/fit_run_idx{0}_{1}_*.pkl'.format(idx, filt))#+\
-    fit_files = [fit_files[i] for i in range(len(fit_files)) if '_IncludeOtherID' not in fit_files[i] and 'useidx' not in fit_files[i]]
+    # fit_files = [fit_files[i] for i in range(len(fit_files)) if '_IncludeOtherID' not in fit_files[i] and 'useidx' not in fit_files[i]]
     fit_files.sort()
     for i in range(len(fit_files)):
         fit_run_list.append(pickle.load(open(fit_files[i],'rb')))

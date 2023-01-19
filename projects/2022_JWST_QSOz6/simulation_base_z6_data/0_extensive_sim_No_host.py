@@ -87,11 +87,13 @@ sort_PSF_Chisq = chisqs_PSF.argsort()
 
 Based_PSF_list= [PSF_list_clean[i] for i in sort_PSF_Chisq]
 
-# if idx == 1:
-#     del Based_PSF_list[1]
+if idx == 1:
+    del Based_PSF_list[1]
+
 
 zp = fit_run_.zp
-# for seed in range(30,100):
+
+#%%
 for seed in range(100):
     sim_psf = np.random.randint(5)
     for fit_psf in range(4):
@@ -112,6 +114,9 @@ for seed in range(100):
         imageModel = ImageModel(data_class, psf_class, lens_light_model_class=lightModel,
                                         point_source_class=pointSource, kwargs_numerics=kwargs_numerics)
         kwargs_sersic = fit_run_.kwargs_result['kwargs_lens_light'][0]
+        
+        kwargs_sersic['amp'] = 0  #!!!
+        
         kwargs_pointsource= fit_run_.kwargs_result['kwargs_ps'][0]
         kwargs_host = [kwargs_sersic]
         kwargs_ps = [kwargs_pointsource]
@@ -147,7 +152,7 @@ for seed in range(100):
             fit_sepc.prepare_fitting_seq(point_source_num = 1, fix_n_list= [[0,1]])
         fit_sepc.build_fitting_seq()
         fit_sepc.kwargs_params['lens_light_model'][0] = [fit_run_.kwargs_result['kwargs_lens_light'][0]]
-        plot_fit_name = 'sim_result/sim_idx{3}_{4}_seed{0}BasedPSF{1}_FitBasedPSF{2}'.format(seed,sim_psf,fit_psf,idx, filt)
+        plot_fit_name = 'sim_result_nohost/sim_idx{3}_{4}_seed{0}BasedPSF{1}_FitBasedPSF{2}'.format(seed,sim_psf,fit_psf,idx, filt)
         fit_run = FittingProcess(fit_sepc, savename = plot_fit_name, fitting_level='norm')
         fit_run.run(algorithm_list = ['PSO','PSO', 'PSO'], fitting_level=['norm','deep', 'deep'])
         fit_run.plot_final_qso_fit()
@@ -155,7 +160,7 @@ for seed in range(100):
     
     #%% recombin use top-2 PSF:
     #Load top PSF result from the overall fittings
-    fit_files = glob.glob('sim_result/sim_idx{1}_{2}_seed{0}B*.pkl'.format(seed,idx,filt))#+\
+    fit_files = glob.glob('sim_result_nohost/sim_idx{1}_{2}_seed{0}B*.pkl'.format(seed,idx,filt))#+\
     fit_files.sort()
     fit_run_list = []
     for i in range(len(fit_files)):
@@ -175,7 +180,7 @@ for seed in range(100):
         fit_sepc.prepare_fitting_seq(point_source_num = 1, fix_n_list= [[0,1]])
     fit_sepc.build_fitting_seq()
     fit_sepc.kwargs_params['lens_light_model'][0] = [fit_run_.kwargs_result['kwargs_lens_light'][0]]
-    plot_fit_name = 'sim_result/sim_idx{2}_{3}_seed{0}BasedPSF{1}_FitBasedCombPSF'.format(seed,sim_psf,idx,filt)
+    plot_fit_name = 'sim_result_nohost/sim_idx{2}_{3}_seed{0}BasedPSF{1}_FitBasedCombPSF'.format(seed,sim_psf,idx,filt)
     fit_run = FittingProcess(fit_sepc, savename = plot_fit_name, fitting_level='norm')
     fit_run.run(algorithm_list = ['PSO','PSO', 'PSO'], fitting_level=['norm','deep', 'deep'])
     fit_run.plot_final_qso_fit()

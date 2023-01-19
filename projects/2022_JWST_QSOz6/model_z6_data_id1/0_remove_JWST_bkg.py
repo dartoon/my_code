@@ -18,10 +18,11 @@ warnings.filterwarnings("ignore")
 
 filters =  ['F150','F356']
 
-folder = '../NIRCam_data/Nov14/'
+# folder = '../NIRCam_data/Nov14/'
+folder = '../NIRCam_data/Jan14/'
 # folder_1 = '/Users/Dartoon/Downloads/z6JWSTNIRcam/NIRCam_J2236_stage3_all/_first_download/'
 
-filt = filters[1] #!!!
+filt = filters[0] #!!!
 import sys
 sys.path.insert(0,'../model_z6_data_id0/')
 

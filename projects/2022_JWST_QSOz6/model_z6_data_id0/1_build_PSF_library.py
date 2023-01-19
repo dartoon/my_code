@@ -19,7 +19,7 @@ from galight.tools.astro_tools import plt_many_fits
 filters =  ['F150','F356']
 
 data_type = 'all'
-filt = filters[1] #!!!
+filt = filters[0] #!!!
 file_NO = 0  #!!!
 
 idx = 0
@@ -27,7 +27,8 @@ from target_info import target_info
 info = target_info[str(idx)]
 target_id, RA, Dec, z = info['target_id'], info['RA'], info['Dec'], info['z']
 
-folder = '../NIRCam_data/Nov14/bkg_removed/' 
+# folder = '../NIRCam_data/Nov14/bkg_removed/' 
+folder = '../NIRCam_data/Jan14/bkg_removed/' 
 from astropy.coordinates import SkyCoord
 from astropy import units as u
 pos = SkyCoord('{0} {1}'.format(RA, Dec), unit=(u.hourangle, u.deg))

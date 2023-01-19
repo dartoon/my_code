@@ -137,9 +137,9 @@ def total_compare(flux_list_2d, label_list_2d,
     plt.show()       
     return f
 
-idx = 1
+idx = 0
 # filters = ['F150W', 'F356W']
-filters = ['F356W']
+filters = ['F150W']
 from target_info import target_info
 info = target_info[str(idx)]
 target_id, RA, Dec, z = info['target_id'], info['RA'], info['Dec'], info['z']
@@ -164,10 +164,10 @@ for top_psf_id in [0]:
         my_cmap.set_bad('black')
 
         PSF_lib_files = glob.glob(run_folder+'material/*'+filt[:-1]+'*_PSF_Library_idx{0}.pkl'.format(idx))[0]
-        if idx ==0:
+        if idx !=1:
             fit_files = glob.glob(run_folder+'*fit_material*/fit_run_idx{0}_{1}_*.pkl'.format(idx, filt))#+\
         elif idx ==1:
-            fit_files = glob.glob(run_folder+'*fit_material*/fit_run*_idx{0}_{1}_*.pkl'.format(idx, filt))#+\
+            fit_files = glob.glob(run_folder+'*fit_material*/fit_run*_fixn1_*idx{0}_{1}_*.pkl'.format(idx, filt))#+\
         fit_files.sort()
         for i in range(len(fit_files)):
             fit_run_list.append(pickle.load(open(fit_files[i],'rb')))
@@ -182,6 +182,8 @@ ps_x, ps_y = np.array(fit_run.final_result_ps[0]['position_xy']) + len(fit_run.i
 host_x, host_y = np.array(fit_run.final_result_galaxy[0]['position_xy']) + len(fit_run.image_host_list[0])/2
 
 label = list(fit_run.flux_2d_out.keys())
+label.sort()
+label[1],label[2] = label[2], label[1]
 image_list = [fit_run.flux_2d_out[label[i]] for i in range(len(label)) ]
 label[2] = "data$-$point source"
 fig = total_compare(image_list, label, [fit_run.fitting_specify_class.deltaPix]*4, 

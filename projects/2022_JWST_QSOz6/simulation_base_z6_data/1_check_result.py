@@ -15,7 +15,7 @@ sys.path.insert(0,'../model_z6_data_id0/')
 from target_info import target_info
 
 #%%Input number
-filt = 'F356W'
+filt = 'F150W'
 idx = 1
 run_folder = '../model_z6_data_id{0}/stage3_all/'.format(idx)
 
@@ -50,7 +50,7 @@ sort_Chisq = chisqs.argsort()
 fit_run_ = fit_run_list[sort_Chisq[0]]  # use top PSF result to run the simulation.
 
 #%% Read Best fitting result:
-prop= ['magnitude', 'R_sersic', 'n_sersic', 'offset'][0]  #Offset is in unit of arcsec.
+prop= ['magnitude', 'R_sersic', 'n_sersic', 'offset'][-1]  #Offset is in unit of arcsec.
 if prop != 'offset':
     true_value = fit_run_.final_result_galaxy[0][prop]
 else:
@@ -63,6 +63,7 @@ seedmax =  len(all_sim)
 obtain_value = [] 
 for seed in range(seedmax):
     fit_files = glob.glob('sim_result/sim_idx{1}_{2}_seed{0}B*.pkl'.format(seed,idx,filt))#+\
+    # fit_files = glob.glob('sim_result/sim_idx{1}_{2}_seed{0}Based*BasedP*.pkl'.format(seed,idx,filt))#+\
     fit_files.sort()
     fit_run_list = []
     for i in range(len(fit_files)):
@@ -87,5 +88,4 @@ plt.xlabel(prop+' bias (obtained $-$ true)', fontsize=27)
 plt.tick_params(labelsize=20)
 plt.title('Simulation Result using {0} realizations'.format(seedmax+1), fontsize = 29)
 plt.show()
-print(np.mean(np.array(obtain_value)-true_value))
-print(np.std(np.array(obtain_value)-true_value))
+print('{0:.2f}$\pm${1:.2f}'.format(np.mean(np.array(obtain_value)-true_value), np.std(np.array(obtain_value)-true_value)) )

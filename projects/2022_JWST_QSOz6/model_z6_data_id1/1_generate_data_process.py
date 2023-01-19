@@ -43,7 +43,7 @@ info = target_info[str(idx)]
 target_id, RA, Dec, z = info['target_id'], info['RA'], info['Dec'], info['z']
 
 # folder = '/Users/Dartoon/Downloads/z6JWSTNIRcam/NIRCam_{1}_stage3_{0}/bkg_removed'.format(data_type, target_id[:5])
-folder = '../NIRCam_data/Nov14/bkg_removed/' 
+folder = '../NIRCam_data/Jan14/bkg_removed/' 
 
 # jwst_all_filenames = glob.glob(folder+'/*{0}*{1}*.fits'.format(target_id[:5], filts[0]))
 jwst_all_filenames = glob.glob(folder+'*{0}*{1}*_rmbkg.fits'.format(target_id[:5], filt))  #For NIRCam
@@ -66,7 +66,7 @@ result_folder = run_folder + 'fit_result/'
 if filt == 'F356W':
     radius = 45
 elif filt == 'F150W':
-    radius = 25
+    radius = 45
 #%%
 cut_kernel = None #After pos correct then, do the nearest_obj_center
 # filts = ['F356W', 'F150W']

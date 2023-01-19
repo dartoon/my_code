@@ -25,9 +25,9 @@ run_folder = 'stage3_all/' #!!!
 z_str = str(z)
 
 # filters = ['F150W', 'F356W']
-filters = ['F356W']
+filters = ['F150W']
 import copy, matplotlib
-for top_psf_id in [0]:
+for top_psf_id in [0,1,2]:
     for count in range(len(filters)):
         fit_run_list = []
         # idx = idx_info

@@ -23,7 +23,10 @@ cosmo1 = LambdaCDM(70 * (u.km/u.s/u.Mpc), 0.3, 0.7)
 
 def return_Reff_aper(fit_run, cosmo1=cosmo1):
     fit_run.cal_astrometry()
-    img = fit_run.flux_2d_out['data-Point Source'] 
+    try:
+        img = fit_run.flux_2d_out['data-point source'] 
+    except:
+        img = fit_run.flux_2d_out['data-Point Source'] 
     if len(fit_run.image_host_list) ==1:
        img = img
     elif len(fit_run.image_host_list) ==2:

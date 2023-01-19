@@ -13,9 +13,10 @@ import glob
 import pickle
 filters =  ['F150','F356']
 
-folder = '../NIRCam_data/Nov14/'
+# folder = '../NIRCam_data/Nov14/'
+folder = '../NIRCam_data/Jan14/'
 
-filt = filters[1] #!!!
+filt = filters[0] #!!!
 
 idx = 0
 from target_info import target_info

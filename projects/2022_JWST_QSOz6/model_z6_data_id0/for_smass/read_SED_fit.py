@@ -21,7 +21,7 @@ sys.path.insert(0,'../')
 # folder = '20221106' #More flexible for obj1
 # folder = '20221109' #No lines; mel -1
 # folder = '20221115' #fix mel as -1, age as 0.5
-folder = '20221120' #
+folder = '20230115' #
 # folder = '20221121' #
 
 
@@ -31,12 +31,15 @@ info = target_info[str(fitidx)]
 target_id, RA, Dec, z = info['target_id'], info['RA'], info['Dec'], info['z']
 
 # idx = 1012  #our target
-idx = 10212  #our target 102 fix age.
+idx = 1  #our target 102 fix age.
 # idx, target_id = 201,  'obj1'
 # idx, target_id = 202,  'obj2'
 # idx, target_id = 203,  'obj3'
 
 folder = 'esti_smass/'+folder+str(idx)
+# folder = folder + '_freeParam'
+folder = folder + '_freeParam_withEmissionLine'
+
 steller_file = glob.glob(folder+'/gsf_spec_*.fits')[0]
 hdul = pyfits.open(steller_file)
 info_muv = hdul[1].header 
@@ -57,7 +60,68 @@ print('smass', info1['Mstel_50'], info1['Mstel_16'], info1['Mstel_84'])
 import numpy as np
 import astropy.io.fits as pyfits
 import matplotlib.pyplot as plt
-import glob
+import glob,seaborn
+
+#%%
+import pickle, glob
+file = glob.glob(folder+'/chain_*_phys.cpkl')
+value = pickle.load(open(file[0],'rb'))
+import pandas as pd 
+
+
+seaborn.set(font_scale=1.5)
+
+prop = list(value['chain'].keys())
+for i in range(len(prop)):
+    if i == 1:
+        value['chain'][prop[i]] = 10**value['chain'][prop[i]]
+
+df = pd.DataFrame(data=value['chain'])
+# g.map_lower(seaborn.kdeplot, levels=4, color=".2")
+
+for key in df.keys():
+    if key == 'logM_stel':
+        newkey = r"log M$_{*}$/M$_{\rm \odot}$"
+        df[newkey] = df.pop(key)
+    if key == 'logZ_MW':
+        newkey = r"log Z/Z$_{\rm \odot}$"
+        df[newkey] = df.pop(key)
+    if key == 'AV':
+        newkey = r'A$\mathrm{_{V}}$'
+        df[newkey] = df.pop(key)
+    if key == 'logT_MW':
+        newkey = 'age (Gyr)'
+        df[newkey] = df.pop(key)
+values = []
+for key in df.keys():
+    values.append([np.percentile(df[key], 16), np.median(df[key]), np.percentile(df[key], 84)])
+g = seaborn.pairplot(df,corner=True, diag_kind="kde", plot_kws=dict(marker="+", s=20, linewidth=1))
+   
+for i in range(len(g.axes.ravel())):
+    ax = g.axes.ravel()[i]
+    if ax != None:
+        ax.spines['top'].set_visible(True) 
+        ax.spines['right'].set_visible(True)
+        ax.spines['left'].set_visible(True)
+        j = i % len(values)
+        ax.axvline(x=values[j][1], ls='--', linewidth=1.6, c='coral')
+        ax.axvline(x=values[j][0], ls='--', linewidth=1.6, c='coral')
+        ax.axvline(x=values[j][2], ls='--', linewidth=1.6, c='coral')
+        if i %5 == 0:
+            title_fmt=".2f"
+            fmt = "{{0:{0}}}".format(title_fmt).format
+            title = r"${{{0}}}_{{-{1}}}^{{+{2}}}$"
+            title = title.format(fmt(values[j][1]), fmt(values[j][1]-values[j][0]), fmt(values[j][2]-values[j][1]))
+            # title = title.replace('0.00', '0.01')
+            ax.set_title(title, fontsize=16)
+            # ax.set_title(df.keys()[i/5]+r'$\displaystyle\substack{1\2}$'.format(values[j][1], values[j][2]-values[j][1], values[j][1]-values[j][0]))
+            # ax.set_title(r'\frac{-e^{i\pi}}{2^n}$!')
+            # ax.set_title(r'\frac{-e^{i\pi}}{2^n}$!', fontsize=16, color='r')
+            # ax.set_title(r'\TeX\ is Number $\displaystyle\sum_{n=1}^\infty'
+            #              r'\frac{-e^{i\pi}}{2^n}$!', fontsize=16, color='r')
+            # ax.set_title(df.keys()[i/5]+r'={0}$\pm$')
+plt.savefig('../../model_z6_data_id0/figures/{0}_SED_MCMC.pdf'.format(target_id[:5]), bbox_inches = "tight")
+
 
 # import matplotlib as mat
 # mat.rcParams['font.family'] = 'STIXGeneral'
@@ -125,13 +189,12 @@ f_16 = table_spec['f_model_16']
 f_50 = table_spec['f_model_50']
 f_84 = table_spec['f_model_84']
 
+seaborn.reset_orig()
 plt.figure(figsize=(10, 6))
-
 # array_spec[:,2] =  array_spec[:,2]/ array_spec[:,2].max() * 2.65
 
-# plt.plot(wave/10000., f_16, 'gray', alpha=0.4)
 plt.plot(wave/10000., f_50, 'black', alpha=0.7)
-# plt.plot(wave/10000., f_84, 'gray', alpha=0.4)
+plt.fill_between(wave/10000., f_16,f_84, color = 'gray',alpha = 0.5)
 
 hst_filt_id = {'F606W': '4', 'F814W':'6', 'F105W':'202', 'F125W':'203', 'F140W':'204', 'F160W':'205'}
 
@@ -172,11 +235,12 @@ for i, fid in enumerate(filt_id[::-1]):
         plt.arrow(lam, flambda, 0, -flambda*0.6, length_includes_head=True,
               head_width=0.2, head_length=flambda*0.1, zorder=102, color='red', linewidth=1.2)
         
+        
     f_array = np.vstack((wave, f_50)).T
     filt_flam = cal_filt_flam(f_array , f_fil[:,1:])    
-    plt.scatter(lam, filt_flam, marker="d", zorder =90,  s=280, facecolors='none', edgecolors='blue', linewidths=2)
+    plt.scatter(lam, filt_flam, marker="d", zorder =90,  s=280, facecolors='none', edgecolors='black', linewidths=2)
     
-    flambda_list.append(flambda)
+    # flambda_list.append(flambda)
         
         
 # fnu = np.array([316.14340, 329.82858, 17.06660, 44.70776])
@@ -205,7 +269,7 @@ for i, fid in enumerate(filt_id):
 # plt.text( (xmax-xmin)*005, (ymax-ymin)*0.87, r"M$_*$: [{1:.2f}$\leftarrow${0:.2f}$\rightarrow${2:.2f}]".format(smass, smass_l, smass_h), fontsize=17)
 # plt.text( (xmax-xmin)*0.05, (ymax-ymin)*0.80, "M$_{uv}$: "+ r"[{1:.2f}$\leftarrow${0:.2f}$\rightarrow${2:.2f}]".format(info_muv['MUV50'], info_muv['MUV84'], info_muv['MUV16']), fontsize=17)
 # print('M$_*$:  [{1:.2f}, {0:.2f} ,{2:.2f}]'.format(smass, smass_l, smass_h))
-# print('Muv:  [{1:.2f}, {0:.2f} ,{2:.2f}]'.format(info_muv['MUV50'], info_muv['MUV84'], info_muv['MUV16']))
+print('Muv:  [{1:.2f}, {0:.2f} ,{2:.2f}]'.format(info_muv['MUV50'], info_muv['MUV84'], info_muv['MUV16']))
 # if '{0:.1f}'.format(age_l) == '0.0':
 #     plt.text( (xmax-xmin)*0.07, (ymax-ymin)*0.61, r'age: [$\leftarrow${2:.1f}]  Gyr'.format(age, age_l, age_h), fontsize=17)
 #     print(r'age:  [$\leftarrow${2:.1f}]  Gyr'.format(age, age_l, age_h))
@@ -215,23 +279,17 @@ for i, fid in enumerate(filt_id):
     # print('age:  [{1:.1f}$-${2:.1f}]  Gyr'.format(age, age_l, age_h))
 plt.text( (xmax-xmin)*0.07, (ymax-ymin)*0.95, r"log M$_*$ = {0:.2f}".format(smass), fontsize=17)
 plt.text( (xmax-xmin)*0.07, (ymax-ymin)*0.88, "M$\mathrm{_{uv}}$ = "+ r"{0:.2f}".format(info_muv['MUV50']), fontsize=17)
-plt.text( (xmax-xmin)*0.07, (ymax-ymin)*0.81, 'age = {0:.1f} Gyr (fixed)'.format(age, age_l, age_h), fontsize=17)
-plt.text( (xmax-xmin)*0.07, (ymax-ymin)*0.74, r'A$\mathrm{_{V}}$'+ r'= {0:.1f} (fixed)'.format(float(info['AV_50'])) , fontsize=17)    
-plt.text( (xmax-xmin)*0.07, (ymax-ymin)*0.67, r"log Z/Z$_{\rm \odot}$" + r" = {0:.1f} (fixed)".format(mel), fontsize=17)    
-# if '{0:.1f}'.format(sfr_l) == '0.0':
-#     plt.text( (xmax-xmin)*0.07, (ymax-ymin)*0.75, r"SFR: [$\leftarrow${2:.1f}]".format(sfr, sfr_l, sfr_h) + r" M$_{\rm \odot}$/yr ", fontsize=17)
-#     print("[$\leftarrow${2:.1f}]".format(sfr, sfr_l, sfr_h) + r" M$_{\rm \odot}$/yr ")
-# else:
-#     plt.text( (xmax-xmin)*0.07, (ymax-ymin)*0.74, "SFR: [{1:.1f}$-${2:.1f}]".format(sfr, sfr_l, sfr_h) + r" M$_{\rm \odot}$/yr ", fontsize=17)
-#     print("SFR:  [{1:.1f}$-${2:.1f}]".format(sfr, sfr_l, sfr_h) + r" M$_{\rm \odot}$/yr ")
-# plt.text( (xmax-xmin)*0.07, (ymax-ymin)*0.74, "SFR: [{1:.1f}$-${2:.1f}]".format(sfr, sfr_l, sfr_h) + r" M$_{\rm \odot}$/yr ", fontsize=17)
+# plt.text( (xmax-xmin)*0.07, (ymax-ymin)*0.81, 'age = {0:.1f} Gyr (fixed)'.format(age, age_l, age_h), fontsize=17)
+# plt.text( (xmax-xmin)*0.07, (ymax-ymin)*0.74, r'A$\mathrm{_{V}}$'+ r'= {0:.1f} (fixed)'.format(float(info['AV_50'])) , fontsize=17)    
+# plt.text( (xmax-xmin)*0.07, (ymax-ymin)*0.67, r"log Z/Z$_{\rm \odot}$" + r" = {0:.1f} (fixed)".format(mel), fontsize=17)    
+plt.text( (xmax-xmin)*0.07, (ymax-ymin)*0.81, 'age = {0:.1f} Gyr'.format(values[1][1]), fontsize=17)
+plt.text( (xmax-xmin)*0.07, (ymax-ymin)*0.74, r'A$\mathrm{_{V}}$'+ r'= {0:.1f}'.format(float(info['AV_50'])) , fontsize=17)    
+plt.text( (xmax-xmin)*0.07, (ymax-ymin)*0.67, r"log Z/Z$_{\rm \odot}$" + r" = {0:.1f}".format(mel), fontsize=17)    
     
 plt.legend(prop={'size':18}, ncol=2, loc = 1)
 plt.tick_params(labelsize=20)
 plt.xlabel(r"$\lambda$ ($\mu$m)",fontsize=25)
 plt.ylabel(r"f$_\lambda$  (10$^{\rm" + " -{0}}}$".format(unit.split('e-')[1][:2])+" erg s$^{-1}$ cm$^{-2}$$\mathrm{\AA}^{-1}$)",fontsize=25)
 plt.title(target_id,fontsize=27, y=1.02) 
-plt.savefig('../figures/{0}_SED_map.pdf'.format(target_id[:5]))
+plt.savefig('../figures/{0}_SED_map.pdf'.format(target_id[:5]), bbox_inches = "tight")
 # #plt.yticks([])
-
-

@@ -116,8 +116,8 @@ for i in range(len(PSF_test_files)):
 # from galight.tools.astro_tools import plt_many_fits
 # plt_many_fits(images)
 
-from matplotlib.colors import LogNorm
 
+from matplotlib.colors import LogNorm
 fig, (axs) = plt.subplots(2, 5, figsize=(15, 6))
 for i in range(len(images)):
     _i = int(i / 5)
@@ -125,12 +125,12 @@ for i in range(len(images)):
     im_i = axs[_i][_j].imshow(images[i][0]/np.sum(images[i][1]) * 280, origin='lower',vmin = -0.2, vmax = 0.2  , cmap='bwr')
     frame_size = len(images[i][0])
     # cax = fig.add_axes([0.27, 0.8, 0.5, 0.05])
-    fig.colorbar(im_i, ax=axs[_i][_j], pad=0.01, shrink=0.8)
+    # fig.colorbar(im_i, ax=axs[_i][_j], pad=0.01, shrink=0.8)
     
     # label = labels[i]
     use_i = PSF_test_files[i].split('use')[1][0]
     fit_j = PSF_test_files[i].split('fit')[-1][0]
-    label = 'use{0}fit{1}'.format(use_i,fit_j)
+    label = 'fit star {1} using star {0}'.format(int(use_i)+1,int(fit_j)+1)
     plttext = axs[_i][_j].text(frame_size*0.05, frame_size*0.87, label,
               fontsize=15, weight='bold', color='black')
     plttext.set_bbox(dict(facecolor='white', alpha=0.5))
@@ -142,7 +142,15 @@ for i in range(len(images)):
     axs[_i][_j].axes.yaxis.set_visible(False)
     fig.tight_layout()
 
-# plt.savefig(savename,bbox_inches='tight')
+text='0.5"'
+dist=0.5/fit_run.fitting_specify_class.deltaPix
+frame_size = len(fit_run.image_ps_list[0])
+d = frame_size
+p0 = d / 15.
+axs[0][0].plot([4, 4 + dist], [4, 4], linewidth=3, color='black')
+axs[0][0].text(3 + dist / 2., 6 + 0.01 * d, text, fontsize=25, color='black', ha='center')
+
+plt.savefig('PSF_residual_each.pdf',bbox_inches='tight')
 plt.show()    
 
         

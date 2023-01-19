@@ -20,7 +20,7 @@ target_id, RA, Dec, z = info['target_id'], info['RA'], info['Dec'], info['z']
 run_folder = 'stage3_all/' #!!!
 
 # for filt in ['F356W', 'F150W'] :
-for filt in ['F356W'] :
+for filt in ['F150W'] :
     data_process = pickle.load(open(run_folder+'material/data_process_idx{0}_{1}.pkl'.format(idx, filt),'rb'))
     # print(data_process.target_stamp[40,40])
     filt = data_process.filt
@@ -30,7 +30,8 @@ for filt in ['F356W'] :
     for i in range(len(PSF_list_clean)):
         psf = PSF_list_clean[i]
         if filt == 'F150W':
-            psf = psf[40:-40, 40:-40]
+            ct = int((len(PSF_list[1]) - len(data_process.target_stamp)) /2)
+            psf = psf[ct:-ct, ct:-ct]
         data_process.PSF_list = [psf]
         pickle.dump(data_process , open(run_folder+'fit_material/'+'data_process_idx{2}_{0}_FOVpsf{1}.pkl'.format(filt, i, idx), 'wb'))
         

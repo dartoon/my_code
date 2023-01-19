@@ -29,7 +29,7 @@ from astropy.cosmology import LambdaCDM, FlatLambdaCDM
 cosmo1 = LambdaCDM(70 * (u.km/u.s/u.Mpc), 0.3, 0.7)
 arc_per_kpc = cosmo1.arcsec_per_kpc_proper(z).value
 # filters = ['F150W', 'F356W']
-filters = ['F356W']
+filters = ['F150W']
 import copy, matplotlib
 for top_psf_id in [0]:
     for count in range(len(filters)):
@@ -68,6 +68,7 @@ for top_psf_id in [0]:
         weighted_value = np.sum(np.array(all_values)*weight) / np.sum(weight)
         rms_value = np.sqrt(np.sum((np.array(all_values)-weighted_value)**2*weight) / np.sum(weight))
         print('host', prop_name, "{0:.2f}$\pm${1:.2f}".format(weighted_value, rms_value))
+        # np.percentile(all_values, 16) #To check the lower limit!!!
         
         prop_name = 'R_sersic'
         # all_values = [fit_run_list[i].final_result_ps[0][prop_name] for i in range(len(fit_run_list))]
@@ -91,6 +92,8 @@ for top_psf_id in [0]:
         weighted_value = np.sum(np.array(all_values)*weight) / np.sum(weight)
         rms_value = np.sqrt(np.sum((np.array(all_values)-weighted_value)**2*weight) / np.sum(weight))
         print('host flux ratio " ' , "{0:.1f}\%$\pm${1:.1f}\%".format(weighted_value, rms_value))
+        # np.percentile(all_values, 84) #To check the upper limit!!!
+
 
         prop_name = 'magnitude'
         all_values = [fit_run_list[i].final_result_ps[0][prop_name] for i in range(len(fit_run_list))]

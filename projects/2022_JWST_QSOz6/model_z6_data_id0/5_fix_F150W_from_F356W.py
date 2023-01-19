@@ -33,6 +33,7 @@ import copy, matplotlib
 
 mag_list = []
 chisq_list = []
+fit_run_list_fix = []
 for top_psf_id in range(5):
     for filt in ['F356W', 'F150W']:
         fit_run_list = []
@@ -43,7 +44,7 @@ for top_psf_id in range(5):
         chisqs = np.array([fit_run_list[i].reduced_Chisq for i in range(len(fit_run_list))])
         sort_Chisq = chisqs.argsort() 
         if filt == 'F356W':
-            fit_run_F356W = fit_run_list[sort_Chisq[top_psf_id]]
+            fit_run_F356W = fit_run_list[sort_Chisq[0]]
         elif filt == 'F150W':
             fit_run_F150W = fit_run_list[sort_Chisq[top_psf_id]]
 
@@ -61,6 +62,7 @@ for top_psf_id in range(5):
     fit_run.run(algorithm_list = ['PSO','PSO', 'PSO'], fitting_level=['norm','deep', 'deep'])
     fit_run.plot_final_qso_fit(target_ID =target_id)
     fit_run_F150W_fix = fit_run
+    fit_run_list_fix.append(fit_run_F150W_fix)
     mag_list.append(fit_run_F150W_fix.final_result_galaxy[0]['magnitude'])
     chisq_list.append(fit_run_F150W_fix.reduced_Chisq)
 
@@ -74,6 +76,26 @@ weight = np.zeros(len(chisqs))
 for i in range(len(chisq_list)):
     weight[i] = np.exp(-1/2. * (chisqs[i]-Chisq_best)/(Chisq_best* inf_alp))
     
-all_values = mag_list
+# all_values = mag_list
+# weighted_value = np.sum(np.array(all_values)*weight) / np.sum(weight)
+# rms_value = np.sqrt(np.sum((np.array(all_values)-weighted_value)**2*weight) / np.sum(weight))
+
+prop_name = 'magnitude'
+# all_values = [fit_run_list[i].final_result_ps[0][prop_name] for i in range(len(fit_run_list))]
+all_values = [fit_run_list_fix[i].final_result_galaxy[0][prop_name] for i in range(len(fit_run_list_fix))]
 weighted_value = np.sum(np.array(all_values)*weight) / np.sum(weight)
 rms_value = np.sqrt(np.sum((np.array(all_values)-weighted_value)**2*weight) / np.sum(weight))
+print('host', prop_name, "{0:.2f}$\pm${1:.2f}".format(weighted_value, rms_value))
+
+prop_name = 'magnitude'
+all_values = [fit_run_list_fix[i].final_result_ps[0][prop_name] for i in range(len(fit_run_list_fix))]
+weighted_value = np.sum(np.array(all_values)*weight) / np.sum(weight)
+rms_value = np.sqrt(np.sum((np.array(all_values)-weighted_value)**2*weight) / np.sum(weight))
+print('quasar', prop_name, "{0:.2f}$\pm${1:.2f}".format(weighted_value, rms_value))
+
+prop_name = 'flux_within_frame'
+all_values = [100*(fit_run_list_fix[i].final_result_galaxy[0][prop_name]/ (fit_run_list_fix[i].final_result_galaxy[0][prop_name] + fit_run_list[i].final_result_ps[0][prop_name]))
+              for i in range(len(fit_run_list_fix))]
+weighted_value = np.sum(np.array(all_values)*weight) / np.sum(weight)
+rms_value = np.sqrt(np.sum((np.array(all_values)-weighted_value)**2*weight) / np.sum(weight))
+print('host flux ratio " ' , "{0:.1f}\%$\pm${1:.1f}\%".format(weighted_value, rms_value))

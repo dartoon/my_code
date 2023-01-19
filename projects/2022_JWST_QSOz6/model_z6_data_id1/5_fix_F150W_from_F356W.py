@@ -43,7 +43,7 @@ for top_psf_id in range(5):
         chisqs = np.array([fit_run_list[i].reduced_Chisq for i in range(len(fit_run_list))])
         sort_Chisq = chisqs.argsort() 
         if filt == 'F356W':
-            fit_run_F356W = fit_run_list[sort_Chisq[top_psf_id]]
+            fit_run_F356W = fit_run_list[sort_Chisq[0]]
         elif filt == 'F150W':
             fit_run_F150W = fit_run_list[sort_Chisq[top_psf_id]]
 

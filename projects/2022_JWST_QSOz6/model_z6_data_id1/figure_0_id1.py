@@ -31,14 +31,18 @@ from galight.tools.astro_tools import plt_fits, plt_many_fits
 #%%
 data_type = 'all' 
 filt = 'F356W'
-# filt = 'F150W'
+filt = 'F150W'
 file_NO = 0
 
 idx = 1
 info = target_info[str(idx)]
 target_id, RA, Dec, z = info['target_id'], info['RA'], info['Dec'], info['z']
 # folder = '/Users/Dartoon/Downloads/z6JWSTNIRcam/NIRCam_{1}_stage3_{0}/bkg_removed'.format(data_type, target_id[:5])
-folder = '../NIRCam_data/Nov14/bkg_removed/' 
+if filt == 'F356W':
+    folder = '../NIRCam_data/Nov14/bkg_removed/' 
+if filt == 'F150W':
+    # folder = '../NIRCam_data/Jan14/bkg_removed/' 
+    folder = '../NIRCam_data/Nov14/bkg_removed/' 
 # jwst_all_filenames = glob.glob(folder+'/*{0}*{1}*.fits'.format(target_id[:5], filts[0]))
 jwst_all_filenames = glob.glob(folder+'/*{0}*.fits'.format(filt))
 jwst_all_filenames.sort()
@@ -158,7 +162,7 @@ ax.text(p0 + dist / 2.  + d / 15., p0 + 0.02 * d , text, fontsize=25, color=colo
 
 angle = 0 / 180 * np.pi
 coordinate_arrows(ax, frame_size, header=header, arrow_size=0.03)
-ax.set_ylim(0,800)
+# ax.set_ylim(0,800)
 if filt == 'F150W':
     circle1 = plt.Circle((38, 95),32, color='white', fill=False, linewidth=2)
     circle2 = plt.Circle((400., 400),20, color='white', fill=False, linewidth=1, alpha = 1)

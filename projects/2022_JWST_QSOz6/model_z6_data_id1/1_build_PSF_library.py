@@ -22,12 +22,13 @@ sys.path.insert(0,'../model_z6_data_id0/')
 filters =  ['F150','F356']
 
 data_type = 'all'
-filt = filters[1] #!!!
+filt = filters[0] #!!!
 
 file_NO = 0  #!!!
 
 # folder = '/Users/Dartoon/Downloads/z6JWSTNIRcam/NIRCam_J2236_stage3_{0}/bkg_removed'.format(data_type)
-folder = '../NIRCam_data/Nov14/bkg_removed/' 
+# folder = '../NIRCam_data/Nov14/bkg_removed/' 
+folder = '../NIRCam_data/Jan14/bkg_removed/' 
 idx = 1
 from target_info import target_info
 info = target_info[str(idx)]
@@ -86,7 +87,7 @@ if re_select == True:
         if '356' in filt:
             radius = 70
         elif '150' in filt:
-            radius = 50
+            radius = 70
         
         #PSF works.
         data_process.find_PSF(radius = radius, user_option = True, if_filter=False, nearyby_obj_filter=False, FWHM_sort=True)
@@ -133,7 +134,7 @@ if clean_up == True:
     # f = open("target_info.txt","r")
     # string = f.read()
     # lines = string.split('\n')   # Split in to \n
-    pixscale = 0.031
+    pixscale = data_process.deltaPix
     # lines = np.loadtxt('target_info.txt', dtype='str')
     pos_targets = target_pos
     idx_is_QSO = []
@@ -159,6 +160,8 @@ if clean_up == True:
     final_PSF_RA_DEC_is_QSO = [PSF_RA_DEC_list[i] for i in range(len(PSF_RA_DEC_list)) if i in idx_is_QSO]
     final_PSF_from_file_list = [PSF_from_list[i] for i in range(len(PSF_from_list)) if i not in final_rm_list]
     # plt_many_fits(final_PSF_list_clean)
+# pickle.dump([final_PSF_list, final_PSF_list_clean, final_PSF_RA_DEC_list, final_PSF_from_file_list],
+            # open(run_folder+'material/'+filt+'_PSF_Library_idx{0}.pkl'.format(idx), 'wb'))
 pickle.dump([final_PSF_list, final_PSF_list_clean, final_PSF_RA_DEC_list, final_PSF_from_file_list],
             open(run_folder+'material/'+filt+'_PSF_Library_idx{0}.pkl'.format(idx), 'wb'))
 #%%

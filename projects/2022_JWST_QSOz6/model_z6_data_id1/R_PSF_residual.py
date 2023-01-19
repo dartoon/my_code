@@ -51,7 +51,7 @@ from galight.data_process import DataProcess
 from galight.fitting_specify import FittingSpecify
 from galight.fitting_process import FittingProcess
 
-run_test = False
+run_test = True
 
 if run_test == True:
     for i in range(5):
@@ -87,7 +87,7 @@ if run_test == True:
             if filt == 'F356W':
                 radius = 40
             elif filt == 'F150W':
-                radius = 20
+                radius = 40
             
             data_process.generate_target_materials(radius=radius, create_mask = False,
                                                     cut_kernel = None, if_select_obj=False,
@@ -149,8 +149,14 @@ for i in range(len(images)):
     axs[_i][_j].axes.yaxis.set_visible(False)
     fig.tight_layout()
 
-# plt.savefig(savename,bbox_inches='tight')
-plt.show()    
+text='0.5"'
+dist=0.5/fit_run.fitting_specify_class.deltaPix
+frame_size = len(fit_run.image_ps_list[0])
+d = frame_size
+p0 = d / 15.
+axs[0][0].plot([4, 4 + dist], [4, 4], linewidth=3, color='black')
+axs[0][0].text(3 + dist / 2., 6 + 0.01 * d, text, fontsize=25, color='black', ha='center')
 
-        
+# plt.savefig('PSF_residual_each.pdf',bbox_inches='tight')
+plt.show()    
     
