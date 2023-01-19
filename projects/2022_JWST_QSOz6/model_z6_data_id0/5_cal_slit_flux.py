@@ -37,7 +37,6 @@ for top_psf_id in [0]:
         fit_run_list = []
         # idx = idx_info
         filt = filters[count]
-
         if filt == 'F150W':
             cmap = 'inferno'
         else:
@@ -110,8 +109,10 @@ plt.imshow(image, origin='lower', cmap=my_cmap, norm=LogNorm(
     vmin=vmin, vmax=vmax))  # , vmin=vmin, vmax=vmax)
 image_host = fit_run.flux_2d_out['data-point source']
 image_host_sersic = fit_run.image_host_list[0]
+image_ps = fit_run.image_ps_list[0]
 fluxes = []
 fluxes_sersic = []
+fluxes_ps = []
 for i in range(splt):
     l = h/2
     xdis = np.abs(l * np.cos((theta.value)/180*np.pi))
@@ -128,15 +129,20 @@ for i in range(splt):
                   ['aperture_sum'].value[0])
     fluxes_sersic.append(aperture_photometry(
         image_host_sersic, aper)['aperture_sum'].value[0])
+    fluxes_ps.append(aperture_photometry(
+        image_ps, aper)['aperture_sum'].value[0])
 plt.show()
 fluxes = np.array(fluxes)
 fluxes_sersic = np.array(fluxes_sersic)
+fluxes_ps = np.array(fluxes_ps)
 x_data = np.linspace(0, len(fluxes)-1, len(fluxes)) * \
     (h/splt)*deltaPix  # Pixel grid in x, arcsec
-plt.plot(x_data, fluxes)
-plt.plot(x_data, fluxes_sersic)
+plt.plot(x_data, fluxes/fluxes.max(),label='data-ps (host) profile')
+plt.plot(x_data, fluxes_sersic/fluxes_sersic.max(), label='host sersic profile')
+plt.plot(x_data, fluxes_ps/fluxes_ps.max(), label='Point source profile')
 plt.xlabel('arcsec',  fontsize=16)
 plt.ylabel('flux',  fontsize=16)
+plt.legend(fontsize=10)
 plt.show()
 
 
@@ -148,5 +154,8 @@ parameters, covariance = curve_fit(func, x_data, fluxes)
 sigma = parameters[-1]
 print(sigma)
 parameters, covariance = curve_fit(func, x_data, fluxes_sersic)
+sigma = parameters[-1]
+print(sigma)
+parameters, covariance = curve_fit(func, x_data, fluxes_ps)
 sigma = parameters[-1]
 print(sigma)
