@@ -149,7 +149,7 @@ for top_psf_id in [0]:
         weighted_value = np.sum(np.array(all_values)*weight) / np.sum(weight)
         rms_value = np.sqrt(np.sum((np.array(all_values)-weighted_value)**2*weight) / np.sum(weight))
         # print('Position Offset:', round(dis[0],3), 'pixel, ', round(dis[0],2), 'kpc')
-        print('positional offset (")', "{0:.2f}$\pm${1:.2f}".format(weighted_value, rms_value))
+        print('positional offset (")', "{0:.2f}$\pm${1:.4f}".format(weighted_value, rms_value))
 
         dis = []
         for i in range(len(fit_run_list)):
@@ -161,7 +161,7 @@ for top_psf_id in [0]:
         weighted_value = np.sum(np.array(all_values)*weight) / np.sum(weight)
         rms_value = np.sqrt(np.sum((np.array(all_values)-weighted_value)**2*weight) / np.sum(weight))
         # print('Position Offset:', round(dis[0],3), 'pixel, ', round(dis[0],2), 'kpc')
-        print('Position offset', "{0:.2f}$\pm${1:.2f}".format(weighted_value, rms_value))
+        print('Position offset', "{0:.2f}$\pm${1:.4f}".format(weighted_value, rms_value))
 
 data_process = fit_run.fitting_specify_class.data_process_class
 print(-2.5*np.log10(data_process.tbl['kron_flux'][data_process.tbl['label']==0]) + data_process.zp)

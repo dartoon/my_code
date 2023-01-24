@@ -38,6 +38,7 @@ idx = 2
 folder = 'esti_smass/'+folder+str(idx)
 # folder = folder + '_freeParam' #!!!
 folder = folder + '_freeParam_withEmissionLine' #!!!
+# folder = folder + '_freeParam_withEmissionLine_high-dust' #!!!
 
 
 steller_file = glob.glob(folder+'/gsf_spec_*.fits')[0]

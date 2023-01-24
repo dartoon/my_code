@@ -20,7 +20,7 @@ import matplotlib.pyplot as plt
 import glob
 import pickle
 
-idx = 0
+idx = 1
 info = target_info[str(idx)]
 target_id, RA, Dec, z = info['target_id'], info['RA'], info['Dec'], info['z']
 
@@ -74,7 +74,7 @@ theta_dict = {0: 137.475, 1: 139.818}
 theta = Angle(theta_dict[idx], 'deg')
 
 image_host = fit_run.flux_2d_out['data-point source']
-image_host = fit_run.image_host_list[0]
+# image_host = fit_run.image_host_list[0]
 image_ps = fit_run.image_ps_list[0]
 image_total = fit_run.flux_2d_out['data']
 fit_run.cal_astrometry()
@@ -96,6 +96,7 @@ plt.imshow(image, origin='lower', cmap=my_cmap, norm=LogNorm(
     vmin=vmin, vmax=vmax))  # , vmin=vmin, vmax=vmax)
 aper.plot(color='blue',
           lw=3.5)
+plt.show()
 
 phot_table_host = aperture_photometry(image_host, aper)
 phot_table_ps = aperture_photometry(image_ps, aper)
@@ -104,7 +105,7 @@ print('slit flux of host:', round(phot_table_host['aperture_sum'].value[0], 3),
       '\nslit flux of qso:', round(phot_table_ps['aperture_sum'].value[0], 3),
       '\nslit flux of total,', round(phot_table_total['aperture_sum'].value[0], 3))
 # %%
-splt = 8
+splt = 12
 plt.imshow(image, origin='lower', cmap=my_cmap, norm=LogNorm(
     vmin=vmin, vmax=vmax))  # , vmin=vmin, vmax=vmax)
 image_host = fit_run.flux_2d_out['data-point source']
@@ -122,7 +123,7 @@ for i in range(splt):
     x_ci = x_c - xdis + xdis/(splt/2)*i
     y_ci = y_c - ydis + ydis/(splt/2)*i
     aper = RectangularAperture((x_ci, y_ci), w, h/splt, theta=theta)
-    if i > 0:
+    if i >0: #%2 == 1:
         aper.plot(color='blue',
                   lw=1.5, label='comp {0}'.format(i))
     fluxes.append(aperture_photometry(image_host, aper)
@@ -149,7 +150,6 @@ plt.show()
 def func(x, a, x0, sigma):
     return a*np.exp(-(x-x0)**2/(2*sigma**2))
 
-
 parameters, covariance = curve_fit(func, x_data, fluxes)
 sigma = parameters[-1]
 print(sigma)
@@ -159,3 +159,5 @@ print(sigma)
 parameters, covariance = curve_fit(func, x_data, fluxes_ps)
 sigma = parameters[-1]
 print(sigma)
+
+read = fluxes

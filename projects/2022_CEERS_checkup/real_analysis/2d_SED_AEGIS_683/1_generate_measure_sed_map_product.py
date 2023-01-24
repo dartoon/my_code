@@ -139,8 +139,8 @@ for i in [-1, -3, 1]:  #['F356W', 'F200W', 'F115W', 'F150W', 'F277W', 'F410M', '
 
     
 from galight.tools.astro_tools import plt_fits_color
-import pickle
-pickle.dump(image_list, open('color_image_quasar'+'.pkl', 'wb'))  
+# import pickle
+# pickle.dump(image_list, open('color_image_quasar'+'.pkl', 'wb'))  
 images = [images[i] * 10 ** (-0.4*(zp_list[i]-zp_list[0])) for i in range(len(images)) ]
 for i in range(len(images)):
     plt_fits(images[i], vmin=0.001, vmax=2.5)

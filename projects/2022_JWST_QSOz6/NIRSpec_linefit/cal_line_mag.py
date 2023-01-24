@@ -35,16 +35,17 @@ def cal_filt_flam(array_spec, fil):
 #%%
 sample = pd.read_csv('HSCJ2255p0251_lines_edit.csv')
 fitidx = 0
-keys = [ 'line_Hb_na',
-        'line_O3_4959_c', 'line_O3_5008_c', 'line_O3_4959_w', 'line_O3_5008_w',]
-keys = [ 'line_Hb_na', 'line_O3_4959_c', 
-        'line_O3_4959_w', 'line_O3_5008_c', 'line_O3_5008_w']
+keys = [ 'line_Hb_na', 'line_O3_4959_c', 'line_O3_5008_c', 'line_O3_4959_w', 'line_O3_5008_w',]
 
-# sample = pd.read_csv('HSCJ2236p0032_lines_edit.csv')
-# fitidx = 1
+sample = pd.read_csv('HSCJ2236p0032_lines_edit.csv')
+fitidx = 1
+keys = ['line_O3_4959_na', 'line_O3_5008_na', 'line_O3_4959_w',
+        'line_O3_5008_w']
+
+
 # keys = ['line_Hb_br','line_O3_4959_na', 'line_O3_5008_na', 'line_O3_4959_w',
-#         'line_O3_5008_w']
-# keys = ['flux']
+        # 'line_O3_5008_w']
+keys = ['flux']
 flux = sample[keys[0]]
 
 for key in keys[1:]:
@@ -91,4 +92,8 @@ fit_run = pickle.load(open(fit_file,'rb'))
 zp = fit_run.zp
 
 NIRCam_flux = 10**(-0.4*(mag-zp))
-print(NIRCam_flux)
+print(NIRCam_flux) #This value is before correction.
+
+#!!! For example, J2255 should be 6/248*155.  248 is the total in NIRSpec, 155 is total in NIRCam
+#!!! For example, J2236 should be 1.97/309*234. 248 is the total in NIRSpec, 155 is total in NIRCam
+

@@ -14,7 +14,8 @@ import glob, pickle
 
 run_folder = 'stage3_all/' #!!!
 idx = 0
-filt = 'F356W'
+filt = 'F150W'
+# filt = 'F356W'
 
 
 #Load PSF information:
@@ -39,7 +40,6 @@ print(all_values[sort_Chisq[:5]])
 folder = '../NIRCam_data/Nov14/bkg_removed'
 from target_info import target_info
 info = target_info[str(idx)]
-
 file = glob.glob(folder+'/*{1}*{0}*.fits'.format(filt, info['target_id'][:5]))[0]
 
 #%%
@@ -111,8 +111,11 @@ PSF_test_files.sort()
 images = []
 for i in range(len(PSF_test_files)):
     fit_run = pickle.load(open(PSF_test_files[i],'rb'))
-    images.append([fit_run.flux_2d_out['data-point source'],fit_run.flux_2d_out['data']])
-    
+    try:    
+        images.append([fit_run.flux_2d_out['data-point source'],fit_run.flux_2d_out['data']])
+    except:
+        images.append([fit_run.flux_2d_out['data-Point Source'],fit_run.flux_2d_out['data']])
+        
 # from galight.tools.astro_tools import plt_many_fits
 # plt_many_fits(images)
 
@@ -150,7 +153,72 @@ p0 = d / 15.
 axs[0][0].plot([4, 4 + dist], [4, 4], linewidth=3, color='black')
 axs[0][0].text(3 + dist / 2., 6 + 0.01 * d, text, fontsize=25, color='black', ha='center')
 
-plt.savefig('PSF_residual_each.pdf',bbox_inches='tight')
+# plt.savefig('PSF_residual_each.pdf',bbox_inches='tight')
 plt.show()    
+
+#%%Check the PSF wing standard to host.
+import copy
+PSFs_res = []
+for i in range(len(images)):
+    PSFs_res.append(images[i][0]/np.sum(images[i][1]))
+    PSFs_res.append(-images[i][0]/np.sum(images[i][1]))
+PSFs_res = np.array(PSFs_res)
+PSF_std = np.std(PSFs_res, axis = 0)
+fit_run = fit_run_list[sort_Chisq[0]]
+try:
+    host_res = copy.deepcopy(fit_run.flux_2d_out['data-Point Source'])
+except:
+    host_res = copy.deepcopy(fit_run.flux_2d_out['data-point source'])
+size = np.min( [len(host_res), len(PSF_std)] )
+
+qso_data = copy.deepcopy(fit_run.flux_2d_out['data'])
+if len(host_res) == len(PSF_std):
+    1
+elif size == len(host_res):
+    ct = int((len(PSF_std) - len(host_res))/2)
+    PSF_std = PSF_std[ct:-ct , ct:-ct]
+elif size == len(PSF_std):
+    ct = int((len(host_res) - len(PSF_std))/2)
+    host_res = host_res[ct:-ct , ct:-ct]
+    qso_data = qso_data[ct:-ct , ct:-ct]
+showimg = (host_res )  / (PSF_std * np.sum(qso_data) )
+
+std = fit_run.fitting_specify_class.data_process_class.noise_map.min()
+if filt == 'F356W':
+    vmax = 4
+    vmin=-4
+    fact = 0.4
+    showimg[host_res<1.5*std] = 0 
+else:
+    vmax = 10
+    vmin=-8
+    fact = 0.35
+    showimg[host_res<1.5*std] = 0 
+    
+from photutils import EllipticalAperture
+aprs = [EllipticalAperture([len(PSF_std)/2,len(PSF_std)/2 ], len(PSF_std)*fact, len(PSF_std)*fact, theta=0)]
+from galight.tools.measure_tools import mask_obj
+mask = np.sum(mask_obj(host_res, aprs),axis=0)
+showimg[mask ==1] =np.nan
+
+fig, ax = plt.subplots(figsize=(5,7))
+plt.imshow(showimg,vmax=vmax, vmin=vmin, origin='lower')
+
+frame_size = len(PSF_std)
+d = frame_size
+p0 = d / 15.
+plt.plot([4, 4 + dist], [4, 4], linewidth=3, color='black')
+plt.text(3 + dist / 2., 6 + 0.01 * d, text, fontsize=25, color='black', ha='center')
+
+plt.xticks([])
+plt.yticks([])
+cbar = plt.colorbar(orientation="horizontal", pad=0.01)
+cbar.ax.set_xlim(0,vmax)
+cbar.ax.tick_params(labelsize=15) 
+cbar.set_label(label='Signal (data$-$PSF) to PSF std ratio',fontsize=20)
+plt.title(info['target_id']+'\t'+filt,fontsize=25,y=0.9 )
+# plt.savefig('../model_z6_data_id0/figures/host_toPSFstd_ratio_idx{0}_{1}.pdf'.format(idx, filt))
+plt.show()
+    
 
         

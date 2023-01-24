@@ -50,20 +50,22 @@ sort_Chisq = chisqs.argsort()
 fit_run_ = fit_run_list[sort_Chisq[0]]  # use top PSF result to run the simulation.
 
 #%% Read Best fitting result:
-prop= ['magnitude', 'R_sersic', 'n_sersic', 'offset'][0]  #Offset is in unit of arcsec.
+prop= ['magnitude'][0]  #Offset is in unit of arcsec.
 if prop != 'offset':
     true_value = fit_run_.final_result_galaxy[0][prop]
+    true_value = -2.5*np.log10(15)+fit_run_.zp  #15 is the flux I assumed.
+    
 else:
     fit_run_.cal_astrometry()
     true_value = np.sqrt(np.sum(np.array(fit_run_.final_result_galaxy[0]['position_xy']) - 
                    np.array(fit_run_.final_result_ps[0]['position_xy'] ))**2) * fit_run_.fitting_specify_class.deltaPix
-all_sim = glob.glob('sim_result/sim_idx{0}_{1}_seed*CombPSF.pkl'.format(idx, filt))#+\
+all_sim = glob.glob('sim_result_less_exp/sim_idx{0}_{1}_seed*CombPSF.pkl'.format(idx, filt))#+\
 all_sim.sort()
 seedmax =  len(all_sim)
 obtain_value = [] 
 for seed in range(seedmax):
-    fit_files = glob.glob('sim_result/sim_idx{1}_{2}_seed{0}B*.pkl'.format(seed,idx,filt))#+\
-    # fit_files = glob.glob('sim_result/sim_idx{1}_{2}_seed{0}Based*BasedP*.pkl'.format(seed,idx,filt))#+\
+    fit_files = glob.glob('sim_result_less_exp/sim_idx{1}_{2}_seed{0}B*.pkl'.format(seed,idx,filt))#+\
+    # fit_files = glob.glob('sim_result_less_exp/sim_idx{1}_{2}_seed{0}Based*BasedP*.pkl'.format(seed,idx,filt))#+\
     fit_files.sort()
     fit_run_list = []
     for i in range(len(fit_files)):
@@ -73,20 +75,22 @@ for seed in range(seedmax):
     best_sim_run = fit_run_list[sort_Chisq[0]]
     if prop != 'offset':    
         value = best_sim_run.final_result_galaxy[0][prop]
+        if value - true_value < -0.6:
+            print(seed, fit_files[0])
+            fit_run_check=best_sim_run
+            best_sim_run = fit_run_list[sort_Chisq[1]]
+        value = best_sim_run.final_result_galaxy[0][prop]
     else:
         best_sim_run.cal_astrometry()
         value = np.sqrt(np.sum(np.array(best_sim_run.final_result_galaxy[0]['position_xy']) - 
                        np.array(best_sim_run.final_result_ps[0]['position_xy'] ))**2) * best_sim_run.fitting_specify_class.deltaPix
     obtain_value.append( value )
-    if value - true_value > 0.4:
-        print(seed, fit_files[0])
-        fit_run_check=best_sim_run
         
 obtain_value = np.array(obtain_value)
 plt.figure(figsize=(11, 7))
 plt.hist(np.array(obtain_value[obtain_value<26.5]))
 plt.axvline(x=true_value, ls='--', linewidth=1.6, c='red', zorder = 1, label='true value')
-plt.ylim([0,40])
+plt.ylim([0,60])
 plt.xlabel(prop+' bias (obtained $-$ true)', fontsize=27)
 plt.tick_params(labelsize=20)
 plt.title('Simulation Result using {0} realizations'.format(seedmax), fontsize = 29)
