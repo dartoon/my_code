@@ -299,11 +299,21 @@ plt.scatter(Mstar,MBs,c='lightsalmon',s=420,marker=".",zorder=100, edgecolors='k
 
 #%%    
 MBs_ALMA = np.array([2.1E+09, 1.5E+09, 9.5E+08, 4.9E+08, 1.8E+09, 3.1E+09, 1.9E+09, 9.4E+08, 6.3E+09, 7.2E+09, 8.0E+07, 1.2E+08, 2.4E+08, 2.5E+08, 3.4E+07, 6.3E+08, 7.0E+08, 7.1E+08, 1.1E+09, 3.3E+08, 9.6E+08, 7.6E+08, 7.0E+08, 7.7E+08, 1.8E+09, 1.5E+09, 1.3E+09, 3.7E+09, 1.4E+09, 2.2E+09, 1.2E+09, 2.0E+09, 8.5E+09, 1.6E+09, 1.0E+09, 1.2E+09, 1.3E+09, 1.1E+09, 2.9E+07, 1.6E+08, 3.8E+07, 1.1E+08, 2.4E+09, 7.8E+08])
-MBs_ALMA = MBs_ALMA 
 Mstar_ALMA = np.array([7.2E+10, 1.4E+11, 4.1E+10, 2.3E+11, 1.3E+11, 8.8E+10, 5.6E+10, 1.1E+11, 6.5E+10, 9.6E+10, 1.3E+10, 4.4E+10, 4.2E+10, 1.2E+11, 5.6E+10, 1.4E+10, 8.2E+10, 1.3E+10, 2.9E+11, 7.6E+10, 5.3E+11, 7.2E+10, 1.1E+11, 1.9E+11, 1.4E+11, 1.3E+11, 3.1E+11, 6.3E+10, 6.1E+10, 2.1E+11, 9.0E+10, 1.7E+12, 3.4E+10, 1.4E+11, 1.3E+11, 3.5E+11, 5.8E+10, 4.3E+10, 4.4E+10, 1.3E+10, 4.4E+10, 2.0E+10, 4.3E+10, 3.2E+10])
+zs_ALMA = np.array([6.90, 6.79, 6.61, 6.52, 6.13, 6.59, 6.08, 6.08, 6.02, 6.00, 6.43, 6.15, 6.01, 6.42, 6.39, 6.36, 6.10, 6.12, 6.25, 7.07, 6.23, 6.04, 6.66, 6.44, 6.44, 6.38, 6.34, 6.31, 6.15, 6.14, 6.12, 6.12, 6.12, 6.11, 6.10, 6.04, 6.00, 5.99, 6.15, 5.78, 5.93, 6.08, 7.09, 7.54])
+M1450_ALMA = np.array([-25.70, -25.50, -26.00, -25.62, -27.12, -27.14, -26.91, -25.55, -26.81, -27.61, -24.30, -24.72, -24.50, -25.19, -24.09, -25.31, -23.82, -24.73, -24.69, -24.13, -26.35, -26.09, -26.00, -26.11, -27.03, -26.80, -26.71, -27.81, -26.79, -27.25, -26.62, -27.14, -26.21, -26.93, -26.41, -26.63, -26.64, -26.53, -22.54, -24.39, -22.83, -24.00, -26.60, -26.76])
 
-plt.scatter(np.log10(Mstar_ALMA),np.log10(MBs_ALMA) - 0.24,c='red',s=420,marker=".",zorder=100, edgecolors='k', alpha = 0.8)
-
+MB_is_upperlim = np.array([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0])
+Mstell_upplim =np.array([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2])
+plt.scatter(np.log10(Mstar_ALMA),np.log10(MBs_ALMA) - 0.24,c='darkorange',s=220,marker="v",zorder=100, edgecolors='k', alpha = 0.8)
+for i in  range(len(Mstell_upplim)):
+    if Mstell_upplim[i] == 1:    
+        plt.arrow(np.log10(Mstar_ALMA[i]),np.log10(MBs_ALMA[i]) - 0.24, 
+                  0,0.4, width=0.01, color='darkorange')
+    if Mstell_upplim[i] == 2:    
+        plt.arrow(np.log10(Mstar_ALMA[i]),np.log10(MBs_ALMA[i]) - 0.24, 
+                  -0.4,0, width=0.01, color='darkorange')
+        
 #%%
 
 #==============================================================================
@@ -315,18 +325,20 @@ plt.xlabel(r"log(M$_*$/M$_{\odot})$",fontsize=35)
 plt.ylabel(r'log(M$_{\rm BH}$/M$_{\odot}$)',fontsize=35)
 plt.xlim(9,12.5)
 plt.ylim(6.0,10.3)
-plt.grid(linestyle='--')
+# plt.grid(linestyle='--')
 plt.tick_params(labelsize=25)
 
 Bkc=mlines.Line2D([], [], color='gray', ls='', marker='.', markersize=15)
 Hkc=mlines.Line2D([], [], color='black', ls='', marker='.', markersize=15)
 SS13 = mlines.Line2D([], [], color='darkseagreen', ls='', marker='^', markersize=13)
 ding_sample = mlines.Line2D([], [], color='lightsalmon', ls='', marker='.', markersize=20,markeredgecolor='k')
-plt.legend([Bkc,Hkc,SS13,ding_sample],[
-'Local by Bennert+11',\
+alma_sample = mlines.Line2D([], [], color='darkorange', ls='', marker='v', markersize=15,markeredgecolor='k')
+plt.legend([Bkc,Hkc,SS13,ding_sample,alma_sample],[
+'Local by Bennert+11',
 "Local by H&R",
 "intermediate redshift AGNs",
-"$1.2<z<1.7$ AGNs by D20"\
-],scatterpoints=1,numpoints=1,loc=3,prop={'size':20,'family': 'Arial'},ncol=2)
-# plt.savefig("MBH-Mstar.pdf")
+"$1.2<z<1.7$ AGNs by D20",
+"$z>6$ ALMA sample (dyn. mass)"\
+],scatterpoints=1,numpoints=1,loc=3,prop={'size':17,'family': 'Arial'},ncol=2)
+# plt.savefig("MbhMs_demo.pdf")
 plt.show()
