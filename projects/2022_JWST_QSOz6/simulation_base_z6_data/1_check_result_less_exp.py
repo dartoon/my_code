@@ -63,7 +63,7 @@ all_sim = glob.glob('sim_result_less_exp/sim_idx{0}_{1}_seed*CombPSF.pkl'.format
 all_sim.sort()
 seedmax =  len(all_sim)
 obtain_value = [] 
-for seed in range(seedmax):
+for seed in range(100):
     fit_files = glob.glob('sim_result_less_exp/sim_idx{1}_{2}_seed{0}B*.pkl'.format(seed,idx,filt))#+\
     # fit_files = glob.glob('sim_result_less_exp/sim_idx{1}_{2}_seed{0}Based*BasedP*.pkl'.format(seed,idx,filt))#+\
     fit_files.sort()
@@ -96,3 +96,27 @@ plt.tick_params(labelsize=20)
 plt.title('Simulation Result using {0} realizations'.format(seedmax), fontsize = 29)
 plt.show()
 print('{0:.2f}$\pm${1:.2f}'.format(np.mean(np.array(obtain_value)-true_value), np.std(np.array(obtain_value)-true_value)) )
+
+
+#%%
+replot = True
+if replot == True:
+    for seed in [32,100]:
+        # fit_files = glob.glob('sim_result_less_exp/sim_idx{1}_{2}_seed{0}B*.pkl'.format(seed,idx,filt))#+\
+        fit_files = glob.glob('sim_result_less_exp/sim_idx{1}_{2}_seed{0}Based*BasedP*.pkl'.format(seed,idx,filt))#+\
+        fit_files.sort()
+        fit_run_list = []
+        for i in range(len(fit_files)):
+            fit_run_list.append(pickle.load(open(fit_files[i],'rb')))
+        chisqs = np.array([fit_run_list[i].reduced_Chisq for i in range(len(fit_run_list))])
+        sort_Chisq = chisqs.argsort() 
+        best_sim_run = fit_run_list[sort_Chisq[0]]
+        best_sim_run.savename = 'seed'+str(seed)
+        if seed == 32:
+            best_sim_run.plot_final_qso_fit(target_ID='host ratio 5 p',save_plot = True)
+        elif seed == 100:
+            best_sim_run.plot_final_qso_fit(target_ID='host ratio 20 p',save_plot = True)
+        
+        
+        
+        

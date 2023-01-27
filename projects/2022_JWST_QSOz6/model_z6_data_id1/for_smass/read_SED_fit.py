@@ -14,7 +14,6 @@ import glob
 import sys
 sys.path.insert(0,'../../model_z6_data_id0/')
 
-
 # folder = '20221103' #metallicity considered with nebular lines
 # folder = '20221104' #No lines; mel -1
 # folder = '20221105' #No lines; mel -2.5
@@ -37,8 +36,8 @@ idx = 2
 
 folder = 'esti_smass/'+folder+str(idx)
 # folder = folder + '_freeParam' #!!!
-folder = folder + '_freeParam_withEmissionLine' #!!!
-# folder = folder + '_freeParam_withEmissionLine_high-dust' #!!!
+# folder = folder + '_freeParam_withEmissionLine' #!!!
+folder = folder + '_freeParam_withEmissionLine_high-dust' #!!!
 
 
 steller_file = glob.glob(folder+'/gsf_spec_*.fits')[0]

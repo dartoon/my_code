@@ -91,7 +91,7 @@ Based_PSF_list= [PSF_list_clean[i] for i in sort_PSF_Chisq]
 import lenstronomy.Util.param_util as param_util
 zp = fit_run_.zp
 # for seed in range(30,100):
-for seed in range(100):
+for seed in range(100,101):
     sim_psf = np.random.randint(5)
     for fit_psf in range(4):
         psf = Based_PSF_list[sim_psf] #!!! Use PSF 
@@ -113,7 +113,8 @@ for seed in range(100):
         kwargs_sersic = fit_run_.kwargs_result['kwargs_lens_light'][0]
         q = np.random.uniform(0.5,0.9)
         phi = np.random.uniform(0.,2*np.pi)   
-        host_flux = 15
+        # host_flux = 15
+        host_flux = 60  #!!!
         e1, e2 = param_util.phi_q2_ellipticity(phi=phi, q=q)
         kwargs_sersic['e1'] = e1
         kwargs_sersic['e2'] = e2

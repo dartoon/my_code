@@ -303,6 +303,47 @@ Mstar_err = np.array([[-0.15,  0.19], [-0.15,  0.19], [-0.14,  0.16], [-0.14,  0
 plt.scatter(Mstar,MBs,c='lightseagreen',s=420,marker=".",zorder=100, edgecolors='k', alpha = 0.9)
 # plt.errorbar(Mstar,MBs, xerr=[np.abs(Mstar_err)[:,0], np.abs(Mstar_err)[:,1]], yerr=0.4, color='blue',ecolor='orange', fmt='.',zorder=-500,markersize=1, alpha = 0.4)
 
+#%%
+#Plot HSC data on top of Ding 2020
+line_means = ['id', 'z', 'ra', 'dec', 'fix_sersic_n', 'sersic_n_fitted', 'sersic_re_fitted', 'sersic_n_corrected',
+         'sersic_re_corrected', 'host_mag_g', 'host_mag_r', 'host_mag_i', 'host_mag_z', 'host_mag_y',
+         'ps_mag_g', 'ps_mag_r', 'ps_mag_i', 'ps_mag_z', 'ps_mag_y', 'decomposition_chisq', 'stellar_mass', 
+         'sed_chisq', 'logMBH', 'logMBH_err']
+infers  = np.loadtxt('../../../Plot_MM_relation/sdss_quasar_decomposition_v1.txt', dtype=str)
+IDs_ = infers[:, 0]
+HSC_z_ = infers[:,1].astype(np.float)
+HSC_Mstar_ = infers[:,20].astype(np.float)
+HSC_MBHs_ = infers[:,22].astype(np.float)
+HSC_MBHs_err_ = infers[:,23].astype(np.float)
+flags_  = np.loadtxt('../../../Plot_MM_relation/sdss_quasar_decomposition_v1_catalog_flag.txt', dtype=str)
+flags = flags_[:,0]
+IDs, HSC_z, HSC_Mstar, HSC_MBHs, HSC_MBHs_err =[], [], [], [], []
+for i in range(len(IDs_)):
+    idx = np.where(IDs_[i] == flags)[0][0]
+    if flags_[idx][1] == 'y':
+        IDs.append(IDs_[i])
+        HSC_z.append(HSC_z_[i])
+        HSC_Mstar.append(HSC_Mstar_[i])
+        HSC_MBHs.append(HSC_MBHs_[i])
+        HSC_MBHs_err.append(HSC_MBHs_err_[i])
+HSC_z = np.array(HSC_z)
+HSC_Mstar = np.array(HSC_Mstar)
+HSC_MBHs = np.array(HSC_MBHs)
+HSC_MBHs_err = np.array(HSC_MBHs_err)
+yerr_highz = ((m_ml*np.ones_like(HSC_Mstar)*0.2)**2+0.4**2)**0.5
+# plt.errorbar(np.log10(1+HSC_z),HSC_MBHs-(m_ml*HSC_Mstar+b_ml),
+#              yerr= yerr_highz,fmt='^',color='gray',markersize=4, )
+
+HSC_x=np.log10(1+HSC_z)
+HSC_y=HSC_MBHs-(m_ml*HSC_Mstar+b_ml)
+HSC_x = HSC_x[HSC_y>-100]
+HSC_y = HSC_y[HSC_y>-100]
+# plt.scatter(HSC_Mstar,HSC_MBHs,c='blue',
+#             s=220, marker=".",zorder=-1, edgecolors='k', alpha = 0.4)
+import seaborn as sns
+# sns.kdeplot(data=geyser, hue="kind", fill=True)
+sns.kdeplot(HSC_Mstar, HSC_MBHs, linewidths = 2, color = 'lightcyan', 
+            fill=True, levels=5, alpha=0.3, zorder = -10)
 
 #%%    
 # MBs_ALMA = np.array([2.1E+09, 1.5E+09, 9.5E+08, 4.9E+08, 1.8E+09, 3.1E+09, 1.9E+09, 9.4E+08, 6.3E+09, 7.2E+09, 8.0E+07, 1.2E+08, 2.4E+08, 2.5E+08, 3.4E+07, 6.3E+08, 7.0E+08, 7.1E+08, 1.1E+09, 3.3E+08, 9.6E+08, 7.6E+08, 7.0E+08, 7.7E+08, 1.8E+09, 1.5E+09, 1.3E+09, 3.7E+09, 1.4E+09, 2.2E+09, 1.2E+09, 2.0E+09, 8.5E+09, 1.6E+09, 1.0E+09, 1.2E+09, 1.3E+09, 1.1E+09, 2.9E+07, 1.6E+08, 3.8E+07, 1.1E+08, 2.4E+09, 7.8E+08])
@@ -346,7 +387,7 @@ plt.title(r"M$_{\rm BH}-$M$_*$ relation",fontsize=35)
 plt.xlabel(r"log(M$_*$/M$_{\odot})$",fontsize=35)
 plt.ylabel(r'log(M$_{\rm BH}$/M$_{\odot}$)',fontsize=35)
 plt.xlim(9.0,12.5)
-plt.ylim(5.4,10.3)
+plt.ylim(5.1,10.)
 plt.grid(linestyle='--')
 plt.tick_params(labelsize=25)
 
@@ -359,18 +400,20 @@ ding_sample = mlines.Line2D([], [], color='lightseagreen', ls='', marker='.', ma
 alma_sample = mlines.Line2D([], [], color='lightgray', ls='', marker='v', markersize=15,markeredgecolor='k')
 target0 = mlines.Line2D([], [], color='red', ls='', marker='h', markersize=20,markeredgecolor='k')
 target1 = mlines.Line2D([], [], color='red', ls='', marker='X', markersize=20,markeredgecolor='k')
+HSC_contour = mlines.Line2D([], [], color='teal',ls='-', linewidth=20.0,alpha=0.2)
 plt.legend([#Bkc,Hkc,
-            target1,SS13,ding_sample, target0, #alma_sample,
-            local,local_greene],[
+            target1,local,SS13, ding_sample, target0, #alma_sample,
+            local_greene, HSC_contour],[
 # 'Local by Bennert+11',
 # "Local by H&R",
 'J2236+0032',
-"$0.3<z\lesssim1.5$ quasars",
-"$1.2<z<1.7$ quasars, \nDing et al. 2020",
+"Local by H&R 2004 \nand Bennert et al. 2011",
+"$0.3<z\lesssim1.5$  quasars, \nby HST",
+"$1.2<z<1.7$ quasars, \nby HST, Ding20",
 'J2255+0251',
 # "$z\gtrsim6$ by ALMA (dyn. mass)",
-"Local by H&R 2004 \nand Bennert et al. 2011",
 "Local by Greene et al. 2020",
+"$0.2<z<0.8$ quasars \n by HSC, Li21",
 ],scatterpoints=1,numpoints=1,loc=4,prop={'size':20,'family': 'Arial'},ncol=2, framealpha=0.9).set_zorder(1000)
 plt.savefig("MBH-Mstar.pdf")
 plt.show()

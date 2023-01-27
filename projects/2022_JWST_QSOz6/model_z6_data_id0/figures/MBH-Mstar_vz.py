@@ -331,7 +331,49 @@ plt.errorbar(np.log10(1+6.34),MBH2-(m_ml*Mstar2+b_ml),
              yerr= yerr_z6,
              color='red', fmt='.',markersize=1,zorder=299,linewidth=3)     
 
-# %%
+#%%
+#Plot HSC data on top of Ding 2020
+line_means = ['id', 'z', 'ra', 'dec', 'fix_sersic_n', 'sersic_n_fitted', 'sersic_re_fitted', 'sersic_n_corrected',
+         'sersic_re_corrected', 'host_mag_g', 'host_mag_r', 'host_mag_i', 'host_mag_z', 'host_mag_y',
+         'ps_mag_g', 'ps_mag_r', 'ps_mag_i', 'ps_mag_z', 'ps_mag_y', 'decomposition_chisq', 'stellar_mass', 
+         'sed_chisq', 'logMBH', 'logMBH_err']
+infers  = np.loadtxt('../../../Plot_MM_relation/sdss_quasar_decomposition_v1.txt', dtype=str)
+IDs_ = infers[:, 0]
+HSC_z_ = infers[:,1].astype(np.float)
+HSC_Mstar_ = infers[:,20].astype(np.float)
+HSC_MBHs_ = infers[:,22].astype(np.float)
+HSC_MBHs_err_ = infers[:,23].astype(np.float)
+flags_  = np.loadtxt('../../../Plot_MM_relation/sdss_quasar_decomposition_v1_catalog_flag.txt', dtype=str)
+flags = flags_[:,0]
+IDs, HSC_z, HSC_Mstar, HSC_MBHs, HSC_MBHs_err =[], [], [], [], []
+for i in range(len(IDs_)):
+    idx = np.where(IDs_[i] == flags)[0][0]
+    if flags_[idx][1] == 'y':
+        IDs.append(IDs_[i])
+        HSC_z.append(HSC_z_[i])
+        HSC_Mstar.append(HSC_Mstar_[i])
+        HSC_MBHs.append(HSC_MBHs_[i])
+        HSC_MBHs_err.append(HSC_MBHs_err_[i])
+HSC_z = np.array(HSC_z)
+HSC_Mstar = np.array(HSC_Mstar)
+HSC_MBHs = np.array(HSC_MBHs)
+HSC_MBHs_err = np.array(HSC_MBHs_err)
+yerr_highz = ((m_ml*np.ones_like(HSC_Mstar)*0.2)**2+0.4**2)**0.5
+# plt.errorbar(np.log10(1+HSC_z),HSC_MBHs-(m_ml*HSC_Mstar+b_ml),
+#              yerr= yerr_highz,fmt='^',color='gray',markersize=4, )
+
+HSC_x=np.log10(1+HSC_z)
+HSC_y=HSC_MBHs-(m_ml*HSC_Mstar+b_ml)
+HSC_x = HSC_x[HSC_y>-100]
+HSC_y = HSC_y[HSC_y>-100]
+# plt.scatter(HSC_Mstar,HSC_MBHs,c='blue',
+#             s=220, marker=".",zorder=-1, edgecolors='k', alpha = 0.4)
+import seaborn as sns
+# sns.kdeplot(data=geyser, hue="kind", fill=True)
+sns.kdeplot(HSC_x, HSC_y, linewidths = 2, color = 'lightcyan', 
+            fill=True, levels=5, alpha=0.3, zorder = -10)
+
+# %% z6 ALMA
 MBs_ALMA = np.array([2.1E+09, 1.5E+09, 9.5E+08, 4.9E+08, 1.8E+09, 3.1E+09, 1.9E+09, 9.4E+08, 6.3E+09, 7.2E+09, 8.0E+07, 1.2E+08, 2.4E+08, 2.5E+08, 3.4E+07, 6.3E+08, 7.0E+08, 7.1E+08, 1.1E+09, 3.3E+08, 9.6E+08, 7.6E+08, 7.0E+08, 7.7E+08, 1.8E+09, 1.5E+09, 1.3E+09, 3.7E+09, 1.4E+09, 2.2E+09, 1.2E+09, 2.0E+09, 8.5E+09, 1.6E+09, 1.0E+09, 1.2E+09, 1.3E+09, 1.1E+09, 2.9E+07, 1.6E+08, 3.8E+07, 1.1E+08, 2.4E+09, 7.8E+08])
 Mstar_ALMA = np.array([7.2E+10, 1.4E+11, 4.1E+10, 2.3E+11, 1.3E+11, 8.8E+10, 5.6E+10, 1.1E+11, 6.5E+10, 9.6E+10, 1.3E+10, 4.4E+10, 4.2E+10, 1.2E+11, 5.6E+10, 1.4E+10, 8.2E+10, 1.3E+10, 2.9E+11, 7.6E+10, 5.3E+11, 7.2E+10, 1.1E+11, 1.9E+11, 1.4E+11, 1.3E+11, 3.1E+11, 6.3E+10, 6.1E+10, 2.1E+11, 9.0E+10, 1.7E+12, 3.4E+10, 1.4E+11, 1.3E+11, 3.5E+11, 5.8E+10, 4.3E+10, 4.4E+10, 1.3E+10, 4.4E+10, 2.0E+10, 4.3E+10, 3.2E+10])
 zs_ALMA = np.array([6.90, 6.79, 6.61, 6.52, 6.13, 6.59, 6.08, 6.08, 6.02, 6.00, 6.43, 6.15, 6.01, 6.42, 6.39, 6.36, 6.10, 6.12, 6.25, 7.07, 6.23, 6.04, 6.66, 6.44, 6.44, 6.38, 6.34, 6.31, 6.15, 6.14, 6.12, 6.12, 6.12, 6.11, 6.10, 6.04, 6.00, 5.99, 6.15, 5.78, 5.93, 6.08, 7.09, 7.54])
@@ -347,6 +389,27 @@ for i in  range(len(Mstell_upplim)):
     # if Mstell_upplim[i] == 2:    
     #     plt.arrow(np.log10(Mstar_ALMA[i]),np.log10(MBs_ALMA[i]) - 0.24, 
     #               -0.4,0, width=0.01, color='gray')
+#%%
+# J0807 10.7 9.2 4.879 4.871
+# J1404 10.9 9.5 4.923 4.871
+# J1433 10.6 9.1 4.728 4.685
+# J1616 10.9 9.4 4.884 4.863
+# J1654 10.8 9.6 4.728 4.707
+# J2225 10.7 9.3 4.716 4.883
+# J0331T17 10.6 8.8 4.737 4.732
+# J1341T17 10.7 9.8 4.700 4.682
+# J1511T17 10.8 8.4 4.679 4.677
+# J1017 10.0 8.7 4.949 4.918
+# J1321 10.8 9.0 4.722 4.739
+# J1447 10.2 8.0 4.682 4.688
+# J2057 10.5 9.2 4.683 4.685
+# J2244 10.3 8.8 4.661 4.621
+# J0923T17 10.5 8.7 4.655 4.650
+# J1328T17 10.1 9.1 4.646 4.650
+# J0935T17 10.4 8.8 4.682 4.699
+ALMA_z4 = np.array([[10.7, 9.2, 4.879, 4.871], [10.9, 9.5, 4.923, 4.871], [10.6, 9.1, 4.728, 4.685], [10.9, 9.4, 4.884, 4.863], [10.8, 9.6, 4.728, 4.707], [10.7, 9.3, 4.716, 4.883], [10.6, 8.8, 4.737, 4.732], [10.7, 9.8, 4.700, 4.682], [10.8, 8.4, 4.679, 4.677], [10.0, 8.7, 4.949, 4.918], [10.8, 9.0, 4.722, 4.739], [10.2, 8.0, 4.682, 4.688], [10.5, 9.2, 4.683, 4.685], [10.3, 8.8, 4.661, 4.621], [10.5, 8.7, 4.655, 4.650], [10.1, 9.1, 4.646, 4.650], [10.4, 8.8, 4.682, 4.699]])
+plt.scatter(np.log10(1+ALMA_z4[:,2]),ALMA_z4[:,1]-(m_ml*ALMA_z4[:,0]+b_ml),
+            c='lightgray',s=220,marker="v",zorder=100, edgecolors='k', alpha = 0.8)
 
 #%%
 # # #####fit the evolution##########
@@ -451,14 +514,16 @@ SS13 = mlines.Line2D([], [], color='steelblue', ls='', marker='^', markersize=15
 target0 = mlines.Line2D([], [], color='red', ls='', marker='h', markersize=20,markeredgecolor='k')
 target1 = mlines.Line2D([], [], color='red', ls='', marker='X', markersize=20,markeredgecolor='k')
 alma_sample = mlines.Line2D([], [], color='lightgray', ls='', marker='v', markersize=15,markeredgecolor='k')
-plt.legend([target0, Bkc, Hkc, SS13,target1, ding_sample,alma_sample],[
-'J2236+0032', 
-'Local by Bennert et al. 2011',
-"Local by H&R 2004",
-"$0.3<z\lesssim1.5$ quasars",
-'J2255+0251',
-"by Ding et al. 2020",
-"by ALMA (dyn. mass)",
-],scatterpoints=1,numpoints=1,loc=3,prop={'size':22,'family': 'Arial'},ncol=2,handletextpad=0)
+HSC_contour = mlines.Line2D([], [], color='teal',ls='-', linewidth=20.0,alpha=0.2)
+plt.legend([target0, Bkc, ding_sample, SS13,target1, Hkc,HSC_contour, alma_sample],[
+    'J2236+0032', 
+    'Local by Bennert et al. 2011',
+    "HST, Ding et al. 2020",
+    "HST, in the literature",
+    'J2255+0251',
+    "Local by H&R 2004",
+    'HSC, Li et al. 2021',
+    "ALMA (dyn. mass)",
+],scatterpoints=1,numpoints=1,loc=3,prop={'size':22,'family': 'Arial'},ncol=2)
 plt.savefig("MBH-Mstar_vz.pdf")
 plt.show()
