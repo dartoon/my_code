@@ -220,7 +220,7 @@ xmin, xmax, ymin, ymax = plt.axis()
 # cnorm = mcol.Normalize(vmin=1,vmax=5)
 # cpick = cm.ScalarMappable(norm=cnorm,cmap=cm1)
 # cpick.set_array([])
-to_rgba = ['red','tomato','coral','orange','gold','green','turquoise','teal','dodgerblue','blue']
+to_rgba = ['brown','tomato','coral','orange','gold','green','turquoise','teal','dodgerblue','blue']
 first_color = [5,1]
 for i, fid in enumerate(filt_id[::-1]):
     f_fil = np.loadtxt('../../../../template/gsf_temp/filter/{0}.fil'.format(fid))
@@ -229,7 +229,7 @@ for i, fid in enumerate(filt_id[::-1]):
     plt.plot(f_fil[1:,1]/10000., f_fil[1:,2], label='{0}'.format(ivd[fid]),linewidth=3, color= to_rgba[first_color[i]])
 
 sec_color = [7,6,4,3,2,0]
-for i, filt in enumerate(['F115W', 'F200W', 'F250M', 'F300M', 'F460M', 'F480M']):
+for i, filt in enumerate(['F115W', 'F200W', 'F250M', 'F300M', 'F444W', 'F480M']):
     fid = jwst_filt_id[filt]
     f_fil = np.loadtxt('../../../../template/gsf_temp/filter/{0}.fil'.format(fid))
     top = f_50.max()

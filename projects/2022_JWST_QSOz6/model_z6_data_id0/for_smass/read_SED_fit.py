@@ -37,8 +37,8 @@ idx = 1  #our target 102 fix age.
 # idx, target_id = 203,  'obj3'
 
 folder = 'esti_smass/'+folder+str(idx)
-# folder = folder + '_freeParam'
-folder = folder + '_freeParam_withEmissionLine'
+folder = folder + '_freeParam'
+# folder = folder + '_freeParam_withEmissionLine'
 
 steller_file = glob.glob(folder+'/gsf_spec_*.fits')[0]
 hdul = pyfits.open(steller_file)
@@ -120,7 +120,7 @@ for i in range(len(g.axes.ravel())):
             # ax.set_title(r'\TeX\ is Number $\displaystyle\sum_{n=1}^\infty'
             #              r'\frac{-e^{i\pi}}{2^n}$!', fontsize=16, color='r')
             # ax.set_title(df.keys()[i/5]+r'={0}$\pm$')
-plt.savefig('../../model_z6_data_id0/figures/{0}_SED_MCMC.pdf'.format(target_id[:5]), bbox_inches = "tight")
+# plt.savefig('../../model_z6_data_id0/figures/{0}_SED_MCMC.pdf'.format(target_id[:5]), bbox_inches = "tight")
 
 
 # import matplotlib as mat
@@ -291,5 +291,5 @@ plt.tick_params(labelsize=20)
 plt.xlabel(r"$\lambda$ ($\mu$m)",fontsize=25)
 plt.ylabel(r"f$_\lambda$  (10$^{\rm" + " -{0}}}$".format(unit.split('e-')[1][:2])+" erg s$^{-1}$ cm$^{-2}$$\mathrm{\AA}^{-1}$)",fontsize=25)
 plt.title(target_id,fontsize=27, y=1.02) 
-plt.savefig('../figures/{0}_SED_map.pdf'.format(target_id[:5]), bbox_inches = "tight")
+# plt.savefig('../figures/{0}_SED_map.pdf'.format(target_id[:5]), bbox_inches = "tight")
 # #plt.yticks([])
