@@ -11,9 +11,8 @@ import astropy.io.fits as pyfits
 import matplotlib.pyplot as plt
 import pickle,glob
 
-# import sys
-# count = int(sys.argv[1]) - 1 # 1 - 12586
-count = 1
+import sys
+count = int(sys.argv[1]) - 1 # 1 - 12586
 
 # filt_i = 1
 # filt = ['F115W', 'F150W','F277W', 'F444W'][filt_i]
