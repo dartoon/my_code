@@ -13,7 +13,6 @@ import pickle,glob
 
 # import sys
 # count = int(sys.argv[1]) - 1 # 1 - 12586
-
 count = 1
 
 # filt_i = 1
@@ -28,5 +27,5 @@ fit_run = pickle.load(open(fit_files[i],'rb'))
 # Quick run:
 fit_run.run(algorithm_list = ['PSO'], fitting_level=['norm'])
 fit_run.plot_final_qso_fit(target_ID =None, show_plot=False)
-savename = fit_files[i].replace('_notrunyet_', '_run_')[:-4]+'_{0}.pkl'.format(i)
+# savename = fit_files[i].replace('_notrunyet_', '_run_')[:-4]+'_{0}.pkl'.format(i)
 # pickle.dump(fit_run , open(savename, 'wb'))
