@@ -1,0 +1,15 @@
+#!/bin/bash
+#PBS -N fit_run_JWST
+#PBS -o /home/xuheng.ding/Astro/my_code/projects/2022_CEERS_checkup/real_analysis/model_JWST_stage3_Masafusa/pbs/
+#PBS -e /home/xuheng.ding/Astro/my_code/projects/2022_CEERS_checkup/real_analysis/model_JWST_stage3_Masafusa/pbs/
+#PBS -l nodes=1:ppn=1
+#PBS -l walltime=01:50:00
+#PBS -l mem=200mb
+#PBS -J 1-6300:1
+#PBS -u xuheng.ding
+#PBS -m ae
+#PBS -V
+#PBS -q tiny
+
+cd /home/xuheng.ding/Astro/my_code/projects/2022_COSMOSweb
+python 1_run_fit_onidark.py $PBS_ARRAY_INDEX
