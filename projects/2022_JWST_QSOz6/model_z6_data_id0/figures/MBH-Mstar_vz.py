@@ -318,7 +318,7 @@ plt.scatter(np.log10(1+6.4),MBH1-(m_ml*Mstar1+b_ml),c='red',
 plt.errorbar(np.log10(1+6.4),MBH1-(m_ml*Mstar1+b_ml),
              yerr= yerr_z6,
              color='red', fmt='.',markersize=1,zorder=299,linewidth=3)       
-
+print('offet J2236', MBH1-(m_ml*Mstar1+b_ml))
 
 # Mstar2, MBH2 = 10.53,8+np.log10(1.94)
 Mstar2, MBH2 = 10.53, 8+np.log10(1.87)
@@ -330,6 +330,7 @@ plt.scatter(np.log10(1+6.34),MBH2-(m_ml*Mstar2+b_ml),c='red',
 plt.errorbar(np.log10(1+6.34),MBH2-(m_ml*Mstar2+b_ml),
              yerr= yerr_z6,
              color='red', fmt='.',markersize=1,zorder=299,linewidth=3)     
+print('offet J2255', MBH2-(m_ml*Mstar2+b_ml))
 
 #%%
 #Plot HSC data on top of Ding 2020
@@ -370,7 +371,7 @@ HSC_y = HSC_y[HSC_y>-100]
 #             s=220, marker=".",zorder=-1, edgecolors='k', alpha = 0.4)
 import seaborn as sns
 # sns.kdeplot(data=geyser, hue="kind", fill=True)
-sns.kdeplot(HSC_x, HSC_y, linewidths = 2, color = 'lightcyan', 
+sns.kdeplot(HSC_x, HSC_y, linewidths = 2, color = 'orange', 
             fill=True, levels=5, alpha=0.3, zorder = -10)
 
 # %% z6 ALMA
@@ -514,8 +515,8 @@ SS13 = mlines.Line2D([], [], color='steelblue', ls='', marker='^', markersize=15
 target0 = mlines.Line2D([], [], color='red', ls='', marker='h', markersize=20,markeredgecolor='k')
 target1 = mlines.Line2D([], [], color='red', ls='', marker='X', markersize=20,markeredgecolor='k')
 alma_sample = mlines.Line2D([], [], color='lightgray', ls='', marker='v', markersize=15,markeredgecolor='k')
-HSC_contour = mlines.Line2D([], [], color='teal',ls='-', linewidth=20.0,alpha=0.2)
-plt.legend([target0, Bkc, ding_sample, SS13,target1, Hkc,HSC_contour, alma_sample],[
+HSC_contour = mlines.Line2D([], [], color='orange',ls='-', linewidth=20.0,alpha=0.2)
+plt.legend([target1, Bkc, ding_sample, SS13,target0, Hkc,HSC_contour, alma_sample],[
     'J2236+0032', 
     'Local by Bennert et al. 2011',
     "HST, Ding et al. 2020",

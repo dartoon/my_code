@@ -342,7 +342,7 @@ HSC_y = HSC_y[HSC_y>-100]
 #             s=220, marker=".",zorder=-1, edgecolors='k', alpha = 0.4)
 import seaborn as sns
 # sns.kdeplot(data=geyser, hue="kind", fill=True)
-sns.kdeplot(HSC_Mstar, HSC_MBHs, linewidths = 2, color = 'lightcyan', 
+sns.kdeplot(HSC_Mstar, HSC_MBHs, linewidths = 2, color = 'orange', 
             fill=True, levels=5, alpha=0.3, zorder = -10)
 
 #%%    
@@ -400,7 +400,7 @@ ding_sample = mlines.Line2D([], [], color='lightseagreen', ls='', marker='.', ma
 alma_sample = mlines.Line2D([], [], color='lightgray', ls='', marker='v', markersize=15,markeredgecolor='k')
 target0 = mlines.Line2D([], [], color='red', ls='', marker='h', markersize=20,markeredgecolor='k')
 target1 = mlines.Line2D([], [], color='red', ls='', marker='X', markersize=20,markeredgecolor='k')
-HSC_contour = mlines.Line2D([], [], color='teal',ls='-', linewidth=20.0,alpha=0.2)
+HSC_contour = mlines.Line2D([], [], color='orange',ls='-', linewidth=20.0,alpha=0.2)
 plt.legend([#Bkc,Hkc,
             target1,local,SS13, ding_sample, target0, #alma_sample,
             local_greene, HSC_contour],[
