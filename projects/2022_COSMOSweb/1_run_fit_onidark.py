@@ -17,7 +17,7 @@ count = 1
 
 # filt_i = 1
 # filt = ['F115W', 'F150W','F277W', 'F444W'][filt_i]
-cata_list = pickle.load(open('material/cata_list.pkl','rb'))
+# cata_list = pickle.load(open('material/cata_list.pkl','rb'))
 
 fit_files = glob.glob('fit_material/fit_notrunyet_*.pkl')
 fit_files.sort()
