@@ -98,6 +98,21 @@ def total_compare(flux_list_2d, label_list_2d,
         # if not (idx == 0 and filt == 'F150W'):
         #     ax_l[2].text(frame_size*0.40, frame_size*0.05, "Host", weight='bold', fontsize=20, 
         #                  color='white')
+        
+        if filt != 'F150W':
+            theta_dict = {0: 137.475, 1: 139.818}
+            from astropy.coordinates import Angle
+            theta = Angle(theta_dict[idx], 'deg')
+    
+            f_center = len(flux_list_2d[0])/2
+            w = 0.2 / deltaPix_list[0]
+            h = 0.6 / deltaPix_list[0]
+            from photutils.aperture import RectangularAperture
+            aper = RectangularAperture((ps_x, ps_y), w, h, theta=theta)
+            aper.plot(color='white',
+                      lw=0.8,axes=ax_l[0])
+            # axins.add_patch(aper)
+        
         fontsize = 20
         if i <3:
             cb_i = f.colorbar(im_i, ax=ax_l[i], shrink=0.48, pad=0.01,  orientation="horizontal", 
@@ -137,7 +152,7 @@ def total_compare(flux_list_2d, label_list_2d,
     plt.show()       
     return f
 
-idx = 0
+idx = 1
 # filters = ['F150W', 'F356W']
 filters = ['F150W']
 from target_info import target_info

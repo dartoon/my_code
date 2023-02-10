@@ -37,8 +37,9 @@ idx = 1  #our target 102 fix age.
 # idx, target_id = 203,  'obj3'
 
 folder = 'esti_smass/'+folder+str(idx)
-folder = folder + '_freeParam'
-# folder = folder + '_freeParam_withEmissionLine'
+# folder = folder + '_freeParam'
+folder = folder + '_freeParam_withEmissionLine'
+# folder = folder + '202301151_freeParam_wider_withEmissionLine'
 
 steller_file = glob.glob(folder+'/gsf_spec_*.fits')[0]
 hdul = pyfits.open(steller_file)

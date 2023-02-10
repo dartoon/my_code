@@ -371,7 +371,7 @@ HSC_y = HSC_y[HSC_y>-100]
 #             s=220, marker=".",zorder=-1, edgecolors='k', alpha = 0.4)
 import seaborn as sns
 # sns.kdeplot(data=geyser, hue="kind", fill=True)
-sns.kdeplot(HSC_x, HSC_y, linewidths = 2, color = 'orange', 
+sns.kdeplot(HSC_x, HSC_y, linewidths = 2, color = 'plum', 
             fill=True, levels=5, alpha=0.3, zorder = -10)
 
 # %% z6 ALMA
@@ -500,7 +500,8 @@ xl=-0.01
 xh=np.log10(1+8)
 plt.yticks(np.arange(-5.5,6,0.5))
 plt.axis([xl,xh,-2.5,3.0])
-plt.ylabel(r"$\Delta$logM$_{\rm BH}$ (vs M$_*$)",fontsize=45)
+# plt.ylabel(r"$\Delta$logM$_{\rm BH}$ (vs M$_*$)",fontsize=45)
+plt.ylabel(r"$\Delta$log(M$_{\rm BH}$/M$_*$)",fontsize=45)
 plt.grid()
 plt.tick_params(labelsize=35)
 
@@ -515,7 +516,7 @@ SS13 = mlines.Line2D([], [], color='steelblue', ls='', marker='^', markersize=15
 target0 = mlines.Line2D([], [], color='red', ls='', marker='h', markersize=20,markeredgecolor='k')
 target1 = mlines.Line2D([], [], color='red', ls='', marker='X', markersize=20,markeredgecolor='k')
 alma_sample = mlines.Line2D([], [], color='lightgray', ls='', marker='v', markersize=15,markeredgecolor='k')
-HSC_contour = mlines.Line2D([], [], color='orange',ls='-', linewidth=20.0,alpha=0.2)
+HSC_contour = mlines.Line2D([], [], color='plum',ls='-', linewidth=20.0,alpha=0.3)
 plt.legend([target1, Bkc, ding_sample, SS13,target0, Hkc,HSC_contour, alma_sample],[
     'J2236+0032', 
     'Local by Bennert et al. 2011',

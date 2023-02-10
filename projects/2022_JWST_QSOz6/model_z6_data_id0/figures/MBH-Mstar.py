@@ -134,20 +134,27 @@ def find_n(array,value):           #get the corresponding b for a given m
     return array[idx]
 m=np.percentile(samples,50,axis=0)[0]
 #print samples[:,1][samples[:,0]==find_n(samples[:,0],m)]
-for i in range(100):
+for i in range(200):
     posi=np.random.uniform(16,84)
     m=np.percentile(samples,posi,axis=0)[0]
     b=samples[:,1][samples[:,0]==find_n(samples[:,0],m)][0]   #may find out many numbers
     plt.plot(xl, m*xl+b, color="lightgray", alpha=0.2,linewidth=7.0,zorder=-1000)
 #plt.text(9.3, 6.24, r"log(M$_{\rm BH}/$10$^{7}$M$_{\odot}$)=%s+%slog(M$_*/$10$^{10}$M$_{\odot}$)"%(round(b_ml+m_ml*10-7,2),round(m_ml,2)),color='blue',fontsize=25)
 
-
+#%%
 alpha, beta = 7.56, 1.39    #All, no limits
 # alpha, beta = 7.43, 1.61    #All, limits
 # alpha, beta = 7.89, 1.33    # Early
 # alpha, beta = 6.94, 0.98    #Late, no limits
 # alpha, beta = 6.70, 1.61    #Late, limits
-plt.plot(xl, alpha+ beta*xl - beta*np.log10(3 * 10**10), color="green", alpha=0.6,linewidth=4.0,zorder=-1000)
+plt.plot(xl, alpha+ beta*xl - beta*np.log10(3 * 10**10), color="green", alpha=0.8,linewidth=4.0,zorder=-999)
+
+dalpha, dbeta = 0.09, 0.13
+for i in range(200):
+    alpha_ = alpha + np.random.normal(0, scale = dalpha)
+    beta_ = beta + np.random.normal(0, scale = dbeta)
+    plt.plot(xl, alpha_+ beta_*xl - beta_*np.log10(3 * 10**10), color="lightgreen", alpha=0.1,linewidth=4.0,zorder=-1000)
+
 
 #%%
 inp_SS13 = 1
@@ -342,7 +349,7 @@ HSC_y = HSC_y[HSC_y>-100]
 #             s=220, marker=".",zorder=-1, edgecolors='k', alpha = 0.4)
 import seaborn as sns
 # sns.kdeplot(data=geyser, hue="kind", fill=True)
-sns.kdeplot(HSC_Mstar, HSC_MBHs, linewidths = 2, color = 'orange', 
+sns.kdeplot(HSC_Mstar, HSC_MBHs, linewidths = 2, color = 'plum', 
             fill=True, levels=5, alpha=0.3, zorder = -10)
 
 #%%    
@@ -400,7 +407,7 @@ ding_sample = mlines.Line2D([], [], color='lightseagreen', ls='', marker='.', ma
 alma_sample = mlines.Line2D([], [], color='lightgray', ls='', marker='v', markersize=15,markeredgecolor='k')
 target0 = mlines.Line2D([], [], color='red', ls='', marker='h', markersize=20,markeredgecolor='k')
 target1 = mlines.Line2D([], [], color='red', ls='', marker='X', markersize=20,markeredgecolor='k')
-HSC_contour = mlines.Line2D([], [], color='orange',ls='-', linewidth=20.0,alpha=0.2)
+HSC_contour = mlines.Line2D([], [], color='plum',ls='-', linewidth=20.0,alpha=0.3)
 plt.legend([#Bkc,Hkc,
             target1,local,SS13, ding_sample, target0, #alma_sample,
             local_greene, HSC_contour],[

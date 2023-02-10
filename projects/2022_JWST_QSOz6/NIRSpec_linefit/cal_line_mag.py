@@ -43,8 +43,8 @@ keys = ['line_O3_4959_na', 'line_O3_5008_na', 'line_O3_4959_w',
         'line_O3_5008_w']
 
 
-# keys = ['line_Hb_br','line_O3_4959_na', 'line_O3_5008_na', 'line_O3_4959_w',
-        # 'line_O3_5008_w']
+keys = ['line_Hb_br','line_O3_4959_na', 'line_O3_5008_na', 'line_O3_4959_w',
+        'line_O3_5008_w']
 keys = ['flux']
 flux = sample[keys[0]]
 
