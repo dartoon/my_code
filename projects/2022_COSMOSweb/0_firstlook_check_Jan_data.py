@@ -45,7 +45,7 @@ for i in range(len(table)):
                 if flux!=0: 
                     print(pos, flux, table[i][38], table[i][39])
                     cata_list.append([i, RA, Dec, pos[0], pos[1], table[i][38], table[i][39], table[i][0]]) #myid, RA, Dec, pos, redshift, name 
-                    # plt_fits(img[int(pos[1])-100:int(pos[1])+100, int(pos[0])-100:int(pos[0])+100])
+                    plt_fits(img[int(pos[1])-100:int(pos[1])+100, int(pos[0])-100:int(pos[0])+100])
                     # flux = np.sum(img[int(pos[1])-40:int(pos[1])+40, int(pos[0])-40:int(pos[0])+40])
                     print(flux)
                     frame_flux.append(flux)

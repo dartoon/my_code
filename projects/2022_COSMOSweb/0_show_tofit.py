@@ -23,17 +23,18 @@ filt = ['F115W', 'F150W','F277W', 'F444W'][filt_i]
 cata_list = pickle.load(open('material/cata_list.pkl','rb'))
 
 not_fit_id = []
-for i in range(0, len(cata_list)):
-# for i in [0]:
+for i in range(10, len(cata_list)):
+# for i in [10]:
     savename = 'fit_material/fit_notrunyet_{2}_idx{0}_psf{1}.pkl'.format(i,4,filt)
     try:
         fit_run = pickle.load(open(savename,'rb'))
         print('idx {0} for fitting:'.format(i))
+        print(cata_list[i][-2])
         f = fit_run.fitting_specify_class.plot_fitting_sets()
     except:
         print('idx {0} is skiped'.format(i))
         not_fit_id.append(i)
-    time.sleep(0.5)
+    time.sleep(1)
     
     # # Quick run:
     # fit_run.run(algorithm_list = ['PSO'], fitting_level=['norm'])
