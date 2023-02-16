@@ -18,6 +18,7 @@ from matplotlib.colors import LogNorm
 name = ['cid_473', 'cid_1210', 'cid_1245'][0]
  
 sed_2d_info = pickle.load(open('2d_filts_mag_bin2_{0}.pkl'.format(name),'rb'))
+
 f = open("{0}_sed_2d_result_bin2.txt".format(name),"r")
 string = f.read()
 lines = string.split('\n')   # Split in to \n
@@ -26,17 +27,19 @@ smass_image = np.zeros([size,size])
 sfr_image =  np.zeros([size,size])
 age_image =  np.zeros([size,size])
 AV_image = np.zeros([size,size])
+Ebv_image = np.zeros([size,size])
 for ct, line in enumerate(lines[1:-1]):
     if len(line.split(' ')) < 4:
         continue
     else:
-        count, smass, sfr, m_age, l_age, AV = line.split(' ')
+        count, smass, sfr, m_age, l_age, AV, Ebv = line.split(' ')
         count = int(count)
         _i, _j = sed_2d_info[count][0], sed_2d_info[count][1]
         smass_image[_i, _j] = float(smass)    #smass in logMsun
         sfr_image[_i, _j] = float(sfr)          #logMsun/yr 
         age_image[_i, _j] = 10**float(m_age)    #logGyr to Gry
         AV_image[_i, _j] = AV    #logGyr
+        Ebv_image[_i, _j] = Ebv    #E(B-V)
 
         
 for i in range(len(smass_image)):
