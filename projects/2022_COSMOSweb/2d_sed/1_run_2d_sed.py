@@ -38,7 +38,7 @@ folder = 'esti_smass/'+check_name+'/'+str(count)
 #%%
 from functions_for_result import esti_smass
 if glob.glob(folder+'/SFH_*.fits') == [] and len(mag_dict)>2:
-    esti_smass(ID = str(int(count)), folder = 'esti_smass/'+check_name+'/',
+    esti_smass(ID = check_name[4:]+str(int(count)), folder = 'esti_smass/'+check_name+'/',
                mags_dict = mag_dict, z = z, flag = flag, if_run_gsf=True)
     spec_file = glob.glob(folder+'/gsf_spec_*.fits')[0]
     hdul_spec = pyfits.open(spec_file)
