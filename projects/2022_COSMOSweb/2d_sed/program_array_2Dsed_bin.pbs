@@ -1,0 +1,18 @@
+#!/bin/bash
+#PBS -N sed_2d
+#PBS -o /home/xuheng.ding/Astro/my_code/projects/2022_COSMOSweb/2d_sed
+#PBS -e /home/xuheng.ding/Astro/my_code/projects//2022_COSMOSweb/2d_sed
+#PBS -l nodes=1:ppn=1
+#PBS -l walltime=01:50:00
+#PBS -l mem=200mb
+#PBS -J 1-8100:1
+#PBS -u xuheng.ding
+#PBS -m ae
+#PBS -V
+#PBS -q tiny
+
+cd /home/xuheng.ding/Astro/my_code/projects/2022_COSMOSweb/2d_sed
+source activate gsf
+python 2_sed_2Dmap_idark.py $PBS_ARRAY_INDEX 1 1
+python 2_sed_2Dmap_idark.py $PBS_ARRAY_INDEX 1 2
+python 2_sed_2Dmap_idark.py $PBS_ARRAY_INDEX 1 3

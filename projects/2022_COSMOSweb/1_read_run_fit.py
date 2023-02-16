@@ -31,8 +31,12 @@ for i, item in enumerate(cata_list):
 # savename = fit_files[i].replace('_notrunyet_', '_run_')[:-4]+'_{0}.pkl'.format(i)
 # pickle.dump(fit_run , open(savename, 'wb'))
 top_psf_id = 0
-fit_file_folder ='/Volumes/Seagate_Expansion_Drive/data_backup/JWST_COSMOS/'
-for idx in range(50):
+# fit_file_folder ='/Volumes/Seagate_Expansion_Drive/data_backup/JWST_COSMOS/'
+fit_file_folder ='./'
+save_plot = True
+save_psf = False
+# for idx in range(50):
+for idx in [10]:
     fit_run_list = []
     fit_files = glob.glob(fit_file_folder+'fit_result/fit_run_{0}*idx{1}_psf*.pkl'.format(filt,idx))
     fit_files.sort()
@@ -52,11 +56,17 @@ for idx in range(50):
         fit_run.cal_astrometry()
         target_ID = 'idx{0}_{1}_{2}_{3}'.format(idx,cata_list[idx][-1],filt,zinfo)
         fit_run.savename = 'figures/idx{0}_{1}_{2}_{3}'.format(idx,cata_list[idx][-1],filt,zinfo)
-        fit_run.plot_final_qso_fit(target_ID =target_ID, show_plot=True,save_plot=True)
+        fit_run.plot_final_qso_fit(target_ID =target_ID, show_plot=True,save_plot=save_plot)
+    if save_psf == True:
+        pyfits.PrimaryHDU(fit_run.fitting_specify_class.data_process_class.PSF_list[0]).writeto('PSFs_library/PSF_{0}_id{1}.fits'.format(
+            filt,sort_Chisq[top_psf_id]),overwrite=True)
     if fit_files == []:
         pos = cata_list[idx][3:5]
         filename = 'mosaic_nircam_f{0}w_COSMOS-Web_30mas_v0_1_i2d.fits'.format(filt[1:-1])
         # filename = '1727_cosmos_mosaic_miri_exptime_scale1.0.fits'
         fitsFile = pyfits.open(fit_file_folder+filename)
         img = fitsFile[1].data[int(pos[1])-100:int(pos[1])+100, int(pos[0])-100:int(pos[0])+100] #
-        plt_fits(img, savename='figures/idx{0}_{1}_{2}_{3}_notfit.pdf'.format(idx,cata_list[idx][-1],filt,zinfo))
+        if save_plot == False:
+            plt_fits(img)
+        elif save_plot == True:
+            plt_fits(img, savename='figures/idx{0}_{1}_{2}_{3}_notfit.pdf'.format(idx,cata_list[idx][-1],filt,zinfo))
