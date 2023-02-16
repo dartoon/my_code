@@ -12,9 +12,13 @@ import matplotlib.pyplot as plt
 
 #     # host_residual_list = fit_run.
 import pickle
-from matplotlib.colors import LogNorm      
-sed_2d_info = pickle.load(open('sed_2d_info{0}.pkl'.format(bin_info),'rb'))
-f = open("sed_2d_result{0}.txt".format(bin_info),"r")
+from matplotlib.colors import LogNorm     
+
+
+name = ['cid_473', 'cid_1210', 'cid_1245'][0]
+ 
+sed_2d_info = pickle.load(open('2d_filts_mag_bin2_{0}.pkl'.format(name),'rb'))
+f = open("{0}_sed_2d_result_bin2.txt".format(name),"r")
 string = f.read()
 lines = string.split('\n')   # Split in to \n
 size = int(np.sqrt(len(sed_2d_info)))
