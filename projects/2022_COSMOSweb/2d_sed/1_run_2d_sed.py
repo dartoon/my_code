@@ -28,7 +28,7 @@ if target_ID == 2:
 if target_ID == 3:
     check_name= 'cid_1245' #10
 check_id = [i for i in range(len(cata_list)) if cata_list[i][-1] == check_name]
-print(cata_list[check_id[0]])
+# print(cata_list[check_id[0]])
 z = cata_list[check_id[0]][-2]
 sed_2d_info = pickle.load(open('2d_filts_mag_bin2_{0}.pkl'.format(check_name),'rb'))
 
