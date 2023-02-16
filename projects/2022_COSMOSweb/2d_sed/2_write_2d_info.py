@@ -16,19 +16,19 @@ for name in ['cid_473', 'cid_1210', 'cid_1245']:
     steller_files = glob.glob(folder+'/SFH_*.fits')
     for file in steller_files:
         hdul = pyfits.open(file)
-        count = file.split('/')[2][4:]
+        count = file.split('SFH_')[1].split('.')[0]
         info = hdul[0].header 
         smass = info['Mstel_50']
         sfr = info['SFR_50']
         m_age = info['T_MW_50']
         l_age = info['T_LW_50']
         AV = info['AV_50']
-        shdul = pyfits.open(file.replace('SFH','gsf_spec'))
-        info_stellar = shdul[1].header 
-        BV50 = info_stellar['BV50']
-        # f = open( file.split('SFH')[0]+'gsf_spec_header.txt',"r")
-        # string = f.read()
-        # BV50 = float(string.split('BV50    =')[1].split('BV84')[0])
+        # shdul = pyfits.open(file.replace('SFH','gsf_spec'))
+        # info_stellar = shdul[1].header 
+        # BV50 = info_stellar['BV50']
+        f = open( file.split('SFH')[0]+'gsf_spec_header.txt',"r")
+        string = f.read()
+        BV50 = float(string.split('BV50    =')[1].split('BV84')[0])
         filename = name+'_sed_2d_result_bin2.txt'
         if_file = glob.glob(filename)
         if if_file == []:
