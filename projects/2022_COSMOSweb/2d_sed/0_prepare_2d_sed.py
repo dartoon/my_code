@@ -16,9 +16,9 @@ from matplotlib.colors import LogNorm
 from galight.tools.astro_tools import read_pixel_scale
 
 cata_list = pickle.load(open('../material/cata_list.pkl','rb'))
-check_name= 'cid_473'  #29
+# check_name= 'cid_473'  #29
 # check_name= 'cid_1210' #8
-# check_name= 'cid_1245' #10
+check_name= 'cid_1245' #10
 check_id = [i for i in range(len(cata_list)) if cata_list[i][-1] == check_name]
 print(cata_list[check_id[0]])
 
@@ -52,7 +52,7 @@ for idx in check_id:
         print(filt,'finish', img_show.shape)
 images = []
 # zp_list = []
-for i in [-1,-2,-4]:  #['F356W', 'F200W', 'F115W', 'F150W', 'F277W', 'F410M', 'F444W']
+for i in [-1,-3,-4]:  #['F115W', 'F150W','F277W', 'F444W']
     # zp_list.append(zp_dict[filts[i]])
     images.append(image_list[i])
 from galight.tools.astro_tools import plt_fits_color, plt_fits
@@ -60,6 +60,8 @@ from galight.tools.astro_tools import plt_fits_color, plt_fits
 for i in range(len(images)):
     plt_fits(images[i], vmin=0.001, vmax=2.5)
 plt_fits_color(images, Q=7, stretch=0.3)
+import pickle      
+pickle.dump(image_list, open('colorimage_bin2_{0}.pkl'.format(check_name), 'wb'))
 
 
 #%%        
@@ -78,6 +80,6 @@ for i in range(len(sed_image[0])):
                 mag_result[filt] = mag
         sed_2d_info.append([i, j, mag_result])
 import pickle      
-pickle.dump(sed_2d_info, open('2d_filts_mag_bin2_{0}.pkl'.format(check_name), 'wb'))
+# pickle.dump(sed_2d_info, open('2d_filts_mag_bin2_{0}.pkl'.format(check_name), 'wb'))
 
 

@@ -17,8 +17,9 @@ import sys
 count = int(sys.argv[1]) - 1 # 1 - 2809
 flag = int(sys.argv[2])
 target_ID = int(sys.argv[3])
-# count = 4000 # 1 - 2809
+# count = 4001 # 1 - 2809
 # flag = 1
+# target_ID = 1
 
 cata_list = pickle.load(open('../material/cata_list.pkl','rb'))
 if target_ID == 1:
@@ -33,13 +34,13 @@ z = cata_list[check_id[0]][-2]
 sed_2d_info = pickle.load(open('2d_filts_mag_bin2_{0}.pkl'.format(check_name),'rb'))
 
 mag_dict = sed_2d_info[count][2]
-folder = 'esti_smass/'+check_name+'/'+str(count)
 
 #%%
 from functions_for_result import esti_smass
+folder = 'esti_smass/'+check_name+'/'+check_name[4:]+str(count)
 if glob.glob(folder+'/SFH_*.fits') == [] and len(mag_dict)>2:
     esti_smass(ID = check_name[4:]+str(int(count)), folder = 'esti_smass/'+check_name+'/',
-               mags_dict = mag_dict, z = z, flag = flag, if_run_gsf=True)
+                mags_dict = mag_dict, z = z, flag = flag, if_run_gsf=True)
     spec_file = glob.glob(folder+'/gsf_spec_*.fits')[0]
     hdul_spec = pyfits.open(spec_file)
     info_spec = hdul_spec[1].header
