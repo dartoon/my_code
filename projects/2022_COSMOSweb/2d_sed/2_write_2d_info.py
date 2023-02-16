@@ -16,7 +16,7 @@ for name in ['cid_473', 'cid_1210', 'cid_1245']:
     steller_files = glob.glob(folder+'/SFH_*.fits')
     for file in steller_files:
         hdul = pyfits.open(file)
-        count = file.split('SFH_')[1].split('.')[0]
+        count = file.split('SFH_')[1].split('.')[0].split(name[:4])[1]
         info = hdul[0].header 
         smass = info['Mstel_50']
         sfr = info['SFR_50']
