@@ -57,6 +57,7 @@ fit_result*/
 *.bst
 *.cls
 *.doc
+*.docx
 *.eps
 predict_GW/*
 */*/image_library/*
@@ -120,3 +121,4 @@ template/*/*
 projects/2022_CEERS_checkup/real_analysis/model_JWST_stage3_Masafusa/fit_one_target/*/*
 projects/2022_JWST_QSOz6/model_z6_data_id*/for_smass/esti_smass/*/
 *.ecsv
+projects/2022_COSMOSweb/2d_sed/esti_smass/*

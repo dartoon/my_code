@@ -46,6 +46,6 @@ if glob.glob(folder+'/SFH_*.fits') == [] and len(mag_dict)>2:
     write_file = open(folder + '/gsf_spec_header.txt','w') 
     write_file.write(str(info_spec))
     write_file.close()
-    rm_file = glob.glob(folder + '/SPEC*corner*png') + glob.glob(folder+'/*asdf') 
+    rm_file = glob.glob(folder+'/gsf_spec_*.fits') + glob.glob(folder + '/SPEC*corner*png') + glob.glob(folder+'/*asdf') 
     for file in rm_file:
         os.remove(file)
