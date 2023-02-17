@@ -19,7 +19,7 @@ from galight.data_process import DataProcess
 from galight.tools.astro_tools import read_pixel_scale
 from galight.tools.astro_tools import plt_many_fits
 
-filt_i = 3
+filt_i = 0
 filt = ['F115W', 'F150W','F277W', 'F444W'][filt_i]
 filefolder = '/Volumes/Seagate_Expansion_Drive/data_backup/JWST_COSMOS/'
 filename = 'mosaic_nircam_f{0}w_COSMOS-Web_30mas_v0_1_i2d.fits'.format(filt[1:-1])
@@ -41,7 +41,6 @@ all_PSF_pos_list_ = []
 FWHM_filer = [2.1,2.25,4.5, 5.5][filt_i]  #Set 2.1 as upper limit
 # flux_filt = [[], []]
 rerun = False
-
 if rerun == True:
     for i in range(cut_p):
         for j in range(cut_p):
@@ -100,7 +99,7 @@ if rerun == True:
     all_PSF_pos_list = np.array(all_PSF_pos_list_)
     remove_i = []
     for i in range(len(all_PSF_pos_list)-1):
-        if np.min(np.sqrt( np.sum( (all_PSF_pos_list[i] - all_PSF_pos_list[i+1:])**2,axis=1 ) )) < 10:
+        if np.min(np.sqrt(np.sum( (all_PSF_pos_list[i] - all_PSF_pos_list[i+1:])**2,axis=1 ) )) < 10:
             remove_i.append(i)
             print('This PSF id{0} is repeated!'.format(i))
     
@@ -140,5 +139,24 @@ if rerun == True:
 print("After remove candidates")
 PSF_lib_files = glob.glob('material/'+filt+'_PSF_Library.pkl')[0]
 PSF_org_list, PSF_clean_list, all_PSF_pos_list, PSF_RA_DEC_list = pickle.load(open(PSF_lib_files,'rb'))
-plt_many_fits(PSF_clean_list)
+# plt_many_fits(PSF_clean_list)
 
+#%%Recut for larger size
+new_PSF_org_list, new_PSF_clean_list, new_all_PSF_pos_list, new_PSF_RA_DEC_list = [],[],[],[]
+from galight.tools.cutout_tools import cutout
+for i,pos in enumerate(all_PSF_pos_list):
+    image = cutout(image = img, center = pos, radius=120)
+    # plt_fits(image)
+    psf = psf_clean(image,if_plot=False, nsigma=3, npixels=45, ratio_to_replace=0.005,
+                    if_print_fluxratio=True)
+    plt_fits(psf)
+    ifsave = input('input any string to not save:\n')
+    if ifsave == '':
+        new_PSF_org_list.append(image)
+        new_PSF_clean_list.append(psf)
+        new_all_PSF_pos_list.append(all_PSF_pos_list[i])
+        new_PSF_RA_DEC_list.append(PSF_RA_DEC_list[i])
+        
+pickle.dump([new_PSF_org_list, new_PSF_clean_list, new_all_PSF_pos_list, new_PSF_RA_DEC_list],
+            open('material/'+filt+'_PSF_Library_v2.pkl', 'wb'))
+plt_many_fits(new_PSF_clean_list)

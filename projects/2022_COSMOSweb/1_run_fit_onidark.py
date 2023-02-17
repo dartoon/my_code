@@ -12,13 +12,13 @@ import matplotlib.pyplot as plt
 import pickle,glob
 
 import sys
-count = int(sys.argv[1]) - 1 # 1 - 12586
+count = int(sys.argv[1]) - 1 # 1 - 12000
 
 # filt_i = 1
 # filt = ['F115W', 'F150W','F277W', 'F444W'][filt_i]
 # cata_list = pickle.load(open('material/cata_list.pkl','rb'))
 
-fit_files = glob.glob('fit_material/fit_notrunyet_*.pkl')
+fit_files = glob.glob('fit_material/fit2_notrunyet_*.pkl')
 fit_files.sort()
 
 i = count
