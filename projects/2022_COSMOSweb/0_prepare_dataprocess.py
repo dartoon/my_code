@@ -41,12 +41,12 @@ for idx in range(run_i,len(cata_list)):
     if idx == 24:
         nsigma = 3.5
         npixel = 400
-    if idx == 42:
-        nsigma = 3.5
-        npixel = 400
     if idx == 27:
         nsigma = 4.5
         npixel = 470
+    if idx == 42:
+        nsigma = 3.5
+        npixel = 200
         
     for filt in filts:
         filename = 'mosaic_nircam_f{0}w_COSMOS-Web_30mas_v0_1_i2d.fits'.format(filt[1:-1])
