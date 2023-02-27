@@ -15,13 +15,13 @@ from galight.tools.astro_tools import plt_fits
 # count = int(sys.argv[1]) - 1 # 1 - 12586
 # idx = 10
 
-filt_i = 0
+filt_i = 3
 filt = ['F115W', 'F150W','F277W', 'F444W'][filt_i]
 # cata_list = pickle.load(open('material/cata_list.pkl','rb'))
 cata_list = pickle.load(open('material/cata_list.pkl','rb'))
 
-for i, item in enumerate(cata_list):
-    print(i, item)
+# for i, item in enumerate(cata_list):
+#     print(i, item)
 
 #%%
 # Quick check:
@@ -31,14 +31,17 @@ for i, item in enumerate(cata_list):
 # savename = fit_files[i].replace('_notrunyet_', '_run_')[:-4]+'_{0}.pkl'.format(i)
 # pickle.dump(fit_run , open(savename, 'wb'))
 top_psf_id = 0
-# fit_file_folder ='/Volumes/Seagate_Expansion_Drive/data_backup/JWST_COSMOS/'
-fit_file_folder ='./'
+# top_psf_id = 3 For idx 32 F444
+# top_psf_id = 2 For idx 40 F444
+
+fit_file_folder ='/Volumes/Seagate_Expansion_Drive/data_backup/JWST_COSMOS/'
+# fit_file_folder ='./'
 save_plot = True
 save_psf = False
 # for idx in range(50):
-for idx in [10]:
+for idx in [46]:
     fit_run_list = []
-    fit_files = glob.glob(fit_file_folder+'fit_result/fit_run_{0}*idx{1}_psf*.pkl'.format(filt,idx))
+    fit_files = glob.glob(fit_file_folder+'fit_result/fit2_run_{0}*idx{1}_psf*.pkl'.format(filt,idx))
     fit_files.sort()
     z = cata_list[idx][6]
     if z >0:
@@ -55,18 +58,21 @@ for idx in [10]:
         fit_run = fit_run_list[sort_Chisq[top_psf_id]]
         fit_run.cal_astrometry()
         target_ID = 'idx{0}_{1}_{2}_{3}'.format(idx,cata_list[idx][-1],filt,zinfo)
-        fit_run.savename = 'figures/idx{0}_{1}_{2}_{3}'.format(idx,cata_list[idx][-1],filt,zinfo)
+        
+        savename = 'figures/idx{0}_{1}_{2}_{3}'.format(idx,cata_list[idx][-1],filt,zinfo)
+        fit_run.fitting_specify_class.plot_fitting_sets(savename=savename+'_fitting_config.pdf')
+        fit_run.savename = savename
         fit_run.plot_final_qso_fit(target_ID =target_ID, show_plot=True,save_plot=save_plot)
     if save_psf == True:
         pyfits.PrimaryHDU(fit_run.fitting_specify_class.data_process_class.PSF_list[0]).writeto('PSFs_library/PSF_{0}_id{1}.fits'.format(
             filt,sort_Chisq[top_psf_id]),overwrite=True)
-    if fit_files == []:
-        pos = cata_list[idx][3:5]
-        filename = 'mosaic_nircam_f{0}w_COSMOS-Web_30mas_v0_1_i2d.fits'.format(filt[1:-1])
-        # filename = '1727_cosmos_mosaic_miri_exptime_scale1.0.fits'
-        fitsFile = pyfits.open(fit_file_folder+filename)
-        img = fitsFile[1].data[int(pos[1])-100:int(pos[1])+100, int(pos[0])-100:int(pos[0])+100] #
-        if save_plot == False:
-            plt_fits(img)
-        elif save_plot == True:
-            plt_fits(img, savename='figures/idx{0}_{1}_{2}_{3}_notfit.pdf'.format(idx,cata_list[idx][-1],filt,zinfo))
+    # if fit_files == []:
+    #     pos = cata_list[idx][3:5]
+    #     filename = 'mosaic_nircam_f{0}w_COSMOS-Web_30mas_v0_1_i2d.fits'.format(filt[1:-1])
+    #     # filename = '1727_cosmos_mosaic_miri_exptime_scale1.0.fits'
+    #     fitsFile = pyfits.open(fit_file_folder+filename)
+    #     img = fitsFile[1].data[int(pos[1])-100:int(pos[1])+100, int(pos[0])-100:int(pos[0])+100] #
+    #     if save_plot == False:
+    #         plt_fits(img)
+    #     elif save_plot == True:
+    #         plt_fits(img, savename='figures/idx{0}_{1}_{2}_{3}_notfit.pdf'.format(idx,cata_list[idx][-1],filt,zinfo))
