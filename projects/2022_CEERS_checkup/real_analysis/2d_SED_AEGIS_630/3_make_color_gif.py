@@ -15,7 +15,7 @@ import sys
 sys.path.insert(0, '../model_JWST_stage3_Masafusa/')
 # ID, mags, z = 'idx0', 
 # 1,2,0,51,35
-idx = 20
+idx = 16
 # root_folder = '../*/*'  #Include HST
 root_folder = '../model_JWST_stage3_Masafusa/'  #Not include HST
 fit_run_dict = load_prop(idx, root_folder = root_folder, prop_name='fit_run')
