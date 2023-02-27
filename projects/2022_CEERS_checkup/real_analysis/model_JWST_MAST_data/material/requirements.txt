@@ -60,7 +60,7 @@ jedi @ file:///Users/runner/miniforge3/conda-bld/jedi_1649067453550/work
 jellyfish @ file:///Users/runner/miniforge3/conda-bld/jellyfish_1649404793684/work
 Jinja2 @ file:///home/conda/feedstock_root/build_artifacts/jinja2_1636510082894/work
 jinja2-time @ file:///home/conda/feedstock_root/build_artifacts/jinja2-time_1646750632133/work
-joblib==1.1.0
+joblib==1.2.0
 jsonschema @ file:///home/conda/feedstock_root/build_artifacts/jsonschema-meta_1654138136460/work
 jupyter==1.0.0
 jupyter-client @ file:///home/conda/feedstock_root/build_artifacts/jupyter_client_1654730843242/work
