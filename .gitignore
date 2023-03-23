@@ -123,3 +123,4 @@ projects/2022_JWST_QSOz6/model_z6_data_id*/for_smass/esti_smass/*/
 *.ecsv
 projects/2022_COSMOSweb/2d_sed/esti_smass/*
 *_2d_result_bin2.txt
+projects/2022_JWST_QSOz6/simulation_SED/first_run/*
