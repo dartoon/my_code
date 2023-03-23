@@ -13,9 +13,9 @@ from scipy.interpolate import interp1d
 
 
 #%%
-
 from gsf import gsf
 gsf.run_gsf_all('sample.input', 1, idman=None)
+plt.show()
 
 #%%
 def cal_filt_flam(array_spec, fil):

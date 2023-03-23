@@ -48,6 +48,10 @@ if filter_set == 3:
     filts = ['F150W', 'F277W', 'F356W']
 if filter_set == 4:
     filts = ['F150W', 'F277W', 'F356W', 'F444W']
+if filter_set == 5:
+    filts = ['F150W', 'F277W']
+if filter_set == 6:
+    filts = ['F150W', 'F200W']
 
 
 #%%
