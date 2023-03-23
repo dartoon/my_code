@@ -27,8 +27,7 @@ print(cata_list[check_id[0]])
 #%%
 filts = ['F115W', 'F150W','F277W', 'F444W']
 image_list = []
-fit_file_folder ='fit_material'
-
+fit_file_folder ='fit_result'
 ifACS = True
 
 for idx in check_id:
@@ -38,29 +37,30 @@ for idx in check_id:
         image_list.append(image)
     for filt in filts:
         fit_run_list = []
-        fit_files = glob.glob(fit_file_folder+'/fit_notrunyet_{0}_idx{1}_psf0.pkl'.format(filt,idx))
+        fit_files = glob.glob(fit_file_folder+'/fit2_run_{0}_idx{1}_psf*.pkl'.format(filt,idx))
         fit_files.sort()
         z = cata_list[idx][6]
         if z >0:
             zinfo = 'Zspec'+str(z)
         elif z <0:
             zinfo = 'Zphot'+str(cata_list[idx][5])
-        
         fit_run = pickle.load(open(fit_files[0],'rb'))
+        fit_run.plot_final_qso_fit(target_ID = check_name+'_'+filt)
         image_list.append(fit_run.fitting_specify_class.data_process_class.target_stamp)
-if ifACS==True:
-    filts  = ['ACS']+filts
         
-import copy, matplotlib
-my_cmap = copy.copy(matplotlib.cm.get_cmap('gist_heat')) # copy the default cmap
-my_cmap.set_bad('black')
+# if ifACS==True:
+#     filts  = ['ACS']+filts
+        
+# import copy, matplotlib
+# my_cmap = copy.copy(matplotlib.cm.get_cmap('gist_heat')) # copy the default cmap
+# my_cmap.set_bad('black')
 
-fig, axs = plt.subplots(len(image_list), figsize=(5,18))
-for i in range(len(image_list)):
-    norm = LogNorm(vmin = 0.001, vmax =image_list[i].max() )
-    axs[i].imshow(image_list[i], norm=norm, origin='lower',cmap = my_cmap) 
-    axs[i].set_ylabel(filts[i],fontsize=20)
-    axs[i].tick_params(labelsize=15)
-fig.suptitle('{0}'.format(check_name),fontsize=35)
-fig.tight_layout()
-plt.show()
+# fig, axs = plt.subplots(len(image_list), figsize=(5,18))
+# for i in range(len(image_list)):
+#     norm = LogNorm(vmin = 0.001, vmax =image_list[i].max() )
+#     axs[i].imshow(image_list[i], norm=norm, origin='lower',cmap = my_cmap) 
+#     axs[i].set_ylabel(filts[i],fontsize=20)
+#     axs[i].tick_params(labelsize=15)
+# fig.suptitle('{0}'.format(check_name),fontsize=35)
+# fig.tight_layout()
+# plt.show()

@@ -128,15 +128,15 @@ for ct, line in enumerate(lines[1:-1]):
         EBV_image[_i, _j] = EBV    #logGyr
 
         
-for i in range(len(smass_image)):
-    for j in range(len(smass_image)):
-        if smass_image[i,j]>8.:
-            check = np.average([ smass_image[i-1,j], smass_image[i+1,j], 
-                                           smass_image[i,j-1], smass_image[i,j+1]])
-            if smass_image[i,j] > check*1.1:
-                smass_image[i,j] = check
-                sfr_image[i,j] = np.average([ sfr_image[i-1,j], sfr_image[i+1,j], 
-                                               sfr_image[i,j-1], sfr_image[i,j+1]])
+# for i in range(len(smass_image)):
+#     for j in range(len(smass_image)):
+#         if smass_image[i,j]>8.:
+#             check = np.average([ smass_image[i-1,j], smass_image[i+1,j], 
+#                                            smass_image[i,j-1], smass_image[i,j+1]])
+#             if smass_image[i,j] > check*1.1:
+#                 smass_image[i,j] = check
+#                 sfr_image[i,j] = np.average([ sfr_image[i-1,j], sfr_image[i+1,j], 
+#                                                sfr_image[i,j-1], sfr_image[i,j+1]])
 
         
 #%%
@@ -171,9 +171,11 @@ plt.imshow(EBV_image, norm=norm, origin='lower' )
 plt.colorbar()
 plt.show()
 
+pickle.dump(EBV_image , open('E(BV)_{0}.pkl'.format(target_id), 'wb'))
 
-import matplotlib
-cmap_r = matplotlib.cm.get_cmap('RdBu_r')
+
+# import matplotlib
+# cmap_r = matplotlib.cm.get_cmap('RdBu_r')
 
 # #%%
 # from astropy.visualization import make_lupton_rgb

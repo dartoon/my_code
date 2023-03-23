@@ -83,7 +83,8 @@ for i, filt in enumerate(run_filt_list[:]):
     image_list[i] = img_show
     print(pos)
     print(filt,'finish', img_show.shape)
-    
+
+   
 
 #%%
 zp_dict = {}
@@ -130,6 +131,10 @@ for i in range(len(sed_image[0])):
         sed_2d_info.append([i, j, mag_result])
 import pickle      
 pickle.dump(sed_2d_info, open('sed_2d_info_bin2.pkl', 'wb'))
+
+pickle.dump(image_list, open('colorimage_bin2_{0}.pkl'.format(target_id), 'wb'))
+
+ 
 #%%
 
 images = []

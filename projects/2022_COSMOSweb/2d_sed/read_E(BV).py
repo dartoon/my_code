@@ -59,11 +59,7 @@ aper.plot(color='blue',
 plt.show()
 from photutils.aperture import aperture_photometry
 mask_ = aper.to_mask(method = 'center')
-w,h = mask_.shape
-mask = np.zeros_like(Ebv_image) 
-mask[int(f_center - w/2): int(f_center + w/2) , int(f_center- h/2): int(f_center+h/2) ] +=  mask_
-# plt.imshow(mask, origin='lower')
-# plt.show()
+mask = mask_.to_image(Ebv_image.shape)
 mean = np.mean(Ebv_image[mask==1])
 std = np.std(Ebv_image[mask==1])
 print('{2} E(B-V) in aperture: {0:.3}$\pm${1:.3}'.format(mean,std, name))

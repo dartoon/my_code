@@ -171,6 +171,7 @@ plt.imshow(EBV_image, norm=norm, origin='lower' )
 plt.colorbar()
 plt.show()
 
+pickle.dump(EBV_image , open('E(BV)_{0}.pkl'.format(target_id), 'wb'))
 
 import matplotlib
 cmap_r = matplotlib.cm.get_cmap('RdBu_r')
