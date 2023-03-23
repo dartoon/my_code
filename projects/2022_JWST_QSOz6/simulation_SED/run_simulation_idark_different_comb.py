@@ -33,12 +33,12 @@ def cal_filt_flam(array_spec, fil):
 #%%Produce mock paramters
 
 import sys
-# count = int(sys.argv[1]) - 1 # 1 - 2809
-# flag = int(sys.argv[2])
-# filter_set = int(sys.argv[3])
-filter_set = 4
-count = 0
-flag = 1
+count = int(sys.argv[1]) - 1 # 1 - 2809
+flag = int(sys.argv[2])
+filter_set = int(sys.argv[3])
+# filter_set = 4
+# count = 0
+# flag = 1
 
 if filter_set == 1:
     filts = ['F277W', 'F356W']
