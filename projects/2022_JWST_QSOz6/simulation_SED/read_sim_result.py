@@ -10,27 +10,32 @@ import numpy as np
 import astropy.io.fits as pyfits
 import matplotlib.pyplot as plt
 import glob
-folder = 'first_run/F150W_F356W/'  #F150W_F356W
-folder = 'first_run/F150W_F200W/'
-folder = 'first_run/F150W_F277W/'
-folder = 'first_run/F277W_F356W/'
-folder = 'first_run/F356W_F444W/'
-# folder = 'otherfilt_result/F150W_F277W_F356W/'
-# folder = 'otherfilt_result/F150W_F277W_F356W_F444W/'
+
+path = 'second_run/'
+folder = path+'F150W_F356W/'  #F150W_F356W
+# folder = path+'F150W_F200W/'
+# folder = path+'F150W_F277W/'
+# folder = path+'F277W_F356W/'
+# folder = path+'F356W_F444W/'
+# folder = path+'/F150W_F277W_F356W/'
+# folder = path+'/F150W_F277W_F356W_F444W/'
 
 result_folders = glob.glob(folder + 'seed*_result')
 
-sim_folder = 'first_run/F150W_F356W/'
+sim_folder = 'first_run/simulation/'
 smass_match = []
 age_match = []
 ages = []
 Avs = []
+
+check_mass_up_low = []
 for result_folder in result_folders:
     seed = result_folder.split('seed')[1].split('_')[0]
     steller_file = glob.glob(sim_folder+'/seed{0}_sim/SFH_*.fits'.format(seed))[0]
     hdul = pyfits.open(steller_file)
     info1 = hdul[0].header 
     smass_True = float(info1['Mstel_50'])
+    check_mass_up_low = float(info1['Mstel_50']) - float(info1['Mstel_50']) 
     ages.append(10**float(info1['T_MW_50']))
     Avs.append(float(info1['AV_50']))
     

@@ -3,8 +3,8 @@
 #
 # params for MCMC
 #
-NMC		700 # interation of MCMC    #Run after redshift MCMC
-NWALK		50 #number of walker
+NMC		5000 # interation of MCMC    #Run after redshift MCMC
+NWALK		200 #number of walker
 NMCZ		5	#MCMC interation for redshift.  #First run in the MCMC
 NWALKZ		2  #walkers for redshift
 TAU0		-1 # in Gyr for tau; Randomly taken when MCMC.  IGNORE

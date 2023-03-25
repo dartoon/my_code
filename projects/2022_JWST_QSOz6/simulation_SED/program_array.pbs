@@ -3,7 +3,7 @@
 #PBS -o /home/xuheng.ding/Astro/my_code/projects/2022_JWST_QSOz6/simulation_SED/pbs
 #PBS -e /home/xuheng.ding/Astro/my_code/projects/2022_JWST_QSOz6/simulation_SED/pbs
 #PBS -l nodes=1:ppn=1
-#PBS -l walltime=01:50:00
+#PBS -l walltime=03:50:00
 #PBS -l mem=200mb
 #PBS -J 1-3000:1
 #PBS -u xuheng.ding
