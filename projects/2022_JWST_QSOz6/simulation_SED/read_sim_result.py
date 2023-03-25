@@ -55,6 +55,8 @@ for result_folder in result_folders:
     age_match.append( 10**float(info2['T_MW_50'])-10**float(info1['T_MW_50']) )
     
 #%%
+Avs = np.array(Avs)
+ages = np.array(ages)
 smass_match = np.array(smass_match)
 sim_mass_up_low = np.array(sim_mass_up_low)
 mod_mass_up_low = np.array(mod_mass_up_low)
