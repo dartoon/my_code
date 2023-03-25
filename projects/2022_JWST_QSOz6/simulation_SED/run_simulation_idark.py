@@ -34,7 +34,7 @@ def cal_filt_flam(array_spec, fil):
 
 import sys
 count = int(sys.argv[1]) - 1 # 1 - 2809
-filter_set = int(sys.argv[3])
+filter_set = int(sys.argv[2])
 # count = 1
 # filter_set = 0
 
