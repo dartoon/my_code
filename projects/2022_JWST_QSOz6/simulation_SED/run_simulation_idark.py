@@ -134,12 +134,12 @@ if glob.glob(SED_folder) ==[]:
 from SED_function import esti_smass
 sed_folder = SED_folder + folder.split('/')[1].replace('sim', 'result')
 
-esti_smass(ID = '20230302'+str(seed),folder = folder.replace('sim', 'result'), 
+esti_smass(ID = '20230302'+str(seed),folder = sed_folder, 
            mags_dict = mag_result, z = z, flag = flag, 
             if_run_gsf=True, band_as_upper = [],
             mag_err=[0.2]*len(mag_result), just_run = False)
 #%%Collecting results
-steller_file = glob.glob(folder.replace('sim', 'result')+'/SFH_*.fits')[0]
+steller_file = glob.glob(sed_folder+'/SFH_*.fits')[0]
 hdul = pyfits.open(steller_file)
 info1 = hdul[0].header 
 smass_infer = info1['Mstel_50']
