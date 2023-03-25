@@ -33,13 +33,15 @@ def cal_filt_flam(array_spec, fil):
 #%%Produce mock paramters
 
 import sys
-count = int(sys.argv[1]) - 1 # 1 - 2809
-filter_set = int(sys.argv[2])
-# count = 1
-# filter_set = 0
+# count = int(sys.argv[1]) - 1 # 1 - 2809
+# filter_set = int(sys.argv[2])
+# sim_flag = int(sys.argv[3])
+# flag = int(sys.argv[4])
 
-# flag = int(sys.argv[2])
-flag = 1
+count = 1
+filter_set = 0
+flag = 0
+sim_flag = 0
 if filter_set == 0:
     filts = ['F150W', 'F356W']
 if filter_set == 1:
@@ -57,9 +59,9 @@ if filter_set == 6:
     
 #%%
 seed = count
-age = np.random.uniform(0.3,0.7)#0.3
+# age = np.random.uniform(0.3,0.7)#0.3
 Av = np.random.uniform(0.3,1.0)
-# metallicity = np.random.uniform(-0.7, -0.3)
+# metallicity = np.random.uniform(-1.0, -0.3)
 
 folder = 'second_run/seed{0}_sim'.format(seed)
 if filter_set == 0:
@@ -77,7 +79,8 @@ if filter_set == 0:
     #Create a input file
     f = open("gene_temp/sample.input","r")
     string = f.read()
-    string = string.replace("age_temp", str(age))
+    # string = string.replace("age_temp", str(age))
+    string = string.replace("age_temp", '0.3,0.4,0.5,0.6,0.7')
     string = string.replace("folder", folder)
     # string = string.replace("Z_temp", str(metallicity))
     string = string.replace("Av_temp", str(Av) )
@@ -87,7 +90,7 @@ if filter_set == 0:
     write_file.close()
     
     from gsf import gsf
-    gsf.run_gsf_all(folder + '/generate_sample.input', 0, idman=None)
+    gsf.run_gsf_all(folder + '/generate_sample.input', sim_flag, idman=None)
     move_file = glob.glob('*_20230301{0}_*'.format(seed)) + glob.glob('*_20230301{0}.*'.format(seed))
     for file in move_file:
         shutil.move(file, folder)

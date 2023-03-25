@@ -16,8 +16,8 @@ TAU_COMP	1 # comparison between different tau for each ssp when plot.
 #
 # Params for data
 #
-DIR_TEMP	./folder/templates/  # Directory of extracted spectra.
-DIR_EXTR	./folder/templates/ # Directory of extracted spectra.
+DIR_TEMP	./gene_temp/templates/  # Directory of extracted spectra.
+DIR_EXTR	./gene_temp/templates/ # Directory of extracted spectra.
 DIR_FILT	../../../template/gsf_temp/filter/ 
 CAT_BB		./folder/generate_sample.cat # Directory of extracted spectra.
 FILTER		356,353 #

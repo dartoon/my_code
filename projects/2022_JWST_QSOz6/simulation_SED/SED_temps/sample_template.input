@@ -27,7 +27,7 @@ FILTER		filterIDs #
 #
 AGE			0.3,0.4,0.5,0.6,0.7 #I only select one value
 ZMAX		-0.3 # Max metalicity
-ZMIN		-0.7 # Min metalicity
+ZMIN		-1 # Min metalicity
 DELZ		0.1  # Should be smaller than the gap between ZMAX and ZMIN.
 #ZFIX		metaltemp # logZ/Zsun
 ZEVOL		0 # Evolution in Z; 1=yes, 0=no.
