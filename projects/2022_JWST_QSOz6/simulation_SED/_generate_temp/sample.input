@@ -8,7 +8,7 @@ NWALK		50 #number of walker
 NMCZ		5	#MCMC interation for redshift.  #First run in the MCMC
 NWALKZ		2  #walkers for redshift
 TAU0		-1 # in Gyr for tau; Randomly taken when MCMC.  IGNORE
-FNELD		nelder #powell, nelder, differential_evolution
+FNELD		differential_evolution #powell, nelder, differential_evolution
 NTEMP		0 # Number of parallel tempering.
 NCPU		0 # Number of multiprocessing.
 TAU_COMP	1 # comparison between different tau for each ssp when plot.
@@ -49,8 +49,8 @@ CZ0 		0.83167 # Initial guess of spectral normalization for G102. #Doesn't affec
 CZ1		    10.96804 # Initial guess of spectral normalization for G141.
 LINE 		0 #4102,4341,4861,4959 #3869.,3894.6,4102,4341,4960.,5008.  # Emission line, iin AA.
 ZVIS		0 # Visual inspection of redshift. 1=yes, 0=no. If you are not confident with zgal, cz1/2, then ZVIS should be 1 for iteration.
-ADD_NEBULAE	0 # Add nebular lines from Cloudy if 1.
-logUMAX     -1
-logUMIN     -1.1
-DELlogU     1
-#logUFIX     -1 #Typcial ionization para.
+ADD_NEBULAE	1 # Add nebular lines from Cloudy if 1.
+#logUMAX     -1
+#logUMIN     -3
+#DELlogU     2
+logUFIX     -6 #Typcial ionization para.

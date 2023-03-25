@@ -13,4 +13,10 @@
 
 cd /home/xuheng.ding/Astro/my_code/projects/2022_JWST_QSOz6/simulation_SED/
 source activate gsf
+python run_simulation_idark.py $PBS_ARRAY_INDEX 0
 python run_simulation_idark.py $PBS_ARRAY_INDEX 1
+python run_simulation_idark.py $PBS_ARRAY_INDEX 2
+python run_simulation_idark.py $PBS_ARRAY_INDEX 3
+python run_simulation_idark.py $PBS_ARRAY_INDEX 4
+python run_simulation_idark.py $PBS_ARRAY_INDEX 5
+python run_simulation_idark.py $PBS_ARRAY_INDEX 6

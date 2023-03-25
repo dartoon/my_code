@@ -31,12 +31,12 @@ def cal_filt_flam(array_spec, fil):
     return filt_flam
 
 #%%Produce mock paramters
-seed = 3
+seed = 1
 age = np.random.uniform(0.3,0.7)#0.3
 Av = np.random.uniform(0.3,1.0)
-metallicity = np.random.uniform(-0.7, -0.3)
+#metallicity = np.random.uniform(-0.7, -0.3)
 
-folder = 'first_run/seed{0}_sim'.format(seed)
+folder = 'second_run/seed{0}_sim'.format(seed)
 if glob.glob(folder) !=[]:
     shutil.rmtree(folder)
 os.mkdir(folder)
@@ -53,7 +53,7 @@ f = open("gene_temp/sample.input","r")
 string = f.read()
 string = string.replace("age_temp", str(age))
 string = string.replace("folder", folder)
-string = string.replace("Z_temp", str(metallicity))
+# string = string.replace("Z_temp", str(metallicity))
 string = string.replace("Av_temp", str(Av) )
 string = string.replace("seedid", str(seed) )
 write_file = open(folder+'/generate_sample.input','w') 

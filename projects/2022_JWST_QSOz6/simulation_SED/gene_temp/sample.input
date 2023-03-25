@@ -26,10 +26,10 @@ FILTER		356,353 #
 # Params for SED
 #
 AGE			age_temp #I only select one value
-#ZMAX		-0.3 # Max metalicity
-#ZMIN		-1 # Min metalicity
-#DELZ		0.1  # Should be smaller than the gap between ZMAX and ZMIN.
-ZFIX		Z_temp # logZ/Zsun
+ZMAX		-0.3 # Max metalicity
+ZMIN		-1 # Min metalicity
+DELZ		0.1  # Should be smaller than the gap between ZMAX and ZMIN.
+#ZFIX		Z_temp # logZ/Zsun
 ZEVOL		0 # Evolution in Z; 1=yes, 0=no.
 AVFIX		Av_temp #
 #AVMIN		0.3 # Minimum Av (Dust Attenuation) in mag.
@@ -49,8 +49,8 @@ CZ0 		0.83167 # Initial guess of spectral normalization for G102. #Doesn't affec
 CZ1		    10.96804 # Initial guess of spectral normalization for G141.
 LINE 		0 #4102,4341,4861,4959 #3869.,3894.6,4102,4341,4960.,5008.  # Emission line, iin AA.
 ZVIS		0 # Visual inspection of redshift. 1=yes, 0=no. If you are not confident with zgal, cz1/2, then ZVIS should be 1 for iteration.
-ADD_NEBULAE	0 # Add nebular lines from Cloudy if 1.
-#logUMAX     -2
-#logUMIN     -2
-#DELlogU     1 
-logUFIX     -1.5 #Typcial ionization para.
+ADD_NEBULAE	1 # Add nebular lines from Cloudy if 1.
+logUMAX     -1
+logUMIN     -3
+DELlogU     2
+#logUFIX     -1.5 #Typcial ionization para.

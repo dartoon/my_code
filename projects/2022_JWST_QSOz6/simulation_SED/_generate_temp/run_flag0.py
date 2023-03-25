@@ -11,7 +11,6 @@ import astropy.io.fits as pyfits
 import matplotlib.pyplot as plt
 from scipy.interpolate import interp1d
 
-
 #%%
 from gsf import gsf
 gsf.run_gsf_all('sample.input', 1, idman=None)
