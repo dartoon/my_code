@@ -22,20 +22,21 @@ folder = path+'F150W_F356W/'  #F150W_F356W
 
 result_folders = glob.glob(folder + 'seed*_result')
 
-sim_folder = 'first_run/simulation/'
+sim_folder = 'second_run/simulation/'
 smass_match = []
 age_match = []
 ages = []
 Avs = []
 
-check_mass_up_low = []
+sim_mass_up_low = []
+mod_mass_up_low = []
 for result_folder in result_folders:
     seed = result_folder.split('seed')[1].split('_')[0]
     steller_file = glob.glob(sim_folder+'/seed{0}_sim/SFH_*.fits'.format(seed))[0]
     hdul = pyfits.open(steller_file)
     info1 = hdul[0].header 
     smass_True = float(info1['Mstel_50'])
-    check_mass_up_low = float(info1['Mstel_50']) - float(info1['Mstel_50']) 
+    sim_mass_up_low.append(float(info1['Mstel_84']) - float(info1['Mstel_16']) )
     ages.append(10**float(info1['T_MW_50']))
     Avs.append(float(info1['AV_50']))
     
@@ -43,27 +44,38 @@ for result_folder in result_folders:
     hdul = pyfits.open(steller_file)
     info2 = hdul[0].header 
     smass_infer = float(info2['Mstel_50'])
+    mod_mass_up_low.append(float(info2['Mstel_84']) - float(info2['Mstel_16']) )
     # print(float(smass_infer)-float(smass_True))
     smass_match.append(float(smass_infer)-float(smass_True))
+    # if len(seed) == 2:
+    # if seed == '22':
+    #     print(info1)
+    #     print(info2)
+    #     print(seed, float(smass_infer)-float(smass_True))
     age_match.append( 10**float(info2['T_MW_50'])-10**float(info1['T_MW_50']) )
     
 #%%
+smass_match = np.array(smass_match)
+sim_mass_up_low = np.array(sim_mass_up_low)
+mod_mass_up_low = np.array(mod_mass_up_low)
 comb= folder.split('/')[-2]
+
 plt.figure(figsize=(7,5))
-plt.hist(smass_match)
-plt.xlabel('log(M*) scatter (infer $-$ True): $\pm${0:.2f}'.format(np.std(smass_match)),fontsize=15)
+eff_bool = (sim_mass_up_low<1.2)*(mod_mass_up_low<1.2)
+plt.hist(smass_match[eff_bool])
+plt.xlabel('log(M*) scatter (infer $-$ True): $\pm${0:.2f}'.format(np.std(smass_match[eff_bool])),fontsize=15)
 plt.title("filter set: "+comb, fontsize=15)
 plt.show()
 print(folder)
 print(np.std(smass_match))
 
-plt.figure(figsize=(7,5))
-plt.hist(age_match)
-plt.xlabel('age scatter (infer $-$ True): $\pm${0:.2f} Gyr'.format(np.std(age_match)),fontsize=15)
-plt.title("filter set: "+comb, fontsize=15)
-plt.show()
-print(folder)
-print(np.std(age_match))
+# plt.figure(figsize=(7,5))
+# plt.hist(age_match)
+# plt.xlabel('age scatter (infer $-$ True): $\pm${0:.2f} Gyr'.format(np.std(age_match)),fontsize=15)
+# plt.title("filter set: "+comb, fontsize=15)
+# plt.show()
+# print(folder)
+# print(np.std(age_match))
 
 # plt.figure(figsize=(7,5))
 # plt.scatter(ages,smass_match)
