@@ -78,7 +78,7 @@ if filter_set == 0:
     write_file.close()
     
     #Create a input file
-    f = open("gene_temp/sample.input","r")
+    f = open("gene_temp/sample_Av2.input","r")
     string = f.read()
     # string = string.replace("age_temp", str(age))
     string = string.replace("age_temp", '0.3,0.4,0.5,0.6,0.7')
@@ -86,7 +86,7 @@ if filter_set == 0:
     # string = string.replace("Z_temp", str(metallicity))
     string = string.replace("Av_temp", str(Av) )
     string = string.replace("seedid", str(seed) )
-    write_file = open(folder+'/generate_sample.input','w') 
+    write_file = open(folder+'/generate_sample_Av2.input','w') 
     write_file.write(string)
     write_file.close()
     
