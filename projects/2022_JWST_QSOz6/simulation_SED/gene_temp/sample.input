@@ -52,5 +52,5 @@ ZVIS		0 # Visual inspection of redshift. 1=yes, 0=no. If you are not confident w
 ADD_NEBULAE	1 # Add nebular lines from Cloudy if 1.
 logUMAX     -1
 logUMIN     -3
-DELlogU     1
+DELlogU     2
 #logUFIX     -1.5 #Typcial ionization para.
