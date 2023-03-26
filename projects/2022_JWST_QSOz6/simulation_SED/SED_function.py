@@ -20,7 +20,7 @@ jwst_filt_id = {'F115W': '352', 'F150W': '353', 'F200W': '354',
            'F277W': '355', 'F356W': '356', 'F444W': '357', 'F410M': '362'}
 
 def esti_smass(ID, mags_dict, z, folder = 'esti_smass/', flag = 0, if_run_gsf=True, band_as_upper = [],
-               mag_err = [], just_run = False, metallicity = 0.0):
+               mag_err = [], just_run = False, metallicity = 0.0, inputname = 'sample_template'):
     from gsf import gsf
     if just_run == False:
         ID = ID
@@ -72,7 +72,7 @@ def esti_smass(ID, mags_dict, z, folder = 'esti_smass/', flag = 0, if_run_gsf=Tr
         write_file.close()
     
         #Create a input file
-        f = open("SED_temps/sample_template.input","r")
+        f = open("SED_temps/{0}.input".format(inputname),"r")
         string = f.read()
         string = string.replace("idname", str(int(ID)))
         string = string.replace("zinfo", str(z))
