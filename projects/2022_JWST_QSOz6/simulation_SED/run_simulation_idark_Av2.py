@@ -64,7 +64,7 @@ seed = count
 Av = np.random.uniform(0.3,2.0)
 # metallicity = np.random.uniform(-1.0, -0.3)
 
-folder = 'second_run/seed{0}_sim'.format(seed)
+folder = 'third_run/seed{0}_sim'.format(seed)
 if filter_set == 0:
     if glob.glob(folder) !=[]:
         shutil.rmtree(folder)
