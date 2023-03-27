@@ -11,19 +11,22 @@ import astropy.io.fits as pyfits
 import matplotlib.pyplot as plt
 import glob
 
-# path = 'second_run/'
-path = 'third_run/'
+# path = 'first_run/'  #Av 0.3-1, Metal, -1, -0.3, logU -3, -2.
+# path = 'second_run/'  #Av 0.3-1, Metal, -1, -0.3, logU -3, -1
+# path = 'third_run/'   #Av 0.3-2, Metal, -1, -0.3
+path = 'fourth_run/'   #Av 0.3-3, Metal, -2, 0
+
 folder = path+'F150W_F356W/'  #F150W_F356W
 # folder = path+'F150W_F200W/'
 # folder = path+'F150W_F277W/'
 # folder = path+'F277W_F356W/'
 # folder = path+'F356W_F444W/'
-# folder = path+'/F150W_F277W_F356W/'
-# folder = path+'/F150W_F277W_F356W_F444W/'
+# folder = path+'F150W_F277W_F356W/'
+# folder = path+'F150W_F277W_F356W_F444W/'
 
 result_folders = glob.glob(folder + 'seed*_result')
 
-sim_folder = path + '/simulation/'
+sim_folder = path + 'simulation/'
 smass_match = []
 age_match = []
 ages = []
@@ -33,7 +36,7 @@ sim_mass_up_low = []
 mod_mass_up_low = []
 for result_folder in result_folders:
     seed = result_folder.split('seed')[1].split('_')[0]
-    steller_file = glob.glob(sim_folder+'/seed{0}_sim/SFH_*.fits'.format(seed))[0]
+    steller_file = glob.glob(sim_folder+'seed{0}_sim/SFH_*.fits'.format(seed))[0]
     hdul = pyfits.open(steller_file)
     info1 = hdul[0].header 
     smass_True = float(info1['Mstel_50'])
@@ -65,9 +68,11 @@ comb= folder.split('/')[-2]
 
 
 plt.figure(figsize=(7,5))
-eff_bool = (sim_mass_up_low<100)
-# eff_bool = (sim_mass_up_low<0.4) *(mod_mass_up_low<0.4) #* (sim_mass_up_low>0.15) *(mod_mass_up_low>0.15)
-eff_bool = (sim_mass_up_low<np.percentile(sim_mass_up_low,70)) *(mod_mass_up_low<np.percentile(mod_mass_up_low,70)) #* (sim_mass_up_low>0.15) *(mod_mass_up_low>0.15)
+if 'first' in path:
+    eff_bool = (sim_mass_up_low<100)
+else:
+    # eff_bool = (sim_mass_up_low<0.4) *(mod_mass_up_low<0.4) #* (sim_mass_up_low>0.15) *(mod_mass_up_low>0.15)
+    eff_bool = (sim_mass_up_low<np.percentile(sim_mass_up_low,70)) *(mod_mass_up_low<np.percentile(mod_mass_up_low,70)) #* (sim_mass_up_low>0.15) *(mod_mass_up_low>0.15)
 plt.hist(smass_match[eff_bool])
 plt.xlabel('log(M*) scatter (infer $-$ True): {0:.2f}$\pm${1:.2f}'.format(np.mean(smass_match[eff_bool]), np.std(smass_match[eff_bool])),fontsize=15)
 plt.title("filter set: "+comb, fontsize=15)
