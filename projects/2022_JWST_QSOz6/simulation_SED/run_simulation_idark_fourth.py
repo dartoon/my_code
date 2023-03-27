@@ -81,7 +81,7 @@ if filter_set == 0:
     f = open("gene_temp/sample_fourth.input","r")
     string = f.read()
     # string = string.replace("age_temp", str(age))
-    string = string.replace("age_temp", '0.3,0.4,0.5,0.6,0.7')
+    string = string.replace("age_temp", '0.01,0.03,0.1,0.3,0.5,0.75')
     string = string.replace("folder", folder)
     # string = string.replace("Z_temp", str(metallicity))
     string = string.replace("Av_temp", str(Av) )

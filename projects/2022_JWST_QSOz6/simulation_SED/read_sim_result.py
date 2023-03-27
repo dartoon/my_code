@@ -11,7 +11,7 @@ import astropy.io.fits as pyfits
 import matplotlib.pyplot as plt
 import glob
 
-# path = 'first_run/'  #Av 0.3-1, Metal, -1, -0.3, logU -3, -2.
+# path = 'first_run/'  #Av 0.3-1, Metal, -1, -0.3, No logU
 # path = 'second_run/'  #Av 0.3-1, Metal, -1, -0.3, logU -3, -1
 # path = 'third_run/'   #Av 0.3-2, Metal, -1, -0.3
 path = 'fourth_run/'   #Av 0.3-3, Metal, -2, 0
