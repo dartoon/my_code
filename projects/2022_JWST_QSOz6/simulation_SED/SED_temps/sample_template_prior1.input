@@ -26,7 +26,7 @@ FILTER		filterIDs #
 # Params for SED
 #
 AGE			0.01,0.03,0.1,0.3,0.5,0.75 #I only select one value
-ZMAX		0.3 # Max metalicity
+ZMAX		-0.3 # Max metalicity
 ZMIN		-1 # Min metalicity
 DELZ		0.1  # Should be smaller than the gap between ZMAX and ZMIN.
 #ZFIX		metaltemp # logZ/Zsun
