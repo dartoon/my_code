@@ -11,10 +11,10 @@ import astropy.io.fits as pyfits
 import matplotlib.pyplot as plt
 import glob
 
-# path = 'first_run/'  #Av 0.3-1, Metal, -1, -0.3, No logU
+# path = 'first_run/'  #Av 0.3-1, Metal, -1, -0.3, No Emission line.
 # path = 'second_run/'  #Av 0.3-1, Metal, -1, -0.3, logU -3, -1
 # path = 'third_run/'   #Av 0.3-2, Metal, -1, -0.3
-path = 'fourth_run/'   #Av 0.3-2, Metal, -2, 0, Age, 0.01,0.75
+path = 'fourth_run/'   #Av 0.3-3, Metal, -2, 0, Age, 0.01,0.75
 
 folder = path+'F150W_F356W/'  #F150W_F356W
 # folder = path+'F150W_F200W/'
@@ -80,7 +80,7 @@ plt.show()
 print(folder)
 print(len(smass_match[eff_bool])/len(smass_match))
 print(len(smass_match))
-
+# plt.hist(Avs[sim_mass_up_low<0.6])
 # plt.hist(sim_mass_up_low[sim_mass_up_low<np.percentile(sim_mass_up_low,60)])
 
 # plt.figure(figsize=(7,5))

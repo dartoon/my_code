@@ -41,7 +41,7 @@ z = 6.34
 import time
 t1 = time.time()
 print('Run estimate')
-esti_smass(ID = folder+str(idx), mags_dict = mag_result, z = z, flag = 1, 
+esti_smass(ID = folder+str(idx), mags_dict = mag_result, z = z, flag = 0, 
             if_run_gsf=True, band_as_upper = band_as_upper, metallicity=-0.7,
             mag_err=[0.2]*len(mag_result), just_run = False)
 t2 = time.time()

@@ -61,10 +61,10 @@ if filter_set == 6:
 #%%
 seed = count
 # age = np.random.uniform(0.3,0.7)#0.3
-Av = np.random.uniform(0.3,2.0)
+Av = np.random.uniform(0.3,1)
 # metallicity = np.random.uniform(-1.0, -0.3)
 
-folder = 'third_run/seed{0}_sim'.format(seed)
+folder = 'prior1_run/seed{0}_sim'.format(seed)
 if filter_set == 0:
     if glob.glob(folder) !=[]:
         shutil.rmtree(folder)
@@ -78,20 +78,20 @@ if filter_set == 0:
     write_file.close()
     
     #Create a input file
-    f = open("gene_temp/sample_Av2.input","r")
+    f = open("gene_temp/sample_prior1.input","r")
     string = f.read()
     # string = string.replace("age_temp", str(age))
-    string = string.replace("age_temp", '0.3,0.4,0.5,0.6,0.7')
+    string = string.replace("age_temp", '0.01,0.03,0.1,0.3,0.5,0.75')
     string = string.replace("folder", folder)
     # string = string.replace("Z_temp", str(metallicity))
     string = string.replace("Av_temp", str(Av) )
     string = string.replace("seedid", str(seed) )
-    write_file = open(folder+'/generate_sample_Av2.input','w') 
+    write_file = open(folder+'/generate_sample.input','w') 
     write_file.write(string)
     write_file.close()
     
     from gsf import gsf
-    gsf.run_gsf_all(folder + '/generate_sample_Av2.input', sim_flag, idman=None)
+    gsf.run_gsf_all(folder + '/generate_sample.input', sim_flag, idman=None)
     move_file = glob.glob('*_20230301{0}_*'.format(seed)) + glob.glob('*_20230301{0}.*'.format(seed))
     for file in move_file:
         shutil.move(file, folder)
@@ -138,7 +138,7 @@ esti_smass(ID = '20230302'+str(seed),folder = sed_folder,
            mags_dict = mag_result, z = z, flag = flag, 
             if_run_gsf=True, band_as_upper = [],
             mag_err=[0.2]*len(mag_result), just_run = False,
-            inputname = 'sample_template_Av2')
+            inputname = 'sample_template_prior1')
 #%%Collecting results
 steller_file = glob.glob(sed_folder+'/SFH_*.fits')[0]
 hdul = pyfits.open(steller_file)
