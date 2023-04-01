@@ -14,7 +14,9 @@ import glob
 # path = 'first_run/'  #Av 0.3-1, Metal, -1, -0.3, No Emission line.
 # path = 'second_run/'  #Av 0.3-1, Metal, -1, -0.3, logU -3, -1
 # path = 'third_run/'   #Av 0.3-2, Metal, -1, -0.3
-path = 'fourth_run/'   #Av 0.3-3, Metal, -2, 0, Age, 0.01,0.75
+# path = 'fourth_run/'   #Av 0.3-3, Metal, -2, 0, Age, 0.01,0.75
+# path = 'prior1_run/'   #Av 0.3-1, Metal, -1, 0.3, Age, 0.01,0.75
+path = 'prior2_run/'   #Av 0.3-1.5, Metal, -2, 0, Age, 0.01,0.75
 
 folder = path+'F150W_F356W/'  #F150W_F356W
 # folder = path+'F150W_F200W/'
@@ -22,7 +24,7 @@ folder = path+'F150W_F356W/'  #F150W_F356W
 # folder = path+'F277W_F356W/'
 # folder = path+'F356W_F444W/'
 # folder = path+'F150W_F277W_F356W/'
-# folder = path+'F150W_F277W_F356W_F444W/'
+# folder = path+'F150W_F277W_F356W_F444W/' 
 
 result_folders = glob.glob(folder + 'seed*_result')
 

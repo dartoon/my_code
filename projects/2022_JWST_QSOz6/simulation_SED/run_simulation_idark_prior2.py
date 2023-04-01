@@ -61,7 +61,7 @@ if filter_set == 6:
 #%%
 seed = count
 # age = np.random.uniform(0.3,0.7)#0.3
-Av = np.random.uniform(0.3,1.5)
+Av = np.random.uniform(0.3,2.0)
 # metallicity = np.random.uniform(-1.0, -0.3)
 
 folder = 'prior2_run/seed{0}_sim'.format(seed)
