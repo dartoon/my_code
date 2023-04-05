@@ -17,6 +17,7 @@ import glob
 # path = 'fourth_run/'   #Av 0.3-3, Metal, -2, 0, Age, 0.01,0.75
 # path = 'prior1_run/'   #Av 0.3-1, Metal, -1, 0.3, Age, 0.01,0.75
 path = 'prior2_run/'   #Av 0.3-1.5, Metal, -2, 0, Age, 0.01,0.75
+path = 'prior2_run_Av1.5/'   #Av 0.3-1.5, Metal, -2, 0, Age, 0.01,0.75
 
 folder = path+'F150W_F356W/'  #F150W_F356W
 # folder = path+'F150W_F200W/'
