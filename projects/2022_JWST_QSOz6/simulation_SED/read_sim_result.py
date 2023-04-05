@@ -74,8 +74,8 @@ comb= folder.split('/')[-2]
 plt.figure(figsize=(7,5))
 if 'first' in path:
     eff_bool = (sim_mass_up_low<100)
-elif 'idx0' in path:
-    eff_bool = (sim_mass_up_low<100)
+# elif 'idx0' in path:
+#     eff_bool = (sim_mass_up_low<100)
 else:
     # eff_bool = (sim_mass_up_low<0.4) *(mod_mass_up_low<0.4) #* (sim_mass_up_low>0.15) *(mod_mass_up_low>0.15)
     eff_bool = (sim_mass_up_low<np.percentile(sim_mass_up_low,70)) *(mod_mass_up_low<np.percentile(mod_mass_up_low,70)) #* (sim_mass_up_low>0.15) *(mod_mass_up_low>0.15)
