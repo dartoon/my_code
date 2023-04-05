@@ -16,8 +16,9 @@ import glob
 # path = 'third_run/'   #Av 0.3-2, Metal, -1, -0.3
 # path = 'fourth_run/'   #Av 0.3-3, Metal, -2, 0, Age, 0.01,0.75
 # path = 'prior1_run/'   #Av 0.3-1, Metal, -1, 0.3, Age, 0.01,0.75
-path = 'prior2_run/'   #Av 0.3-1.5, Metal, -2, 0, Age, 0.01,0.75
-path = 'prior2_run_Av1.5/'   #Av 0.3-1.5, Metal, -2, 0, Age, 0.01,0.75
+# path = 'prior2_run/'   #Av 0.3-1.5, Metal, -2, 0, Age, 0.01,0.75
+# path = 'prior2_run_Av1.5/'   #Av 0.3-1.5, Metal, -2, 0, Age, 0.01,0.75
+path = 'prior1_run_idx0/'   #Av 0.3-1, Metal, -2, 0, Age, 0.01,0.75
 
 folder = path+'F150W_F356W/'  #F150W_F356W
 # folder = path+'F150W_F200W/'
@@ -72,6 +73,8 @@ comb= folder.split('/')[-2]
 
 plt.figure(figsize=(7,5))
 if 'first' in path:
+    eff_bool = (sim_mass_up_low<100)
+elif 'idx0' in path:
     eff_bool = (sim_mass_up_low<100)
 else:
     # eff_bool = (sim_mass_up_low<0.4) *(mod_mass_up_low<0.4) #* (sim_mass_up_low>0.15) *(mod_mass_up_low>0.15)

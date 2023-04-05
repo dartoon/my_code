@@ -125,7 +125,7 @@ def esti_smass_fixAv(ID, mags_dict, z, folder = 'esti_smass/', flag = 0, if_run_
         fnu = [10 ** ((mags[i]-25)/(-2.5)) for i in range(len(mags))]
         fnu_up = [10 ** ((mags[i]-mag_err[i]-25)/(-2.5)) for i in range(len(mags))]
         fnu_dw = [10 ** ((mags[i]+mag_err[i]-25)/(-2.5)) for i in range(len(mags))]
-        fnu_err = [(fnu_up[i]-fnu_dw[i])/2 for i in range(len(mags))]
+        fnu_err = [(fnu_up[i]-fnu_dw[i]) for i in range(len(mags))]
             
         # for i in range(7):
         #     if mags[i] <0:
