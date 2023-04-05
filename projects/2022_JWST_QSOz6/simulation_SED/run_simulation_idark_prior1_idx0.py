@@ -115,7 +115,7 @@ filters = ''
 mag_result =  {}#{'F150W': 26.4, 'F356W': 24.80} #QSO host
 for filt in filts:
     fid = jwst_filt_id[filt]
-    f_fil = np.loadtxt('../../../template/gsf_temp_idx0/filter/{0}.fil'.format(fid))
+    f_fil = np.loadtxt('../../../template/gsf_temp/filter/{0}.fil'.format(fid))
     lam = np.median(f_fil[1:,1])
     f_array = np.vstack((wave, f_50)).T
     filt_flam = cal_filt_flam(f_array , f_fil[:,1:])    
