@@ -70,7 +70,7 @@ if filter_set == 0:
         shutil.rmtree(folder)
     os.mkdir(folder)
     # shutil.copy('gene_temp/sample.cat', folder)
-    f = open("gene_temp/sample.cat","r")
+    f = open("gene_temp_idx0/sample.cat","r")
     string = f.read()
     string = string.replace("seedid", str(seed) )
     write_file = open(folder+'/generate_sample.cat','w') 
@@ -78,7 +78,7 @@ if filter_set == 0:
     write_file.close()
     
     #Create a input file
-    f = open("gene_temp/sample_prior1.input","r")
+    f = open("gene_temp_idx0/sample_prior1.input","r")
     string = f.read()
     # string = string.replace("age_temp", str(age))
     string = string.replace("age_temp", '0.01,0.03,0.1,0.3,0.5,0.75')
@@ -138,7 +138,7 @@ if glob.glob(SED_folder) ==[]:
 from SED_function import esti_smass
 sed_folder = SED_folder + folder.split('/')[1].replace('sim', 'result')
 
-esti_smass(ID = '20230302'+str(seed),folder = sed_folder, 
+esti_smass(ID = '20230301'+str(seed),folder = sed_folder, SED_folder = 'SED_temps_idx0',
            mags_dict = mag_result, z = z, flag = flag, 
             if_run_gsf=True, band_as_upper = ['F150W'],
             mag_err=[0.2]*len(mag_result), just_run = False,
