@@ -23,8 +23,8 @@ sys.path.insert(0,'../../model_z6_data_id0/')
 # folder = '20221120' #The one show in paper
 # folder = '20221122' #The extended
 # folder = '20221220' #Test emission lines with different ages.
-folder = '20230115' #The one show in paper
-
+folder = '20230328' #The one show in paper
+# /Users/Dartoon/Astro/Projects/my_code/projects/2022_JWST_QSOz6/model_z6_data_id1/for_smass/esti_smass/20230328_freeParam_prior2/run_flag6.py
 
 fitidx = 1
 from target_info import target_info
@@ -32,12 +32,13 @@ info = target_info[str(fitidx)]
 target_id, RA, Dec, z = info['target_id'], info['RA'], info['Dec'], info['z']
 
 
-idx = 2
+# idx = 2
 
-folder = 'esti_smass/'+folder+str(idx)
+folder = 'esti_smass/'+folder #+str(idx)
 # folder = folder + '_freeParam' #!!!
-folder = folder + '_freeParam_withEmissionLine' #!!!
-# folder = folder + '_freeParam_withEmissionLine_high-dust' #!!!
+folder = folder + '_freeParam_prior1_Av2' #!!!
+# folder = folder + '_freeParam_withEmissionLine_high-dust' #
+# folder = 'esti_smass/202301152_freeParam_withEmissionLine_wide-dustup3' #!!!
 
 
 steller_file = glob.glob(folder+'/gsf_spec_*.fits')[0]
@@ -97,6 +98,7 @@ for key in df.keys():
 g = seaborn.pairplot(df,corner=True, diag_kind="kde", plot_kws=dict(marker="+", s=20, linewidth=1))
 # g.map_lower(seaborn.kdeplot, levels=4, color=".2")
     
+Mstr = ''
 for i in range(len(g.axes.ravel())):
     ax = g.axes.ravel()[i]
     if ax != None:
@@ -120,7 +122,11 @@ for i in range(len(g.axes.ravel())):
             # ax.set_title(r'\TeX\ is Number $\displaystyle\sum_{n=1}^\infty'
             #              r'\frac{-e^{i\pi}}{2^n}$!', fontsize=16, color='r')
             # ax.set_title(df.keys()[i/5]+r'={0}$\pm$')
-plt.savefig('../../model_z6_data_id0/figures/{0}_SED_MCMC.pdf'.format(target_id[:5]), bbox_inches = "tight")
+        if j %5 ==0:
+            ax.set_xlim(9.47, 11.5)
+        if Mstr == '':
+            Mstr = title
+# plt.savefig('../../model_z6_data_id0/figures/{0}_SED_MCMC.pdf'.format(target_id[:5]), bbox_inches = "tight")
 
 #%%
 
@@ -239,7 +245,7 @@ for i, fid in enumerate(filt_id[::-1]):
         
     f_array = np.vstack((wave, f_50)).T
     filt_flam = cal_filt_flam(f_array , f_fil[:,1:])    
-    plt.scatter(lam, filt_flam, marker="d", zorder =90,  s=280, facecolors='none', edgecolors='black', linewidths=2)
+    plt.scatter(lam, filt_flam, marker="d", zorder =90,  s=280, facecolors='none', edgecolors='blue', linewidths=2)
     
     flambda_list.append(flambda)
         
@@ -257,47 +263,34 @@ for i, fid in enumerate(filt_id[::-1]):
     f_fil[:,2] = f_fil[:,2]/f_fil[:,2].max() * (ymax-ymin) * 0.1
     plt.plot(f_fil[1:,1]/10000., f_fil[1:,2], label='{0}'.format(ivd[fid]))
 
-z = 6.40
+
+# plt.text( (xmax-xmin)*0.07, (ymax-ymin)*0.93, 'z: {0}'.format(z), fontsize=17)
 # plt.text( (xmax-xmin)*005, (ymax-ymin)*0.87, r"M$_*$: [{1:.2f}$\leftarrow${0:.2f}$\rightarrow${2:.2f}]".format(smass, smass_l, smass_h), fontsize=17)
 # plt.text( (xmax-xmin)*0.05, (ymax-ymin)*0.80, "M$_{uv}$: "+ r"[{1:.2f}$\leftarrow${0:.2f}$\rightarrow${2:.2f}]".format(info_muv['MUV50'], info_muv['MUV84'], info_muv['MUV16']), fontsize=17)
-# plt.text( (xmax-xmin)*0.07, (ymax-ymin)*0.93, 'z: {0:.2f}'.format(z), fontsize=17)
-# plt.text( (xmax-xmin)*0.07, (ymax-ymin)*0.87, r"M$_*$: {0:.2f}".format(smass), fontsize=17)
-# plt.text( (xmax-xmin)*0.07, (ymax-ymin)*0.80, "M$_{uv}$: "+ r"{0:.2f}".format(info_muv['MUV50']), fontsize=17)
 # print('M$_*$:  [{1:.2f}, {0:.2f} ,{2:.2f}]'.format(smass, smass_l, smass_h))
-print('Muv:  [{1:.2f}, {0:.2f} ,{2:.2f}]'.format(info_muv['MUV50'], info_muv['MUV84'], info_muv['MUV16']))
-# if age_l!= age:
+# print('Muv:  [{1:.2f}, {0:.2f} ,{2:.2f}]'.format(info_muv['MUV50'], info_muv['MUV84'], info_muv['MUV16']))
+# if '{0:.1f}'.format(age_l) == '0.0':
 #     plt.text( (xmax-xmin)*0.07, (ymax-ymin)*0.61, r'age: [$\leftarrow${2:.1f}]  Gyr'.format(age, age_l, age_h), fontsize=17)
 #     print(r'age:  [$\leftarrow${2:.1f}]  Gyr'.format(age, age_l, age_h))
 # else:
 #     plt.text( (xmax-xmin)*0.07, (ymax-ymin)*0.61, 'age fixed as {0:.1f} Gyr'.format(age, age_l, age_h), fontsize=17)
 #     print('age:  [{1:.1f}$-${2:.1f}]  Gyr'.format(age, age_l, age_h))
-# print(r"{1:.2f}$\leftarrow${0:.2f}$\rightarrow${2:.2f}".format(info_muv['MUV50'], info_muv['MUV84'], info_muv['MUV16']))
-# plt.text( (xmax-xmin)*0.07, (ymax-ymin)*0.95, r"M$_*$ = {0:.2f}".format(smass), fontsize=17)
-# plt.text( (xmax-xmin)*0.07, (ymax-ymin)*0.88, "M$_{uv}$ = "+ r"{0:.2f}".format(info_muv['MUV50']), fontsize=17)
-# plt.text( (xmax-xmin)*0.07, (ymax-ymin)*0.81, 'age = {0:.1f} Gyr'.format(age, age_l, age_h), fontsize=17)
-# plt.text( (xmax-xmin)*0.07, (ymax-ymin)*0.74, 'Av = {0:.1f} (fixed)'.format(float(info['AV_50'])) , fontsize=17)    
-# plt.text( (xmax-xmin)*0.07, (ymax-ymin)*0.67, 'metallicity = {0:.1f} logZ/'.format(mel) + r"Z$_{\rm \odot}$ (fixed)", fontsize=17)    
-plt.text( (xmax-xmin)*0.07, (ymax-ymin)*0.95, r"log M$_*$ = {0:.2f}".format(smass), fontsize=17)
-plt.text( (xmax-xmin)*0.07, (ymax-ymin)*0.88, "M$\mathrm{_{uv}}$ = "+ r"{0:.2f}".format(info_muv['MUV50']), fontsize=17)
-plt.text( (xmax-xmin)*0.07, (ymax-ymin)*0.81, 'age = {0:.1f} Gyr'.format(values[1][1], age_l, age_h), fontsize=17)
-# plt.text( (xmax-xmin)*0.07, (ymax-ymin)*0.74, r'A$\mathrm{_{V}}$'+ r'= {0:.1f} (fixed)'.format(float(info['AV_50'])) , fontsize=17)    
-# plt.text( (xmax-xmin)*0.07, (ymax-ymin)*0.67, r"log Z/Z$_{\rm \odot}$" + r" = {0:.1f} (fixed)".format(mel), fontsize=17)  
-plt.text( (xmax-xmin)*0.07, (ymax-ymin)*0.74, r'A$\mathrm{_{V}}$'+ r'= {0:.1f}'.format(float(info['AV_50'])) , fontsize=17)    
-plt.text( (xmax-xmin)*0.07, (ymax-ymin)*0.67, r"log Z/Z$_{\rm \odot}$" + r" = {0:.1f}".format(mel), fontsize=17)  
-# plt.text( (xmax-xmin)*0.07, (ymax-ymin)*0.57, r"SFR" + r" = {0:.1f} (fixed)".format(mel), fontsize=17)  
-
-# if '{0:.1f}'.format(sfr_l) == '0.0':
-#     plt.text( (xmax-xmin)*0.07, (ymax-ymin)*0.75, r"SFR: [$\leftarrow${2:.1f}]".format(sfr, sfr_l, sfr_h) + r" M$_{\rm \odot}$/yr ", fontsize=17)
-#     print("[$\leftarrow${2:.1f}]".format(sfr, sfr_l, sfr_h) + r" M$_{\rm \odot}$/yr ")
-# else:
-#     plt.text( (xmax-xmin)*0.07, (ymax-ymin)*0.74, "SFR: [{1:.1f}$-${2:.1f}]".format(sfr, sfr_l, sfr_h) + r" M$_{\rm \odot}$/yr ", fontsize=17)
-#     print("SFR:  [{1:.1f}$-${2:.1f}]".format(sfr, sfr_l, sfr_h) + r" M$_{\rm \odot}$/yr ")
-# plt.text( (xmax-xmin)*0.07, (ymax-ymin)*0.74, "SFR: [{1:.1f}$-${2:.1f}]".format(sfr, sfr_l, sfr_h) + r" M$_{\rm \odot}$/yr ", fontsize=17)
-    
+    # print('age:  [{1:.1f}$-${2:.1f}]  Gyr'.format(age, age_l, age_h))
+values = float(info1['Mstel_16']), float(info1['Mstel_50']), float(info1['Mstel_84'])
+plt.text( (xmax-xmin)*0.07, (ymax-ymin)*0.9, r"log M$_*$="+Mstr, fontsize=20)
+# plt.text( (xmax-xmin)*0.07, (ymax-ymin)*0.95, r"log M$_*$ = {0:.2f}".format(smass), fontsize=17)
+# plt.text( (xmax-xmin)*0.07, (ymax-ymin)*0.88, "M$\mathrm{_{uv}}$ = "+ r"{0:.2f}".format(info_muv['MUV50']), fontsize=17)
+# # plt.text( (xmax-xmin)*0.07, (ymax-ymin)*0.81, 'age = {0:.1f} Gyr (fixed)'.format(age, age_l, age_h), fontsize=17)
+# # plt.text( (xmax-xmin)*0.07, (ymax-ymin)*0.74, r'A$\mathrm{_{V}}$'+ r'= {0:.1f} (fixed)'.format(float(info['AV_50'])) , fontsize=17)    
+# # plt.text( (xmax-xmin)*0.07, (ymax-ymin)*0.67, r"log Z/Z$_{\rm \odot}$" + r" = {0:.1f} (fixed)".format(mel), fontsize=17)    
+# plt.text( (xmax-xmin)*0.07, (ymax-ymin)*0.81, 'age = {0:.1f} Gyr'.format(values[1][1]), fontsize=17)
+# plt.text( (xmax-xmin)*0.07, (ymax-ymin)*0.74, r'A$\mathrm{_{V}}$'+ r'= {0:.1f}'.format(float(info['AV_50'])) , fontsize=17)    
+# plt.text( (xmax-xmin)*0.07, (ymax-ymin)*0.67, r"log Z/Z$_{\rm \odot}$" + r" = {0:.1f}".format(mel), fontsize=17)    
+     
 plt.legend(prop={'size':18}, ncol=2, loc = 1)
 plt.tick_params(labelsize=20)
 plt.xlabel(r"$\lambda$ ($\mu$m)",fontsize=25)
 plt.ylabel(r"f$_\lambda$  (10$^{\rm" + " -{0}}}$".format(unit.split('e-')[1][:2])+" erg s$^{-1}$ cm$^{-2}$$\mathrm{\AA}^{-1}$)",fontsize=25)
 plt.title(target_id,fontsize=27, y=1.02) 
-plt.savefig('../../model_z6_data_id0/figures/{0}_SED_map.pdf'.format(target_id[:5]), bbox_inches = "tight")
+# plt.savefig('../../model_z6_data_id0/figures/{0}_SED_map.pdf'.format(target_id[:5]), bbox_inches = "tight")
 

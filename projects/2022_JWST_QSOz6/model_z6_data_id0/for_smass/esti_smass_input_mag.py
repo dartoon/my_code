@@ -20,7 +20,7 @@ import glob
 # folder = '20221109' #fix mel as -1, age as 0.2
 # folder = '20221115' #fix mel as -1, age as 0.5, dust = 1.0
 # folder = '20221231' #fix mel as -1, age as 0.5, dust = 1.0
-folder = '20230119' #fix mel as -1, age as 0.5, dust = 1.0
+folder = '20230329' #fix mel as -1, age as 0.5, dust = 1.0
 rerun = False
 
 mag_result = {'F150W': 26.4, 'F356W': 24.80} #QSO host

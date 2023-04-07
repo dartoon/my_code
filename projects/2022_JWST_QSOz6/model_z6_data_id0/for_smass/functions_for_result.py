@@ -67,7 +67,7 @@ def esti_smass(ID, mags_dict, z, folder = 'esti_smass/', flag = 0, if_run_gsf=Tr
             if if_hst[i] == False:
                 _string = _string + " {0:.8f} {1:.8f}".format(fnu[i], fnu_err[i])
             else:
-                _string = _string + " {0:.8f} {1:.8f}".format(0, fnu[i]/2)
+                _string = _string + " {0:.8f} {1:.8f}".format(0, fnu[i])
         write_file.write(_string)
         write_file.close()
     
@@ -139,7 +139,7 @@ def esti_smass_fixAv(ID, mags_dict, z, folder = 'esti_smass/', flag = 0, if_run_
             if if_hst[i] == False:
                 _string = _string + " {0:.8f} {1:.8f}".format(fnu[i], fnu_err[i])
             else:
-                _string = _string + " {0:.8f} {1:.8f}".format(0, fnu[i]/2)
+                _string = _string + " {0:.8f} {1:.8f}".format(0, fnu[i])
         write_file.write(_string)
         write_file.close()
     
