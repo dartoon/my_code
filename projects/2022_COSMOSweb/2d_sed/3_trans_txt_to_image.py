@@ -28,6 +28,8 @@ sfr_image =  np.zeros([size,size])
 age_image =  np.zeros([size,size])
 AV_image = np.zeros([size,size])
 Ebv_image = np.zeros([size,size])
+
+Rv = []
 for ct, line in enumerate(lines[1:-1]):
     if len(line.split(' ')) < 4:
         continue
@@ -40,6 +42,7 @@ for ct, line in enumerate(lines[1:-1]):
         age_image[_i, _j] = 10**float(m_age)    #logGyr to Gry
         AV_image[_i, _j] = AV    #logGyr
         Ebv_image[_i, _j] = Ebv    #E(B-V)
+        Rv.append(float(AV)/float(Ebv))
 
 # for i in range(len(smass_image)):
 #     for j in range(len(smass_image)):
@@ -96,15 +99,23 @@ plt.show()
 # plt.colorbar()
 # plt.show()
 
-print('Ebv_image')
+# print('Ebv_image')
+# # norm = LogNorm(vmin=0.001, vmax=3)#np.max(img[~np.isnan(img)]))
+# norm = None
+# plt.imshow(Ebv_image, norm=norm, origin='lower' ) 
+# plt.colorbar()
+# plt.show()
+# pickle.dump(Ebv_image , open('E(BV)_{0}.pkl'.format(name), 'wb'))
+
+print('Av_image')
 # norm = LogNorm(vmin=0.001, vmax=3)#np.max(img[~np.isnan(img)]))
 norm = None
-plt.imshow(Ebv_image, norm=norm, origin='lower' ) 
+plt.imshow(AV_image, norm=norm, origin='lower' ) 
 plt.colorbar()
 plt.show()
+pickle.dump(AV_image , open('Av_{0}.pkl'.format(name), 'wb'))
 
-pickle.dump(Ebv_image , open('E(BV)_{0}.pkl'.format(name), 'wb'))
 
 
-import matplotlib
-cmap_r = matplotlib.cm.get_cmap('RdBu_r')
+# import matplotlib
+# cmap_r = matplotlib.cm.get_cmap('RdBu_r')

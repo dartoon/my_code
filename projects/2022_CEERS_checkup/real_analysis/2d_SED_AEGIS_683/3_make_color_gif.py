@@ -171,6 +171,7 @@ plt.imshow(EBV_image, norm=norm, origin='lower' )
 plt.colorbar()
 plt.show()
 pickle.dump(EBV_image , open('E(BV)_{0}.pkl'.format(target_id), 'wb'))
+pickle.dump(AV_image , open('Av_{0}.pkl'.format(target_id), 'wb'))
 
 
 import matplotlib
