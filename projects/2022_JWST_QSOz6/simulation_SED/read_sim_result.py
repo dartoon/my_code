@@ -16,8 +16,8 @@ import glob
 # path = 'third_run/'   #Av 0.3-2, Metal, -1, -0.3
 # path = 'fourth_run/'   #Av 0.3-3, Metal, -2, 0, Age, 0.01,0.75
 # path = 'prior1_run/'   #Av 0.3-1, Metal, -1, 0.3, Age, 0.01,0.75
-# path = 'prior2_run/'   #Av 0.3-1.5, Metal, -2, 0, Age, 0.01,0.75
 # path = 'prior2_run_Av1.5/'   #Av 0.3-1.5, Metal, -2, 0, Age, 0.01,0.75
+# path = 'prior2_run/'   #!!!Finall used Av 0.3-1.5, Metal, -2, 0, Age, 0.01,0.75
 path = 'prior1_run_idx0/'   #Av 0.3-1, Metal, -2, 0, Age, 0.01,0.75
 
 folder = path+'F150W_F356W/'  #F150W_F356W
@@ -45,6 +45,7 @@ for result_folder in result_folders:
     info1 = hdul[0].header 
     smass_True = float(info1['Mstel_50'])
     sim_mass_up_low.append(float(info1['Mstel_84']) - float(info1['Mstel_50']) )
+    # sim_mass_up_low.append(float(info1['Mstel_84']) - float(info1['Mstel_16']) )
     ages.append(10**float(info1['T_MW_50']))
     Avs.append(float(info1['AV_50']))
     
@@ -53,6 +54,7 @@ for result_folder in result_folders:
     info2 = hdul[0].header 
     smass_infer = float(info2['Mstel_50'])
     mod_mass_up_low.append(float(info2['Mstel_84']) - float(info2['Mstel_50']) )
+    # mod_mass_up_low.append(float(info2['Mstel_84']) - float(info2['Mstel_16']) )
     # print(float(smass_infer)-float(smass_True))
     smass_match.append(float(smass_infer)-float(smass_True))
     # if len(seed) == 1:
@@ -74,8 +76,9 @@ comb= folder.split('/')[-2]
 plt.figure(figsize=(7,5))
 if 'first' in path:
     eff_bool = (sim_mass_up_low<100)
-# elif 'idx0' in path:
-#     eff_bool = (sim_mass_up_low<100)
+elif 'idx0' in path:
+    # eff_bool = (sim_mass_up_low<100)
+    eff_bool = (sim_mass_up_low<np.percentile(sim_mass_up_low,90)) *(mod_mass_up_low<np.percentile(mod_mass_up_low,90)) #* (sim_mass_up_low>0.15) *(mod_mass_up_low>0.15)
 else:
     # eff_bool = (sim_mass_up_low<0.4) *(mod_mass_up_low<0.4) #* (sim_mass_up_low>0.15) *(mod_mass_up_low>0.15)
     eff_bool = (sim_mass_up_low<np.percentile(sim_mass_up_low,70)) *(mod_mass_up_low<np.percentile(mod_mass_up_low,70)) #* (sim_mass_up_low>0.15) *(mod_mass_up_low>0.15)
@@ -86,6 +89,7 @@ plt.show()
 print(folder)
 print(len(smass_match[eff_bool])/len(smass_match))
 print(len(smass_match))
+print(np.sum(eff_bool))
 # plt.hist(Avs[sim_mass_up_low<0.6])
 # plt.hist(sim_mass_up_low[sim_mass_up_low<np.percentile(sim_mass_up_low,60)])
 
