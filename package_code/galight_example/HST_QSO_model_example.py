@@ -75,13 +75,13 @@ fit_run.run(algorithm_list = ['PSO','PSO', ])
 # fit_run.plot_all()
 fit_run.plot_all()
 
-# # fit_run.dump_result()
+# fit_run.dump_result()
 # # print(fit_run.final_result_galaxy[0])
 
-# # #%%
-# # # Test load pkl
-# # import pickle
-# # picklename = 'savename.pkl'
-# # fitting_run_class = pickle.load(open(picklename,'rb'))
-# # fitting_run_class.run_diag()
+#%%
+# Test load pkl
+import pickle
+picklename = 'savename.pkl'
+fitting_run_class = pickle.load(open(picklename,'rb'))
+fitting_run_class.run_diag()
 

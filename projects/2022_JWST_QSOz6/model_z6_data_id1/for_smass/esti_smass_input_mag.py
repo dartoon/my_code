@@ -23,7 +23,7 @@ import glob
 folder = '2023032203' #FIX n =1 result, update F150 result
 # idx = [1,2,0,51,35]
 
-mag_result = {'F356W': 23.23, 'F150W': 25.32}
+mag_result = {'F356W': 23.25, 'F150W': 25.32}
 # del mag_result['F410M']
 
 target_id = 'J2236'

@@ -59,8 +59,8 @@ apertures = apertures + [add_aperture1]  #attach the added aperture into the gro
 
 data_process.apertures = apertures #Pass apertures to the data
 
-from galight.tools.measure_tools import plot_data_apertures
-plot_data_apertures(data_process.target_stamp, apertures)
+from galight.tools.plot_tools import plot_data_apertures_point
+plot_data_apertures_point(data_process.target_stamp, apertures)
 
 #%%Start to produce the class and params for lens fitting.
 from galight.fitting_specify import FittingSpecify
