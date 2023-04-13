@@ -11,7 +11,15 @@ import astropy.io.fits as pyfits
 import matplotlib.pyplot as plt
 import glob
 
-for name in ['cid_473', 'cid_1210', 'cid_1245']:
+f = open('fmos_alma_cosmosweb.cat','r')
+string = f.read()
+lines = string.split('\n')
+lines = [lines[i] for i in range(len(lines)) if 'FMOS_J09' in lines[i]]
+
+for i in range(5):
+    target_name, RA, Dec, z, best_mass = lines[i].split(' ')
+    name = target_name[7:12]
+    z = float(z)
     folder = 'esti_smass/{0}/*'.format(name)
     steller_files = glob.glob(folder+'/SFH_*.fits')
     for file in steller_files:

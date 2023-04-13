@@ -14,10 +14,17 @@ import matplotlib.pyplot as plt
 import pickle
 from matplotlib.colors import LogNorm     
 
+f = open('fmos_alma_cosmosweb.cat','r')
+string = f.read()
+lines = string.split('\n')
+lines = [lines[i] for i in range(len(lines)) if 'FMOS_J09' in lines[i]]
+idx = 0
 
-name = ['cid_473', 'cid_1210', 'cid_1245'][2]
+target_name, RA, Dec, z, best_mass = lines[idx].split(' ')
+name = target_name[7:12]
+t_name = target_name[5:12]
  
-sed_2d_info = pickle.load(open('2d_filts_mag_bin2_{0}.pkl'.format(name),'rb'))
+sed_2d_info = pickle.load(open('2d_filts_mag_bin2_{0}.pkl'.format(t_name),'rb'))
 
 f = open("{0}_sed_2d_result_bin2.txt".format(name),"r")
 string = f.read()
