@@ -42,10 +42,12 @@ data_process.checkout() #Check if all the materials is known.
 from galight.fitting_specify import FittingSpecify
 fit_sepc = FittingSpecify(data_process)
 fit_sepc.prepare_fitting_seq(point_source_num = 2)#, fix_n_list= [[0,4]], fix_center_list = [[0,0]])
+# fit_sepc.prepare_fitting_seq(point_source_num = 2, ps_pix_center_list = [[1,1],[-2,-1]])#, fix_n_list= [[0,4]], fix_center_list = [[0,0]])
 fit_sepc.build_fitting_seq()
+fit_sepc.plot_fitting_sets()
 
-from galight.tools.measure_tools import plot_data_apertures, plot_data_apertures_point
-plot_data_apertures_point(fit_sepc.data_class.data, fit_sepc.apertures, fit_sepc.center_pix_pos)
+# from galight.tools.measure_tools import plot_data_apertures, plot_data_apertures_point
+# plot_data_apertures_point(fit_sepc.data_class.data, fit_sepc.apertures, fit_sepc.center_pix_pos)
 
 # # #%%Setting the fitting method and run.
 # # from galight.fitting_process import FittingProcess

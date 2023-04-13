@@ -16,7 +16,7 @@ string = f.read()
 lines = string.split('\n')
 lines = [lines[i] for i in range(len(lines)) if 'FMOS_J09' in lines[i]]
 
-for i in range(5):
+for i in range(1):
     target_name, RA, Dec, z, best_mass = lines[i].split(' ')
     name = target_name[7:12]
     z = float(z)
@@ -34,9 +34,9 @@ for i in range(5):
         # shdul = pyfits.open(file.replace('SFH','gsf_spec'))
         # info_stellar = shdul[1].header 
         # BV50 = info_stellar['BV50']
-        f = open( file.split('SFH')[0]+'gsf_spec_header.txt',"r")
-        string = f.read()
-        BV50 = float(string.split('BV50    =')[1].split('BV84')[0])
+        # f = open( file.split('SFH')[0]+'gsf_spec_header.txt',"r")
+        # string = f.read()
+        # BV50 = float(string.split('BV50    =')[1].split('BV84')[0])
         filename = name+'_sed_2d_result_bin2.txt'
         if_file = glob.glob(filename)
         if if_file == []:
@@ -45,6 +45,6 @@ for i in range(5):
         else:
             write_file =  open(filename,'r+') 
             write_file.read()
-        write_file.write("{0} {1} {2} {3} {4} {5} {6:.4f}".format(count, smass, sfr, m_age, l_age, AV, BV50))
+        write_file.write("{0} {1} {2} {3} {4} {5}".format(count, smass, sfr, m_age, l_age, AV))
         write_file.write("\n")
         write_file.close()

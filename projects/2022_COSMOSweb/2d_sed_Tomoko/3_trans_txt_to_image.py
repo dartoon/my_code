@@ -18,7 +18,7 @@ f = open('fmos_alma_cosmosweb.cat','r')
 string = f.read()
 lines = string.split('\n')
 lines = [lines[i] for i in range(len(lines)) if 'FMOS_J09' in lines[i]]
-idx = 0
+idx = 1
 
 target_name, RA, Dec, z, best_mass = lines[idx].split(' ')
 name = target_name[7:12]
@@ -42,7 +42,7 @@ for ct, line in enumerate(lines[1:-1]):
         continue
     else:
         count, smass, sfr, m_age, l_age, AV, Ebv = line.split(' ')
-        count = int(count)
+        count = int(count[4:])
         _i, _j = sed_2d_info[count][0], sed_2d_info[count][1]
         smass_image[_i, _j] = float(smass)    #smass in logMsun
         sfr_image[_i, _j] = float(sfr)          #logMsun/yr 
@@ -65,7 +65,7 @@ for ct, line in enumerate(lines[1:-1]):
 #%%
 import pickle 
 from galight.tools.astro_tools import plt_fits_color
-image_list = pickle.load(open('colorimage_bin2_{0}.pkl'.format(name),'rb'))
+image_list = pickle.load(open('colorimage_bin2_{0}.pkl'.format(t_name),'rb'))
 images = []
 # zp_list = []
 for i in [-1,-3,-4]:  #['F115W', 'F150W','F277W', 'F444W']
@@ -81,6 +81,7 @@ plt_fits_color(images, Q=7, stretch=0.3)
 norm = None  
 print('smass_image')
 norm = LogNorm(vmin=4.5, vmax=8)#np.max(img[~np.isnan(img)]))
+plt.title(t_name)
 plt.imshow(smass_image, norm=norm, origin='lower' ) 
 plt.colorbar()
 plt.show()
@@ -117,6 +118,7 @@ plt.show()
 print('Av_image')
 # norm = LogNorm(vmin=0.001, vmax=3)#np.max(img[~np.isnan(img)]))
 norm = None
+plt.title(t_name)
 plt.imshow(AV_image, norm=norm, origin='lower' ) 
 plt.colorbar()
 plt.show()
