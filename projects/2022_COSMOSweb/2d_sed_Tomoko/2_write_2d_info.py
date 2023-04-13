@@ -16,7 +16,7 @@ string = f.read()
 lines = string.split('\n')
 lines = [lines[i] for i in range(len(lines)) if 'FMOS_J09' in lines[i]]
 
-for i in range(1):
+for i in range(5):
     target_name, RA, Dec, z, best_mass = lines[i].split(' ')
     name = target_name[7:12]
     z = float(z)
