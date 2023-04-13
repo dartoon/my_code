@@ -115,7 +115,7 @@ kpc_per_pixel = scale_relation
 scale = 0.5 * kpc_per_pixel
 
 EBV = Av_image/3.1
-factor = 16
+factor = 5
 bools = (images[2] < np.std(images[2][:,:3])*factor) * (images[1] < np.std(images[1][:,:3])*factor ) *  (images[0] < np.std(images[0][:,:3])*factor) 
 EBV[ bools ] = 0 
 fig, ax = plt.subplots()
