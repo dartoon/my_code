@@ -26,8 +26,6 @@ string = f.read()
 lines = string.split('\n')
 lines = [lines[i] for i in range(len(lines)) if 'FMOS_J09' in lines[i]]
 
-cata_list = pickle.load(open('../material/cata_list.pkl','rb'))
-
 target_name, RA, Dec, z, best_mass = lines[target_ID].split(' ')
 z = float(z)
 
