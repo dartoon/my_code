@@ -53,6 +53,6 @@ if glob.glob(folder+'/SFH_*.fits') == [] and len(mag_dict)>2:
     for file in rm_file:
         os.remove(file)
         
-rm_file = glob.glob('./templates/*{0}.asdf'.format(name[1:]+str(int(count))))
-for file in rm_file:
-    os.remove(file)
+    rm_file = glob.glob('./templates/*{0}.asdf'.format(name[1:]+str(int(count))))
+    for file in rm_file:
+        os.remove(file)

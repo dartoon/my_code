@@ -13,7 +13,6 @@
 
 cd /home/xuheng.ding/Astro/my_code/projects/2022_COSMOSweb/2d_sed_Tomoko
 source activate gsf
-python 1_run_2d_sed.py $PBS_ARRAY_INDEX 1 0
 python 1_run_2d_sed.py $PBS_ARRAY_INDEX 1 1
 python 1_run_2d_sed.py $PBS_ARRAY_INDEX 1 2
 python 1_run_2d_sed.py $PBS_ARRAY_INDEX 1 3
