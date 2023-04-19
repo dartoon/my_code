@@ -115,13 +115,13 @@ kpc_per_pixel = scale_relation
 scale = 0.5 * kpc_per_pixel
 
 EBV = Av_image/3.1
-factor = 5
+factor = 10
 bools = (images[2] < np.std(images[2][:,:3])*factor) * (images[1] < np.std(images[1][:,:3])*factor ) *  (images[0] < np.std(images[0][:,:3])*factor) 
 EBV[ bools ] = 0 
 fig, ax = plt.subplots()
 plt.imshow(EBV, norm=norm, origin='lower',vmin = vmin) 
 plt.colorbar()
-scale_bar(ax, len(images[0]), dist=0.5/deltaPix, text='0.5"', text2 ='~{0:.2f}kpc'.format(scale), color = 'white')
+scale_bar(ax, len(images[0]), dist=0.5/deltaPix, text='0.5"', text2 ='{0:.2f}kpc'.format(scale), color = 'white')
 plt.savefig('/Users/Dartoon/Downloads/'+name+"_E(B-V).pdf")
 plt.show()
 

@@ -15,7 +15,7 @@ import pickle
 from matplotlib.colors import LogNorm     
 
 
-name = ['cid_473', 'cid_1210', 'cid_1245'][2]
+name = ['cid_473', 'cid_1210', 'cid_1245'][0]
  
 sed_2d_info = pickle.load(open('2d_filts_mag_bin2_{0}.pkl'.format(name),'rb'))
 
@@ -73,10 +73,11 @@ plt_fits_color(images, Q=7, stretch=0.3)
 
 norm = None  
 print('smass_image')
-norm = LogNorm(vmin=4.5, vmax=8)#np.max(img[~np.isnan(img)]))
+norm = LogNorm(vmin=4.5, vmax=9)#np.max(img[~np.isnan(img)]))
 plt.imshow(smass_image, norm=norm, origin='lower' ) 
 plt.colorbar()
 plt.show()
+# pyfits.PrimaryHDU(smass_image).writeto('stellar_mass_{0}.fits'.format(name),overwrite=True)
 
 # print('sfr_image')
 # norm = LogNorm(vmin=0.003, vmax=0.1)#np.max(img[~np.isnan(img)]))

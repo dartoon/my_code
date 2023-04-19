@@ -26,7 +26,7 @@ def scale_bar(ax, d, dist=1/0.13, text='1"', text2=None, color='black', flipped=
 import matplotlib as mat
 mat.rcParams['font.family'] = 'STIXGeneral'
 
-name = ['cid_473', 'cid_1210', 'cid_1245'][1]
+name = ['cid_473', 'cid_1210', 'cid_1245'][2]
 image_list = pickle.load(open('colorimage_bin2_{0}.pkl'.format(name),'rb'))
 images = []
 # zp_list = []
@@ -137,11 +137,12 @@ EBV = Av_image/3.1
 factor = 5
 bools = (images[2] < np.std(images[2][:,:3])*factor) * (images[1] < np.std(images[1][:,:3])*factor ) *  (images[0] < np.std(images[0][:,:3])*factor) 
 EBV[ bools ] = 0 
+print(name, "overall mean E(B-V):", np.mean(EBV[ EBV !=0 ] ) )
 fig, ax = plt.subplots()
 plt.imshow(EBV, norm=norm, origin='lower',vmin = vmin) 
 plt.colorbar()
-scale_bar(ax, len(images[0]), dist=0.5/deltaPix, text='0.5"', text2 ='~{0:.2f}kpc'.format(scale), color = 'white')
-plt.savefig('/Users/Dartoon/Downloads/'+name+"_E(B-V).pdf")
+scale_bar(ax, len(images[0]), dist=0.5/deltaPix, text='0.5"', text2 ='{0:.2f}kpc'.format(scale), color = 'white')
+# plt.savefig('/Users/Dartoon/Downloads/'+name+"_E(B-V).pdf")
 plt.show()
 
 

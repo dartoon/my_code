@@ -28,8 +28,8 @@ def scale_bar(ax, d, dist=1/0.13, text='1"', text2=None, color='black', flipped=
 cata_list = pickle.load(open('material/cata_list.pkl','rb'))
 
 check_name= 'cid_473'  #29
-check_name= 'cid_1210' #8
-check_name= 'cid_1245' #10
+# check_name= 'cid_1210' #8
+# check_name= 'cid_1245' #10
 check_id = [i for i in range(len(cata_list)) if cata_list[i][-1] == check_name]
 
 print(cata_list[check_id[0]])
@@ -105,7 +105,8 @@ for i in range(len(image_list_ct)):
     axs[i].imshow(image_list_ct[i], norm=norm, origin='lower',cmap = my_cmap) 
     axs[i].set_ylabel(filts[i],fontsize=20)
     axs[i].tick_params(labelsize=15)
-    scale_bar(axs[i], len(image_list_ct[i]), dist=0.5/deltaPix, text='0.5"', text2 ='~{0:.2f}kpc'.format(scale), color = 'white')
+    if i == 0:
+        scale_bar(axs[i], len(image_list_ct[i]), dist=0.5/deltaPix, text='0.5"', text2 ='{0:.2f}kpc'.format(scale), color = 'white')
 show_name = check_name.replace('cid_', 'CID ')
 fig.suptitle('{0}'.format(show_name),fontsize=35)
 fig.tight_layout()

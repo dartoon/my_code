@@ -34,12 +34,18 @@ top_psf_id = 0
 # top_psf_id = 3 For idx 32 F444
 # top_psf_id = 2 For idx 40 F444
 
-fit_file_folder ='/Volumes/Seagate_Expansion_Drive/data_backup/JWST_COSMOS/'
-# fit_file_folder ='./'
-save_plot = True
+# fit_file_folder ='/Volumes/Seagate_Expansion_Drive/data_backup/JWST_COSMOS/'
+fit_file_folder ='./'
+save_plot = False
 save_psf = False
+
+# check_name= 'cid_473'  #29
+# check_name= 'cid_1210' #8
+# check_name= 'cid_1245' #10
+
 # for idx in range(50):
-for idx in [46]:
+# [i for i in range(len(cata_list)) if cata_list[i][-1] == 'cid_473']
+for idx in [29]:
     fit_run_list = []
     fit_files = glob.glob(fit_file_folder+'fit_result/fit2_run_{0}*idx{1}_psf*.pkl'.format(filt,idx))
     fit_files.sort()
@@ -66,6 +72,26 @@ for idx in [46]:
     if save_psf == True:
         pyfits.PrimaryHDU(fit_run.fitting_specify_class.data_process_class.PSF_list[0]).writeto('PSFs_library/PSF_{0}_id{1}.fits'.format(
             filt,sort_Chisq[top_psf_id]),overwrite=True)
+    print(fit_run.reduced_Chisq)
+    # plt_fits(fit_run.flux_2d_out['data'] - fit_run.flux_2d_out['data-point source'])
+    
+    
+    # count_n = 5
+    # Chisq_best = chisqs[sort_Chisq[top_psf_id]]
+    # Chisq_last= chisqs[sort_Chisq[count_n-1]]
+    # inf_alp = (Chisq_last-Chisq_best) / (2*2.* Chisq_best)
+    # weight = np.zeros(len(chisqs))
+    # for i in sort_Chisq[:count_n]:
+    #     weight[i] = np.exp(-1/2. * (chisqs[i]-Chisq_best)/(Chisq_best* inf_alp))
+    # prop_name = 'magnitude'
+    # # all_values = [fit_run_list[i].final_result_ps[0][prop_name] for i in range(len(fit_run_list))]
+    # all_values = [fit_run_list[i].final_result_galaxy[0][prop_name] for i in range(len(fit_run_list))]
+    # weighted_value = np.sum(np.array(all_values)*weight) / np.sum(weight)
+    # rms_value = np.sqrt(np.sum((np.array(all_values)-weighted_value)**2*weight) / np.sum(weight))
+    # print(cata_list[idx][-1], filt,': ' , round(weighted_value,2), '+-', round(rms_value,2))
+    # print(prop_name, round(weighted_value,2), '+-', round(rms_value,2))
+    
+        
     # if fit_files == []:
     #     pos = cata_list[idx][3:5]
     #     filename = 'mosaic_nircam_f{0}w_COSMOS-Web_30mas_v0_1_i2d.fits'.format(filt[1:-1])
@@ -76,3 +102,24 @@ for idx in [46]:
     #         plt_fits(img)
     #     elif save_plot == True:
     #         plt_fits(img, savename='figures/idx{0}_{1}_{2}_{3}_notfit.pdf'.format(idx,cata_list[idx][-1],filt,zinfo))
+
+
+# #%% Refit image but not adding point source
+# from galight.fitting_specify import FittingSpecify
+# from galight.fitting_process import FittingProcess
+# fit_sepc = FittingSpecify(fit_run.fitting_specify_class.data_process_class)
+# import copy
+# # ps_pix_center_list = [copy.deepcopy(ps_pos)]
+# if idx == 15:
+#     ps_pix_center_list = None
+# fit_sepc.prepare_fitting_seq(point_source_num = 0, supersampling_factor = 3, apertures_center_focus=True )
+# # fit_sepc.kwargs_params['lens_light_model'][3][0]['R_sersic'] = 0.06
+# # fit_sepc.kwargs_params['lens_light_model'][4][0]['R_sersic'] = 1.
+# fit_sepc.plot_fitting_sets()
+# # print(idx, filt, 'apertures', len(data_process.apertures) )
+# fit_run = FittingProcess(fit_sepc, savename = cata_list[idx][-1])
+# fit_run.run(algorithm_list = ['PSO','PSO','PSO'], fitting_level=['norm', 'norm','norm'])
+
+# fit_run.savename =  '/Users/Dartoon/Downloads/no_ps_fit'
+# fit_run.plot_final_galaxy_fit(target_ID=' ', save_plot=True )
+
