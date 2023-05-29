@@ -100,19 +100,19 @@ def total_compare(flux_list_2d, label_list_2d,
         #     ax_l[2].text(frame_size*0.40, frame_size*0.05, "Host", weight='bold', fontsize=20, 
         #                  color='white')
         
-        if filt != 'F150W':
-            theta_dict = {0: 137.475, 1: 139.818, 2: -221.479, 4: -221.458}
-            from astropy.coordinates import Angle
-            theta = Angle(theta_dict[idx], 'deg')
+        # if filt != 'F150W':
+        #     theta_dict = {0: 137.475, 1: 139.818, 2: -221.479, 4: -221.458}
+        #     from astropy.coordinates import Angle
+        #     theta = Angle(theta_dict[idx], 'deg')
     
-            f_center = len(flux_list_2d[0])/2
-            w = 0.2 / deltaPix_list[0]
-            h = 0.6 / deltaPix_list[0]
-            from photutils.aperture import RectangularAperture
-            aper = RectangularAperture((ps_x, ps_y), w, h, theta=theta)
-            aper.plot(color='white',
-                      lw=0.8,axes=ax_l[0])
-            # axins.add_patch(aper)
+        #     f_center = len(flux_list_2d[0])/2
+        #     w = 0.2 / deltaPix_list[0]
+        #     h = 0.6 / deltaPix_list[0]
+        #     from photutils.aperture import RectangularAperture
+        #     aper = RectangularAperture((ps_x, ps_y), w, h, theta=theta)
+        #     aper.plot(color='white',
+        #               lw=0.8,axes=ax_l[0])
+        #     # axins.add_patch(aper)
         
         fontsize = 20
         if i <3:
@@ -155,9 +155,9 @@ def total_compare(flux_list_2d, label_list_2d,
 
 # idx = 2
 # for idx in range(6):
-for idx in [2]:
-    # filters = ['F150W', 'F356W']
-    filters = ['F356W']
+for idx in [7]:
+    filters = ['F150W', 'F356W']
+    # filters = ['F356W']
     from target_info import target_info
     info = target_info[str(idx)]
     target_id, RA, Dec, z = info['target_id'], info['RA'], info['Dec'], info['z']
@@ -170,6 +170,7 @@ for idx in [2]:
     import copy, matplotlib
     for top_psf_id in [0]:
         for count in range(len(filters)):
+            print(count)
             fit_run_list = []
             # idx = idx_info
             filt = filters[count]
@@ -195,18 +196,29 @@ for idx in [2]:
             fit_run = fit_run_list[sort_Chisq[top_psf_id]]
             # fit_run.savename = 'figures/' + fit_run.savename+'_'+filt
             # fit_run.plot_final_qso_fit(target_ID = filt, save_plot = True, cmap = my_cmap)
-    fit_run.cal_astrometry()
-    ps_x, ps_y = np.array(fit_run.final_result_ps[0]['position_xy']) + len(fit_run.image_host_list[0])/2
-    host_x, host_y = np.array(fit_run.final_result_galaxy[0]['position_xy']) + len(fit_run.image_host_list[0])/2
-    
-    label = list(fit_run.flux_2d_out.keys())
-    label.sort()
-    label[1],label[2] = label[2], label[1]
-    image_list = [fit_run.flux_2d_out[label[i]] for i in range(len(label)) ]
-    label[2] = "data$-$point source"
-    
-    print(target_id, RA, Dec)
-    print('host ratio:', round(np.sum(fit_run.image_host_list[0])/np.sum(fit_run.image_host_list[0] + fit_run.image_ps_list[0]),2))
-    fig = total_compare(image_list, label, [fit_run.fitting_specify_class.deltaPix]*4, 
-                        target_ID=None, z=None,)
+            fit_run.cal_astrometry()
+            ps_x, ps_y = np.array(fit_run.final_result_ps[0]['position_xy']) + len(fit_run.image_host_list[0])/2
+            host_x, host_y = np.array(fit_run.final_result_galaxy[0]['position_xy']) + len(fit_run.image_host_list[0])/2
+            
+            label = list(fit_run.flux_2d_out.keys())
+            label.sort()
+            label[1],label[2] = label[2], label[1]
+            image_list = [fit_run.flux_2d_out[label[i]] for i in range(len(label)) ]
+            label[2] = "data$-$point source"
+            
+            print(target_id, RA, Dec)
+            print('host ratio:', round(np.sum(fit_run.image_host_list[0])/np.sum(fit_run.image_host_list[0] + fit_run.image_ps_list[0]),2))
+            fig = total_compare(image_list, label, [fit_run.fitting_specify_class.deltaPix]*4, 
+                                target_ID=None, z=None,)
     # fig.savefig('figures/{1}_{0}_qso_final_plot.pdf'.format(filt,target_id))
+
+# #%%
+# final_result_galaxy_0 = fit_run.final_result_galaxy 
+# import copy
+# fit_run_ = copy.deepcopy(fit_run)
+# fit_run_.fitting_specify_class.kwargs_numerics['point_source_supersampling_factor'] = 4
+# fit_run_.run(algorithm_list = ['PSO','PSO'], fitting_level=['norm','deep'])
+# print(fit_run.final_result_galaxy[0]['magnitude'] - fit_run_.final_result_galaxy[0]['magnitude'])
+# #%%
+# fit_run.plot_final_qso_fit()
+# fit_run_.plot_final_qso_fit()

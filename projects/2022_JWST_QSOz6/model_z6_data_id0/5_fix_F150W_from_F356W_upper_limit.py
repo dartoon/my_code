@@ -37,7 +37,11 @@ fit_run_list_fix = []
 for top_psf_id in range(5):
     for filt in ['F356W', 'F150W']:
         fit_run_list = []
-        fit_files = glob.glob(run_folder+'*fit_material*/fit_run_idx{0}_{1}_FOV*.pkl'.format(idx, filt))#+\
+        if filt == 'F356W':
+            fit_files = glob.glob(run_folder+'*fit_material_super2/fit_run_idx{0}_{1}_FOV*.pkl'.format(idx, filt))#+\
+        elif filt == 'F150W':
+            fit_files = glob.glob(run_folder+'*fit_material/fit_run_idx{0}_{1}_FOV*.pkl'.format(idx, filt))#+\
+            
         fit_files.sort()
         for i in range(len(fit_files)):
             fit_run_list.append(pickle.load(open(fit_files[i],'rb')))
@@ -58,6 +62,7 @@ for top_psf_id in range(5):
     fit_sepc.kwargs_params['lens_light_model'][2][0]['e2'] = fit_run_F356W.final_result_galaxy[0]['e2']
     fit_sepc.kwargs_params['lens_light_model'][1][0]['e2'] = fit_run_F356W.final_result_galaxy[0]['e2']
     
+    fit_sepc.kwargs_numerics['point_source_supersampling_factor'] = 2 #!!!
     fit_run = FittingProcess(fit_sepc, savename = target_id)
     fit_run.run(algorithm_list = ['PSO','PSO', 'PSO'], fitting_level=['norm','deep', 'deep'])
     fit_run.plot_final_qso_fit(target_ID =target_id)

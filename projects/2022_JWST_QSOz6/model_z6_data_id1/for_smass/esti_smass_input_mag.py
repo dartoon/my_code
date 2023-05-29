@@ -20,10 +20,10 @@ import glob
 # folder = '20221108' #FIX n =1 result
 # folder = '20221120' #FIX n =1 result
 # folder = '20230113' #FIX n =1 result, test mel = 0.2
-folder = '2023032203' #FIX n =1 result, update F150 result
+folder = '20230527' #FIX n =1 result, update F150 result
 # idx = [1,2,0,51,35]
 
-mag_result = {'F356W': 23.25, 'F150W': 25.32}
+mag_result = {'F356W': 23.12, 'F150W': 25.12}
 # del mag_result['F410M']
 
 target_id = 'J2236'
@@ -42,9 +42,9 @@ import time
 t1 = time.time()
 print('Run estimate')
 band_as_upper = []
-esti_smass(ID = folder+str(idx), mags_dict = mag_result, z = z, flag = 1, 
+esti_smass(ID = folder+str(idx), mags_dict = mag_result, z = z, flag = 0, 
             if_run_gsf=True, band_as_upper = band_as_upper, metallicity=-0.7,
-            mag_err=[0.2]*len(mag_result), just_run = False)
+            mag_err=[0.2, 0.3], just_run = False)
 t2 = time.time()
 
 print(idx)

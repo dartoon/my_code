@@ -127,3 +127,4 @@ projects/2022_JWST_QSOz6/simulation_SED/*_run*/*
 projects/2022_JWST_QSOz6/simulation_SED/F*
 projects/2022_JWST_QSOz6/model_z6_data_id0/figures/mbh_bias_v2/prob.txt
 projects/2022_JWST_QSOz6/model_z6_data_id0/J2236_material/Galight QSO image decomposition.ipynb
+projects/2022_JWST_QSOz6/model_z6_data_id1/stage3_all/fit_material_super2/fit_run_fixn1__idx1_F150W_CombPsfsNO_2

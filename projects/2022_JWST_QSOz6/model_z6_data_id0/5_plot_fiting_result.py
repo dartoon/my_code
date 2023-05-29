@@ -100,19 +100,20 @@ def total_compare(flux_list_2d, label_list_2d,
         #                  color='white')
         
         if filt != 'F150W':
-            theta_dict = {0: 137.475, 1: 139.818}
+            # theta_dict = {0: 137.475, 1: 139.818, }
             from astropy.coordinates import Angle
-            theta = Angle(theta_dict[idx], 'deg')
-    
-            f_center = len(flux_list_2d[0])/2
-            w = 0.2 / deltaPix_list[0]
-            h = 0.6 / deltaPix_list[0]
-            from photutils.aperture import RectangularAperture
-            aper = RectangularAperture((ps_x, ps_y), w, h, theta=theta)
-            aper.plot(color='white',
-                      lw=0.8,axes=ax_l[0])
-            # axins.add_patch(aper)
-        
+            # theta = Angle(theta_dict[idx], 'deg')
+            if target_info[str(idx)]['theta'] != None:
+                theta = Angle(target_info[str(idx)]['theta'], 'deg')
+                f_center = len(flux_list_2d[0])/2
+                w = 0.2 / deltaPix_list[0]
+                h = 0.6 / deltaPix_list[0]
+                from photutils.aperture import RectangularAperture
+                aper = RectangularAperture((ps_x, ps_y), w, h, theta=theta)
+                aper.plot(color='white',
+                          lw=0.8,axes=ax_l[0])
+                # axins.add_patch(aper)
+            
         fontsize = 20
         if i <3:
             cb_i = f.colorbar(im_i, ax=ax_l[i], shrink=0.48, pad=0.01,  orientation="horizontal", 
@@ -153,8 +154,8 @@ def total_compare(flux_list_2d, label_list_2d,
     return f
 
 idx = 1
-# filters = ['F150W', 'F356W']
-filters = ['F150W']
+filters = ['F150W', 'F356W']
+# filters = ['F150W']
 from target_info import target_info
 info = target_info[str(idx)]
 target_id, RA, Dec, z = info['target_id'], info['RA'], info['Dec'], info['z']
@@ -180,9 +181,9 @@ for top_psf_id in [0]:
 
         PSF_lib_files = glob.glob(run_folder+'material/*'+filt[:-1]+'*_PSF_Library_idx{0}.pkl'.format(idx))[0]
         if idx !=1:
-            fit_files = glob.glob(run_folder+'*fit_material*/fit_run_idx{0}_{1}_*.pkl'.format(idx, filt))#+\
+            fit_files = glob.glob(run_folder+'*fit_material/fit_run_idx{0}_{1}_*.pkl'.format(idx, filt))#+\
         elif idx ==1:
-            fit_files = glob.glob(run_folder+'*fit_material*/fit_run*_fixn1_*idx{0}_{1}_*.pkl'.format(idx, filt))#+\
+            fit_files = glob.glob(run_folder+'*fit_material/fit_run*_fixn1_*idx{0}_{1}_*.pkl'.format(idx, filt))#+\
         fit_files.sort()
         for i in range(len(fit_files)):
             fit_run_list.append(pickle.load(open(fit_files[i],'rb')))
@@ -192,15 +193,40 @@ for top_psf_id in [0]:
         fit_run = fit_run_list[sort_Chisq[top_psf_id]]
         # fit_run.savename = 'figures/' + fit_run.savename+'_'+filt
         # fit_run.plot_final_qso_fit(target_ID = filt, save_plot = True, cmap = my_cmap)
-fit_run.cal_astrometry()
-ps_x, ps_y = np.array(fit_run.final_result_ps[0]['position_xy']) + len(fit_run.image_host_list[0])/2
-host_x, host_y = np.array(fit_run.final_result_galaxy[0]['position_xy']) + len(fit_run.image_host_list[0])/2
+        
+        #%%
+        fit_run.cal_astrometry()
+        ps_x, ps_y = np.array(fit_run.final_result_ps[0]['position_xy']) + len(fit_run.image_host_list[0])/2
+        host_x, host_y = np.array(fit_run.final_result_galaxy[0]['position_xy']) + len(fit_run.image_host_list[0])/2
+        
+        label = list(fit_run.flux_2d_out.keys())
+        label.sort()
+        label[1],label[2] = label[2], label[1]
+        image_list = [fit_run.flux_2d_out[label[i]] for i in range(len(label)) ]
+        label[2] = "data$-$point source"
+        fig = total_compare(image_list, label, [fit_run.fitting_specify_class.deltaPix]*4, 
+                            target_ID=None, z=None,)
+        # fig.savefig('figures/{1}_{0}_qso_final_plot.pdf'.format(filt,target_id))
+        print(target_id) 
+        
+#%%Calculate slit loss:
+    
+twoD_flux =   fit_run.flux_2d_out['data-point source']  
+twoD_flux =   fit_run.image_ps_list[0]
+    
+total_flux = np.sum(twoD_flux)
 
-label = list(fit_run.flux_2d_out.keys())
-label.sort()
-label[1],label[2] = label[2], label[1]
-image_list = [fit_run.flux_2d_out[label[i]] for i in range(len(label)) ]
-label[2] = "data$-$point source"
-fig = total_compare(image_list, label, [fit_run.fitting_specify_class.deltaPix]*4, 
-                    target_ID=None, z=None,)
-fig.savefig('figures/{1}_{0}_qso_final_plot.pdf'.format(filt,target_id))
+from photutils.aperture import aperture_photometry
+from astropy.coordinates import Angle
+if target_info[str(idx)]['theta'] != None:
+    theta = Angle(target_info[str(idx)]['theta'], 'deg')
+    f_center = len(image_list[0])/2
+    w = 0.2 / fit_run.fitting_specify_class.deltaPix
+    h = 0.6 / fit_run.fitting_specify_class.deltaPix
+    from photutils.aperture import RectangularAperture
+    aper = RectangularAperture((ps_x, ps_y), w, h, theta=theta)
+aper_flux = aperture_photometry(twoD_flux, aper)['aperture_sum'].value[0]
+
+print("ratio:, ", aper_flux/total_flux)
+
+

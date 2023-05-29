@@ -17,7 +17,8 @@ import copy
 
 run_folder = 'stage3_all/' #!!!
 filt = 'F150W'
-files = glob.glob(run_folder+'fit_material/data_process_idx0_*{0}*_*FOVpsf*.pkl'.format(filt))
+idx = ? #!!!
+files = glob.glob(run_folder+'fit_material/data_process_idx{1}_*{0}*_*FOVpsf*.pkl'.format(filt,idx))
 files.sort()
 collect_info = []
 for i in range(len(files)):
@@ -54,3 +55,14 @@ for count in range(len(collect_info)):
             ct = 'all'
         pickle.dump(_data_process , open(run_folder+'fit_material/'+'data_process_idx{0}_{2}_CombPsfsNO_{1}.pkl'.format(idx, ct, filt), 'wb'))
         
+    # if if_printshow==True:
+    #     fit_run = fit_run_list[idx_counts[0]]
+    #     fit_run.plot_final_qso_fit()
+    #     host_flux = fit_run.final_result_galaxy[0]['flux_within_frame']
+    #     AGN_flux = fit_run.final_result_ps[0]['flux_within_frame']
+    #     ratio = host_flux/(host_flux+AGN_flux)
+    #     print('count', count)
+    #     print('Chisqs top 2', round(chisqs[idx_counts[0]],2), round(chisqs[idx_counts[1]],2))
+    #     print_s ='idx: '+ item[0]+' '+item[1]+' ratio: ' + str(round(ratio,2)) +" OK?"
+    #     print(fit_files[idx_counts[0]])
+    #     hold = input(print_s)

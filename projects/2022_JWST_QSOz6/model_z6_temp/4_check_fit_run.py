@@ -10,24 +10,25 @@ import numpy as np
 import astropy.io.fits as pyfits
 import matplotlib.pyplot as plt
 import glob, pickle
-import sys
-sys.path.insert(0,'../model_z6_data_id0/')
 
-idx = 1
+idx = ?  #!!!
+
+import sys
+sys.path.insert(0, '../model_z6_data_id0/')
 from target_info import target_info
 info = target_info[str(idx)]
 target_id, RA, Dec, z = info['target_id'], info['RA'], info['Dec'], info['z']
 
 # files = glob.glob('./*fit_material*sm*/data_process_idx{0}_*_psf*.pkl'.format(idx))
 # files.sort()
-# run_folder = 'stage3_*/' #!!!
 run_folder = 'stage3_all/' #!!!
+# run_folder = 'stage3_second_half/' #!!!
 z_str = str(z)
 
 # filters = ['F150W', 'F356W']
-filters = ['F150W']
+filters = ['F356W']
 import copy, matplotlib
-for top_psf_id in [0]:
+for top_psf_id in range(1):
     for count in range(len(filters)):
         fit_run_list = []
         # idx = idx_info
@@ -42,9 +43,8 @@ for top_psf_id in [0]:
 
         PSF_lib_files = glob.glob(run_folder+'material/*'+filt[:-1]+'*_PSF_Library_idx{0}.pkl'.format(idx))[0]
         # idx, filt= item
-        fit_files = glob.glob(run_folder+'*fit_material*/fit_run_fixn1__idx{0}_{1}_*.pkl'.format(idx, filt))#+\
         # fit_files = glob.glob(run_folder+'*fit_material*/fit_run_withcentralMask_idx{0}_{1}_FOV*.pkl'.format(idx, filt))#+\
-        # fit_files = glob.glob(run_folder+'*fit_material*/fit_run_idx{0}_{1}_*.pkl'.format(idx, filt))#+\
+        fit_files = glob.glob(run_folder+'*fit_material*/fit_run_idx{0}_{1}_*.pkl'.format(idx, filt))#+\
         fit_files.sort()
         for i in range(len(fit_files)):
             fit_run_list.append(pickle.load(open(fit_files[i],'rb')))
@@ -52,8 +52,8 @@ for top_psf_id in [0]:
         sort_Chisq = chisqs.argsort()  
         print('idx', idx, filt, "Total PSF NO.", 'chisq',chisqs[sort_Chisq[top_psf_id]], len(sort_Chisq), fit_files[sort_Chisq[top_psf_id]])
         fit_run = fit_run_list[sort_Chisq[top_psf_id]]
-        fit_run.savename = 'figures/' + fit_run.savename+'_'+filt
-        fit_run.plot_final_qso_fit(target_ID = target_id+'$-$'+filt, save_plot = True, cmap = my_cmap)
+        # fit_run.savename = 'figures/' + fit_run.savename+'_'+filt
+        fit_run.plot_final_qso_fit(target_ID = target_id+'$-$'+filt, save_plot = False, cmap = my_cmap)
         count_n = 5
         Chisq_best = chisqs[sort_Chisq[top_psf_id]]
         Chisq_last= chisqs[sort_Chisq[count_n-1]]
@@ -64,12 +64,7 @@ for top_psf_id in [0]:
         
         
         prop_name = 'magnitude'
-        # all_values = [fit_run_list[i].final_result_ps[0][prop_name] for i in range(len(fit_run_list))]
-        all_values = [fit_run_list[i].final_result_galaxy[0][prop_name] for i in range(len(fit_run_list))]
-        # prop_name = 'total magnitude'
-        # all_values = [ -2.5*np.log10(fit_run_list[i].final_result_ps[0]['flux_within_frame'] + fit_run_list[i].final_result_galaxy[0]['flux_within_frame'] ) +
-        #               fit_run_list[0].zp
-        #               for i in range(len(fit_run_list))]
+        all_values = [fit_run_list[i].final_result_ps[0][prop_name] for i in range(len(fit_run_list))]
         # all_values = [fit_run_list[i].final_result_galaxy[0][prop_name] for i in range(len(fit_run_list))]
         weighted_value = np.sum(np.array(all_values)*weight) / np.sum(weight)
         rms_value = np.sqrt(np.sum((np.array(all_values)-weighted_value)**2*weight) / np.sum(weight))
@@ -79,11 +74,10 @@ for top_psf_id in [0]:
         host_flux = fit_run.final_result_galaxy[0]['flux_within_frame']
         AGN_flux = fit_run.final_result_ps[0]['flux_within_frame']
         ratio = host_flux/(host_flux+AGN_flux)
-        # print(fit_run.reduced_Chisq)
-        # print(ratio)
-        # print(fit_run.final_result_galaxy[0]['R_sersic'])
-        # print(fit_run.final_result_galaxy)
-        # print(prop_name, round(weighted_value,2), '+-', round(rms_value,2))
+        print("HOST ratio", ratio)
+        print(fit_run.final_result_galaxy[0]['R_sersic'])
+        print(fit_run.final_result_galaxy)
+        print(prop_name, round(weighted_value,2), '+-', round(rms_value,2))
     #     print('Chisqs top 2', round(chisqs[sort_Chisq[0]],2), round(chisqs[sort_Chisq[1]],2))
     #     print_s =filt +' ratio: ' + str(round(ratio,2)) + "\n\n\n"
     #     print(fit_files[sort_Chisq[0]])
@@ -96,28 +90,12 @@ for top_psf_id in [0]:
         PSF_RA_DEC_list = np.array(PSF_RA_DEC_list)
         # print( 'The number to the east:',
         #     np.sum(PSF_RA_DEC_list[sort_Chisq[top_psf_id]][0] - PSF_RA_DEC_list[:,0] > 0))
-        # print(ratio, fit_run.final_result_galaxy[0]['magnitude'], fit_run.reduced_Chisq)
-#%%
+        
+        #%%
 # noise_map  = fit_run.fitting_specify_class.data_process_class.noise_map
 # host = fit_run.flux_2d_out['data-Point Source']
 # mask = fit_run.fitting_specify_class.data_process_class.target_mask
 # from galight.tools.astro_tools import plt_fits
 # plt.imshow(abs(host)/noise_map * mask, origin='lower', vmin = 1, vmax = 10)
 # plt.colorbar()
-# plt.show()    
-
-# #%%More tests with ssf = 2 and fix center.
-#         final_result_galaxy_0 = fit_run.final_result_galaxy 
-#         import copy
-#         fit_run_ = copy.deepcopy(fit_run)
-#         # fit_run_.fitting_specify_class.kwargs_numerics['point_source_supersampling_factor'] = 2
-#         # fit_run_.fitting_specify_class.kwargs_constraints['joint_lens_light_with_point_source'] = [[0, 0]]
-#         fit_run_.run(algorithm_list = ['PSO','PSO'], fitting_level=['norm','deep'])
-#         host_flux = fit_run_.final_result_galaxy[0]['flux_within_frame']
-#         AGN_flux = fit_run_.final_result_ps[0]['flux_within_frame']
-#         ratio = host_flux/(host_flux+AGN_flux)
-#         print(i, ratio, fit_run_.final_result_galaxy[0]['magnitude'])
-#         fit_run_.plot_final_qso_fit()
-#         # print(ratio)
-
-
+# plt.show()     

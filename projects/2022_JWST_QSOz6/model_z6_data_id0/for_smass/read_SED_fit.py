@@ -40,7 +40,8 @@ idx = 1  #our target 102 fix age.
 
 folder = 'esti_smass/'+folder #+str(idx)
 # folder = folder + '_freeParam'
-folder = folder + '_freeParam_withEmissionLine_prior1_lowgrid'
+# folder = folder + '_freeParam_withEmissionLine_prior1_lowgrid'
+folder = folder + '_freeParam_withEmissionLine_Av5'
 # folder = folder + '202301151_freeParam_wider_withEmissionLine'
 
 steller_file = glob.glob(folder+'/gsf_spec_*.fits')[0]
