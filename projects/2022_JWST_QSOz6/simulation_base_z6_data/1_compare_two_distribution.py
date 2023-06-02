@@ -16,8 +16,8 @@ sys.path.insert(0,'../model_z6_data_id0/')
 from target_info import target_info
 
 #%%Input number
-filt = ['F356W','F150W'][1]
-idx = 1
+filt = ['F356W','F150W'][0]
+idx = 0
 run_folder = '../model_z6_data_id{0}/stage3_all/'.format(idx)
 info = target_info[str(idx)]
 target_id, RA, Dec, z = info['target_id'], info['RA'], info['Dec'], info['z']
@@ -113,6 +113,7 @@ for seed in range(seedmax):
 
 #%%
 plt.figure(figsize=(11, 7))
+plt.rcParams["font.family"] = "sans-serif"
 plt.hist(np.array(obtain_value), color = 'orange',label='host galaxy added') #-true_value)
 plt.hist(np.array(obtain_value_nohost),color='wheat', label='host not added')
 plt.axvline(x=true_value, ls='--', linewidth=1.6, c='red', zorder = 1, label='true value')
@@ -123,9 +124,9 @@ plt.axvline(x=true_value, ls='--', linewidth=1.6, c='red', zorder = 1, label='tr
 
 plt.xlabel('inferred '+prop, fontsize=27)
 plt.tick_params(labelsize=20)
-plt.title('Simulation Result for {1} ({2}) with {0} realizations'.format(seedmax, target_id, filt), fontsize = 25)
-plt.legend(prop={'size':17})
-plt.savefig('sim_result_two_distribution.pdf')
+plt.title('Simulation Result for {1} ({2}) with {0} realizations'.format(seedmax, target_id, filt), fontsize = 20)
+plt.legend(prop={'size':15})
+# plt.savefig('sim_result_two_distribution.pdf')
 plt.show()
 print(np.mean(np.array(obtain_value)-true_value))
 print(np.std(np.array(obtain_value)-true_value))

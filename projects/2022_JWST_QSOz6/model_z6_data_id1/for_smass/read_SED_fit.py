@@ -11,6 +11,7 @@ import astropy.io.fits as pyfits
 import matplotlib.pyplot as plt
 import glob
 
+
 import sys
 sys.path.insert(0,'../../model_z6_data_id0/')
 
@@ -81,7 +82,7 @@ for i in range(len(prop)):
         value['chain'][prop[i]] = 10**value['chain'][prop[i]]
 
 df = pd.DataFrame(data=value['chain'])
-
+plt.rcParams["font.family"] = "sans-serif"
 for key in df.keys():
     if key == 'logM_stel':
         newkey = r"log M$_{*}$/M$_{\rm \odot}$"
@@ -126,7 +127,7 @@ for i in range(len(g.axes.ravel())):
             #              r'\frac{-e^{i\pi}}{2^n}$!', fontsize=16, color='r')
             # ax.set_title(df.keys()[i/5]+r'={0}$\pm$')
         if j %5 ==0:
-            ax.set_xlim(9.47, 11.5)
+            ax.set_xlim(10.2, 11.9)
         if Mstr == '':
             Mstr = title
 # plt.savefig('../../model_z6_data_id0/figures/{0}_SED_MCMC.pdf'.format(target_id[:5]), bbox_inches = "tight")
@@ -202,6 +203,7 @@ f_84 = table_spec['f_model_84']
 
 seaborn.reset_orig()
 plt.figure(figsize=(10, 6))
+plt.rcParams["font.family"] = "sans-serif"
 # array_spec[:,2] =  array_spec[:,2]/ array_spec[:,2].max() * 2.65
 
 plt.plot(wave/10000., f_50, 'black', alpha=0.7)

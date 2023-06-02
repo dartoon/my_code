@@ -12,8 +12,8 @@ import matplotlib.pyplot as plt
 import glob, pickle
 import copy, matplotlib
 from matplotlib.colors import LogNorm
-
-
+# import matplotlib as mat
+# mat.rcParams['font.family'] = "sans-serif"
 
 def scale_bar(ax, d, dist=1/0.13, text='1"', color='black', flipped=False, fontsize=20):
     if flipped:
@@ -66,7 +66,8 @@ def total_compare(flux_list_2d, label_list_2d,
     right = left + width
     top = bottom + height
     
-    f = plt.figure(0, figsize=(6.5+ (cl_num-1)*3.5,4))    
+    f = plt.figure(0, figsize=(6.5+ (cl_num-1)*3.5,4))  
+    plt.rcParams["font.family"] = "sans-serif"
     ax_l = [plt.subplot2grid((6,cl_num), (0,i), rowspan=6) for i in range(len(flux_list_2d))] #The image plot
     if cmap == None:
         cmap = my_cmap
@@ -78,7 +79,7 @@ def total_compare(flux_list_2d, label_list_2d,
         if i == 0:
             im_i = ax_l[i].imshow(flux_list_2d[i],origin='lower',cmap=cmap, norm=LogNorm(vmax = flux_list_2d[0].max(), vmin = 1.e-4))
             clim=im_i.properties()['clim'] #To uniform the color bar scale.
-            ticks= np.array([1.e-4, 1.e-3, 1.e-2,1.e-1,0, 10])
+            ticks= np.array([1.e-4, 1.e-3, 1.e-2,1.e-1,0])
         elif i == 3:
             im_i = ax_l[i].imshow(flux_list_2d[i],origin='lower',cmap='bwr', vmin=-6, vmax=6)
             ax_l[i].get_yaxis().set_visible(False)
@@ -90,13 +91,14 @@ def total_compare(flux_list_2d, label_list_2d,
             ax_l[i].get_yaxis().set_visible(False)
         ax_l[i].get_xaxis().set_visible(False)
         deltaPix = deltaPix_list[i]
-        scale_bar(ax_l[i], frame_size, dist=0.5/deltaPix, text='0.5"', color = color)
+        if i == 0:
+            scale_bar(ax_l[i], frame_size, dist=0.5/deltaPix, text='0.5"', color = color)
         # if i == 0:
         #     ax_l[0].text(frame_size*0.25, frame_size*0.09, "~2.8kpc",fontsize=20, 
         #                  color='white')
         
         # if not (idx == 0 and filt == 'F150W'):
-        #     ax_l[2].text(frame_size*0.40, frame_size*0.05, "Host", weight='bold', fontsize=20, 
+        #     ax_l[2].text(frame_size*0.40, frame_size*0.05, "Host",  fontsize=20, 
         #                  color='white')
         
         if filt != 'F150W':
@@ -114,48 +116,48 @@ def total_compare(flux_list_2d, label_list_2d,
                           lw=0.8,axes=ax_l[0])
                 # axins.add_patch(aper)
             
-        fontsize = 20
+        fontsize = 18
         if i <3:
             cb_i = f.colorbar(im_i, ax=ax_l[i], shrink=0.48, pad=0.01,  orientation="horizontal", 
                               aspect=15, ticks=ticks)
+        cb_i.ax.tick_params(labelsize=15) 
         if i <2:
             ax_l[i].text(frame_size*0.05, frame_size*0.87, label_list_2d[i],fontsize=fontsize, 
-                         weight='bold', color='white')
+                          color='white')
         if i ==2:
             ax_l[i].text(frame_size*0.02, frame_size*0.87, label_list_2d[i],fontsize=fontsize, 
-                         weight='bold', color='white')
+                          color='white')
         if i == 3:
             ax_l[i].text(frame_size*0.02, frame_size*0.87, label_list_2d[i],fontsize=fontsize, 
-                         weight='bold', color='black')
+                          color='black')
         
         if z != None:
             ax_l[i].text(frame_size*0.95, frame_size*0.05, 'z={0}'.format(z),fontsize=fontsize, 
                          ha='right', va='bottom',
-                         weight='bold', color='white', bbox={'facecolor': 'gold', 'alpha': 0.6, 'pad': 3})
+                          color='white', bbox={'facecolor': 'gold', 'alpha': 0.6, 'pad': 3})
         
         if i == 0:
             ax_l[i].text(frame_size*0.95, frame_size*0.95, target_ID,fontsize=fontsize, 
                          ha='right', va='top',
-                         weight='bold', color='white',  bbox={'facecolor': 'gold', 'alpha': 0.6, 'pad': 3})
+                          color='white',  bbox={'facecolor': 'gold', 'alpha': 0.6, 'pad': 3})
    
-    ax_l[2].scatter(ps_x, ps_y, marker= 'x', c='lightblue', s = 80)
+    # ax_l[2].scatter(ps_x, ps_y, marker= 'x', c='lightblue', s = 80)
+    
+    ax_l[0].yaxis.set_tick_params(labelsize=15)
     # if not (filt =='F150W' and idx ==0):
     #     ax_l[2].scatter(host_x, host_y, marker= '+', c='lightblue', s= 100)
     # from matplotlib.patches import Rectangle
     # ax_l[2].add_patch( Rectangle((0, 0), frame_size, frame_size, fc='none', ec='r', lw=10) )
     
-    # for axis in ['top', 'bottom', 'left', 'right']:
-    #     ax_l[2].spines[axis].set_linewidth(5.5)  # change width
-    #     ax_l[2].spines[axis].set_color('red')    # change color
 
-    ax_l[0].set_ylabel(filt, fontsize=20, weight='bold')
+    ax_l[0].set_ylabel(filt, fontsize=20)
     plt.subplots_adjust(wspace=-0.5, hspace=0)
     plt.show()       
     return f
 
-idx = 1
-filters = ['F150W', 'F356W']
-# filters = ['F150W']
+idx = 0
+# filters = ['F150W', 'F356W']
+filters = ['F356W']
 from target_info import target_info
 info = target_info[str(idx)]
 target_id, RA, Dec, z = info['target_id'], info['RA'], info['Dec'], info['z']
@@ -181,9 +183,15 @@ for top_psf_id in [0]:
 
         PSF_lib_files = glob.glob(run_folder+'material/*'+filt[:-1]+'*_PSF_Library_idx{0}.pkl'.format(idx))[0]
         if idx !=1:
-            fit_files = glob.glob(run_folder+'*fit_material/fit_run_idx{0}_{1}_*.pkl'.format(idx, filt))#+\
+            if filt == 'F356W':
+                fit_files = glob.glob(run_folder+'*fit_material/fit_run_idx{0}_{1}_*.pkl'.format(idx, filt))#+\
+            if filt == 'F150W':
+                fit_files = glob.glob(run_folder+'*fit_material_super2/fit_run_idx{0}_{1}_*.pkl'.format(idx, filt))#+\
         elif idx ==1:
-            fit_files = glob.glob(run_folder+'*fit_material/fit_run*_fixn1_*idx{0}_{1}_*.pkl'.format(idx, filt))#+\
+            if filt == 'F356W':
+                fit_files = glob.glob(run_folder+'*fit_material/fit_run*_fixn1_*idx{0}_{1}_*.pkl'.format(idx, filt))#+\
+            if filt == 'F150W':
+                fit_files = glob.glob(run_folder+'*fit_material_super2/fit_run*_fixn1_*idx{0}_{1}_*.pkl'.format(idx, filt))#+\
         fit_files.sort()
         for i in range(len(fit_files)):
             fit_run_list.append(pickle.load(open(fit_files[i],'rb')))
@@ -212,8 +220,7 @@ for top_psf_id in [0]:
 #%%Calculate slit loss:
     
 twoD_flux =   fit_run.flux_2d_out['data-point source']  
-twoD_flux =   fit_run.image_ps_list[0]
-    
+# twoD_flux =   fit_run.image_ps_list[0]
 total_flux = np.sum(twoD_flux)
 
 from photutils.aperture import aperture_photometry
@@ -229,4 +236,10 @@ aper_flux = aperture_photometry(twoD_flux, aper)['aperture_sum'].value[0]
 
 print("ratio:, ", aper_flux/total_flux)
 
+#%%Calculate host ratio in aperture:
+data_image =  fit_run.flux_2d_out['data']  
+data_aperture_flux = aperture_photometry(data_image, aper)['aperture_sum'].value[0]
+qso_image = fit_run.image_ps_list[0]
+ps_aperture_flux = aperture_photometry(qso_image, aper)['aperture_sum'].value[0]
 
+print("aperture host ratio,", 1 - ps_aperture_flux/data_aperture_flux)

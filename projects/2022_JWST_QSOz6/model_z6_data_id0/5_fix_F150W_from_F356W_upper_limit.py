@@ -38,7 +38,7 @@ for top_psf_id in range(5):
     for filt in ['F356W', 'F150W']:
         fit_run_list = []
         if filt == 'F356W':
-            fit_files = glob.glob(run_folder+'*fit_material_super2/fit_run_idx{0}_{1}_FOV*.pkl'.format(idx, filt))#+\
+            fit_files = glob.glob(run_folder+'*fit_material_super2/fit_run_idx{0}_{1}_FOV*.pkl'.format(idx, filt))#+\ #!!!
         elif filt == 'F150W':
             fit_files = glob.glob(run_folder+'*fit_material/fit_run_idx{0}_{1}_FOV*.pkl'.format(idx, filt))#+\
             

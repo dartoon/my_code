@@ -29,6 +29,8 @@ sys.path.insert(0,'../model_z6_data_id0/')
 from target_info import target_info
 from galight.tools.astro_tools import plt_fits, plt_many_fits
 #%%
+plt.rcParams["font.family"] = "sans-serif"
+
 data_type = 'all' 
 filt = 'F356W'
 filt = 'F150W'
@@ -224,5 +226,5 @@ axins.set_yticks([])
 mark_inset(ax, axins, loc1=loc1, loc2=loc2, fc="none", ec="0.6", linewidth=2.2)
 ax.set(frame_on=False)  # New
 
-# plt.savefig('figures/field_overview{0}.pdf'.format(filt))
+plt.savefig('figures/field_overview{0}.pdf'.format(filt))
 plt.show()

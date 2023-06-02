@@ -24,13 +24,16 @@ import warnings
 warnings.filterwarnings("ignore")
 from target_info import target_info
 from galight.tools.astro_tools import plt_fits, plt_many_fits
+
+plt.rcParams["font.family"] = "sans-serif"
+
 #%%
 # data_type = 'all' 
 # filt = 'F356W'
 filt = 'F150W'
 file_NO = 0
 
-idx = 0
+idx = 0 #!!! only for 0
 # folder = '/Users/Dartoon/Downloads/z6JWSTNIRcam/NIRCam_J2255_stage3_{0}/bkg_removed'.format(data_type)
 folder = folder = '../NIRCam_data/Nov14/bkg_removed/' 
 info = target_info[str(idx)]

@@ -155,9 +155,9 @@ def total_compare(flux_list_2d, label_list_2d,
 
 # idx = 2
 # for idx in range(6):
-for idx in [1]:
+for idx in [0]:
     # filters = ['F150W', 'F356W']
-    filters = ['F356W']
+    filters = ['F150W']
     from target_info import target_info
     info = target_info[str(idx)]
     target_id, RA, Dec, z = info['target_id'], info['RA'], info['Dec'], info['z']
@@ -209,12 +209,11 @@ for idx in [1]:
         fig = total_compare(image_list, label, [fit_run.fitting_specify_class.deltaPix]*4, 
                             target_ID=None, z=None,)
         # fig.savefig('figures/{1}_{0}_qso_final_plot.pdf'.format(filt,target_id))
-        if idx == 1:
-            file_header = fit_run.fitting_specify_class.data_process_class.header
-            header = copy.deepcopy(file_header)
-            header['CRPIX1'] = file_header['CRPIX1']- fit_run.fitting_specify_class.data_process_class.target_pos[0]+len(fit_run.image_ps_list[0])/2
-            header['CRPIX2'] = file_header['CRPIX2']- fit_run.fitting_specify_class.data_process_class.target_pos[1]+len(fit_run.image_ps_list[0])/2
-            if top_psf_id == 0:
-                pyfits.PrimaryHDU(fit_run.fitting_specify_class.data_process_class.target_stamp, header=header).writeto('J2236_material/J2236_{0}_data_cutout.fits'.format(filt),overwrite=True)  
-                pyfits.PrimaryHDU(fit_run.fitting_specify_class.data_process_class.noise_map).writeto('J2236_material/J2236_{0}_noise.fits'.format(filt),overwrite=True)  
-        pyfits.PrimaryHDU(fit_run.fitting_specify_class.data_process_class.PSF_list[-1]).writeto('J2236_material/PSF_{1}_top{0}.fits'.format(top_psf_id+1,filt),overwrite=True)  
+        file_header = fit_run.fitting_specify_class.data_process_class.header
+        header = copy.deepcopy(file_header)
+        header['CRPIX1'] = file_header['CRPIX1']- fit_run.fitting_specify_class.data_process_class.target_pos[0]+len(fit_run.image_ps_list[0])/2
+        header['CRPIX2'] = file_header['CRPIX2']- fit_run.fitting_specify_class.data_process_class.target_pos[1]+len(fit_run.image_ps_list[0])/2
+        if top_psf_id == 0:
+            pyfits.PrimaryHDU(fit_run.fitting_specify_class.data_process_class.target_stamp, header=header).writeto('J2255_material/J2255_{0}_data_cutout.fits'.format(filt),overwrite=True)  
+            pyfits.PrimaryHDU(fit_run.fitting_specify_class.data_process_class.noise_map).writeto('J2255_material/J2255_{0}_noise.fits'.format(filt),overwrite=True)  
+        pyfits.PrimaryHDU(fit_run.fitting_specify_class.data_process_class.PSF_list[-1]).writeto('J2255_material/PSF_{1}_top{0}.fits'.format(top_psf_id+1,filt),overwrite=True)  

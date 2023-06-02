@@ -14,8 +14,8 @@ import glob, pickle
 
 run_folder = 'stage3_all/' #!!!
 idx = 0
-filt = 'F150W'
-# filt = 'F356W'
+# filt = 'F150W'
+filt = 'F356W'
 
 
 #Load PSF information:
@@ -122,6 +122,7 @@ for i in range(len(PSF_test_files)):
 
 from matplotlib.colors import LogNorm
 fig, (axs) = plt.subplots(2, 5, figsize=(15, 6))
+plt.rcParams["font.family"] = "sans-serif"
 for i in range(len(images)):
     _i = int(i / 5)
     _j = int(i % 5)
@@ -135,7 +136,7 @@ for i in range(len(images)):
     fit_j = PSF_test_files[i].split('fit')[-1][0]
     label = 'fit star {1} using star {0}'.format(int(use_i)+1,int(fit_j)+1)
     plttext = axs[_i][_j].text(frame_size*0.05, frame_size*0.87, label,
-              fontsize=15, weight='bold', color='black')
+              fontsize=15, color='black')
     plttext.set_bbox(dict(facecolor='white', alpha=0.5))
     # if texts is not None:
     #     plttext = axs[_i][_j].text(frame_size*0.05, frame_size*0.05, "{1} = {0}".format(round(texts[i],3), prop ),
@@ -151,9 +152,8 @@ frame_size = len(fit_run.image_ps_list[0])
 d = frame_size
 p0 = d / 15.
 axs[0][0].plot([4, 4 + dist], [4, 4], linewidth=3, color='black')
-axs[0][0].text(3 + dist / 2., 6 + 0.01 * d, text, fontsize=25, color='black', ha='center')
-
-# plt.savefig('PSF_residual_each.pdf',bbox_inches='tight')
+axs[0][0].text(3 + dist / 2., 6 + 0.01 * d, text, fontsize=20, color='black', ha='center')
+# plt.savefig('./figures/PSF_residuals.pdf',bbox_inches='tight')
 plt.show()    
 
 #%%Check the PSF wing standard to host.
@@ -216,8 +216,8 @@ cbar = plt.colorbar(orientation="horizontal", pad=0.01)
 cbar.ax.set_xlim(0,vmax)
 cbar.ax.tick_params(labelsize=15) 
 cbar.set_label(label='Signal (data$-$PSF) to PSF std ratio',fontsize=20)
-plt.title(info['target_id']+'\t'+filt,fontsize=25,y=0.9 )
-# plt.savefig('../model_z6_data_id0/figures/host_toPSFstd_ratio_idx{0}_{1}.pdf'.format(idx, filt))
+plt.title(info['target_id']+' '+filt,fontsize=25,y=0.9 )
+plt.savefig('../model_z6_data_id0/figures/host_toPSFstd_ratio_idx{0}_{1}.pdf'.format(idx, filt))
 plt.show()
     
 

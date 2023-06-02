@@ -11,6 +11,7 @@ import astropy.io.fits as pyfits
 import matplotlib.pyplot as plt
 import glob
 
+
 import sys
 sys.path.insert(0,'../')
 
@@ -68,7 +69,7 @@ for key in value.keys():
     value[key] = value[key][bool_array]
 
 df = pd.DataFrame(data=value)
-
+plt.rcParams["font.family"] = "sans-serif"
 for key in df.keys():
     if key == 'logM_stel':
         newkey = r"log M$_{*}$/M$_{\rm \odot}$"
@@ -183,14 +184,15 @@ for i in range(2):
     #%%
 f_16 = np.min(f_16_l, axis = 0)
 f_84 = np.max(f_84_l, axis = 0)
-test_i = 1
-f_16 = f_16_l[test_i]
-f_84 = f_84_l[test_i]
+# test_i = 1
+# f_16 = f_16_l[test_i]
+# f_84 = f_84_l[test_i]
 f_50 = f_50_l[0]
     
 
 seaborn.reset_orig()
 plt.figure(figsize=(10, 6))
+plt.rcParams["font.family"] = "sans-serif"
 # array_spec[:,2] =  array_spec[:,2]/ array_spec[:,2].max() * 2.65
 
 plt.plot(wave/10000., f_50, 'black', alpha=0.7)

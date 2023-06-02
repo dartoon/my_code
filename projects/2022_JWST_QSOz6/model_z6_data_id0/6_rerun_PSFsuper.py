@@ -19,7 +19,7 @@ from galight.tools.measure_tools import measure_bkg
 import pickle
 
 run_folder = 'stage3_all/' #!!!
-filt = 'F356W'
+filt = 'F150W'
 dp_files = glob.glob(run_folder+'fit_material/data_process_idx0_{0}_FOVpsf*.pkl'.format(filt))
 dp_files.sort()
 
@@ -135,7 +135,7 @@ for top_psf_id in [0]:
     fit_run_list = []
     # PSF_lib_files = glob.glob(run_folder+'material/*'+filt[:-1]+'*_PSF_Library_idx{0}.pkl'.format(idx))[0]
     # fit_files = glob.glob(run_folder+'*fit_material/fit_run_idx{0}_{1}_*.pkl'.format(idx, filt))#+\
-    fit_files = glob.glob(run_folder+'*fit_material_super4/fit_run_idx{0}_{1}_*.pkl'.format(idx, filt))#+\
+    fit_files = glob.glob(run_folder+'*fit_material_super2/fit_run_idx{0}_{1}_*.pkl'.format(idx, filt))#+\
     fit_files.sort()
     for i in range(len(fit_files)):
         fit_run_list.append(pickle.load(open(fit_files[i],'rb')))
