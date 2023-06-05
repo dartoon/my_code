@@ -114,6 +114,7 @@ for seed in range(seedmax):
 #%%
 plt.figure(figsize=(11, 7))
 plt.rcParams["font.family"] = "sans-serif"
+plt.rcParams['legend.edgecolor'] = '0.5'
 plt.hist(np.array(obtain_value), color = 'orange',label='host galaxy added') #-true_value)
 plt.hist(np.array(obtain_value_nohost),color='wheat', label='host not added')
 plt.axvline(x=true_value, ls='--', linewidth=1.6, c='red', zorder = 1, label='true value')
@@ -123,10 +124,11 @@ plt.axvline(x=true_value, ls='--', linewidth=1.6, c='red', zorder = 1, label='tr
 
 
 plt.xlabel('inferred '+prop, fontsize=27)
+plt.ylabel('Number', fontsize=27)
 plt.tick_params(labelsize=20)
-plt.title('Simulation Result for {1} ({2}) with {0} realizations'.format(seedmax, target_id, filt), fontsize = 20)
+# plt.title('Simulation Result for {1} ({2}) with {0} realizations'.format(seedmax, target_id, filt), fontsize = 20)
 plt.legend(prop={'size':15})
-# plt.savefig('sim_result_two_distribution.pdf')
+plt.savefig('../model_z6_data_id0/figures/sim_result_two_distribution.pdf')
 plt.show()
 print(np.mean(np.array(obtain_value)-true_value))
 print(np.std(np.array(obtain_value)-true_value))

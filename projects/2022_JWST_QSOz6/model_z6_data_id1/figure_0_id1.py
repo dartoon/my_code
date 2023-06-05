@@ -33,7 +33,7 @@ plt.rcParams["font.family"] = "sans-serif"
 
 data_type = 'all' 
 filt = 'F356W'
-filt = 'F150W'
+# filt = 'F150W'
 file_NO = 0
 
 idx = 1
@@ -167,13 +167,13 @@ coordinate_arrows(ax, frame_size, header=header, arrow_size=0.03)
 # ax.set_ylim(0,800)
 if filt == 'F150W':
     circle1 = plt.Circle((38, 95),32, color='white', fill=False, linewidth=2)
-    circle2 = plt.Circle((400., 400),20, color='white', fill=False, linewidth=1, alpha = 1)
+    circle2 = plt.Circle((400., 400),20, color='white', fill=False, linewidth=2, alpha = 1)
     # circle3 = plt.Circle((445., 365),20, color='white', fill=False, linewidth=2, alpha = 0.7)
 if filt == 'F356W':
     circle1 = plt.Circle((50, 100),40, color='white', fill=False, linewidth=2)
-    circle2 = plt.Circle((400., 400),35, color='white', fill=False, linewidth=1, alpha = 1)
+    circle2 = plt.Circle((400., 400),35, color='white', fill=False, linewidth=2, alpha = 1)
     # circle3 = plt.Circle((445., 365),25, color='white', fill=False, linewidth=2, alpha = 0.7)
-ax.text(160., 240, 'PSF-star', fontsize=24, color=color, ha='center')
+ax.text(160., 240, 'PSF star', fontsize=20, color=color, ha='center')
 ax.add_patch(circle1)
 ax.set_xticks([])
 ax.set_yticks([])
@@ -184,18 +184,18 @@ if filt == 'F356W':
     ax.arrow(148, 230, -60,-80,
              head_width=20, head_length=15, fc=color, ec=color, linewidth=1.2)
     ax.set_xlim(0,1220)
-    axins = zoomed_inset_axes(ax, 2.3, loc = 'center right', bbox_to_anchor=(0,0,800,1200) )
+    axins = zoomed_inset_axes(ax, 2.2, loc = 'center right', bbox_to_anchor=(0,0,800,1200) )
     loc1, loc2 = 2,4
-    pso1, pso2 = 350., 430
+    pso1, pso2 = 370., 440
 else:
     ax.arrow(148, 230, -60,-80,
              head_width=20, head_length=15, fc=color, ec=color, linewidth=1.2)
     ax.set_xlim(-420,-420+1220)
-    axins = zoomed_inset_axes(ax, 2.3, loc = 'center left', bbox_to_anchor=(72,0,0,520) )
+    axins = zoomed_inset_axes(ax, 2.2, loc = 'center left', bbox_to_anchor=(86,0,0,520) )
     loc1, loc2 = 2,4
-    pso1, pso2 = 360., 420
+    pso1, pso2 = 370., 427
     
-axins.text(pso1, pso2, 'quasar', fontsize=30, color=color, ha='center')
+axins.text(pso1, pso2, 'quasar', fontsize=25, color=color, ha='center')
 axins.imshow(data_process.target_stamp, origin='lower', cmap=my_cmap, norm=LogNorm(vmin=vmin, vmax=vmax))#, vmin=vmin, vmax=vmax)
 axins.set_xlim(300, 500)
 axins.set_ylim(300, 500)
@@ -212,10 +212,10 @@ axins.add_patch(circle2)
 # axins.add_patch(circle3)
 
 
-ax.text(d*0.2, d*0.85, filt, fontsize=35, color=color, ha='center')
+ax.text(d*0.2, d*0.85, filt, fontsize=25, color=color, ha='center')
 
 if filt =='F356W':
-    ax.text(d*0.475, d*1.05, target_id, fontsize=45, color='black', ha='center')
+    ax.text(d*0.475, d*1.05, target_id, fontsize=30, color='black', ha='center')
 # if filt =='F150W':
 #     ax.text(d*0.52, d*1.05, target_id, fontsize=45, color='black', ha='center')
 
@@ -226,5 +226,5 @@ axins.set_yticks([])
 mark_inset(ax, axins, loc1=loc1, loc2=loc2, fc="none", ec="0.6", linewidth=2.2)
 ax.set(frame_on=False)  # New
 
-plt.savefig('figures/field_overview{0}.pdf'.format(filt))
+plt.savefig('figures/field_overview_{1}_{0}.pdf'.format(filt,target_id), bbox_inches = "tight")
 plt.show()

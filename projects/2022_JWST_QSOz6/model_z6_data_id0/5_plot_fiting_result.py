@@ -149,7 +149,10 @@ def total_compare(flux_list_2d, label_list_2d,
     # from matplotlib.patches import Rectangle
     # ax_l[2].add_patch( Rectangle((0, 0), frame_size, frame_size, fc='none', ec='r', lw=10) )
     
-
+    if filt != 'F150W':
+        plt.title(target_id, fontsize=20,loc='left', x=-1.5,y=1.05)
+        
+    
     ax_l[0].set_ylabel(filt, fontsize=20)
     plt.subplots_adjust(wspace=-0.5, hspace=0)
     plt.show()       
@@ -214,32 +217,32 @@ for top_psf_id in [0]:
         label[2] = "data$-$point source"
         fig = total_compare(image_list, label, [fit_run.fitting_specify_class.deltaPix]*4, 
                             target_ID=None, z=None,)
-        # fig.savefig('figures/{1}_{0}_qso_final_plot.pdf'.format(filt,target_id))
+        fig.savefig('figures/{1}_{0}_qso_final_plot.pdf'.format(filt,target_id))
         print(target_id) 
         
-#%%Calculate slit loss:
+# #%%Calculate slit loss:
     
-twoD_flux =   fit_run.flux_2d_out['data-point source']  
-# twoD_flux =   fit_run.image_ps_list[0]
-total_flux = np.sum(twoD_flux)
+# twoD_flux =   fit_run.flux_2d_out['data-point source']  
+# # twoD_flux =   fit_run.image_ps_list[0]
+# total_flux = np.sum(twoD_flux)
 
-from photutils.aperture import aperture_photometry
-from astropy.coordinates import Angle
-if target_info[str(idx)]['theta'] != None:
-    theta = Angle(target_info[str(idx)]['theta'], 'deg')
-    f_center = len(image_list[0])/2
-    w = 0.2 / fit_run.fitting_specify_class.deltaPix
-    h = 0.6 / fit_run.fitting_specify_class.deltaPix
-    from photutils.aperture import RectangularAperture
-    aper = RectangularAperture((ps_x, ps_y), w, h, theta=theta)
-aper_flux = aperture_photometry(twoD_flux, aper)['aperture_sum'].value[0]
+# from photutils.aperture import aperture_photometry
+# from astropy.coordinates import Angle
+# if target_info[str(idx)]['theta'] != None:
+#     theta = Angle(target_info[str(idx)]['theta'], 'deg')
+#     f_center = len(image_list[0])/2
+#     w = 0.2 / fit_run.fitting_specify_class.deltaPix
+#     h = 0.6 / fit_run.fitting_specify_class.deltaPix
+#     from photutils.aperture import RectangularAperture
+#     aper = RectangularAperture((ps_x, ps_y), w, h, theta=theta)
+# aper_flux = aperture_photometry(twoD_flux, aper)['aperture_sum'].value[0]
 
-print("ratio:, ", aper_flux/total_flux)
+# print("ratio:, ", aper_flux/total_flux)
 
-#%%Calculate host ratio in aperture:
-data_image =  fit_run.flux_2d_out['data']  
-data_aperture_flux = aperture_photometry(data_image, aper)['aperture_sum'].value[0]
-qso_image = fit_run.image_ps_list[0]
-ps_aperture_flux = aperture_photometry(qso_image, aper)['aperture_sum'].value[0]
+# #%%Calculate host ratio in aperture:
+# data_image =  fit_run.flux_2d_out['data']  
+# data_aperture_flux = aperture_photometry(data_image, aper)['aperture_sum'].value[0]
+# qso_image = fit_run.image_ps_list[0]
+# ps_aperture_flux = aperture_photometry(qso_image, aper)['aperture_sum'].value[0]
 
-print("aperture host ratio,", 1 - ps_aperture_flux/data_aperture_flux)
+# print("aperture host ratio,", 1 - ps_aperture_flux/data_aperture_flux)

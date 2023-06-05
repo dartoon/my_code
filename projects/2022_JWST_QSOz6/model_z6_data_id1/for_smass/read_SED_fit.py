@@ -25,6 +25,7 @@ sys.path.insert(0,'../../model_z6_data_id0/')
 # folder = '20221122' #The extended
 # folder = '20221220' #Test emission lines with different ages.
 folder = '20230328' #The one show in paper
+# folder = '20230604' #The one to test Av
 # folder = '202305151' #The one show in paper
 # /Users/Dartoon/Astro/Projects/my_code/projects/2022_JWST_QSOz6/model_z6_data_id1/for_smass/esti_smass/20230328_freeParam_prior2/run_flag6.py
 
@@ -39,7 +40,10 @@ target_id, RA, Dec, z = info['target_id'], info['RA'], info['Dec'], info['z']
 folder = 'esti_smass/'+folder #+str(idx)
 # folder = folder + '_freeParam' #!!!
 # folder = folder + '_freeParam_prior1_Av2' #!!!
+
 folder = folder + '_freeParam_prior1_Av5' #!!!
+# folder = folder + '_freeParam_prior1_Av_test' #!!!
+
 # folder = folder + '_freeParam_addF300M_0.6' #
 # folder = folder + '_freeParam_withEmissionLine_high-dust' #
 # folder = 'esti_smass/202301152_freeParam_withEmissionLine_wide-dustup3' #!!!
@@ -113,13 +117,16 @@ for i in range(len(g.axes.ravel())):
         ax.axvline(x=values[j][1], ls='--', linewidth=1.6, c='coral')
         ax.axvline(x=values[j][0], ls='--', linewidth=1.6, c='coral')
         ax.axvline(x=values[j][2], ls='--', linewidth=1.6, c='coral')
+        ax.set_xlabel(ax.get_xlabel(), fontsize=25)
+        ax.set_ylabel(ax.get_ylabel(), fontsize=25)
+        ax.tick_params(labelsize=18) 
         if i %5 == 0:
             title_fmt=".2f"
             fmt = "{{0:{0}}}".format(title_fmt).format
             title = r"${{{0}}}_{{-{1}}}^{{+{2}}}$"
             title = title.format(fmt(values[j][1]), fmt(values[j][1]-values[j][0]), fmt(values[j][2]-values[j][1]))
             # title = title.replace('0.00', '0.01')
-            ax.set_title(title, fontsize=16)
+            ax.set_title(title, fontsize=20)
             # ax.set_title(df.keys()[i/5]+r'$\displaystyle\substack{1\2}$'.format(values[j][1], values[j][2]-values[j][1], values[j][1]-values[j][0]))
             # ax.set_title(r'\frac{-e^{i\pi}}{2^n}$!')
             # ax.set_title(r'\frac{-e^{i\pi}}{2^n}$!', fontsize=16, color='r')
@@ -288,7 +295,7 @@ for i, fid in enumerate(filt_id[::-1]):
 #     print('age:  [{1:.1f}$-${2:.1f}]  Gyr'.format(age, age_l, age_h))
     # print('age:  [{1:.1f}$-${2:.1f}]  Gyr'.format(age, age_l, age_h))
 values = float(info1['Mstel_16']), float(info1['Mstel_50']), float(info1['Mstel_84'])
-plt.text( (xmax-xmin)*0.07, (ymax-ymin)*0.9, r"log M$_*$="+Mstr, fontsize=20)
+plt.text( (xmax-xmin)*0.07, (ymax-ymin)*0.9, r"log M$_*$="+Mstr, fontsize=22)
 # plt.text( (xmax-xmin)*0.07, (ymax-ymin)*0.95, r"log M$_*$ = {0:.2f}".format(smass), fontsize=17)
 # plt.text( (xmax-xmin)*0.07, (ymax-ymin)*0.88, "M$\mathrm{_{uv}}$ = "+ r"{0:.2f}".format(info_muv['MUV50']), fontsize=17)
 # # plt.text( (xmax-xmin)*0.07, (ymax-ymin)*0.81, 'age = {0:.1f} Gyr (fixed)'.format(age, age_l, age_h), fontsize=17)
@@ -297,11 +304,11 @@ plt.text( (xmax-xmin)*0.07, (ymax-ymin)*0.9, r"log M$_*$="+Mstr, fontsize=20)
 # plt.text( (xmax-xmin)*0.07, (ymax-ymin)*0.81, 'age = {0:.1f} Gyr'.format(values[1][1]), fontsize=17)
 # plt.text( (xmax-xmin)*0.07, (ymax-ymin)*0.74, r'A$\mathrm{_{V}}$'+ r'= {0:.1f}'.format(float(info['AV_50'])) , fontsize=17)    
 # plt.text( (xmax-xmin)*0.07, (ymax-ymin)*0.67, r"log Z/Z$_{\rm \odot}$" + r" = {0:.1f}".format(mel), fontsize=17)    
-     
-plt.legend(prop={'size':18}, ncol=2, loc = 1)
-plt.tick_params(labelsize=20)
-plt.xlabel(r"$\lambda$ ($\mu$m)",fontsize=25)
-plt.ylabel(r"f$_\lambda$  (10$^{\rm" + " -{0}}}$".format(unit.split('e-')[1][:2])+" erg s$^{-1}$ cm$^{-2}$$\mathrm{\AA}^{-1}$)",fontsize=25)
+plt.rcParams['legend.edgecolor'] = '0.5'
+plt.legend(prop={'size':20}, ncol=2, loc = 1)
+plt.tick_params(labelsize=25)
+plt.xlabel(r"$\lambda$ ($\mu$m)",fontsize=27)
+plt.ylabel(r"f$_\lambda$  (10$^{\rm" + " -{0}}}$".format(unit.split('e-')[1][:2])+" erg s$^{-1}$ cm$^{-2}$$\mathrm{\AA}^{-1}$)",fontsize=27)
 plt.title(target_id,fontsize=27, y=1.02) 
-# plt.savefig('../../model_z6_data_id0/figures/{0}_SED_map.pdf'.format(target_id[:5]), bbox_inches = "tight")
+plt.savefig('../../model_z6_data_id0/figures/{0}_SED_map.pdf'.format(target_id[:5]), bbox_inches = "tight")
 

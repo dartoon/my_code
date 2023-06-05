@@ -84,8 +84,11 @@ for key in df.keys():
         newkey = 'age (Gyr)'
         df[newkey] = df.pop(key)
 values = []
-for key in df.keys():
-    values.append([np.percentile(df[key], 16), np.median(df[key]), np.percentile(df[key], 84)])
+for i,key in enumerate(df.keys()):
+    if i != 0:
+        values.append([np.percentile(df[key], 16), np.median(df[key]), np.percentile(df[key], 84)])
+    if i == 0 :
+        values.append([10.53-0.37, 10.53, 10.53+0.51])
 g = seaborn.pairplot(df,corner=True, diag_kind="kde", plot_kws=dict(marker="+", s=20, linewidth=1))
 
 Mstr = ''   
@@ -99,18 +102,24 @@ for i in range(len(g.axes.ravel())):
         ax.axvline(x=values[j][1], ls='--', linewidth=1.6, c='coral')
         ax.axvline(x=values[j][0], ls='--', linewidth=1.6, c='coral')
         ax.axvline(x=values[j][2], ls='--', linewidth=1.6, c='coral')
+        ax.set_xlabel(ax.get_xlabel(), fontsize=25)
+        ax.set_ylabel(ax.get_ylabel(), fontsize=25)
+        ax.tick_params(labelsize=18) 
         if i %5 == 0:
             title_fmt=".2f"
             fmt = "{{0:{0}}}".format(title_fmt).format
             title = r"${{{0}}}_{{-{1}}}^{{+{2}}}$"
             title = title.format(fmt(values[j][1]), fmt(values[j][1]-values[j][0]), fmt(values[j][2]-values[j][1]))
+            # if j == 0:
+            #     title = '${10.53}_{-0.37}^{+0.51}$'
+            ax.set_title(title, fontsize=20)
             # title = title.replace('0.00', '0.01')
-            ax.set_title(title, fontsize=16)
         if j %5 ==0:
             ax.set_xlim(9.4, 11.8)
         if Mstr == '':
             Mstr = title
-# plt.savefig('../../model_z6_data_id0/figures/{0}_SED_MCMC.pdf'.format(target_id[:5]), bbox_inches = "tight")
+            # Mstr = '${10.53}_{-0.37}^{+0.51}$'
+plt.savefig('../../model_z6_data_id0/figures/{0}_SED_MCMC.pdf'.format(target_id[:5]), bbox_inches = "tight")
 
 
 # import matplotlib as mat
@@ -273,12 +282,12 @@ for i, fid in enumerate(filt_id):
     f_fil[:,2] = f_fil[:,2]/f_fil[:,2].max() * (ymax-ymin) * 0.1
     plt.plot(f_fil[1:,1]/10000., f_fil[1:,2], label='{0}'.format(ivd[fid]))
 values = float(info1['Mstel_16']), float(info1['Mstel_50']), float(info1['Mstel_84'])
-plt.text( (xmax-xmin)*0.07, (ymax-ymin)*0.9, r"log M$_*$ = "+Mstr, fontsize=20)
-    
-plt.legend(prop={'size':18}, ncol=2, loc = 1)
-plt.tick_params(labelsize=20)
-plt.xlabel(r"$\lambda$ ($\mu$m)",fontsize=25)
-plt.ylabel(r"f$_\lambda$  (10$^{\rm" + " -{0}}}$".format(unit.split('e-')[1][:2])+" erg s$^{-1}$ cm$^{-2}$$\mathrm{\AA}^{-1}$)",fontsize=25)
+plt.text( (xmax-xmin)*0.07, (ymax-ymin)*0.9, r"log M$_*$ = "+Mstr, fontsize=22)
+plt.rcParams['legend.edgecolor'] = '0.5'
+plt.legend(prop={'size':20}, ncol=2, loc = 1)
+plt.tick_params(labelsize=25)
+plt.xlabel(r"$\lambda$ ($\mu$m)",fontsize=27)
+plt.ylabel(r"f$_\lambda$  (10$^{\rm" + " -{0}}}$".format(unit.split('e-')[1][:2])+" erg s$^{-1}$ cm$^{-2}$$\mathrm{\AA}^{-1}$)",fontsize=27)
 plt.title(target_id,fontsize=27, y=1.02) 
-# plt.savefig('../figures/{0}_SED_map.pdf'.format(target_id[:5]), bbox_inches = "tight")
+plt.savefig('../figures/{0}_SED_map.pdf'.format(target_id[:5]), bbox_inches = "tight")
 #plt.yticks([])

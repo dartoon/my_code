@@ -1,10 +1,3 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-"""
-Created on Sun Jun  4 09:10:49 2023
-
-@author: Dartoon
-"""
 from astropy.table import Table
 import matplotlib.pyplot as plt
 import numpy as np
@@ -24,12 +17,12 @@ ax.plot(gamma, prob)
 ax.set_xlabel('$\gamma$', fontsize=12)
 ax.set_ylabel('pdf', fontsize=12)
 
-ax.axvline(0.21, 0, 1, color='k', linestyle='dashed')
-ax.fill_between([0.21-0.61, 0.21+0.63], 0, 1, color='silver', alpha=0.7, edgecolor='None')
+ax.axvline(0.22, 0, 1, color='k', linestyle='dashed')
+ax.fill_between([0.22-0.62, 0.22+0.63], 0, 1, color='silver', alpha=0.3, edgecolor='None')
 ax.set_ylim(0, 1)
 
 ax.tick_params(axis='x', which='both', direction='in', left=True, bottom=True, right=True, top=True, length=2.5)
 ax.tick_params(axis='y', which='both', direction='in', left=True, bottom=True, right=True, top=True, length=2.5)
 
 fig.subplots_adjust(top=0.95, right=0.98, left=0.13, bottom=0.14)
-fig.savefig('prob_gamma.pdf')
+fig.savefig('gamma.pdf')

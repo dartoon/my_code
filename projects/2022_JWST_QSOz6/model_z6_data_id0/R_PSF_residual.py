@@ -134,9 +134,9 @@ for i in range(len(images)):
     # label = labels[i]
     use_i = PSF_test_files[i].split('use')[1][0]
     fit_j = PSF_test_files[i].split('fit')[-1][0]
-    label = 'fit star {1} using star {0}'.format(int(use_i)+1,int(fit_j)+1)
+    label = 'fit star {1} using {0}'.format(int(use_i)+1,int(fit_j)+1)
     plttext = axs[_i][_j].text(frame_size*0.05, frame_size*0.87, label,
-              fontsize=15, color='black')
+              fontsize=20.9, color='black')
     plttext.set_bbox(dict(facecolor='white', alpha=0.5))
     # if texts is not None:
     #     plttext = axs[_i][_j].text(frame_size*0.05, frame_size*0.05, "{1} = {0}".format(round(texts[i],3), prop ),
@@ -217,7 +217,7 @@ cbar.ax.set_xlim(0,vmax)
 cbar.ax.tick_params(labelsize=15) 
 cbar.set_label(label='Signal (data$-$PSF) to PSF std ratio',fontsize=20)
 plt.title(info['target_id']+' '+filt,fontsize=25,y=0.9 )
-plt.savefig('../model_z6_data_id0/figures/host_toPSFstd_ratio_idx{0}_{1}.pdf'.format(idx, filt))
+# plt.savefig('../model_z6_data_id0/figures/host_toPSFstd_ratio_idx{0}_{1}.pdf'.format(idx, filt))
 plt.show()
     
 

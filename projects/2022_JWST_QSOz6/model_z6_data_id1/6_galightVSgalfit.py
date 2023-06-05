@@ -61,7 +61,8 @@ for i in range(2):
             # t= axs[i, j].text(2,80, 'host mag {0:.2f}'.format(fit_run.final_result_galaxy[0]['magnitude']), color='white', fontsize=23)
             
             model_mag = -2.5*np.log10(fit_run.final_result_galaxy[0]['flux_sersic_model']) + fit_run.zp
-            t= axs[i, j].text(2,80, 'host mag {0:.2f}'.format(model_mag), color='white', fontsize=23)
+            plt.rcParams["font.family"] = "sans-serif"
+            t= axs[i, j].text(2,80, 'host mag {0:.2f}'.format(model_mag), color='white', fontsize=20)
             best_chisq = fit_run.reduced_Chisq            
             # print(filt,'zp:', fit_run.zp)
         if j == 1:    
@@ -99,7 +100,7 @@ for i in range(2):
             im = axs[i, j].imshow(image, norm = LogNorm(vmax = 1.1, vmin = 1.e-4), 
                                   cmap=my_cmap, origin = 'lower')
             #If use host residual
-            t= axs[i, j].text(2,80, 'host mag {0:.2f}'.format(-2.5*np.log10(np.sum(sersic))+zp), color='white', fontsize=23)
+            t= axs[i, j].text(2,80, 'host mag {0:.2f}'.format(-2.5*np.log10(np.sum(sersic))+zp), color='white', fontsize=20)
             
             # t= axs[i, j].text(2,80, 'host mag {0:.2f}'.format(mag_list[psf_i]), color='white', fontsize=23)
         t.set_bbox(dict(facecolor='black', alpha=0.8))    

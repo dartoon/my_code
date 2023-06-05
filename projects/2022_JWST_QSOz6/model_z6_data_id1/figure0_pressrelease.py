@@ -168,7 +168,7 @@ text='10$^5$ light years'
 dist=5/9*10/data_process.deltaPix
 p0 = d / 15.
 ax.plot([p0 + d / 8., p0 + dist + d / 8.], [p0, p0], linewidth=3, color=color)
-# ax.text(p0 + dist / 2.  + d / 6., p0 + 0.02 * d , text, fontsize=22, color=color, ha='center')
+ax.text(p0 + dist / 2.  + d / 6., p0 + 0.02 * d , text, fontsize=22, color=color, ha='center')
 
 angle = 0 / 180 * np.pi
 coordinate_arrows(ax, frame_size, header=header, arrow_size=0.03)

@@ -29,7 +29,7 @@ plt.rcParams["font.family"] = "sans-serif"
 
 #%%
 # data_type = 'all' 
-# filt = 'F356W'
+filt = 'F356W'
 filt = 'F150W'
 file_NO = 0
 
@@ -163,17 +163,17 @@ coordinate_arrows(ax, frame_size, header=header, arrow_size=0.03)
 ax.set_ylim(0,800)
 if filt == 'F150W':
     circle1 = plt.Circle((100, 160),30, color='white', fill=False, linewidth=2)
-    circle2 = plt.Circle((400., 400),20, color='white', fill=False, linewidth=1, alpha = 1)
+    circle2 = plt.Circle((400., 400),20, color='white', fill=False, linewidth=2, alpha = 1)
     circle3 = plt.Circle((445., 365),20, color='white', fill=False, linewidth=2, alpha = 0.7)
     circle4 = plt.Circle((452., 325), 15, color='white', fill=False, linewidth=2, alpha = 0.7)
     circle5 = plt.Circle((456., 418), 15, color='white', fill=False, linewidth=2, alpha = 0.7)
 if filt == 'F356W':
     circle1 = plt.Circle((110, 165),30, color='white', fill=False, linewidth=2)
-    circle2 = plt.Circle((400., 400),25, color='white', fill=False, linewidth=1, alpha = 1)
+    circle2 = plt.Circle((400., 400),30, color='white', fill=False, linewidth=2, alpha = 1)
     circle3 = plt.Circle((445., 365),25, color='white', fill=False, linewidth=2, alpha = 0.7)
     circle4 = plt.Circle((452., 325), 20, color='white', fill=False, linewidth=2, alpha = 0.7)
     circle5 = plt.Circle((456., 418), 15, color='white', fill=False, linewidth=2, alpha = 0.7)
-ax.text(90., 290, 'PSF-star', fontsize=24, color=color, ha='center')
+ax.text(90., 290, 'PSF star', fontsize=20, color=color, ha='center')
 ax.add_patch(circle1)
 ax.set_xticks([])
 ax.set_yticks([])
@@ -184,14 +184,16 @@ if filt == 'F356W':
     ax.arrow(108, 280, 0,-60,
              head_width=20, head_length=15, fc=color, ec=color, linewidth=1.2)
     ax.set_xlim(0,1220)
-    axins = zoomed_inset_axes(ax, 2.3, loc = 'center right', bbox_to_anchor=(0,0,800,1200) )
+    axins = zoomed_inset_axes(ax, 2.2, loc = 'center right', bbox_to_anchor=(0,0,800,1200) )
     loc1, loc2 = 2,4
+    axins.text(375., 435, 'quasar', fontsize=25, color=color, ha='center')
 else:
     ax.arrow(98, 280, 0,-70,
              head_width=20, head_length=15, fc=color, ec=color, linewidth=1.2)
     loc1, loc2 = 2,4
     ax.set_xlim(-420,-420+1220)
-    axins = zoomed_inset_axes(ax, 2.3, loc = 'center left', bbox_to_anchor=(72,0,0,520) )
+    axins = zoomed_inset_axes(ax, 2.2, loc = 'center left', bbox_to_anchor=(86,0,0,520) )
+    axins.text(375., 425, 'quasar', fontsize=25, color=color, ha='center')
     
 axins.imshow(data_process.target_stamp, origin='lower', cmap=my_cmap, norm=LogNorm(vmin=vmin, vmax=vmax))#, vmin=vmin, vmax=vmax)
 axins.set_xlim(300, 500)
@@ -203,20 +205,18 @@ p0 = d / 15.
 axins.plot([320, 320 + dist], [320, 320], linewidth=3, color=color)
 axins.text(320 + dist / 2., 320 + 0.01 * d, text, fontsize=25, color=color, ha='center')
 
-
-axins.text(380., 430, 'quasar', fontsize=30, color=color, ha='center')
 axins.add_patch(circle2)
-axins.text(478., 380, '#1', fontsize=30, color=color, ha='center')
-axins.add_patch(circle3)
-axins.text(485., 320, '#2', fontsize=30, color=color, ha='center')
-axins.add_patch(circle4)
+# axins.text(478., 380, '#1', fontsize=25, color=color, ha='center')
+# axins.add_patch(circle3)
+# axins.text(485., 320, '#2', fontsize=25, color=color, ha='center')
+# axins.add_patch(circle4)
 # axins.text(485., 420, 'obj3', fontsize=20, color=color, ha='center')
 # axins.add_patch(circle5)
 
-ax.text(d*0.2, d*0.85, filt, fontsize=35, color=color, ha='center')
+ax.text(d*0.2, d*0.85, filt, fontsize=25, color=color, ha='center')
 
 if filt =='F356W':
-    ax.text(d*0.475, d*1.05, target_id, fontsize=45, color='black', ha='center')
+    ax.text(d*0.475, d*1.05, target_id, fontsize=30, color='black', ha='center')
 # if filt =='F150W':
 #     ax.text(d*0.52, d*1.05, target_id, fontsize=45, color='black', ha='center')
 
@@ -227,5 +227,6 @@ axins.set_yticks([])
 mark_inset(ax, axins, loc1=loc1, loc2=loc2, fc="none", ec="0.6", linewidth=2.2)
 ax.set(frame_on=False)  # New
 
-# plt.savefig('figures/field_overview{0}.pdf'.format(filt))
+#Figures are copied directly
+plt.savefig('figures/field_overview_{1}_{0}.pdf'.format(filt,target_id), bbox_inches = "tight")
 plt.show()
