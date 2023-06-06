@@ -186,8 +186,10 @@ for target in targets:
         if SCI_BKSUB_image is not None:
             cut_SCI_BKSUB_image = SCI_BKSUB_image[x1:x2, y1:y2]
             file_header = copy.deepcopy(SCI_BKSUB_header)
-            file_header['CRPIX1'] = file_header['CRPIX1']-pos[0]+ct
-            file_header['CRPIX2'] = file_header['CRPIX2']-pos[1]+ct
+            if ct<pos[0]:
+                file_header['CRPIX1'] = file_header['CRPIX1']-pos[0]+ct
+            if ct<pos[1]:
+                file_header['CRPIX2'] = file_header['CRPIX2']-pos[1]+ct
             hdu = pyfits.ImageHDU(cut_SCI_image,header=file_header)
             hdul.insert(4, hdu)
         
