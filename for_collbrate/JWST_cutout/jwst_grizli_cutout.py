@@ -5,7 +5,7 @@ Created on Mon Apr 17 14:31:18 2023
 
 @author: Xuheng Ding
 """
-
+#%%
 import numpy as np
 import astropy.io.fits as pyfits
 import glob, copy
@@ -61,12 +61,14 @@ for filt in filts:
 if filts == []:
     fitsfiles = fclt_fitsfiles
 
-dtype = np.dtype([("name", "U12"), ("RA", float), ("Dec", float),("rad", float)])
+dtype = np.dtype([("name", "U30"), ("RA", float), ("Dec", float),("rad", float)])
 targets = np.loadtxt(cat_file, dtype=dtype)
 
 if targets.shape == ():
     targets = [[str(targets['name']), float(targets['RA']), float(targets['Dec']),float(targets['rad'])]]
 
+
+#%%
 for target in targets:
     name, RA, Dec, cut_rad = target
     # print(len(fitsfiles))
@@ -85,8 +87,10 @@ for target in targets:
         whtfitsFile = pyfits.open(file.replace('sci', 'wht') )
         WHT_image = whtfitsFile['PRIMARY'].data
         WHT_header = whtfitsFile['PRIMARY'].header
-        
-        filt = fitsFile[0].header['FILTER'] 
+        try:
+            filt = fitsFile[0].header['FILTER']
+        except KeyError:
+            filt = fitsFile[0].header['FILTER1'] 
         fac = fitsFile[0].header['INSTRUME'] 
         fov = file.split('/')[-1].split('-')[0]
             
@@ -116,14 +120,13 @@ for target in targets:
         cuts_reg = np.array([int(pos[1])-1-ct,int(pos[1])-1+ct, int(pos[0])-1-ct,int(pos[0])-1+ct])
         cuts_reg[cuts_reg<0] = 0
         x1, x2, y1, y2 = cuts_reg
-        
-        cut_SCI_image = SCI_image[x1, x2, y1, y2]
+        print(np.shape(SCI_image))
+        cut_SCI_image = SCI_image[x1:x2, y1:y2]
         if 'EXTNAME' not in file_header:
             file_header['EXTNAME'] = 'SCI'
         hdu = pyfits.ImageHDU(cut_SCI_image,header=file_header)
         hdul.insert(1, hdu)
-    
-        cut_WHT_image = WHT_image[x1, x2, y1, y2]
+        cut_WHT_image = WHT_image[x1:x2, y1:y2]
         if 'EXTNAME' not in WHT_header:
             WHT_header['EXTNAME'] = 'WHT'
         hdu = pyfits.ImageHDU(cut_WHT_image,header=WHT_header) #.writeto(savename+'_' +fac + '_' + filt + '_' +'WHT' + '.fits',overwrite=True)
