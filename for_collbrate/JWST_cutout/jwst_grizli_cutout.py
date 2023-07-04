@@ -74,8 +74,8 @@ for target in targets:
     # print(len(fitsfiles))
     files = RA_Dec_in_fit(fitsfiles, RA, Dec)
     # print(len(files))
+    i = 0
     for file in files:
-
         cut_SCI_image, cut_Err_image, cut_WHT_image = None, None, None
         fitsFile = pyfits.open(file)
         # layer_names = [fitsFile[i].name for i in range(len(fitsFile))]
@@ -117,7 +117,7 @@ for target in targets:
         hdu = pyfits.PrimaryHDU(None,header=fitsFile['PRIMARY'].header)
         hdul.insert(0, hdu)    
         
-        cuts_reg = np.array([int(pos[1])-1-ct,int(pos[1])-1+ct, int(pos[0])-1-ct,int(pos[0])-1+ct])
+        cuts_reg = np.array([int(pos[1])-ct,int(pos[1])+ct, int(pos[0])-ct,int(pos[0])+ct])
         cuts_reg[cuts_reg<0] = 0
         x1, x2, y1, y2 = cuts_reg
         print(np.shape(SCI_image))
@@ -133,6 +133,7 @@ for target in targets:
         hdul.insert(2, hdu)
         
         print(hdul.info())
-        hdul.writeto(savename+ '_' + fov + '_' +fac + '_' + filt+'_'+'cutout' + '.fits',overwrite=True)
+        hdul.writeto(savename+ '_' + fov + '_' +fac + '_' + filt+'_'+'cutout_' + str(i) + '.fits',overwrite=True)
+        i = i+1
 
 
