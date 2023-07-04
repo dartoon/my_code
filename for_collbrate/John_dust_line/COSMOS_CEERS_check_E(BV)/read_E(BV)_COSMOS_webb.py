@@ -26,7 +26,8 @@ def scale_bar(ax, d, dist=1/0.13, text='1"', text2=None, color='black', flipped=
 import matplotlib as mat
 mat.rcParams['font.family'] = 'STIXGeneral'
 
-name = ['cid_473', 'cid_1210', 'cid_1245'][2]
+#!!!
+name = ['cid_473', 'cid_1210', 'cid_1245'][0]
 image_list = pickle.load(open('colorimage_bin2_{0}.pkl'.format(name),'rb'))
 images = []
 # zp_list = []
@@ -63,8 +64,12 @@ rgb_default = make_lupton_rgb(images[0], images[1], images[2], Q=7, stretch=0.3)
 fig, ax = plt.subplots()
 plt.imshow(rgb_default, origin='lower')
 plt.text(1,80,use_filt,fontsize=20, color = 'white')
+pixel_s = 0.03*2
+ax.set_xticks(np.arange(0,len(images[0]), 1/pixel_s))
+ax.set_yticks(np.arange(0,len(images[0]), 1/pixel_s))
+ax.set_xticklabels(np.arange(0,len(images[0]), 1/pixel_s)*pixel_s)
+ax.set_yticklabels(np.arange(0,len(images[0]), 1/pixel_s)*pixel_s)
 scale_bar(ax, len(images[0]), dist=0.5/deltaPix, text='0.5"', text2 ='~{0:.2f}kpc'.format(scale), color = 'white')
-
 plt.savefig('/Users/Dartoon/Downloads/'+name+"_color.pdf",bbox_inches='tight')
 plt.show()
 
@@ -140,10 +145,19 @@ EBV[ bools ] = 0
 print(name, "overall mean E(B-V):", np.mean(EBV[ EBV !=0 ] ) )
 fig, ax = plt.subplots()
 plt.imshow(EBV, norm=norm, origin='lower',vmin = vmin) 
+# aper.plot(color='red',
+#           lw=1.5,alpha = 0.7)
 plt.colorbar()
+pixel_s = 0.03*2
+ax.set_xticks(np.arange(0,len(images[0]), 1/pixel_s))
+ax.set_yticks(np.arange(0,len(images[0]), 1/pixel_s))
+ax.set_xticklabels(np.arange(0,len(images[0]), 1/pixel_s)*pixel_s)
+ax.set_yticklabels(np.arange(0,len(images[0]), 1/pixel_s)*pixel_s)
 scale_bar(ax, len(images[0]), dist=0.5/deltaPix, text='0.5"', text2 ='{0:.2f}kpc'.format(scale), color = 'white')
-# plt.savefig('/Users/Dartoon/Downloads/'+name+"_E(B-V).pdf")
+plt.savefig('/Users/Dartoon/Downloads/'+name+"_E(B-V).pdf")
 plt.show()
+
+
 
 
 # Ebv_image_scale = Ebv_image/Ebv_image.max()*Av_image.max()/4.05

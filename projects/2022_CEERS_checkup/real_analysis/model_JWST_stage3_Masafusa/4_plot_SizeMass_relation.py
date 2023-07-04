@@ -265,7 +265,7 @@ JWST_Reff,JWST_Reff_err = [],[]
 JWST_n = []
 idx_list = [1,2,0,51,35]
 for idx in idx_list:  #z_spec > 1.6
-    steller_file = glob.glob('esti_smass/20220901'+str(idx)+'/SFH_*.fits')[0]
+    steller_file = glob.glob('esti_smass/20220901'+str(idx)+'/SFH_*.fits')[0]   #!!! This may be not right...
     hdul = pyfits.open(steller_file)
     info = hdul[0].header 
     z = float(info['ZMC_50'])

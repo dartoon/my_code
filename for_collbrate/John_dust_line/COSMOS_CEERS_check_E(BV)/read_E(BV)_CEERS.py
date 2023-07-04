@@ -114,16 +114,17 @@ scale_relation = cosmo.angular_diameter_distance(z).value * 10**3 * (1/3600./180
 kpc_per_pixel = scale_relation 
 scale = 0.5 * kpc_per_pixel
 
-EBV = Av_image/3.1
-factor = 10
-bools = (images[2] < np.std(images[2][:,:3])*factor) * (images[1] < np.std(images[1][:,:3])*factor ) *  (images[0] < np.std(images[0][:,:3])*factor) 
-EBV[ bools ] = 0 
-fig, ax = plt.subplots()
-plt.imshow(EBV, norm=norm, origin='lower',vmin = vmin) 
-plt.colorbar()
-scale_bar(ax, len(images[0]), dist=0.5/deltaPix, text='0.5"', text2 ='{0:.2f}kpc'.format(scale), color = 'white')
-plt.savefig('/Users/Dartoon/Downloads/'+name+"_E(B-V).pdf")
-plt.show()
+# #%% Plt E(B-V)
+# EBV = Av_image/3.1
+# factor = 10
+# bools = (images[2] < np.std(images[2][:,:3])*factor) * (images[1] < np.std(images[1][:,:3])*factor ) *  (images[0] < np.std(images[0][:,:3])*factor) 
+# EBV[ bools ] = 0 
+# fig, ax = plt.subplots()
+# plt.imshow(EBV, norm=norm, origin='lower',vmin = vmin) 
+# plt.colorbar()
+# scale_bar(ax, len(images[0]), dist=0.5/deltaPix, text='0.5"', text2 ='{0:.2f}kpc'.format(scale), color = 'white')
+# # plt.savefig('/Users/Dartoon/Downloads/'+name+"_E(B-V).pdf")
+# plt.show()
 
 
 # Ebv_image_scale = Ebv_image/Ebv_image.max()*Av_image.max()/4.05
@@ -133,4 +134,58 @@ plt.show()
 # plt.colorbar()
 # plt.savefig('/Users/Dartoon/Downloads/'+name+"_E(B-V).pdf")
 # plt.show()
+
+#%%
+# Plot Join image
+import sys
+sys.path.insert(0,'/Users/Dartoon/Astro/Projects/my_code/projects/2022_CEERS_checkup/real_analysis/model_JWST_stage3_Masafusa/')
+from functions_for_result import load_info,load_prop
+
+filts = ['F115W', 'F150W', 'F200W', 'F277W', 'F356W', 'F410M', 'F444W']
+image_list = []
+fit_file_folder ='fit_material'
+
+root_folder = '../*/*' 
+# for idx in [16,20,21]:
+idx = [16,20,21][2]
+target_id, _ = load_info(idx)
+fit_run_dict = load_prop(idx, root_folder = '/Users/Dartoon/Astro/Projects/my_code/projects/2022_CEERS_checkup/real_analysis/model_JWST_stage3_Masafusa/', prop_name='fit_run')
+print(target_id)
+for filt in filts:
+    fit_run_list = []
+    # fit_files = glob.glob(fit_file_folder+'/fit_notrunyet_{0}_idx{1}_psf0.pkl'.format(filt,idx))
+    # fit_files.sort()
+    f = open("/Users/Dartoon/Astro/Projects/my_code/projects/2022_CEERS_checkup/real_analysis/model_JWST_stage3_Masafusa/material/target_info.txt","r")
+    string_1 = f.read()
+    lines_ = string_1.split('\n')   # Split in to \n
+    spec_z = [lines_[i].split(' ')[3] for i in range(len(lines_)) if lines_[i].split(' ')[0] == target_id][0]
+    photo_z = [lines_[i].split(' ')[4] for i in range(len(lines_)) if lines_[i].split(' ')[0] == target_id][0]
+    z = float(spec_z)
+    if z >0:
+        zinfo = 'Zspec'+str(z)
+    elif z <0:
+        zinfo = 'Zphot'+str(photo_z)
+    fit_run = fit_run_dict[filt]
+    fit_run.plot_final_qso_fit(target_ID = target_id+'_'+filt)
+    print(filt,"Host mag",round(fit_run.final_result_galaxy[0]['magnitude'],3), "AGN mag",round(fit_run.final_result_ps[0]['magnitude'],3))
+    image_list.append(fit_run.fitting_specify_class.data_process_class.target_stamp)
+
+image_list_ct = image_list
+fig, axs = plt.subplots(len(image_list_ct), figsize=(5,18))
+for i in range(len(image_list_ct)):
+    norm = LogNorm(vmin = np.std(image_list_ct[i][:,:2])*0.6, vmax =image_list_ct[i].max()/1.5 )
+    axs[i].imshow(image_list_ct[i], norm=norm, origin='lower',cmap = my_cmap) 
+    axs[i].set_ylabel(filts[i],fontsize=20)
+    axs[i].tick_params(labelsize=15)
+    axs[i].set_xticks(np.arange(0,len(image_list_ct[0]), 0.5/0.03))
+    axs[i].set_yticks(np.arange(0,len(image_list_ct[0]), 0.5/0.03))
+    axs[i].set_xticklabels(np.arange(0,len(image_list_ct[0]), 0.5/0.03)*0.03)
+    axs[i].set_yticklabels(np.arange(0,len(image_list_ct[0]), 0.5/0.03)*0.03)
+    if i == 0:
+        scale_bar(axs[i], len(image_list_ct[i]), dist=0.5/deltaPix, text='0.5"', text2 ='{0:.2f}kpc'.format(scale), color = 'white')
+# show_name = check_name.replace('cid_', 'CID ')
+fig.suptitle('{0}'.format(target_id),fontsize=35)
+fig.tight_layout()
+# fig.savefig('/Users/Dartoon/Downloads/{0}_filters_image.pdf'.format(target_id))
+plt.show()
 

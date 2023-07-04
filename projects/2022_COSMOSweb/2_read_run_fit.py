@@ -15,7 +15,7 @@ from galight.tools.astro_tools import plt_fits
 # count = int(sys.argv[1]) - 1 # 1 - 12586
 # idx = 10
 
-filt_i = 3
+filt_i = 0
 filt = ['F115W', 'F150W','F277W', 'F444W'][filt_i]
 # cata_list = pickle.load(open('material/cata_list.pkl','rb'))
 cata_list = pickle.load(open('material/cata_list.pkl','rb'))
@@ -103,6 +103,14 @@ for idx in [29]:
     #     elif save_plot == True:
     #         plt_fits(img, savename='figures/idx{0}_{1}_{2}_{3}_notfit.pdf'.format(idx,cata_list[idx][-1],filt,zinfo))
 
+#%% Read PSF FWHM
+use_psf = fit_run.fitting_specify_class.data_process_class.PSF_list[0]
+from galight.tools.measure_tools import measure_FWHM
+FWHM = np.mean(measure_FWHM(use_psf))
+delta_pixel = fit_run.fitting_specify_class.deltaPix
+print(filt, round(FWHM*delta_pixel,3), 'arcsec')
+
+#%%
 
 # #%% Refit image but not adding point source
 # from galight.fitting_specify import FittingSpecify
@@ -110,8 +118,8 @@ for idx in [29]:
 # fit_sepc = FittingSpecify(fit_run.fitting_specify_class.data_process_class)
 # import copy
 # # ps_pix_center_list = [copy.deepcopy(ps_pos)]
-# if idx == 15:
-#     ps_pix_center_list = None
+# # if idx == 15:
+#     # ps_pix_center_list = None
 # fit_sepc.prepare_fitting_seq(point_source_num = 0, supersampling_factor = 3, apertures_center_focus=True )
 # # fit_sepc.kwargs_params['lens_light_model'][3][0]['R_sersic'] = 0.06
 # # fit_sepc.kwargs_params['lens_light_model'][4][0]['R_sersic'] = 1.
@@ -120,6 +128,13 @@ for idx in [29]:
 # fit_run = FittingProcess(fit_sepc, savename = cata_list[idx][-1])
 # fit_run.run(algorithm_list = ['PSO','PSO','PSO'], fitting_level=['norm', 'norm','norm'])
 
-# fit_run.savename =  '/Users/Dartoon/Downloads/no_ps_fit'
+# check_name = ''
+# if idx == 8:
+#     check_name = 'cid_1210'
+# elif idx == 10:
+#     check_name = 'cid_1245'
+
+# fit_run.savename =  '/Users/Dartoon/Downloads/no_ps_fit_'+ check_name
 # fit_run.plot_final_galaxy_fit(target_ID=' ', save_plot=True )
+# print(fit_run.reduced_Chisq)
 

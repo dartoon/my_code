@@ -35,13 +35,14 @@ remove_id = [24, 55]
 # for idx in [0, 2, 8, 28, 35, 51]:  #z_spec > 2
 # for idx in [29, 53]:  #z_spec > 2
 
+#!!! Note that I print the best-fit using the best PSF as middle and scatter from the other PSFs. This mag is also used for SED fitting.
 
 # for idx in [0, 1, 2, 35, 51]:  #z_spec > 1.6, QSO 
 result_list = []
 rms_result_list = []
 target_ID_list = []
 z_list = []
-filt = 'F160W'
+filt = 'F277W'
 cal_CAS = False
 if_plot = False
 # for idx in [1,2,0,51,35]:  #z_spec > 1.6

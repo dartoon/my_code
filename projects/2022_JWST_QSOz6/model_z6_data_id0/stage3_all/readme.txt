@@ -1,0 +1,2 @@
+fit_material_super2 is the one show in the paper, use PS_supersampling =2 to fit and PS_supersampling=1 to linear_solver.
+fit_material_super2_rerun the rerun, use PS_supersampling = 2 and PS_supersampling= 2 for fit and linear_solver.

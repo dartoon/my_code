@@ -19,7 +19,7 @@ from galight.tools.measure_tools import measure_bkg
 import pickle
 
 run_folder = 'stage3_all/' #!!!
-filt = 'F356W'
+filt = 'F150W'
 idx = 1
 
 dp_files = glob.glob(run_folder+'fit_material/data_process_idx{1}_{0}_FOVpsf*.pkl'.format(filt,idx))
@@ -42,7 +42,7 @@ if rerun == True:
         file = dp_files[i]
         print(file)
         filename = dp_files[i].replace('data_process', 'fit_run_fixn1_').format(i)
-        filename = filename.replace('fit_material', 'fit_material_super2').format(i)
+        filename = filename.replace('fit_material', 'fit_material_super2_rerun').format(i)
         idx = file.split('idx')[1].split('_')[0]
         target_id = target_id
         _data_process = pickle.load(open(file,'rb'))
@@ -86,7 +86,7 @@ if rerun == True:
         item = collect_info[count]
         fit_run_list = []
         idx, filt= item
-        fit_files = glob.glob(run_folder+'fit_material_super2/fit_run_fixn1__idx{0}_{1}_*FOVpsf*.pkl'.format(idx, filt))
+        fit_files = glob.glob(run_folder+'fit_material_super2_rerun/fit_run_fixn1__idx{0}_{1}_*FOVpsf*.pkl'.format(idx, filt))
         fit_files.sort()
         for i in range(len(fit_files)):
             fit_run_list.append(pickle.load(open(fit_files[i],'rb')))
@@ -103,8 +103,8 @@ if rerun == True:
             _data_process.stack_PSF(if_plot = False, tool = 'psfr')
             if ct >8:
                 ct = 'all'
-            pickle.dump(_data_process , open(run_folder+'fit_material_super2/'+'data_process_idx{0}_{2}_CombPsfsNO_{1}.pkl'.format(idx, ct, filt), 'wb'))
-    dp_files = glob.glob(run_folder  + 'fit_material_super2/data_process_idx{1}_*{0}*CombPsfs*.pkl'.format(filt,idx) ) 
+            pickle.dump(_data_process , open(run_folder+'fit_material_super2_rerun/'+'data_process_idx{0}_{2}_CombPsfsNO_{1}.pkl'.format(idx, ct, filt), 'wb'))
+    dp_files = glob.glob(run_folder  + 'fit_material_super2_rerun/data_process_idx{1}_*{0}*CombPsfs*.pkl'.format(filt,idx) ) 
     dp_files.sort()
     
     for i in range(len(dp_files)):
@@ -139,7 +139,7 @@ idx = 1
 for top_psf_id in [0]:
     fit_run_list = []
     fit_files = glob.glob(run_folder+'fit_material_/fit_run_fixn1_*idx{0}_{1}_*.pkl'.format(idx, filt))#+\
-    fit_files = glob.glob(run_folder+'fit_material_super2/fit_run_fixn1_*idx{0}_{1}_*.pkl'.format(idx, filt))#+\
+    fit_files = glob.glob(run_folder+'fit_material_super2_rerun/fit_run_fixn1_*idx{0}_{1}_*.pkl'.format(idx, filt))#+\
     fit_files.sort()
     for i in range(len(fit_files)):
         fit_run_list.append(pickle.load(open(fit_files[i],'rb')))

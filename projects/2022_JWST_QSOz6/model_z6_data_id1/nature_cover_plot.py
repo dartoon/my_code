@@ -22,7 +22,7 @@ from galight.tools.plot_tools import plot_data_apertures_point
 from galight.tools.cutout_tools import cutout
 import warnings
 warnings.filterwarnings("ignore")
-
+#%%
 import sys
 sys.path.insert(0,'../model_z6_data_id0/')
 
@@ -85,7 +85,7 @@ plt.imshow(data_process.target_stamp, origin='lower', cmap=my_cmap, norm=LogNorm
 ax.set_xticks([])
 ax.set_yticks([])
 frame_size = len(data_process.target_stamp)
-plt.savefig('/Users/Dartoon/Downloads/J2236_fov.pdf')
+# plt.savefig('/Users/Dartoon/Downloads/J2236_fov.pdf')
 plt.show()
 
 #%%
@@ -98,7 +98,7 @@ plt.imshow(data_process.target_stamp, origin='lower', cmap=my_cmap, norm=LogNorm
 ax.set_xticks([])
 ax.set_yticks([])
 frame_size = len(data_process.target_stamp)
-plt.savefig('/Users/Dartoon/Downloads/J2236_data.pdf')
+# plt.savefig('/Users/Dartoon/Downloads/J2236_data.pdf')
 plt.show()
 #%%
 run_folder = 'stage3_all/' #!!!
@@ -116,7 +116,14 @@ fig, ax = plt.subplots(figsize=(4,4))  #!!!
 plt.imshow(fit_run.flux_2d_out['data-point source'], origin='lower', cmap=my_cmap, norm=LogNorm(vmin=vmin, vmax=vmax))#, vmin=vmin, vmax=vmax)
 ax.set_xticks([])
 ax.set_yticks([])
-plt.savefig('/Users/Dartoon/Downloads/J2236_data-qso.pdf')
+# plt.savefig('/Users/Dartoon/Downloads/J2236_data-qso.pdf')
+#%%
+plt.show()
+fig, ax = plt.subplots(figsize=(4,4))  #!!!
+plt.imshow(fit_run.image_ps_list[0], origin='lower', cmap=my_cmap, norm=LogNorm(vmin=0.0024, vmax=vmax/3))#, vmin=vmin, vmax=vmax)
+ax.set_xticks([])
+ax.set_yticks([])
+plt.savefig('/Users/Dartoon/Downloads/J2236_qso.pdf')
 plt.show()
 
 

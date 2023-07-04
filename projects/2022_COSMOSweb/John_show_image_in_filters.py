@@ -105,6 +105,10 @@ for i in range(len(image_list_ct)):
     axs[i].imshow(image_list_ct[i], norm=norm, origin='lower',cmap = my_cmap) 
     axs[i].set_ylabel(filts[i],fontsize=20)
     axs[i].tick_params(labelsize=15)
+    axs[i].set_xticks(np.arange(0,len(image_list_ct[0]), 0.5/0.03))
+    axs[i].set_yticks(np.arange(0,len(image_list_ct[0]), 0.5/0.03))
+    axs[i].set_xticklabels(np.arange(0,len(image_list_ct[0]), 0.5/0.03)*0.03)
+    axs[i].set_yticklabels(np.arange(0,len(image_list_ct[0]), 0.5/0.03)*0.03)
     if i == 0:
         scale_bar(axs[i], len(image_list_ct[i]), dist=0.5/deltaPix, text='0.5"', text2 ='{0:.2f}kpc'.format(scale), color = 'white')
 show_name = check_name.replace('cid_', 'CID ')

@@ -37,7 +37,7 @@ remove_id = [24, 55]
 # for idx in [29, 53]:  #z_spec > 2
 from functions_for_result import name_list
 result = []
-for idx in range(10, 21):  #CEERS
+for idx in range(1, 2):  #CEERS
     if idx in remove_id:
         continue
     else:
@@ -80,7 +80,7 @@ for idx in range(10, 21):  #CEERS
         else:
             z_str = 'photo=' + photo_z
         
-        filters = [filters[0], filters[-1]]
+        # filters = [filters[0], filters[-1]]
         
         for count in range(len(filters)):
             fit_run_list = []

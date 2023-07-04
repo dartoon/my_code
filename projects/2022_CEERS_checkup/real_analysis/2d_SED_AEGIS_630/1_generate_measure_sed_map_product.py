@@ -155,6 +155,61 @@ for i in range(len(images)):
 
 plt_fits_color(images, Q=7, stretch=0.3)
 
+#%%
+from matplotlib.colors import LogNorm
+import copy, matplotlib
+from astropy.visualization import make_lupton_rgb
+my_cmap = copy.copy(matplotlib.cm.get_cmap('gist_heat')) # copy the default cmap
+my_cmap.set_bad('black')
+def scale_bar(ax, d, dist=1/0.13, text='1"', text2=None, color='black', flipped=False, fontsize=20):
+    p0 = d / 7.
+    ax.plot([p0, p0 + dist], [p0, p0], linewidth=2, color=color)
+    ax.text(p0 + dist / 2., p0 + 0.02 * d, text, fontsize=fontsize, color=color, ha='center')
+    if text2 is not None:
+        ax.text(p0 + dist / 2., p0 - 0.08 * d, text2, fontsize=fontsize, color=color, ha='center')
+
+plot_filts = ['F150W', 'F200W', 'F277W', 'F356W']
+
+# image_list_ct = [fit_run_dict[filt].flux_2d_out['data'] for filt in plot_filts]
+
+fig, axs = plt.subplots(len(plot_filts)+1, figsize=(5,18))
+for i in range(len(plot_filts)):
+    filt = plot_filts[i]
+    image_list_ct = fit_run_dict[filt].flux_2d_out['data']
+    norm = LogNorm(vmin = np.std(image_list_ct[:,:2])*0.6, vmax =image_list_ct.max()/1.5 )
+    axs[i].imshow(image_list_ct, norm=norm, origin='lower',cmap = my_cmap) 
+    axs[i].set_ylabel(filt,fontsize=20)
+    axs[i].tick_params(labelsize=15)
+    pixscale = fit_run_dict[filt].fitting_specify_class.deltaPix
+    axs[i].set_xticks(np.arange(0,len(image_list_ct), 1/pixscale))
+    axs[i].set_yticks(np.arange(0,len(image_list_ct), 1/pixscale))
+    axs[i].set_xticklabels(np.round(np.arange(0,len(image_list_ct), 1/pixscale)*pixscale,2))
+    axs[i].set_yticklabels(np.round(np.arange(0,len(image_list_ct), 1/pixscale)*pixscale,2))
+    # if i == 0:
+    #     scale_bar(axs[i], len(image_list_ct[i]), dist=0.5/deltaPix, text='0.5"', text2 ='{0:.2f}kpc'.format(scale), color = 'white')
+rgb_default = make_lupton_rgb(images[0], images[1], images[2], Q=7, stretch=0.3)
+
+filters = [['F356W', 'F200W', 'F115W', 'F150W', 'F277W', 'F410M', 'F444W'][i] for i in [-1, -3, 1]]
+use_filt = filters[0]+ '+'+ filters[1]+'+' + filters[2]
+
+# fig, ax = plt.subplots()
+axs[-1].imshow(rgb_default, origin='lower')
+# plt.text(1,80,use_filt,fontsize=20, color = 'white')
+pixel_s = 0.03*2
+axs[-1].set_xticks(np.arange(0,len(images[0]), 1/pixel_s))
+axs[-1].set_yticks(np.arange(0,len(images[0]), 1/pixel_s))
+axs[-1].set_xticklabels(np.arange(0,len(images[0]), 1/pixel_s)*pixel_s)
+axs[-1].set_yticklabels(np.arange(0,len(images[0]), 1/pixel_s)*pixel_s)
+plt.text(1,41,use_filt,fontsize=20, color = 'white')
+axs[-1].tick_params(labelsize=15)
+
+target_id = target_id.replace('aegis_', 'AEGIS ')
+fig.suptitle('{0}'.format(target_id),fontsize=35)
+fig.tight_layout()
+fig.savefig('/Users/Dartoon/Downloads/{0}_filt_color.pdf'.format(target_id))
+plt.show()
+
+
 # #%%
 # # sed_2d_info = pickle.load(open('sed_2d_info.pkl','rb'))
 # # count = 100

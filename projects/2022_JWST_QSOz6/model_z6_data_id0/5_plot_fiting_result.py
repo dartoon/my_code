@@ -68,6 +68,9 @@ def total_compare(flux_list_2d, label_list_2d,
     
     f = plt.figure(0, figsize=(6.5+ (cl_num-1)*3.5,4))  
     plt.rcParams["font.family"] = "sans-serif"
+    import matplotlib
+    matplotlib.rcParams['pdf.fonttype'] = 42
+    
     ax_l = [plt.subplot2grid((6,cl_num), (0,i), rowspan=6) for i in range(len(flux_list_2d))] #The image plot
     if cmap == None:
         cmap = my_cmap
@@ -158,9 +161,9 @@ def total_compare(flux_list_2d, label_list_2d,
     plt.show()       
     return f
 
-idx = 0
+idx = 1
 # filters = ['F150W', 'F356W']
-filters = ['F356W']
+filters = ['F150W']
 from target_info import target_info
 info = target_info[str(idx)]
 target_id, RA, Dec, z = info['target_id'], info['RA'], info['Dec'], info['z']

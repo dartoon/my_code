@@ -27,6 +27,9 @@ from galight.tools.astro_tools import plt_fits, plt_many_fits
 
 plt.rcParams["font.family"] = "sans-serif"
 
+import matplotlib
+matplotlib.rcParams['pdf.fonttype'] = 42
+
 #%%
 # data_type = 'all' 
 filt = 'F356W'

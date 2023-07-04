@@ -29,7 +29,7 @@ info = target_info[str(idx)]
 target_id, RA, Dec, z = info['target_id'], info['RA'], info['Dec'], info['z']
 
 
-rerun = False
+rerun = True
 
 if rerun == True:
     #%%
@@ -38,7 +38,7 @@ if rerun == True:
         file = dp_files[i]
         print(file)
         filename = dp_files[i].replace('data_process', 'fit_run')+'_{0}.pkl'.format(i)
-        filename = filename.replace('fit_material', 'fit_material_super2').format(i)
+        filename = filename.replace('fit_material', 'fit_material_super2_rerun').format(i)
         idx = file.split('idx')[1].split('_')[0]
         target_id = target_id
         _data_process = pickle.load(open(file,'rb'))
@@ -82,7 +82,7 @@ if rerun == True:
         item = collect_info[count]
         fit_run_list = []
         idx, filt= item
-        fit_files = glob.glob(run_folder+'fit_material_super2/fit_run_idx{0}_{1}_*FOVpsf*.pkl'.format(idx, filt))
+        fit_files = glob.glob(run_folder+'fit_material_super2_rerun/fit_run_idx{0}_{1}_*FOVpsf*.pkl'.format(idx, filt))
         fit_files.sort()
         for i in range(len(fit_files)):
             fit_run_list.append(pickle.load(open(fit_files[i],'rb')))
@@ -99,9 +99,9 @@ if rerun == True:
             _data_process.stack_PSF(if_plot = False, tool = 'psfr')
             if ct >8:
                 ct = 'all'
-            pickle.dump(_data_process , open(run_folder+'fit_material_super2/'+'data_process_idx{0}_{2}_CombPsfsNO_{1}.pkl'.format(idx, ct, filt), 'wb'))
+            pickle.dump(_data_process , open(run_folder+'fit_material_super2_rerun/'+'data_process_idx{0}_{2}_CombPsfsNO_{1}.pkl'.format(idx, ct, filt), 'wb'))
     
-    dp_files = glob.glob(run_folder  + 'fit_material_super2/data_process_idx0_*{0}*CombPsfs*.pkl'.format(filt) ) 
+    dp_files = glob.glob(run_folder  + 'fit_material_super2_rerun/data_process_idx0_*{0}*CombPsfs*.pkl'.format(filt) ) 
     dp_files.sort()
     
     for i in range(len(dp_files)):
@@ -135,7 +135,7 @@ for top_psf_id in [0]:
     fit_run_list = []
     # PSF_lib_files = glob.glob(run_folder+'material/*'+filt[:-1]+'*_PSF_Library_idx{0}.pkl'.format(idx))[0]
     # fit_files = glob.glob(run_folder+'*fit_material/fit_run_idx{0}_{1}_*.pkl'.format(idx, filt))#+\
-    fit_files = glob.glob(run_folder+'*fit_material_super2/fit_run_idx{0}_{1}_*.pkl'.format(idx, filt))#+\
+    fit_files = glob.glob(run_folder+'*fit_material_super2_rerun/fit_run_idx{0}_{1}_*.pkl'.format(idx, filt))#+\
     fit_files.sort()
     for i in range(len(fit_files)):
         fit_run_list.append(pickle.load(open(fit_files[i],'rb')))
