@@ -1,0 +1,12 @@
+# Object number: var_objno
+ 0) sersic                 #  object type
+ 1) var_posx  var_posy  1 1  #  position x, y
+ 3) var_ini_mag     1          #  Integrated magnitude	
+ 4) var_ini_reff      1          #  R_e (half-light radius)   [pix]
+ 5) var_ini_n     1          #  Sersic index n (de Vaucouleurs n=4) 
+ 6) 0.0000      0          #     ----- 
+ 7) 0.0000      0          #     ----- 
+ 8) 0.0000      0          #     ----- 
+ 9) var_ini_q      1          #  axis ratio (b/a)  
+10) var_ini_theta  1          #  position angle (PA) [deg: Up=0, Left=90]
+ Z) 0                      #  output option (0 = resid., 1 = Don't subtract) 

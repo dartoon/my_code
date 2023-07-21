@@ -1,0 +1,5 @@
+# Object number: var_objno
+ 0) psf                # object type
+ 1) var_posx  var_posx  1 1  # position x, y        [pixel]
+ 3) var_ini_mag       1       # total magnitude     
+ Z) 0                  #  Skip this model in output image?  (yes=1, no=0)
