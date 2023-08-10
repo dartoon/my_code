@@ -129,7 +129,7 @@ for seed in range(100):
             gain_value = 1.8
             expsize = 1 
         flux_mjsr = header['PHOTMJSR']
-        exp_map = exp * wht/wht.max() / flux_mjsr * gain_value
+        # exp_map = exp * wht/wht.max() / flux_mjsr * gain_value
         exp_map = exp * wht/wht.max() / flux_mjsr * gain_value
         data_process = DataProcess(fov_image = data_mock, target_pos = pos, pos_type = 'pixel', header=fit_run_.fitting_specify_class.data_process_class.header,
                                     rm_bkglight = False, if_plot=False, zp = zp, exptime=exp_map)  #Gain value assuming as 1

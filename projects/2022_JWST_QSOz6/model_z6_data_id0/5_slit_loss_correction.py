@@ -161,9 +161,9 @@ def total_compare(flux_list_2d, label_list_2d,
     plt.show()       
     return f
 
-idx = 1
+idx = 0
 # filters = ['F150W', 'F356W']
-filters = ['F150W']
+filters = ['F356W']
 from target_info import target_info
 info = target_info[str(idx)]
 target_id, RA, Dec, z = info['target_id'], info['RA'], info['Dec'], info['z']
@@ -192,7 +192,7 @@ for top_psf_id in [0]:
             if filt == 'F356W':
                 fit_files = glob.glob(run_folder+'*fit_material/fit_run_idx{0}_{1}_*.pkl'.format(idx, filt))#+\
             if filt == 'F150W':
-                fit_files = glob.glob(run_folder+'*fit_material_super2/fit_run_idx{0}_{1}_*.pkl'.format(idx, filt))#+\
+                fit_files = glob.glob(run_folder+'*fit_material/fit_run_idx{0}_{1}_*.pkl'.format(idx, filt))#+\
         elif idx ==1:
             if filt == 'F356W':
                 fit_files = glob.glob(run_folder+'*fit_material/fit_run*_fixn1_*idx{0}_{1}_*.pkl'.format(idx, filt))#+\
@@ -224,8 +224,10 @@ for top_psf_id in [0]:
         print(target_id) 
         
 #%%Calculate slit loss:
-    
-twoD_flux =   fit_run.flux_2d_out['data-point source']  
+try:
+    twoD_flux =   fit_run.flux_2d_out['data-point source']  
+except:
+    twoD_flux =   fit_run.flux_2d_out['data-Point Source']  
 # twoD_flux =   fit_run.image_ps_list[0]
 total_flux = np.sum(twoD_flux)
 
@@ -241,11 +243,28 @@ if target_info[str(idx)]['theta'] != None:
 aper_flux = aperture_photometry(twoD_flux, aper)['aperture_sum'].value[0]
 
 print("ratio:, ", aper_flux/total_flux)
+print(fit_run.final_result_galaxy[0]['magnitude'])
+print("host mag in slit:", -2.5*np.log10(aper_flux) + fit_run.zp )
 
 #%%Calculate host ratio in aperture:
 data_image =  fit_run.flux_2d_out['data']  
 data_aperture_flux = aperture_photometry(data_image, aper)['aperture_sum'].value[0]
 qso_image = fit_run.image_ps_list[0]
 ps_aperture_flux = aperture_photometry(qso_image, aper)['aperture_sum'].value[0]
-
 print("aperture host ratio,", 1 - ps_aperture_flux/data_aperture_flux)
+
+#%%
+print('to table')
+print(target_id)
+print(filt)
+print("{0:.2f}".format(fit_run.final_result_galaxy[0]['magnitude']))
+print("{0:.2f}%".format(fit_run.final_result_galaxy[0]['flux_within_frame']/(fit_run.final_result_ps[0]['flux_within_frame']+ fit_run.final_result_galaxy[0]['flux_within_frame'])*100))
+print("{0:.2f}".format(fit_run.final_result_galaxy[0]['R_sersic']))
+print("{0:.2f}".format(fit_run.final_result_galaxy[0]['n_sersic']))
+print("{0:.2f}".format(fit_run.final_result_galaxy[0]['q']))
+print("{0:.2f}".format(-2.5*np.log10(aper_flux) + fit_run.zp ))
+print("{0:.2f}".format(fit_run.final_result_ps[0]['magnitude']))
+print("{0:.2f}".format(-2.5*np.log10(ps_aperture_flux) + fit_run.zp ))
+print("{0:.2f}".format( np.sqrt( np.sum(np.array(fit_run.final_result_galaxy[0]['position_xy']) - 
+                           np.array(fit_run.final_result_ps[0]['position_xy'] ))**2) * fit_run.fitting_specify_class.deltaPix))
+

@@ -63,7 +63,7 @@ from galight.tools.astro_tools import plt_fits
 # print(i, np.max(np.nan_to_num(tbl['kron_flux'])))
 plt_fits(cut1)
 
-cut1 = cut1 / np.sqrt(580/fit_run_.fitting_specify_class.data_process_class.header['XPOSURE'])
+# cut1 = cut1 / np.sqrt(580/fit_run_.fitting_specify_class.data_process_class.header['XPOSURE'])
 
 #%% Make the simulation/
 #One random part is the background. DONE!!!

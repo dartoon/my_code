@@ -13,11 +13,11 @@ import glob
 import pickle
 filters =  ['F150','F356']
 
-folder = '../NIRCam_data/Mar24/'
+folder = '../NIRCam_data/2023July13/'
 
-filt = filters[1] #!!!
+filt = filters[0] #!!!
 
-idx = ? 
+idx = 9
 
 import sys
 sys.path.insert(0, '../model_z6_data_id0/')

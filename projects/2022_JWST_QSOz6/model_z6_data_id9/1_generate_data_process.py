@@ -38,14 +38,14 @@ file_NO = 0
 
 fov = 'small'
 
-idx = ? #!!!
-folder = '../NIRCam_data/???/bkg_removed/'   #!!!
+idx = 9 #!!!
+folder = '../NIRCam_data/2023July13/bkg_removed/'   #!!!
 from target_info import target_info
 info = target_info[str(idx)]
 target_id, RA, Dec, z = info['target_id'], info['RA'], info['Dec'], info['z']
 
 # jwst_all_filenames = glob.glob(folder+'/*{0}*{1}*.fits'.format(target_id[:5], filts[0]))
-jwst_all_filenames = glob.glob(folder+'*{0}*{1}*_rmbkg.fits'.format(target_id[:5], filt))  #For NIRCam
+jwst_all_filenames = glob.glob(folder+'/*{0}*{1}*{2}*_rmbkg.fits'.format(target_id[:5], target_id[6:], filt))  #For NIRCam
 jwst_all_filenames.sort()
 file = jwst_all_filenames[file_NO]
 if data_type == 'all':
@@ -101,7 +101,7 @@ for filt in [filt]:
                                    fov_noise_map = None)
     
     data_process.generate_target_materials(radius=radius * expsize, create_mask = False, nsigma=1.5, 
-                                            cut_kernel = None, if_select_obj=False,
+                                            cut_kernel = 'center_bright', if_select_obj=False,
                                           exp_sz= 1.2, npixels = 60 * expsize, if_plot=False)
     
     # # data_process.apertures = []

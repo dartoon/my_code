@@ -13,11 +13,11 @@ import glob
 import pickle
 filters =  ['F150','F356']
 
-folder = '../NIRCam_data/Mar24/'
+folder = '../NIRCam_data/2023July13/'
 
 filt = filters[1] #!!!
 
-idx = ? 
+idx = 8
 
 import sys
 sys.path.insert(0, '../model_z6_data_id0/')
@@ -25,6 +25,7 @@ from target_info import target_info
 info = target_info[str(idx)]
 target_id, RA, Dec, z = info['target_id'], info['RA'], info['Dec'], info['z']
 
+#%%
 filter_files= glob.glob(folder+'/*{0}*{1}*{2}*i2d.fits'.format(target_id[:5], target_id[6:], filt))  #For NIRCam
 filter_files.sort()
 
@@ -53,7 +54,6 @@ for filename in filter_files:
     gain_value = 2
     exp_map = exp * wht/wht.max() / flux_mjsr * gain_value
         
-    from galight.data_process import DataProcess
     data_process = DataProcess(fov_image = fov_image, target_pos = [600,1150], pos_type = 'pixel', header = header,
                               rm_bkglight = True, exptime = exp_map, if_plot=True, zp = zp)#, fov_noise_map = fov_noise_map)
     fitsFile[1].data = data_process.fov_image
