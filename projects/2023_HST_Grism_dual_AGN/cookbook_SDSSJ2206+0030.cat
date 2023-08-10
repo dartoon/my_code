@@ -1,0 +1,16 @@
+#   1 X_IMAGE                Object position along x                                    [pixel]
+#   2 Y_IMAGE                Object position along y                                    [pixel]
+#   3 NUMBER                 Running object number                                     
+#   4 X_WORLD                Barycenter position along world x axis                     [deg]
+#   5 Y_WORLD                Barycenter position along world y axis                     [deg]
+#   6 A_IMAGE                Profile RMS along major axis                               [pixel]
+#   7 B_IMAGE                Profile RMS along minor axis                               [pixel]
+#   8 THETA_IMAGE            Position angle (CCW/x)                                     [deg]
+#   9 A_WORLD                Profile RMS along major axis (world units)                 [deg]
+#  10 B_WORLD                Profile RMS along minor axis (world units)                 [deg]
+#  11 THETA_WORLD            Position angle (CCW/world-x)                               [deg]
+#  12 FLUX_RADIUS            Fraction-of-light radii                                    [pixel]
+#  13 MAG_F1392                Isophotal magnitude                                        [mag]
+#  14 MAGERR_ISO             RMS error for isophotal magnitude                          [mag]
+  534.42213     564.831        1   331.6784228  0.5045400252     2.418     2.093 -46.20 0.0000923394 0.0000821672  54.95      2.942  21.7418   0.0100
+  535.13579     568.17393       2   331.6785354  0.5045864397     2.143     1.754 -55.77 7.516255e-05 6.389128e-05  66.53      3.442  22.7020   0.0165

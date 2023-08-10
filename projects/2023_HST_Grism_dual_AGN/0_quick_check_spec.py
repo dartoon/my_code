@@ -12,7 +12,7 @@ import matplotlib.pyplot as plt
 
 #Plot 1D:
 # SDSS2304-0038
-folder = 'MAST_2023-02-21T0308/HST/iexo11020/'
+folder = 'HST/11_SDSSJ2304-0038/iexo11020/'
 filename = 'iexo11020_drz.fits'
 fitsFile = pyfits.open(folder+filename)
 header = fitsFile[1].header # if target position is add in WCS, the header should have the wcs information, i.e. header['EXPTIME']
@@ -49,7 +49,7 @@ plt.show()
 
 #%%
 #SDSS1246-0017
-folder = 'MAST_2023-02-23T2316/HST/iexo07020/'
+folder = 'HST/07_SDSSJ1246-0017/iexo07020/'
 filename = 'iexo07020_drz.fits'
 fitsFile = pyfits.open(folder+filename)
 header = fitsFile[1].header # if target position is add in WCS, the header should have the wcs information, i.e. header['EXPTIME']
