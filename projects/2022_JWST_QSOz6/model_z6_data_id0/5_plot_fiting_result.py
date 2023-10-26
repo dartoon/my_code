@@ -161,9 +161,9 @@ def total_compare(flux_list_2d, label_list_2d,
     plt.show()       
     return f
 
-idx = 1
+idx = 6
 # filters = ['F150W', 'F356W']
-filters = ['F150W']
+filters = ['F356W']
 from target_info import target_info
 info = target_info[str(idx)]
 target_id, RA, Dec, z = info['target_id'], info['RA'], info['Dec'], info['z']
@@ -192,12 +192,14 @@ for top_psf_id in [0]:
             if filt == 'F356W':
                 fit_files = glob.glob(run_folder+'*fit_material/fit_run_idx{0}_{1}_*.pkl'.format(idx, filt))#+\
             if filt == 'F150W':
-                fit_files = glob.glob(run_folder+'*fit_material_super2/fit_run_idx{0}_{1}_*.pkl'.format(idx, filt))#+\
+                # fit_files = glob.glob(run_folder+'*fit_material_super2/fit_run_idx{0}_{1}_*.pkl'.format(idx, filt))#+\
+                fit_files = glob.glob(run_folder+'*fit_material/fit_run_idx{0}_{1}_*.pkl'.format(idx, filt))#+\
         elif idx ==1:
             if filt == 'F356W':
                 fit_files = glob.glob(run_folder+'*fit_material/fit_run*_fixn1_*idx{0}_{1}_*.pkl'.format(idx, filt))#+\
             if filt == 'F150W':
-                fit_files = glob.glob(run_folder+'*fit_material_super2/fit_run*_fixn1_*idx{0}_{1}_*.pkl'.format(idx, filt))#+\
+                # fit_files = glob.glob(run_folder+'*fit_material_super2/fit_run*_fixn1_*idx{0}_{1}_*.pkl'.format(idx, filt))#+\
+                fit_files = glob.glob(run_folder+'*fit_material/fit_run*_fixn1_*idx{0}_{1}_*.pkl'.format(idx, filt))#+\
         fit_files.sort()
         for i in range(len(fit_files)):
             fit_run_list.append(pickle.load(open(fit_files[i],'rb')))
@@ -220,7 +222,7 @@ for top_psf_id in [0]:
         label[2] = "data$-$point source"
         fig = total_compare(image_list, label, [fit_run.fitting_specify_class.deltaPix]*4, 
                             target_ID=None, z=None,)
-        # fig.savefig('figures/{1}_{0}_qso_final_plot.pdf'.format(filt,target_id))
+        # fig.savefig('/Users/Dartoon/Downloads/{1}_{0}_qso_final_plot.pdf'.format(filt,target_id))
         print(target_id) 
         
 #%%Calculate slit loss:

@@ -19,8 +19,8 @@ cwd = os.getcwd()
 print("We are in %s" % (cwd))
 
 #%%
-name = "SDSSJ1246-0017"  #G102
-# name = "SDSSJ1502+0257"    #G141
+# name = "SDSSJ1246-0017"  #G102
+name = "SDSSJ1502+0257"    #G141
 # name = "SDSSJ1625+4309"    #G141
 # name = "SDSSJ2304-0038"    #G102
 # name = "SDSSJ2206+0030"    #G141
@@ -257,6 +257,7 @@ from galight.tools.astro_tools import plt_fits
 from matplotlib.colors import LogNorm
 import copy, matplotlib
 ID = 2
+
 my_cmap = copy.copy(matplotlib.cm.get_cmap('gist_heat')) # copy the default cmap
 my_cmap.set_bad('black')
 d = pyfits.open("./DRIZZLE/aXeWFC3_{0}_2.STP.fits".format(filt_spec))["BEAM_%dA" % (ID)].data
@@ -292,21 +293,18 @@ plt.show()
 
 
 import glob
-
-# for s in glob.glob("OUTPUT/*2.SPC.fits"):
-#     print (s)
-#     d1 = pyfits.open(s)["BEAM_%dA" % (ID)].data
-#     w = d1["LAMBDA"]
-#     f = d1["FLUX"]
-#     e = d1["FERROR"]
-#     c = d1["CONTAM"]
-#     wg = (w>x1) & (w<x2)
-#     plt.errorbar(w[wg],f[wg],e[wg])
-    # plt.plot(w[vg],c[vg])
+for s in glob.glob("OUTPUT/*2.SPC.fits"):
+    print (s)
+    d1 = pyfits.open(s)["BEAM_%dA" % (ID)].data
+    w = d1["LAMBDA"]
+    f = d1["FLUX"]
+    e = d1["FERROR"]
+    c = d1["CONTAM"]
+    wg = (w>x1) & (w<x2)
+    plt.errorbar(w[wg],f[wg],e[wg])
+    plt.plot(w[wg],c[wg])
 plt.xlabel(r'Wavelength ($\AA$)')
 plt.ylabel(r'Flux ($erg/s/cm^2/\AA/s$)');
-
-
 fin = pyfits.open("./DRIZZLE/aXeWFC3_{0}_2.SPC.fits".format(filt_spec))
 tdata = fin["BEAM_%dA" % (ID)].data
 x = tdata["LAMBDA"]
@@ -318,30 +316,33 @@ plt.plot(x[vg],f[vg],color='k',lw=2)
 plt.errorbar(x[vg],f[vg],e[vg],color='k',lw=2)
 plt.xlim([x1-100,x2+100])
 plt.show()
+
+# =============================================================================
+# #Each individual cases
+# =============================================================================
+for s in glob.glob("OUTPUT/*2.STP.fits"):
+    print (s)
+    d1 = pyfits.open(s)["BEAM_%dA" % (ID)].data
+    plt.imshow(d1, norm=LogNorm(), origin='lower',cmap = my_cmap)
+    plt.show()
+
 #%%
 image_file = glob.glob(filt_image+'/*_drz.fits')[0]
 image = pyfits.open(image_file)['SCI'].data
-pos = np.loadtxt(filt_image+'/cookbook.cat')[0][:2]
+pos = np.loadtxt(filt_image+'/cookbook.cat')[ID-1][:2]
 plt.imshow(image[int(pos[1])-20:int(pos[1])+20,int(pos[0])-20:int(pos[0])+20], 
           norm=LogNorm(), origin='lower',cmap = my_cmap)
 plt.show()
-
 
 fits = pyfits.open("./DRIZZLE/aXeWFC3_{0}_mef_ID{1}.fits".format(filt_spec, ID))
 d = fits['SCI'].data
 header = fits['SCI'].header
 
-# fits = pyfits.open("./DRIZZLE/aXeWFC3_{0}_2.STP.fits".format(filt_spec))["BEAM_%dA" % (ID)]
-# d = fits.data
-# wcs.all_pix2world([[0,0]])
 
 from astropy.wcs import WCS
 wcs = WCS(header, naxis=1, relax=False, fix=False)
 lam = wcs.wcs_pix2world(np.arange(len(d.T)), 0)[0]
-
-# plt.imshow(d[10:-2,:], norm=LogNorm(), origin='lower',cmap = my_cmap)
-y = 10
-y = 7
+y = int(len(d)/2)-2
 d = d[y:y+4,:]
 fig, ax = plt.subplots(1,1,figsize=(12.5, 2))
 ax.imshow(d, norm=LogNorm(), origin='lower',cmap = my_cmap)
@@ -350,19 +351,24 @@ ax.set_xticks(ticks)
 ax.set_xticklabels([round(lam[i]*10**8)*10**2 for i in ticks])
 plt.show()
 
-# plt.plot(np.linspace(0,len(np.sum(d,axis=0))-1,len(np.sum(d,axis=0))),np.sum(d,axis=0))
-# plt.plot((lam*10**10)[(lam*10**10>x1) & (lam*10**10<x2)],(np.sum(d[10:-7,:],axis=0)/(lam*10**7))[(lam*10**10>x1) & (lam*10**10<x2)])
-plt.plot((lam*10**10)[(lam*10**10>x1) & (lam*10**10<x2)],(np.sum(d,axis=0)/(lam*10**7))[(lam*10**10>x1) & (lam*10**10<x2)])
+
+plt.plot((lam*10**10)[(lam*10**10>x1) & (lam*10**10<x2)],(np.sum(d,axis=0)/(lam*10**7))[(lam*10**10>x1) & (lam*10**10<x2)], c= 'k', zorder =100, linewidth = 4)
+for s in glob.glob("OUTPUT/*2.STP.fits"):
+    print (s)
+    d_flt = pyfits.open(s)["BEAM_%dA" % (ID)].data
+    header = pyfits.open(s)["BEAM_%dA" % (ID)].header
+    # plt.imshow(d1, norm=LogNorm(), origin='lower',cmap = my_cmap)
+    y = int(len(d_flt)/2)-2
+    d_flt = d_flt[y:y+4,:]
+    wcs = WCS(header, naxis=1, relax=False, fix=False)
+    lam_flt = wcs.wcs_pix2world(np.arange(len(d_flt.T)), 0)[0]
+    plt.plot((lam_flt*10**10)[(lam_flt*10**10>x1) & (lam_flt*10**10<x2)],(np.sum(d_flt,axis=0)/(lam_flt*10**7))[(lam_flt*10**10>x1) & (lam_flt*10**10<x2)])
+    
 lines = CIV, MgII, Hb, OIII, Halpha
 for line in lines:
     if line * (1+z) > x1 and line * (1+z) < x2:
         plt.axvline(x = line * (1+z), color = 'b', label = str(line))
         plt.text(line * (1+z), np.max((np.sum(d,axis=0)/(lam*10**7))[(lam*10**10>x1) & (lam*10**10<x2)]), str(line))
-# plt.text(MgII * (1+z), np.max((np.sum(d,axis=0)/(lam*10**7))[(lam*10**10>x1) & (lam*10**10<x2)]), 'MgII')
-# plt.axvline(x = Hb * (1+z), color = 'b', label = 'Hb')
-# plt.text(Hb * (1+z), np.max((np.sum(d,axis=0)/(lam*10**7))[(lam*10**10>x1) & (lam*10**10<x2)]), 'Hb')
-# plt.axvline(x = OIII * (1+z), color = 'b', label = 'OIII')
-# plt.text(OIII * (1+z), np.max((np.sum(d,axis=0)/(lam*10**7))[(lam*10**10>x1) & (lam*10**10<x2)]), 'OIII')
 plt.xlim([x1-100,x2+100])
 plt.tight_layout()
 plt.show()

@@ -43,9 +43,9 @@ save_psf = False
 # check_name= 'cid_1210' #8
 # check_name= 'cid_1245' #10
 
-# for idx in range(50):
+for idx in range(50):
 # [i for i in range(len(cata_list)) if cata_list[i][-1] == 'cid_473']
-for idx in [29]:
+# for idx in [29]:
     fit_run_list = []
     fit_files = glob.glob(fit_file_folder+'fit_result/fit2_run_{0}*idx{1}_psf*.pkl'.format(filt,idx))
     fit_files.sort()
