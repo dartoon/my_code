@@ -21,7 +21,7 @@ field = 'CEERS' #all, CEERS, COSMOSweb, PRIMER_COSMOS
 cat_file = 'CEERS_cutout.cat'
 
 # field = 'COSMOSweb' #all, CEERS, COSMOSweb, PRIMER_COSMOS
-# cat_file = 'COSMOS_coutout.cat'
+# cat_file = 'COSMOS_cutout.cat'
 
 # name, RA, Dec, cut_rad 
 #fclts = ['acs', 'wfc3', 'nircam', 'miri']  #
