@@ -32,7 +32,7 @@ from galight.data_process import DataProcess
 QSO_RA, QSO_DEC = 0.07452999800443649, 0.4368380010128021
 data_process = DataProcess(fov_image = fov_image, fov_noise_map = err_data, target_pos = [QSO_RA, QSO_DEC],
                            pos_type = 'wcs', header = header,
-                          rm_bkglight = True, if_plot=False, zp = zp)
+                          rm_bkglight = False, if_plot=False, zp = zp)
 
 data_process.generate_target_materials(radius=None, create_mask = False, nsigma=2.8,
                                       exp_sz= 1.2, npixels = 15, if_plot=True)
@@ -45,7 +45,7 @@ data_process.checkout() #Check if all the materials is known.
 from galight.fitting_specify import FittingSpecify
 fit_sepc = FittingSpecify(data_process)
 fit_sepc.prepare_fitting_seq(point_source_num = 1, supersampling_factor=3)#, fix_n_list= [[0,4]], fix_center_list = [[0,0]])
-# fit_sepc.plot_fitting_sets()
+fit_sepc.plot_fitting_sets()
 fit_sepc.build_fitting_seq()
 
 

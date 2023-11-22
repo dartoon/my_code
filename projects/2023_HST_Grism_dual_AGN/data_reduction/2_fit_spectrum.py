@@ -1,11 +1,10 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Created on Thu Aug 10 14:57:45 2023
+Created on Mon Oct 30 11:32:11 2023
 
 @author: Dartoon
 """
-
 import astropy.io.fits as pyfits
 import numpy as np
 import os, shutil
@@ -14,25 +13,26 @@ import glob
 from astropy.wcs import WCS
 # %matplotlib inline/''
 
+# from 1_analysis_spectrum import z_dic
+z_dic = {"SDSSJ1246-0017": 2.559, "SDSSJ1502+0257": 1.484, "SDSSJ1625+4309":1.647, 
+            "SDSSJ2304-0038": 2.775, "SDSSJ2206+0030": 1.444, "SDSSJ0224+0149":2.721}
+
+
 # from hstaxe import axetasks
 
 cwd = os.getcwd()
 # print("We are in %s" % (cwd))
 
 #%%
-# name = "SDSSJ1246-0017"  #G102
+name = "SDSSJ1246-0017"  #G102   #!!!
+# name = "SDSSJ1625+4309"    #G141   #!!!
 # name = "SDSSJ1502+0257"    #G141
-name = "SDSSJ1625+4309"    #G141
 # name = "SDSSJ2304-0038"    #G102
 # name = "SDSSJ2206+0030"    #G141
 # name = "SDSSJ0224+0149"    #G102
 
-ID = 1  #Dual ID
+ID = 2   #Dual ID
 slit_width = 3
-
-#%%
-z_dic = {"SDSSJ1246-0017": 2.559, "SDSSJ1502+0257": 1.484, "SDSSJ1625+4309":1.647, 
-            "SDSSJ2304-0038": 2.775, "SDSSJ2206+0030": 1.444, "SDSSJ0224+0149":2.721}
 
 z = z_dic[name]
 
@@ -52,8 +52,11 @@ if filt_spec == 'G141':
 else:
     x1, x2 = 8000, 11500
     
-
 #%%
+# =============================================================================
+# For calibrate the spectrum. The black line is the data and the orange line is the aXe inferred flux
+# The ratio will be used to recalibrate the spectrum of each dual
+# =============================================================================
 my_cmap = copy.copy(matplotlib.cm.get_cmap('gist_heat')) # copy the default cmap
 my_cmap.set_bad('black')
 
@@ -65,7 +68,8 @@ d = pyfits.open("./DRIZZLE/aXeWFC3_{0}_2.STP.fits".format(filt_spec))["BEAM_%dA"
 wcs = WCS(header, naxis=1, relax=False, fix=False)
 
 lam = wcs.wcs_pix2world(np.arange(len(d.T)), 0)[0]
-plt.plot((lam*10**10)[(lam*10**10>x1) & (lam*10**10<x2)], (np.sum(d,axis=0)/(lam*10**24))[(lam*10**10>x1) & (lam*10**10<x2)], c= 'k', zorder =100, linewidth = 4)
+plt.plot((lam*10**10)[(lam*10**10>x1) & (lam*10**10<x2)], 
+         (np.sum(d,axis=0)/(lam*10**24))[(lam*10**10>x1) & (lam*10**10<x2)], c= 'k', zorder =100, linewidth = 4)
 
 fin = pyfits.open("./DRIZZLE/aXeWFC3_{0}_2.SPC.fits".format(filt_spec))
 tdata = fin["BEAM_%dA" % (ID)].data
@@ -75,14 +79,16 @@ e = tdata["FERROR"]
 c = tdata["CONTAM"]
 vg = (x>x1) & (x<x2)
 plt.plot(x[vg],f[vg])
-plt.errorbar(x[vg],f[vg],e[vg])
+plt.errorbar(x[vg],f[vg],e[vg])   #The total spectrum
 # plt.plot(x[vg],c[vg])
 plt.xlim([x1-100,x2+100])
 plt.xlabel(r'Wavelength ($\AA$)')
 plt.ylabel(r'Flux ($erg/s/cm^2/\AA/s$)');
-plt.show()  #Compare 1D spec from 2D grism data VS. aXe SPC 
+plt.close()  #Compare 1D spec from 2D grism data VS. aXe SPC to get a unit_ratio
 
 unit_ratio = f[vg]/(np.sum(d,axis=0)/(lam*10**24))[(lam*10**10>x1) & (lam*10**10<x2)]
+
+#%% Show each line's spectrunm
 
 print("The selected region to generate the SPC are not the same for the DRZZLE and OUTPUT")
 
@@ -109,11 +115,11 @@ plt.errorbar(x[vg],f[vg],e[vg],color='k',lw=2)
 plt.xlabel(r'Wavelength ($\AA$)')
 plt.ylabel(r'Flux ($erg/s/cm^2/\AA/s$)');
 plt.xlim([x1-100,x2+100])
-plt.show() #Compare 1D spec from aXe SPC for DRZZILE and flt
+plt.close() #Compare 1D spec from aXe SPC for DRZZILE and flt
 
 
-from scipy.signal import argrelextrema
 #%% Show 2D image
+from scipy.signal import argrelextrema
 print(name, 'redshift:', z, 'filters:', filt_image, filt_spec)
 image_file = glob.glob(filt_image+'/*_drz.fits')[0]
 image = pyfits.open(image_file)['SCI'].data
@@ -162,9 +168,14 @@ lam = wcs.wcs_pix2world(np.arange(len(d.T)), 0)[0]
 driz_spec = unit_ratio*(np.sum(d_sub,axis=0)/(lam*10**24))[(lam*10**10>x1) & (lam*10**10<x2)]
 plt.plot((lam*10**10)[(lam*10**10>x1) & (lam*10**10<x2)], driz_spec, c= 'k', zorder =100, linewidth = 4)
 
+#For the fitting later
+lam = (lam*10**10)[(lam*10**10>x1) & (lam*10**10<x2)]
+flux = driz_spec
+
+
 s_list = glob.glob("OUTPUT/*2.STP.fits")
 d_flt_list = []
-for s in s_list:
+for i, s in enumerate(s_list):
     # print (s)
     d_flt = pyfits.open(s)["BEAM_%dA" % (ID)].data
     header_flt = pyfits.open(s)["BEAM_%dA" % (ID)].header
@@ -190,6 +201,7 @@ for s in s_list:
     d_flt_list.append(d_flt)
     wcs = WCS(header_flt, naxis=1, relax=False, fix=False)
     lam_flt = wcs.wcs_pix2world(np.arange(len(d_flt.T)), 0)[0]
+    # if i == 1:
     plt.plot((lam_flt*10**10)[(lam_flt*10**10>x1) & (lam_flt*10**10<x2)],unit_ratio*(np.sum(d_flt,axis=0)/(lam_flt*10**24))[(lam_flt*10**10>x1) & (lam_flt*10**10<x2)])
 lines = CIV, MgII, Hb, OIII, Halpha
 plt.xlim([x1-100,x2+100])
@@ -202,6 +214,7 @@ for line in lines:
 plt.xlabel(r'Wavelength ($\AA$)')
 plt.ylabel(r'Flux ($erg/s/cm^2/\AA/s$)')
 plt.show()
+
 
 #%% Show entrie 2D spectrum
 xticks = np.int0(ax.get_xticks())
@@ -229,15 +242,8 @@ ax.set_xticklabels(xticks)
 plt.show()
 
 #%%
-# fig, ax = plt.subplots(1,1,figsize=(12.5, 2))
-# ax.imshow(d_sub, norm=LogNorm(), origin='lower',cmap = my_cmap)
-# pos = [np.sum((lam*10**10 - xticks[i])<0) for i in range(len(xticks))]
-# ax.set_xticks(pos)
-# ax.set_xticklabels(xticks)
-# plt.show()
-
 # =============================================================================
-# #Each individual cases
+# #Each dither's 2D's case
 # =============================================================================
 for i,s in enumerate(s_list):
     print(s)
@@ -263,4 +269,137 @@ for i,s in enumerate(s_list):
     plt.axhline(y,c='white')
     plt.axhline(y+slit_width,c='white')
     plt.show()
-    
+    lam_flt = wcs.wcs_pix2world(np.arange(len(d_flt.T)), 0)[0]
+    y = id_y_pos_ - int(slit_width/2)
+    d_flt = d_flt[y:y+slit_width,:]
+    flux_flt = unit_ratio*(np.sum(d_flt,axis=0)/(lam_flt*10**24))[(lam_flt*10**10>x1) & (lam_flt*10**10<x2)]
+    # if i == 0:
+    #     wavelength = (lam_flt*10**10)[(lam_flt*10**10>x1) & (lam_flt*10**10<x2)]/(1+z)
+    #     F_lambda = flux_flt
+
+# fig, ax = plt.subplots(1,1,figsize=(12.5, 2))
+# plt.plot(wavelength, F_lambda)
+# # plt.xlim([x1-100,x2+100])
+# plt.ylim([-4*np.min(driz_spec), 0.5*np.max(driz_spec[10:])])
+# plt.show()
+
+#%% The 1D spectrum
+# fig, ax = plt.subplots(1,1,figsize=(12.5, 2))
+# plt.plot(lam/(1+z), flux)
+# # plt.xlim([x1-100,x2+100])
+# plt.ylim([-4*np.min(driz_spec), 0.5*np.max(driz_spec[10:])])
+# plt.show()
+
+#%%
+import numpy as np
+import matplotlib.pyplot as plt
+from scipy.optimize import minimize
+import emcee
+
+# # Assume data is loaded into arrays called wavelength and F_lambda
+wavelength = lam/(1+z)
+F_lambda = flux
+
+F_lambda_  = F_lambda[wavelength>2500] * 1e18
+wavelength_  = wavelength[wavelength>2500]
+
+# Define the Gaussian function
+def gaussian(wavelength, amp, mu, sigma):
+    return amp * np.exp(-(wavelength - mu)**2 / (2. * sigma**2))
+
+# Define the model: a power-law plus a sum of Gaussians
+def model(wavelength, amp_power, index, gaussian_params):
+    power_law = amp_power * (wavelength / 3000.) ** index
+    total_gaussian = sum(gaussian(wavelength, *params) for params in gaussian_params)
+    return power_law + total_gaussian
+
+# Define the objective function for minimization (chi-squared)
+def log_likelihood(params):
+    amp_power, index, *gaussian_params_flat = params
+    gaussian_params = [(gaussian_params_flat[i], gaussian_params_flat[i+1], gaussian_params_flat[i+2])
+                       for i in range(0, len(gaussian_params_flat), 3)]
+    model_eval = model(wavelength_, amp_power, index, gaussian_params)
+    # chi_squared = np.sum((F_lambda - model_eval)**2 / model_eval)
+    chi_squared = - 0.5* np.sum( (F_lambda_ - model_eval) ** 2 / np.std(F_lambda_)**2 )
+    # print(chi_squared, amp_power, index, gaussian_params)
+    return chi_squared
+
+
+
+# # Define the objective function for minimization (chi-squared)
+# def log_likelihood(params):
+#     model_eval = model(wavelength_, params)
+#     # chi_squared = np.sum((F_lambda_ - model_eval)**2 / model_eval)
+#     chi_squared =  - 0.5* np.sum( (F_lambda_ - model_eval) ** 2 / np.std(F_lambda_)**2 )
+#     # print(chi_squared, params)
+#     return chi_squared
+
+# Initial guess
+params_initial = [np.mean(F_lambda_), -1.5, 1., 2798, 20.]
+# params_initial = [np.mean(F_lambda_), -1.5, 1., 4861, 20., 1., 5007, 10.]
+# plt.plot(wavelength, F_lambda)
+# plt.plot(wavelength, model(wavelength, params_initial))
+# plt.show()
+
+nll = lambda *args: -log_likelihood(*args)
+
+# Minimization
+result_min = minimize(nll, params_initial,args=())
+params_best_fit = result_min.x
+
+amp_power_best, index_best, *gaussian_params_best = params_best_fit
+
+gaussian_params_best_split = [(gaussian_params_best[i], gaussian_params_best[i+1], gaussian_params_best[i+2])
+                   for i in range(0, len(gaussian_params_best), 3)]
+
+plt.plot(wavelength, F_lambda * 1e18)
+plt.plot(wavelength_, model(wavelength_, amp_power_best, index_best, gaussian_params_best_split))
+# plt.ylim(0,2*np.max(model(wavelength_, params_best_fit)))
+plt.show()
+chi_squared = np.sum( ((F_lambda_ - model(wavelength_, amp_power_best, index_best, gaussian_params_best_split)) / np.std(F_lambda_) )**2 )
+print(params_best_fit, chi_squared)
+
+# #%% MCMC is not needed
+# def log_prior(params):
+#     amp_power, index, amp_gauss, sigma = params
+#     if 0.1 < amp_power < 50 and 0.5 < index < 3 and 0.1 < amp_gauss < 4.0 and 0<sigma<200:
+#         return 0.0
+#     return -np.inf
+# def log_probability(params):
+#     lp = log_prior(params)
+#     if not np.isfinite(lp):
+#         return -np.inf
+#     return lp + log_likelihood(params)
+
+# # Now set up the MCMC
+# ndim, nwalkers = len(params_initial), 100
+# sampler = emcee.EnsembleSampler(nwalkers, ndim, log_probability)
+
+# # Initial positions of walkers
+# pos = [params_best_fit + 1e-4*np.random.randn(ndim) for i in range(nwalkers)]
+
+# # Run MCMC
+# sampler.run_mcmc(pos, 10000, progress = True)
+
+# # Optionally, plot the results
+# samples = sampler.chain[:, 50:, :].reshape((-1, ndim))
+
+# # for i in range(ndim):
+# #     plt.figure()
+# #     plt.hist(samples[:, i], 100, color="k", histtype="step")
+# #     plt.title("Dimension {0:d}".format(i))
+# # plt.show()
+
+# import corner
+# flat_samples = sampler.get_chain(discard=100, thin=15, flat=True)
+# fig = corner.corner(
+#     flat_samples)
+
+# for i in range(ndim):
+#     mcmc = np.percentile(flat_samples[:, i], [16, 50, 84])
+#     print(mcmc[1])
+#     # q = np.diff(mcmc)
+#     # txt = "\mathrm{{{3}}} = {0:.3f}_{{-{1:.3f}}}^{{{2:.3f}}}"
+#     # txt = txt.format(mcmc[1], q[0], q[1])
+#     # print(txt)
+
