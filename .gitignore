@@ -133,3 +133,7 @@ projects/2022_JWST_QSOz6/submission/*
 projects/2023_HST_Grism_dual_AGN/data_reduction/*/*
 projects/2023_HST_Grism_dual_AGN/MAST*/*
 projects/2023_HST_Grism_dual_AGN/cookbook_example/*
+/for_collbrate/Takumi/confirm_SED/test_on_three_sample/esti_smass_lines
+/for_collbrate/Takumi/confirm_SED/test_on_three_sample/esti_smass
+/for_collbrate/Takumi/confirm_SED/test_on_three_sample/esti_smass_first_three
+/for_collbrate/Takumi/confirm_SED/test_on_three_sample/esti_smass_magerr0.2
