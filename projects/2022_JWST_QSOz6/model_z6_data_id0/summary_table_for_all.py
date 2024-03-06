@@ -16,7 +16,7 @@ from photutils.aperture import aperture_photometry
 from photutils.aperture import RectangularAperture
 from astropy.coordinates import Angle
 
-idx = 10
+idx = 3
 from target_info import target_info
 info = target_info[str(idx)]
 target_id, RA, Dec, z = info['target_id'], info['RA'], info['Dec'], info['z']

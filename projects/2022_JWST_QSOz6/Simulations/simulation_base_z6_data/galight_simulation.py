@@ -14,7 +14,7 @@ from galight.tools.astro_tools import read_pixel_scale
 
 filt = 'F356W'
 #%%
-folder = '../NIRCam_data/Nov14/bkg_removed'
+folder = '../../NIRCam_data/Nov14/bkg_removed'
 files = glob.glob(folder+'/SHELLQs_J2236p0032_{0}_Nov14_i2d_rmbkg.fits'.format(filt))  #!!! Load in your own JWST data
 file = files[0]
 im = pyfits.open(file)
@@ -24,7 +24,7 @@ header = im[1].header
 zp = -2.5*np.log10(2.350443 * 10**(-5) *read_pixel_scale(header)**2/3631) #- 2.5*np.log10(flux_mjsr)  #zp for flux
 
 #Load in the PSF information:
-PSF_lib_files = glob.glob('../model_z6_data_id0/stage3_all/material/*'+filt[:-1]+'*_PSF_Library_idx0.pkl')[0]
+PSF_lib_files = glob.glob('../../model_z6_data_id0/stage3_all/material/*'+filt[:-1]+'*_PSF_Library_idx0.pkl')[0]
 _, PSF_list_clean, _, _ = pickle.load(open(PSF_lib_files,'rb'))  #A list of PSF
 
 

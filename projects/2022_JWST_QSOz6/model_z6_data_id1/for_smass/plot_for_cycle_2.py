@@ -25,9 +25,8 @@ target_id, RA, Dec, z = info['target_id'], info['RA'], info['Dec'], info['z']
 idx = 2
 
 folder = 'esti_smass/'+folder+str(idx)
-# folder = folder + '_freeParam' #!!!
-# folder = folder + '_freeParam_withEmissionLine' #!!!
-folder = folder + '_freeParam_withEmissionLine_high-dust' #!!!
+folder = folder + '_freeParam_withEmissionLine' #!!!
+# folder = folder + '_freeParam_withEmissionLine_high-dust' #!!!
 
 
 steller_file = glob.glob(folder+'/gsf_spec_*.fits')[0]
@@ -245,10 +244,38 @@ plt.text( (xmax-xmin)*0.07, (ymax-ymin)*0.88, 'age = {0:.2f} Gyr'.format(age, ag
 # plt.text( (xmax-xmin)*0.07, (ymax-ymin)*0.67, r"log Z/Z$_{\rm \odot}$" + r" = {0:.1f} (fixed)".format(mel), fontsize=17)  
 plt.text( (xmax-xmin)*0.07, (ymax-ymin)*0.74, r'A$\mathrm{_{V}}$'+ r'= {0:.1f}'.format(float(info['AV_50'])) , fontsize=17)    
 plt.text( (xmax-xmin)*0.07, (ymax-ymin)*0.81, r"log Z/Z$_{\rm \odot}$" + r" = {0:.1f}".format(mel), fontsize=17)  
+
+#F444W: 23.21, F480M: 23.23, F300M: 23.41, F250M: 24.56, F200W: 24.68, F115W: 25.7
+lam = 4.44
+mag = 23.21
+flambda = 10**(-0.4*(mag+2.402+5.0*np.log10(lam * 10000))) * 10**float(unit.split('e-')[1][:2])
+plt.scatter(lam, flambda, c='green', zorder=100,  s=180)
+lam = 4.8
+mag = 23.23
+flambda = 10**(-0.4*(mag+2.402+5.0*np.log10(lam * 10000))) * 10**float(unit.split('e-')[1][:2])
+plt.scatter(lam, flambda, c='green', zorder=100,  s=180)
+lam = 3.00
+mag = 23.41
+flambda = 10**(-0.4*(mag+2.402+5.0*np.log10(lam * 10000))) * 10**float(unit.split('e-')[1][:2])
+plt.scatter(lam, flambda, c='green', zorder=100,  s=180)
+lam = 2.50
+mag = 24.56
+flambda = 10**(-0.4*(mag+2.402+5.0*np.log10(lam * 10000))) * 10**float(unit.split('e-')[1][:2])
+plt.scatter(lam, flambda, c='green', zorder=100,  s=180)
+lam = 2.00
+mag = 24.68
+flambda = 10**(-0.4*(mag+2.402+5.0*np.log10(lam * 10000))) * 10**float(unit.split('e-')[1][:2])
+plt.scatter(lam, flambda, c='green', zorder=100,  s=180)
+lam = 1.15
+mag = 25.7 
+flambda = 10**(-0.4*(mag+2.402+5.0*np.log10(lam * 10000))) * 10**float(unit.split('e-')[1][:2])
+plt.scatter(lam, flambda, c='green', zorder=100,  s=180)
+# plt.savefig('/Users/Dartoon/Downloads/J2236_SED_Av{0}.pdf'.format(info['AV_50'][:3]), bbox_inches = "tight")
+
+
 plt.legend(prop={'size':14}, ncol=3, loc = 1)
 plt.tick_params(labelsize=20)
 plt.xlabel(r"$\lambda$ ($\mu$m)",fontsize=25)
 plt.ylabel(r"f$_\lambda$  (10$^{\rm" + " -{0}}}$".format(unit.split('e-')[1][:2])+" erg s$^{-1}$ cm$^{-2}$$\mathrm{\AA}^{-1}$)",fontsize=25)
 plt.title(target_id,fontsize=27, y=1.02) 
-plt.savefig('/Users/Dartoon/Downloads/J2236_SED_Av{0}.pdf'.format(info['AV_50'][:3]), bbox_inches = "tight")
 

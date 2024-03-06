@@ -17,7 +17,8 @@ import pickle
 hst_filt_id = {'F606W': '4', 'F814W':'6', 'F105W':'202', 'F125W':'203', 'F140W':'204', 'F160W':'205'}
 
 jwst_filt_id = {'F115W': '352', 'F150W': '353', 'F200W': '354', 
-           'F277W': '355', 'F356W': '356', 'F444W': '357', 'F410M': '362'}
+           'F277W': '355', 'F356W': '356', 'F444W': '357', 'F410M': '362', 'F480M': '365', 'F300M':'359',
+           'F250M': '358'}
 
 def esti_smass(ID, mags_dict, z, folder = 'esti_smass/', flag = 0, if_run_gsf=True, band_as_upper = [],
                mag_err = [], just_run = False, metallicity = 0.0):

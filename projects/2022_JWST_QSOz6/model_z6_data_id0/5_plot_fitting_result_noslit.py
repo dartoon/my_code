@@ -155,9 +155,9 @@ def total_compare(flux_list_2d, label_list_2d,
 
 # idx = 2
 # for idx in range(6):
-for idx in [7]:
-    filters = ['F150W', 'F356W']
-    # filters = ['F356W']
+for idx in [0]:
+    # filters = ['F150W', 'F356W']
+    filters = ['F356W']
     from target_info import target_info
     info = target_info[str(idx)]
     target_id, RA, Dec, z = info['target_id'], info['RA'], info['Dec'], info['z']
