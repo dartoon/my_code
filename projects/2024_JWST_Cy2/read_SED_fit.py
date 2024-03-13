@@ -15,25 +15,14 @@ import glob
 import sys
 sys.path.insert(0,'../../model_z6_data_id0/')
 
-# folder = '20221103' #metallicity considered with nebular lines
-# folder = '20221104' #No lines; mel -1
-# folder = '20221105' #No lines; mel -2.5
-# folder = '20221106' #with lines; mel -2.5
-# folder = '20221108' #More flexible for obj1
-# folder = '20221115' #The one used in the very first version.
-# folder = '20221120' #The one show in paper
-# folder = '20221122' #The extended
-# folder = '20221220' #Test emission lines with different ages.
-# folder = '20230328' #The one show in paper
-# folder = '20230604' #The one to test Av
-# folder = '202305151' #The one show in paper
-folder = '202401261' #The one show in paper
+folder = '202401261' #
+folder = '202403111' #
 # /Users/Dartoon/Astro/Projects/my_code/projects/2022_JWST_QSOz6/model_z6_data_id1/for_smass/esti_smass/20230328_freeParam_prior2/run_flag6.py
 
 fitidx = 1
-from target_info import target_info
-info = target_info[str(fitidx)]
-target_id, RA, Dec, z = info['target_id'], info['RA'], info['Dec'], info['z']
+# from target_info import target_info
+# info = target_info[str(fitidx)]
+# target_id, RA, Dec, z = info['target_id'], info['RA'], info['Dec'], info['z']
 
 
 # idx = 2
@@ -238,7 +227,7 @@ fnu_s = [float(fnu_s[i]) for i in range(len(fnu_s))]
 
 flambda_list = []
 for i, fid in enumerate(filt_id[::-1]):
-    f_fil = np.loadtxt('../../../../template/gsf_temp/filter/{0}.fil'.format(fid))
+    f_fil = np.loadtxt('../../template/gsf_temp/filter/{0}.fil'.format(fid))
     lam = np.median(f_fil[1:,1])
     fnu = fnu_s[::-1][2*i+1]
     fnu_err = fnu_s[::-1][2*i]
@@ -278,7 +267,7 @@ plt.ylim(0., 0.88)
 xmin, xmax, ymin, ymax = plt.axis()
 
 for i, fid in enumerate(filt_id[::-1]):
-    f_fil = np.loadtxt('../../../../template/gsf_temp/filter/{0}.fil'.format(fid))
+    f_fil = np.loadtxt('../../template/gsf_temp/filter/{0}.fil'.format(fid))
     top = f_50.max()
     f_fil[:,2] = f_fil[:,2]/f_fil[:,2].max() * (ymax-ymin) * 0.1
     plt.plot(f_fil[1:,1]/10000., f_fil[1:,2], label='{0}'.format(ivd[fid]))
@@ -300,9 +289,9 @@ values = float(info1['Mstel_16']), float(info1['Mstel_50']), float(info1['Mstel_
 plt.text( (xmax-xmin)*0.07, (ymax-ymin)*0.9, r"log M$_*$="+Mstr, fontsize=22)
 # plt.text( (xmax-xmin)*0.07, (ymax-ymin)*0.95, r"log M$_*$ = {0:.2f}".format(smass), fontsize=17)
 # plt.text( (xmax-xmin)*0.07, (ymax-ymin)*0.88, "M$\mathrm{_{uv}}$ = "+ r"{0:.2f}".format(info_muv['MUV50']), fontsize=17)
-# # plt.text( (xmax-xmin)*0.07, (ymax-ymin)*0.81, 'age = {0:.1f} Gyr (fixed)'.format(age, age_l, age_h), fontsize=17)
-# # plt.text( (xmax-xmin)*0.07, (ymax-ymin)*0.74, r'A$\mathrm{_{V}}$'+ r'= {0:.1f} (fixed)'.format(float(info['AV_50'])) , fontsize=17)    
-# # plt.text( (xmax-xmin)*0.07, (ymax-ymin)*0.67, r"log Z/Z$_{\rm \odot}$" + r" = {0:.1f} (fixed)".format(mel), fontsize=17)    
+plt.text( (xmax-xmin)*0.07, (ymax-ymin)*0.81, 'age = {0:.1f} Gyr'.format(age, age_l, age_h), fontsize=17)
+plt.text( (xmax-xmin)*0.07, (ymax-ymin)*0.74, r'A$\mathrm{_{V}}$'+ r'= {0:.1f} '.format(float(info['AV_50'])) , fontsize=17)    
+plt.text( (xmax-xmin)*0.07, (ymax-ymin)*0.67, r"log Z/Z$_{\rm \odot}$" + r" = {0:.1f}".format(mel), fontsize=17)    
 # plt.text( (xmax-xmin)*0.07, (ymax-ymin)*0.81, 'age = {0:.1f} Gyr'.format(values[1][1]), fontsize=17)
 # plt.text( (xmax-xmin)*0.07, (ymax-ymin)*0.74, r'A$\mathrm{_{V}}$'+ r'= {0:.1f}'.format(float(info['AV_50'])) , fontsize=17)    
 # plt.text( (xmax-xmin)*0.07, (ymax-ymin)*0.67, r"log Z/Z$_{\rm \odot}$" + r" = {0:.1f}".format(mel), fontsize=17)    
@@ -311,6 +300,6 @@ plt.legend(prop={'size':13}, ncol=2, loc = 1)
 plt.tick_params(labelsize=25)
 plt.xlabel(r"$\lambda$ ($\mu$m)",fontsize=27)
 plt.ylabel(r"f$_\lambda$  (10$^{\rm" + " -{0}}}$".format(unit.split('e-')[1][:2])+" erg s$^{-1}$ cm$^{-2}$$\mathrm{\AA}^{-1}$)",fontsize=27)
-plt.title(target_id,fontsize=27, y=1.02) 
+# plt.title(target_id,fontsize=27, y=1.02) 
 # plt.savefig('../../model_z6_data_id0/figures/{0}_SED_map.pdf'.format(target_id[:5]), bbox_inches = "tight")
 

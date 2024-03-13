@@ -24,11 +24,13 @@ import glob
 # folder = '20221120' #FIX n =1 result
 # folder = '20230113' #FIX n =1 result, test mel = 0.2
 # folder = '20230527' #FIX n =1 result, update F150 result
-folder = '20240126' #FIX n =1 result, update F150 result
+folder = '20240126' #FIX n =1 result, update Cy2 result
+folder = '20240311' #FIX n =4 result, update Cy2 result
 # idx = [1,2,0,51,35]
 
 # mag_result = {'F356W': 23.12, 'F150W': 25.12}
-mag_result = {'F356W': 23.12, 'F150W': 25.12, 'F444W': 23.21, 'F480M': 23.23, 'F300M': 23.41, 'F250M': 24.56, 'F200W': 24.68, 'F115W': 25.7}
+# mag_result = {'F356W': 23.12, 'F150W': 25.12, 'F444W': 23.21, 'F480M': 23.23, 'F300M': 23.41, 'F250M': 24.56, 'F200W': 24.68, 'F115W': 25.7}
+mag_result = {'F356W': 22.572, 'F150W': 24.902, 'F115W': 25.266, 'F250M': 24.44, 'F444W': 22.628, 'F200W': 24.369, 'F300M': 22.591, 'F480M': 22.725} 
 # del mag_result['F410M']
 
 target_id = 'J2236'

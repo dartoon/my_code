@@ -255,6 +255,6 @@ print("aperture host ratio,", 1 - ps_aperture_flux/data_aperture_flux)
 #%%Save host with WCS
 import copy
 file_header = copy.deepcopy(fit_run.fitting_specify_class.data_process_class.header)
-file_header['CRPIX1'] = file_header['CRPIX1']-fit_run.fitting_specify_class.data_process_class.target_pos[9]+len(fit_run.image_host_list[0])/2
+file_header['CRPIX1'] = file_header['CRPIX1']-fit_run.fitting_specify_class.data_process_class.target_pos[0]+len(fit_run.image_host_list[0])/2
 file_header['CRPIX2'] = file_header['CRPIX2']-fit_run.fitting_specify_class.data_process_class.target_pos[1]+len(fit_run.image_host_list[0])/2
 pyfits.PrimaryHDU(image_list[2],header=file_header).writeto('/Users/Dartoon/Downloads/J2255_host.fits',overwrite=True)

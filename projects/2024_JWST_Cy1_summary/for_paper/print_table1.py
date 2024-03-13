@@ -14,9 +14,11 @@ import sys
 sys.path.insert(0, '../../2022_JWST_QSOz6/model_z6_data_id0/')
 from target_info import target_info
 
+
+
 for idx in range(10):
     info = target_info[str(idx)]
-    target_id, RA, Dec, z = info['target_id'], info['RA'], info['Dec'], info['z']
+    target_id, RA, Dec, z, M1450 = info['target_id'], info['RA'], info['Dec'], info['z'], info['M1450']
     import glob
     folder = '../../2022_JWST_QSOz6/NIRCam_data/*/bkg_removed/'   #!!!
     jwst_all_filenames = glob.glob(folder+'*{0}*{1}*{2}*_rmbkg.fits'.format(target_id[:5],target_id[-4:], 'F356W'))  #For NIRCam
@@ -32,6 +34,7 @@ for idx in range(10):
     
     TARG_DEC = '{0:.5f}'.format(fitsfile[0].header['TARG_DEC'])  #str(round(fitsfile[0].header['TARG_DEC'],5))
     TARG_DEC = TARG_DEC.replace('-', '$-$')
+    M1450 = str(M1450).replace('-', '$-$')
     print(target_name, '&', TARG_RA, '&', 
-          TARG_DEC, '&', z, '&', fitsfile[0].header['DATE-OBS'], '&', 
-          fitsfile[0].header['EFFEXPTM'], '\\\\')
+          TARG_DEC, '&', z, '&', fitsfile[0].header['DATE-OBS'], '&',  M1450, '\\\\')
+          # fitsfile[0].header['EFFEXPTM'], '\\\\')
