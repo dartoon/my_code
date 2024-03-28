@@ -22,6 +22,17 @@ sys.path.insert(0, '../../2022_JWST_QSOz6/model_z6_data_id0/')
 from target_info import target_info
 run_folder = '../material/fit_result/'
 
+def scale_bar(ax, d, dist=1/0.13, text='1"', color='black', flipped=False, fontsize=20):
+    if flipped:
+        p0 = d - d / 15. - dist
+        p1 = d / 15.
+        ax.plot([p0, p0 + dist], [p1, p1], linewidth=2, color=color)
+        ax.text(p0 + dist / 2., p1 + 0.02 * d, text, fontsize=fontsize, color=color, ha='center')
+    else:
+        p0 = d / 15.
+        ax.plot([p0, p0 + dist], [p0, p0], linewidth=2, color=color)
+        ax.text(p0 + dist / 2., p0 + 0.02 * d, text, fontsize=fontsize, color=color, ha='center')
+
 # Set the dimensions and the number of subplots
 fig, axs = plt.subplots(4, 8, figsize=(16, 8))
 
@@ -29,13 +40,14 @@ fig, axs = plt.subplots(4, 8, figsize=(16, 8))
 plt.subplots_adjust(wspace=0, hspace=0.03)
 # Populate the subplots with content and remove ticks
 len_j = 8
+filt = 'F356W'
+# filt = 'F150W'
 for jj in range(len_j):
     idx = jj + 2
     info = target_info[str(idx)]
     target_id, RA, Dec, z = info['target_id'], info['RA'], info['Dec'], info['z']
     fit_run_list_sp1 = []
     add_cond = '_fixn1'
-    filt = 'F356W'
     count_n = 5
     all_library = True
     fit_run_list_sp1 = []
@@ -82,7 +94,10 @@ for jj in range(len_j):
     vmin = 0.0001
     vmax = 3
     norm = LogNorm(vmin=vmin, vmax=vmax)#np.max(img[~np.isnan(img)]))
-    my_cmap = copy.copy(matplotlib.cm.get_cmap('gist_heat')) # copy the default cmap
+    if filt == 'F356W':
+        my_cmap = copy.copy(matplotlib.cm.get_cmap('gist_heat')) # copy the default cmap
+    else:
+        my_cmap = copy.copy(matplotlib.cm.get_cmap('inferno')) # copy the default cmap
     my_cmap.set_bad('black')
     
     
@@ -94,9 +109,12 @@ for jj in range(len_j):
     im1 = axs[2, jj].imshow(fit_run.image_host_list[0],
                       norm=norm, origin='lower',cmap = my_cmap) 
     
+    
+    
     used_PSF_list = [fit_run_list[i].fitting_specify_class.data_process_class.PSF_list[0] for i in range(len(fit_run_list)) if weight[i] != 0]
     PSF_noise_map = np.std(used_PSF_list, axis=0) * fit_run.final_result_ps[0]['flux_within_frame']
-    total_noise = np.sqrt(PSF_noise_map[20:-20, 20:-20] ** 2 +  fit_run.fitting_specify_class.data_process_class.noise_map**2)
+    ct = int(abs( len(fit_run.fitting_specify_class.data_process_class.noise_map) - len(PSF_noise_map))/2)
+    total_noise = np.sqrt(PSF_noise_map[ct:-ct, ct:-ct] ** 2 +  fit_run.fitting_specify_class.data_process_class.noise_map**2)
     fit_run.cal_astrometry()
     x = fit_run.final_result_galaxy[0]['position_xy'][0] + len(fit_run.image_host_list[0])/2
     y = fit_run.final_result_galaxy[0]['position_xy'][1] + len(fit_run.image_host_list[0])/2
@@ -117,6 +135,12 @@ for jj in range(len_j):
     cbar_ax_bottom.tick_params(labelsize=10)
     # # Add another colorbar to the bottom of the figure
     fig.colorbar(im2, cax=cbar_ax_bottom) #, orientation='horizontal')
+    
+    # if jj == 0:
+    deltaPix = fit_run.fitting_specify_class.deltaPix
+    frame_size = len(fit_run.flux_2d_out['data-point source'])
+    scale_bar(axs[2,jj], frame_size, dist=0.5/deltaPix, text='0.5"', color = 'white')
+    
     axs[0, 0].set_ylabel('Data', fontsize=15, fontweight="bold")  # Add title
     axs[1, 0].set_ylabel('Data-QSO', fontsize=15, fontweight="bold")  # Add title
     axs[2, 0].set_ylabel('Host model', fontsize=15, fontweight="bold")  # Add title
@@ -124,7 +148,7 @@ for jj in range(len_j):
     for ii in range(0,4):
         axs[ii, jj].set_xticks([])  # Remove x ticks
         axs[ii, jj].set_yticks([])  # Remove y ticks
-# plt.savefig('/Users/Dartoon/Downloads/figure2.pdf', bbox_inches = "tight")
+plt.savefig('/Users/Dartoon/Downloads/figure2_{0}.pdf'.format(filt), bbox_inches = "tight")
 plt.show()
 
 # # Show the figure

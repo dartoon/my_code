@@ -63,9 +63,9 @@ for top_psf_id in range(1):
             weight[i] = np.exp(-1/2. * (chisqs[i]-Chisq_best)/(Chisq_best* inf_alp))
         
         
-        prop_name = 'magnitude'
-        all_values = [fit_run_list[i].final_result_ps[0][prop_name] for i in range(len(fit_run_list))]
-        # all_values = [fit_run_list[i].final_result_galaxy[0][prop_name] for i in range(len(fit_run_list))]
+        prop_name = 'n_sersic'
+        # all_values = [fit_run_list[i].final_result_ps[0][prop_name] for i in range(len(fit_run_list))]
+        all_values = [fit_run_list[i].final_result_galaxy[0][prop_name] for i in range(len(fit_run_list))]
         weighted_value = np.sum(np.array(all_values)*weight) / np.sum(weight)
         rms_value = np.sqrt(np.sum((np.array(all_values)-weighted_value)**2*weight) / np.sum(weight))
         

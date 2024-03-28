@@ -18,8 +18,8 @@ sys.path.insert(0, '../../2022_JWST_QSOz6/model_z6_data_id0/')
 from target_info import target_info
 
 
-filt = 'F356W'
-point_source_supersampling_factor = 1 #!!!
+filt = 'F150W'
+point_source_supersampling_factor = 2 #!!!
 # info = target_info[str(idx)]
 # target_id, RA, Dec, z = info['target_id'], info['RA'], info['Dec'], info['z']
 take_folder = '../material/{0}/'.format(filt) #!!!
@@ -28,7 +28,7 @@ supersampling_factor = 3
 
 # idx = 0 #!!!
 for idx in range(10):
-# for idx in [1]:
+# for idx in [6]:
     
     info = target_info[str(idx)]
     target_id, RA, Dec, z = info['target_id'], info['RA'], info['Dec'], info['z']

@@ -14,7 +14,7 @@ import pickle
 from galight.tools.astro_tools import plt_fits
 from galight.tools.astro_tools import plt_many_fits
 
-filt =  'F356W'
+filt =  'F150W'
 
 idx = 9 #!!!
 
@@ -70,7 +70,7 @@ data_process.find_PSF(radius = 60, user_option = True, if_filter=False, nearyby_
 
 remove_i = []
 for i in range(len(data_process.PSF_list)):
-    if np.sqrt(np.sum((data_process.PSF_pos_list[i] - data_process.target_pos)**2)) < 10:
+    if np.sqrt(np.sum((data_process.PSF_pos_list[i] - data_process.target_pos)**2)) < 15:
         remove_i.append(i)
 print("remove_i", remove_i)
 data_process.PSF_list = [data_process.PSF_list[i] for i in range(len(data_process.PSF_list)) if i not in remove_i]

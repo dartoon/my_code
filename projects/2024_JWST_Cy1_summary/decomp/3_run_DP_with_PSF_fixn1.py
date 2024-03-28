@@ -18,7 +18,7 @@ sys.path.insert(0, '../../2022_JWST_QSOz6/model_z6_data_id0/')
 from target_info import target_info
 
 
-filt = 'F356W'
+filt = 'F150W'
 point_source_supersampling_factor = 2 #!!!
 # info = target_info[str(idx)]
 # target_id, RA, Dec, z = info['target_id'], info['RA'], info['Dec'], info['z']
@@ -28,9 +28,9 @@ supersampling_factor = 3
 
 # idx = 0 #!!!
 for idx in range(10):
-# for idx in [1]:
-    if idx == 1:
-        continue
+# for idx in [3]:
+    # if idx == 1:
+    #     continue
     
     info = target_info[str(idx)]
     target_id, RA, Dec, z = info['target_id'], info['RA'], info['Dec'], info['z']
@@ -59,6 +59,8 @@ for idx in range(10):
                                          apertures_center_focus=True)
             fit_sepc.kwargs_params['lens_light_model'][3][0]['R_sersic'] = 0.06
             fit_sepc.kwargs_params['lens_light_model'][4][0]['R_sersic'] = 1.
+            if idx == 3:
+                fit_sepc.kwargs_params['lens_light_model'][4][0]['R_sersic'] = 5 * data_process.deltaPix
             fit_sepc.kwargs_params['lens_light_model'][2][0]['n_sersic'] = 1.
             fit_sepc.plot_fitting_sets()
             fit_run = FittingProcess(fit_sepc, savename = target_id)

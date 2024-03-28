@@ -22,12 +22,16 @@ from galight.tools.plot_tools import plot_data_apertures_point
 from galight.tools.cutout_tools import cutout
 import warnings
 
+# =============================================================================
+# Notes: idx 2 F150W has some WCS offset
+# =============================================================================
+
 
 import sys
 sys.path.insert(0, '../../2022_JWST_QSOz6/model_z6_data_id0/')
 from target_info import target_info
 
-filt = 'F356W' #!!!
+filt = 'F150W' #!!!
 
 idx = 9 #!!!
 info = target_info[str(idx)]
@@ -54,7 +58,7 @@ if len(jwst_all_filenames) > 1 :
 if filt == 'F356W':
     radius = 40
 elif filt == 'F150W':
-    radius = 40
+    radius = 35
 
 # filts = ['F356W', 'F150W']
 _fitsFile = pyfits.open(file)
@@ -79,7 +83,7 @@ data_process = DataProcess(fov_image = fov_image, target_pos = [RA, Dec], #The f
 
 data_process.generate_target_materials(radius=radius, create_mask = False, nsigma=1.5, 
                                         cut_kernel = 'center_bright', if_select_obj=False,
-                                      exp_sz= 1.2, npixels = 60 , if_plot=False)
+                                      exp_sz= 1.2, npixels = 50 , if_plot=False)
 
 del data_process.fov_image
 del data_process.exptime
